@@ -47,5 +47,8 @@ export function getAdminCredentials(): AdminCredentials {
 
 export function verifyAdminCredentials(username: string, password: string): boolean {
   const credentials = getAdminCredentials();
-  return username.trim().toLowerCase() === credentials.username.toLowerCase() && password === credentials.password;
+  return (
+    username.trim().toLowerCase() === credentials.username.toLowerCase() &&
+    password === credentials.password
+  );
 }

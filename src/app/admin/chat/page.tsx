@@ -21,10 +21,17 @@ export default function AdminChatPage() {
           </EmptyState>
         ) : (
           visibleOrders.map((order) => (
-            <article key={order.id} className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-[#D7DDE4] bg-white p-4">
+            <article
+              key={order.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-[#D7DDE4] bg-white p-4"
+            >
               <div>
-                <h2 className="font-bold" dir="ltr">{order.orderNumber}</h2>
-                <p className="mt-1 text-sm text-[#5F6C79]">{order.customer.businessName ?? order.customer.fullName}</p>
+                <h2 className="font-bold" dir="ltr">
+                  {order.orderNumber}
+                </h2>
+                <p className="mt-1 text-sm text-[#5F6C79]">
+                  {order.customer.businessName ?? order.customer.fullName}
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <StatusPill tone={order.chat.length > 0 ? "success" : "neutral"}>

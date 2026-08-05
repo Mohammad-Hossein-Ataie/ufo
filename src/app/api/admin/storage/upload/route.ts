@@ -15,14 +15,18 @@ export async function POST(req: Request) {
     }
     const bytes = new Uint8Array(await file.arrayBuffer());
     const key = `uploads/${Date.now()}-${file.name.replace(/[^\w.-]+/g, "-")}`;
-    const stored = await getStorageProvider().upload({ key, body: bytes, contentType: file.type || "application/octet-stream" });
+    const stored = await getStorageProvider().upload({
+      key,
+      body: bytes,
+      contentType: file.type || "application/octet-stream",
+    });
     const publicBaseUrl = process.env.LIARA_PUBLIC_BASE_URL?.replace(/\/$/, "");
     return NextResponse.json({
       message: "فایل آپلود شد.",
       file: {
         ...stored,
-        ...(publicBaseUrl ? { url: `${publicBaseUrl}/${key}` } : {})
-      }
+        ...(publicBaseUrl ? { url: `${publicBaseUrl}/${key}` } : {}),
+      },
     });
   } catch {
     return NextResponse.json({ error: "آپلود فایل ناموفق بود." }, { status: 500 });

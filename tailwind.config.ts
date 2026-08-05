@@ -5,11 +5,11 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Vazirmatn", "Tahoma", "Arial", "sans-serif"]
-      }
-    }
+        sans: ["Vazirmatn", "Tahoma", "Arial", "sans-serif"],
+      },
+    },
   },
-  plugins: []
+  plugins: [],
 };
 
 export default config;

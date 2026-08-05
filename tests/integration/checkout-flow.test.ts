@@ -5,7 +5,7 @@ import {
   createOrderItemSnapshot,
   getPrimaryVariant,
   products,
-  quoteShipping
+  quoteShipping,
 } from "@ufo/domain";
 
 const product = products[0];
@@ -24,7 +24,7 @@ describe("checkout integration", () => {
         city: "تهران",
         line1: "بازار مولوی",
         receiverName: "امیر محمودی",
-        receiverPhone: "09362157181"
+        receiverPhone: "09362157181",
       },
       "tehran_courier",
     );
@@ -35,14 +35,14 @@ describe("checkout integration", () => {
       sequence: 1,
       shippingRial: quote.costRial,
       shippingMethod: quote.method,
-      now: new Date("2026-08-02T08:00:00.000Z")
+      now: new Date("2026-08-02T08:00:00.000Z"),
     });
     const invoice = createInvoice({
       id: "invoice_1",
       order,
       sequence: 1,
       secureTokenHash: "hash",
-      now: new Date("2026-08-02T08:00:00.000Z")
+      now: new Date("2026-08-02T08:00:00.000Z"),
     });
     expect(quote.available).toBe(true);
     expect(order.orderNumber).toBe("RTL-20260802-00001");
@@ -56,7 +56,7 @@ describe("checkout integration", () => {
         city: "شیراز",
         line1: "مرکز شهر",
         receiverName: "کاربر تست",
-        receiverPhone: "09362157181"
+        receiverPhone: "09362157181",
       },
       "tehran_courier",
     );

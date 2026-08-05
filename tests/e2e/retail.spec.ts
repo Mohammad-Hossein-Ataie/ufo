@@ -7,7 +7,7 @@ test("single Next app exposes retail, B2B and admin routes", async ({ page }) =>
   });
 
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "UFO Puff" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "UFO Puff", exact: true })).toBeVisible();
 
   await page.goto("/b2b");
   await expect(page.getByText("UFO Puff B2B").first()).toBeVisible();
@@ -16,7 +16,11 @@ test("single Next app exposes retail, B2B and admin routes", async ({ page }) =>
   await expect(page).toHaveURL(/\/admin\/login$/);
   await expect(page.getByRole("heading", { name: "ورود ادمین" })).toBeVisible();
 
-  expect(consoleErrors.filter((message) => message.includes("hydrated") || message.includes("Hydration"))).toEqual([]);
+  expect(
+    consoleErrors.filter(
+      (message) => message.includes("hydrated") || message.includes("Hydration"),
+    ),
+  ).toEqual([]);
 });
 
 test("admin protected routes redirect to scoped admin login", async ({ page }) => {

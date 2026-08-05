@@ -13,7 +13,8 @@ interface CartLine {
 }
 
 function readCart(): CartLine[] {
-  const raw = window.localStorage.getItem("ufo-b2b-cart") ?? window.localStorage.getItem("ufo-cart");
+  const raw =
+    window.localStorage.getItem("ufo-b2b-cart") ?? window.localStorage.getItem("ufo-cart");
   if (!raw) return [];
   try {
     const parsed: unknown = JSON.parse(raw);
@@ -52,9 +53,16 @@ export function B2BCartClient() {
       cart
         .map((line) => {
           const variant = variants.find((item) => item.id === line.variantId);
-          const product = variant ? products.find((item) => item.id === variant.productId) : undefined;
+          const product = variant
+            ? products.find((item) => item.id === variant.productId)
+            : undefined;
           if (!variant || !product) return null;
-          return { ...line, variant, product, totalRial: variant.wholesalePriceRial * line.quantity };
+          return {
+            ...line,
+            variant,
+            product,
+            totalRial: variant.wholesalePriceRial * line.quantity,
+          };
         })
         .filter((line): line is NonNullable<typeof line> => line !== null),
     [cart],
@@ -80,14 +88,18 @@ export function B2BCartClient() {
     <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
       <div className="grid gap-3">
         {lines.map((line) => (
-          <article key={line.variantId} className="grid gap-3 rounded-md border border-[#D5D9C9] bg-white p-4 sm:grid-cols-[1fr_auto]">
+          <article
+            key={line.variantId}
+            className="grid gap-3 rounded-md border border-[#D5D9C9] bg-white p-4 sm:grid-cols-[1fr_auto]"
+          >
             <div>
               <h2 className="font-bold">{line.product.nameFa}</h2>
               <p className="mt-1 text-sm text-[#596B61]">
                 {line.variant.nameFa} · {line.variant.sku}
               </p>
               <p className="mt-2 text-sm text-[#596B61]">
-                {line.cartonCount.toLocaleString("fa-IR")} کارتن · {line.quantity.toLocaleString("fa-IR")} عدد
+                {line.cartonCount.toLocaleString("fa-IR")} کارتن ·{" "}
+                {line.quantity.toLocaleString("fa-IR")} عدد
               </p>
             </div>
             <div className="font-bold">
@@ -104,7 +116,9 @@ export function B2BCartClient() {
         </div>
         <div className="mt-5 grid gap-2">
           <Link href="/b2b/checkout">
-            <Button className="w-full border-[#E8C547] bg-[#E8C547] text-[#14201B] hover:bg-[#F0D86D]">ادامه ثبت سفارش</Button>
+            <Button className="w-full border-[#E8C547] bg-[#E8C547] text-[#14201B] hover:bg-[#F0D86D]">
+              ادامه ثبت سفارش
+            </Button>
           </Link>
           <Button type="button" variant="ghost" className="w-full" onClick={clearCart}>
             خالی کردن سبد عمده

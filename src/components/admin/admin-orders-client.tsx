@@ -18,10 +18,17 @@ const orderStatusLabelsFa: Record<OrderStatus, string> = {
   shipped: "ارسال شده",
   delivered: "تحویل شده",
   cancelled: "لغو شده",
-  returned: "مرجوع شده"
+  returned: "مرجوع شده",
 };
 
-const statusFlow: OrderStatus[] = ["confirmed", "processing", "ready_for_pickup", "shipped", "delivered", "cancelled"];
+const statusFlow: OrderStatus[] = [
+  "confirmed",
+  "processing",
+  "ready_for_pickup",
+  "shipped",
+  "delivered",
+  "cancelled",
+];
 
 export function AdminOrdersClient() {
   const [orders, setOrders] = useState<SubmittedOrder[]>([]);
@@ -45,7 +52,7 @@ export function AdminOrdersClient() {
     await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ status }),
     });
     await loadOrders();
   }
@@ -62,7 +69,7 @@ export function AdminOrdersClient() {
           {[
             { value: "all", label: "همه" },
             { value: "retail", label: "تکی" },
-            { value: "wholesale", label: "عمده" }
+            { value: "wholesale", label: "عمده" },
           ].map((item) => (
             <Button
               key={item.value}
@@ -75,7 +82,13 @@ export function AdminOrdersClient() {
             </Button>
           ))}
         </div>
-        <Button type="button" size="sm" variant="secondary" onClick={() => loadOrders()} disabled={isLoading}>
+        <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          onClick={() => loadOrders()}
+          disabled={isLoading}
+        >
           <RefreshCcw size={16} />
           تازه‌سازی
         </Button>
@@ -101,15 +114,21 @@ export function AdminOrdersClient() {
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id} className="border-t border-[#D7DDE4] align-top">
-                  <td className="px-4 py-3" dir="ltr">{order.orderNumber}</td>
+                  <td className="px-4 py-3" dir="ltr">
+                    {order.orderNumber}
+                  </td>
                   <td className="px-4 py-3">
                     <StatusPill tone={order.channel === "wholesale" ? "success" : "info"}>
                       {order.channel === "wholesale" ? "عمده" : "تکی"}
                     </StatusPill>
                   </td>
                   <td className="px-4 py-3">
-                    <p className="font-bold">{order.customer.businessName ?? order.customer.fullName}</p>
-                    <p className="mt-1 text-[#5F6C79]" dir="ltr">{order.customer.phone}</p>
+                    <p className="font-bold">
+                      {order.customer.businessName ?? order.customer.fullName}
+                    </p>
+                    <p className="mt-1 text-[#5F6C79]" dir="ltr">
+                      {order.customer.phone}
+                    </p>
                   </td>
                   <td className="px-4 py-3">
                     <StatusPill tone={order.paymentStatus === "approved" ? "success" : "warning"}>
@@ -120,11 +139,15 @@ export function AdminOrdersClient() {
                     <p>{order.shippingTitleFa}</p>
                     <p className="mt-1 text-[#5F6C79]">{order.etaFa}</p>
                   </td>
-                  <td className="px-4 py-3 font-bold"><Price valueRial={order.totalRial} /></td>
+                  <td className="px-4 py-3 font-bold">
+                    <Price valueRial={order.totalRial} />
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-2">
                       <Link href={`/admin/orders/${order.id}`}>
-                        <Button size="sm" variant="secondary">جزئیات</Button>
+                        <Button size="sm" variant="secondary">
+                          جزئیات
+                        </Button>
                       </Link>
                       {statusFlow.map((status) => (
                         <Button

@@ -8,6 +8,9 @@ export async function GET() {
     const files = await getStorageProvider().list();
     return NextResponse.json({ files });
   } catch {
-    return NextResponse.json({ error: "دریافت لیست فایل‌ها ناموفق بود.", files: [] }, { status: 500 });
+    return NextResponse.json(
+      { error: "دریافت لیست فایل‌ها ناموفق بود.", files: [] },
+      { status: 500 },
+    );
   }
 }

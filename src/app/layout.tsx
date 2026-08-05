@@ -1,48 +1,53 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AppShell } from "@/components/app-shell";
+import { canonical, siteOrigin } from "@ufo/seo";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ufopuff.ir"),
+  metadataBase: new URL(siteOrigin()),
   title: {
     default: "UFO Puff | فروشگاه پاد و ویپ",
-    template: "%s | UFO Puff"
+    template: "%s | UFO Puff",
   },
-  description: "فروشگاه فارسی پاد، ویپ، جویس و لوازم جانبی با مسیر جدا برای فروش تکی، عمده و ادمین.",
+  description:
+    "فروشگاه فارسی پاد، ویپ، جویس و لوازم جانبی با مسیر جدا برای فروش تکی، عمده و ادمین.",
   applicationName: "UFO Puff",
   manifest: "/favicons/site.webmanifest",
   icons: {
     icon: [
       { url: "/favicons/favicon.ico", sizes: "any" },
       { url: "/favicons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicons/favicon-16x16.png", sizes: "16x16", type: "image/png" }
+      { url: "/favicons/favicon-16x16.png", sizes: "16x16", type: "image/png" },
     ],
     apple: [{ url: "/favicons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
-    shortcut: ["/favicons/favicon.ico"]
+    shortcut: ["/favicons/favicon.ico"],
   },
   alternates: {
-    canonical: "/"
+    canonical: canonical("/"),
+    languages: {
+      "fa-IR": canonical("/"),
+    },
   },
   openGraph: {
     title: "UFO Puff",
     description: "فروشگاه فارسی پاد و ویپ با موجودی و قیمت شفاف.",
-    url: "https://ufopuff.ir",
+    url: canonical("/"),
     siteName: "UFO Puff",
     images: [{ url: "/logos/logo.png", width: 500, height: 500, alt: "UFO Puff" }],
     locale: "fa_IR",
-    type: "website"
+    type: "website",
   },
   appleWebApp: {
     title: "UFO Puff",
     capable: true,
-    statusBarStyle: "black-translucent"
-  }
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#05070B"
+  themeColor: "#05070B",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

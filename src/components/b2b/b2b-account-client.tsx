@@ -29,7 +29,9 @@ export function B2BAccountClient() {
       <div className="rounded-md border border-[#D5D9C9] bg-white p-5">
         <p className="leading-8 text-[#596B61]">برای سفارش عمده ابتدا با شماره همراه وارد شوید.</p>
         <Link href="/b2b/login" className="mt-4 inline-flex">
-          <Button className="border-[#1F8A5B] bg-[#1F8A5B] text-white hover:bg-[#176D48]">ورود عمده</Button>
+          <Button className="border-[#1F8A5B] bg-[#1F8A5B] text-white hover:bg-[#176D48]">
+            ورود عمده
+          </Button>
         </Link>
       </div>
     );

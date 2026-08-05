@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  type ColumnDef
-} from "@tanstack/react-table";
+import { flexRender, getCoreRowModel, useReactTable, type ColumnDef } from "@tanstack/react-table";
 import { Badge, Price } from "@ufo/ui";
 import { getAvailableStock, inventoryItems, products, variants } from "@ufo/domain";
 
@@ -29,7 +24,7 @@ const rows: InventoryRow[] = inventoryItems.map((item) => {
     onHand: item.onHand,
     reserved: item.reserved,
     available: getAvailableStock(item),
-    wholesalePriceRial: variant?.wholesalePriceRial ?? 0
+    wholesalePriceRial: variant?.wholesalePriceRial ?? 0,
   };
 });
 
@@ -42,22 +37,26 @@ const columns: ColumnDef<InventoryRow>[] = [
     header: "قابل فروش",
     cell: ({ row }) => {
       const value = row.original.available;
-      return <Badge tone={value <= 0 ? "warning" : value < 10 ? "warning" : "success"}>{new Intl.NumberFormat("fa-IR").format(value)}</Badge>;
-    }
+      return (
+        <Badge tone={value <= 0 ? "warning" : value < 10 ? "warning" : "success"}>
+          {new Intl.NumberFormat("fa-IR").format(value)}
+        </Badge>
+      );
+    },
   },
   { accessorKey: "reserved", header: "رزرو" },
   {
     accessorKey: "wholesalePriceRial",
     header: "قیمت همکاری",
-    cell: ({ row }) => <Price valueRial={row.original.wholesalePriceRial} />
-  }
+    cell: ({ row }) => <Price valueRial={row.original.wholesalePriceRial} />,
+  },
 ];
 
 export function InventoryTable() {
   const table = useReactTable({
     data: rows,
     columns,
-    getCoreRowModel: getCoreRowModel()
+    getCoreRowModel: getCoreRowModel(),
   });
 
   return (

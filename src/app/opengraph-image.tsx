@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const size = {
   width: 1200,
-  height: 630
+  height: 630,
 };
 
 export const contentType = "image/png";
@@ -20,7 +20,7 @@ export default function Image() {
           background: "#05070B",
           color: "#F5F7FA",
           fontSize: 88,
-          fontWeight: 800
+          fontWeight: 800,
         }}
       >
         UFO Puff

@@ -13,7 +13,7 @@ interface CartLine {
 
 const cartKeys: Record<SalesChannel, string> = {
   retail: "ufo-retail-cart",
-  wholesale: "ufo-b2b-cart"
+  wholesale: "ufo-b2b-cart",
 };
 
 function isCartLine(value: unknown): value is CartLine {
@@ -30,11 +30,14 @@ function isCartLine(value: unknown): value is CartLine {
 }
 
 function readCart(channel: SalesChannel): CartLine[] {
-  const raw = window.localStorage.getItem(cartKeys[channel]) ?? window.localStorage.getItem("ufo-cart");
+  const raw =
+    window.localStorage.getItem(cartKeys[channel]) ?? window.localStorage.getItem("ufo-cart");
   if (!raw) return [];
   try {
     const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter(isCartLine).filter((line) => line.channel === channel) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter(isCartLine).filter((line) => line.channel === channel)
+      : [];
   } catch {
     return [];
   }
@@ -44,7 +47,7 @@ export function AddToCartButton({
   variantId,
   quantity = 1,
   channel = "retail",
-  label = "افزودن"
+  label = "افزودن",
 }: {
   variantId: string;
   quantity?: number;

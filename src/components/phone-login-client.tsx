@@ -24,14 +24,17 @@ export function PhoneLoginClient() {
         channel: "retail",
         fullName: fullName.trim() || "مشتری تکی",
         phone: normalizedPhone,
-        loggedInAt: new Date().toISOString()
+        loggedInAt: new Date().toISOString(),
       }),
     );
     window.location.href = searchParams.get("next") || "/checkout";
   }
 
   return (
-    <form onSubmit={submit} className="mt-6 grid gap-4 rounded-md border border-[#22303D] bg-[#0D1117] p-5">
+    <form
+      onSubmit={submit}
+      className="mt-6 grid gap-4 rounded-md border border-[#22303D] bg-[#0D1117] p-5"
+    >
       {error ? (
         <Alert title="شماره نامعتبر" tone="danger">
           {error}
@@ -39,7 +42,11 @@ export function PhoneLoginClient() {
       ) : null}
       <label className="grid gap-2">
         نام
-        <Input value={fullName} onChange={(event) => setFullName(event.target.value)} placeholder="نام و نام خانوادگی" />
+        <Input
+          value={fullName}
+          onChange={(event) => setFullName(event.target.value)}
+          placeholder="نام و نام خانوادگی"
+        />
       </label>
       <label className="grid gap-2">
         موبایل

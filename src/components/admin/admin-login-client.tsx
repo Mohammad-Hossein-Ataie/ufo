@@ -19,7 +19,7 @@ export function AdminLoginClient() {
     const response = await fetch("/api/admin/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ username, password }),
     });
     setIsSubmitting(false);
     if (!response.ok) {
@@ -39,7 +39,12 @@ export function AdminLoginClient() {
       ) : null}
       <label className="grid gap-2">
         نام کاربری
-        <Input value={username} onChange={(event) => setUsername(event.target.value)} dir="ltr" required />
+        <Input
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          dir="ltr"
+          required
+        />
       </label>
       <label className="grid gap-2">
         رمز عبور

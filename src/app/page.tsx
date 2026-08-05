@@ -7,20 +7,36 @@ import {
   getAvailableStock,
   getInventoryByVariant,
   getPrimaryVariant,
-  products
+  products,
 } from "@ufo/domain";
 import { AddToCartButton } from "@/components/add-to-cart-button";
-import { organizationJsonLd } from "@ufo/seo";
+import { faqPageJsonLd, jsonLdScriptProps, organizationJsonLd, websiteJsonLd } from "@ufo/seo";
+
+const homeFaq = [
+  {
+    question: "UFO Puff چه محصولاتی عرضه می‌کند؟",
+    answer:
+      "کاتالوگ UFO Puff شامل پاد، ویپ، سالت نیکوتین، جویس، کارتریج، کویل و لوازم جانبی مرتبط است.",
+  },
+  {
+    question: "قیمت محصولات چگونه نمایش داده می‌شود؟",
+    answer: "قیمت‌ها در سیستم به ریال ذخیره می‌شوند و در رابط کاربری به تومان نمایش داده می‌شوند.",
+  },
+  {
+    question: "آیا فروش عمده جدا از تک‌فروشی است؟",
+    answer:
+      "بله، مسیر عمده در بخش B2B قرار دارد و فقط محصولاتی که قیمت همکاری آن‌ها فعال شده باشد در کاتالوگ عمده نمایش داده می‌شوند.",
+  },
+];
 
 export default function HomePage() {
-  const featured = products.slice(0, 4);
+  const featured = products.filter((product) => product.isActive).slice(0, 4);
 
   return (
-    <main>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
-      />
+    <main id="main-content">
+      <script {...jsonLdScriptProps(organizationJsonLd())} />
+      <script {...jsonLdScriptProps(websiteJsonLd())} />
+      <script {...jsonLdScriptProps(faqPageJsonLd(homeFaq))} />
       <section className="relative min-h-[78svh] overflow-hidden">
         <Image
           src="/images/ufo-hero.png"
@@ -55,9 +71,21 @@ export default function HomePage() {
       <section className="bg-[#0D1117]">
         <div className="mx-auto grid max-w-7xl gap-3 px-4 py-5 md:grid-cols-3">
           {[
-            { icon: ShieldCheck, title: "کنترل اصالت", text: "رسید و سفارش پیش از تایید نهایی بررسی می‌شود." },
-            { icon: Truck, title: "ارسال منعطف", text: "تیپاکس، پیک تهران و تحویل حضوری قابل انتخاب است." },
-            { icon: Warehouse, title: "موجودی مشترک", text: "رزرو سفارش برای جلوگیری از oversell طراحی شده است." }
+            {
+              icon: ShieldCheck,
+              title: "کنترل اصالت",
+              text: "رسید و سفارش پیش از تایید نهایی بررسی می‌شود.",
+            },
+            {
+              icon: Truck,
+              title: "ارسال منعطف",
+              text: "تیپاکس، پیک تهران و تحویل حضوری قابل انتخاب است.",
+            },
+            {
+              icon: Warehouse,
+              title: "موجودی مشترک",
+              text: "رزرو سفارش برای جلوگیری از oversell طراحی شده است.",
+            },
           ].map((item) => (
             <div key={item.title} className="flex gap-3 rounded-md border border-[#22303D] p-4">
               <item.icon className="mt-1 text-[#20F28B]" size={22} />
@@ -74,7 +102,9 @@ export default function HomePage() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-black">محصولات منتخب</h2>
-            <p className="mt-2 text-[#9BA7B4]">قیمت‌ها در دیتابیس ریالی ذخیره و در UI به تومان نمایش داده می‌شوند.</p>
+            <p className="mt-2 text-[#9BA7B4]">
+              قیمت‌ها در دیتابیس ریالی ذخیره و در UI به تومان نمایش داده می‌شوند.
+            </p>
           </div>
           <Link href="/products" className="text-sm font-bold text-[#00D9FF]">
             مشاهده همه
@@ -115,12 +145,27 @@ export default function HomePage() {
           {categories.map((category) => (
             <Link
               key={category.id}
-              href={`/products?category=${category.slug}`}
+              href={`/products/category/${category.slug}`}
               className="rounded-md border border-[#22303D] bg-[#0D1117] p-4 transition hover:border-[#00D9FF]"
             >
               <h3 className="font-bold">{category.nameFa}</h3>
               <p className="mt-2 text-sm leading-6 text-[#9BA7B4]">{category.descriptionFa}</p>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-12">
+        <h2 className="text-2xl font-black">پرسش‌های رایج خرید</h2>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {homeFaq.map((item) => (
+            <article
+              key={item.question}
+              className="rounded-md border border-[#22303D] bg-[#0D1117] p-5"
+            >
+              <h3 className="font-bold leading-7">{item.question}</h3>
+              <p className="mt-2 text-sm leading-7 text-[#9BA7B4]">{item.answer}</p>
+            </article>
           ))}
         </div>
       </section>

@@ -6,7 +6,7 @@ import {
   products,
   rialToToman,
   validateWholesaleCartonCount,
-  variants
+  variants,
 } from "@ufo/domain";
 
 const product = products[0];
@@ -23,7 +23,9 @@ describe("pricing", () => {
   });
 
   it("validates wholesale carton minimums", () => {
-    expect(() => validateWholesaleCartonCount(variant, variant.minWholesaleCartonCount - 1)).toThrow("حداقل");
+    expect(() =>
+      validateWholesaleCartonCount(variant, variant.minWholesaleCartonCount - 1),
+    ).toThrow("حداقل");
     expect(validateWholesaleCartonCount(variant, variant.minWholesaleCartonCount).quantity).toBe(
       variant.cartonSize * variant.minWholesaleCartonCount,
     );
@@ -35,7 +37,7 @@ describe("pricing", () => {
       product,
       variant,
       channel: "wholesale",
-      cartonCount: 2
+      cartonCount: 2,
     });
     const totals = calculateOrderTotals([item], 100_000);
     expect(quantity).toBe(variant.cartonSize * 2);

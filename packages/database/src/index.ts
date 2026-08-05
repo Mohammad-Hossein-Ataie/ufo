@@ -42,7 +42,7 @@ export const collectionNames = [
   "redirects",
   "notifications",
   "auditLogs",
-  "settings"
+  "settings",
 ] as const;
 
 export type CollectionName = (typeof collectionNames)[number];
@@ -52,19 +52,36 @@ export const databaseIndexes: Record<CollectionName, IndexDescription[]> = {
   userAddresses: [{ key: { userId: 1 } }],
   businessProfiles: [{ key: { userId: 1 }, unique: true }, { key: { status: 1, city: 1 } }],
   roles: [{ key: { name: 1 }, unique: true }],
-  sessions: [{ key: { userId: 1, expiresAt: 1 } }, { key: { expiresAt: 1 }, expireAfterSeconds: 0 }],
-  otpChallenges: [{ key: { phone: 1, createdAt: -1 } }, { key: { expiresAt: 1 }, expireAfterSeconds: 0 }],
-  products: [{ key: { slug: 1 }, unique: true }, { key: { categoryId: 1, isActive: 1 } }, { key: { nameFa: "text", tags: "text" } }],
+  sessions: [
+    { key: { userId: 1, expiresAt: 1 } },
+    { key: { expiresAt: 1 }, expireAfterSeconds: 0 },
+  ],
+  otpChallenges: [
+    { key: { phone: 1, createdAt: -1 } },
+    { key: { expiresAt: 1 }, expireAfterSeconds: 0 },
+  ],
+  products: [
+    { key: { slug: 1 }, unique: true },
+    { key: { categoryId: 1, isActive: 1 } },
+    { key: { nameFa: "text", tags: "text" } },
+  ],
   productVariants: [{ key: { sku: 1 }, unique: true }, { key: { productId: 1, isActive: 1 } }],
   brands: [{ key: { slug: 1 }, unique: true }],
   categories: [{ key: { slug: 1 }, unique: true }],
   compatibilityGroups: [{ key: { productIds: 1 } }, { key: { variantIds: 1 } }],
   inventoryItems: [{ key: { variantId: 1 }, unique: true }, { key: { restockThreshold: 1 } }],
   inventoryTransactions: [{ key: { variantId: 1, createdAt: -1 } }],
-  inventoryReservations: [{ key: { variantId: 1, expiresAt: 1 } }, { key: { expiresAt: 1 }, expireAfterSeconds: 0 }],
+  inventoryReservations: [
+    { key: { variantId: 1, expiresAt: 1 } },
+    { key: { expiresAt: 1 }, expireAfterSeconds: 0 },
+  ],
   restockEvents: [{ key: { variantId: 1, createdAt: -1 } }],
   carts: [{ key: { userId: 1, channel: 1 } }, { key: { updatedAt: -1 } }],
-  orders: [{ key: { orderNumber: 1 }, unique: true }, { key: { userId: 1, createdAt: -1 } }, { key: { channel: 1, status: 1, createdAt: -1 } }],
+  orders: [
+    { key: { orderNumber: 1 }, unique: true },
+    { key: { userId: 1, createdAt: -1 } },
+    { key: { channel: 1, status: 1, createdAt: -1 } },
+  ],
   orderEvents: [{ key: { orderId: 1, createdAt: -1 } }],
   payments: [{ key: { orderId: 1 } }, { key: { status: 1, createdAt: -1 } }],
   paymentReceipts: [{ key: { orderId: 1 } }, { key: { uploadedBy: 1, createdAt: -1 } }],
@@ -72,14 +89,21 @@ export const databaseIndexes: Record<CollectionName, IndexDescription[]> = {
   shipmentEvents: [{ key: { shipmentId: 1, createdAt: -1 } }],
   shippingMethods: [{ key: { code: 1 }, unique: true }],
   shippingRateRules: [{ key: { methodCode: 1, city: 1 } }],
-  invoices: [{ key: { invoiceNumber: 1 }, unique: true }, { key: { orderId: 1 } }, { key: { secureTokenHash: 1 }, unique: true }],
+  invoices: [
+    { key: { invoiceNumber: 1 }, unique: true },
+    { key: { orderId: 1 } },
+    { key: { secureTokenHash: 1 }, unique: true },
+  ],
   invoiceEvents: [{ key: { invoiceId: 1, createdAt: -1 } }],
   invoiceDeliveries: [{ key: { invoiceId: 1, createdAt: -1 } }],
   preorders: [{ key: { userId: 1, status: 1 } }, { key: { variantId: 1, createdAt: -1 } }],
   restockSubscriptions: [{ key: { variantId: 1, phone: 1 }, unique: true }],
   notificationDeliveries: [{ key: { channel: 1, createdAt: -1 } }],
   coupons: [{ key: { code: 1 }, unique: true }],
-  reviews: [{ key: { productId: 1, status: 1, createdAt: -1 } }, { key: { orderId: 1, userId: 1 } }],
+  reviews: [
+    { key: { productId: 1, status: 1, createdAt: -1 } },
+    { key: { orderId: 1, userId: 1 } },
+  ],
   chatConversations: [{ key: { userId: 1, updatedAt: -1 } }],
   chatMessages: [{ key: { conversationId: 1, createdAt: 1 } }],
   blogPosts: [{ key: { slug: 1 }, unique: true }, { key: { status: 1, publishedAt: -1 } }],
@@ -87,7 +111,7 @@ export const databaseIndexes: Record<CollectionName, IndexDescription[]> = {
   redirects: [{ key: { source: 1 }, unique: true }],
   notifications: [{ key: { userId: 1, readAt: 1 } }],
   auditLogs: [{ key: { actorId: 1, createdAt: -1 } }, { key: { entityType: 1, entityId: 1 } }],
-  settings: [{ key: { id: 1 }, unique: true }]
+  settings: [{ key: { id: 1 }, unique: true }],
 };
 
 const globalForMongo = globalThis as typeof globalThis & {
@@ -104,7 +128,10 @@ export async function getMongoClient(uri = process.env.MONGODB_URI): Promise<Mon
   return globalForMongo.__ufoMongoClientPromise;
 }
 
-export async function getDb(uri = process.env.MONGODB_URI, dbName = process.env.MONGODB_DB_NAME ?? "my-app"): Promise<Db> {
+export async function getDb(
+  uri = process.env.MONGODB_URI,
+  dbName = process.env.MONGODB_DB_NAME ?? "my-app",
+): Promise<Db> {
   const client = await getMongoClient(uri);
   return client.db(dbName);
 }
@@ -136,7 +163,11 @@ export class MongoProductRepository implements ProductRepository {
   constructor(private readonly db: Db) {}
 
   async listProducts(): Promise<Product[]> {
-    return this.db.collection<Product>("products").find({ isActive: true }).sort({ createdAt: -1 }).toArray();
+    return this.db
+      .collection<Product>("products")
+      .find({ isActive: true })
+      .sort({ createdAt: -1 })
+      .toArray();
   }
 
   async findProductBySlug(slug: string): Promise<Product | null> {
@@ -144,7 +175,10 @@ export class MongoProductRepository implements ProductRepository {
   }
 
   async listVariants(productId: string): Promise<ProductVariant[]> {
-    return this.db.collection<ProductVariant>("productVariants").find({ productId, isActive: true }).toArray();
+    return this.db
+      .collection<ProductVariant>("productVariants")
+      .find({ productId, isActive: true })
+      .toArray();
   }
 
   async getInventory(variantId: string): Promise<InventoryItem | null> {
@@ -179,7 +213,9 @@ export class MongoSettingsRepository implements SettingsRepository {
   }
 
   async saveStoreSettings(settings: StoreSettings): Promise<void> {
-    await this.db.collection<StoreSettings>("settings").updateOne({ id: "store" }, { $set: settings }, { upsert: true });
+    await this.db
+      .collection<StoreSettings>("settings")
+      .updateOne({ id: "store" }, { $set: settings }, { upsert: true });
   }
 }
 
@@ -196,27 +232,39 @@ export async function createRepositories(): Promise<{
         },
         async saveStoreSettings(_settings: StoreSettings) {
           return undefined;
-        }
-      }
+        },
+      },
     };
   }
 
   const db = await getDb();
   return {
     products: new MongoProductRepository(db),
-    settings: new MongoSettingsRepository(db)
+    settings: new MongoSettingsRepository(db),
   };
 }
 
 export async function seedDatabase(db: Db): Promise<void> {
   await ensureIndexes(db);
-  await db.collection("settings").updateOne({ id: "store" }, { $set: seedData.storeSettings }, { upsert: true });
-  await db.collection("categories").deleteMany({ id: { $in: seedData.categories.map((item) => item.id) } });
+  await db
+    .collection("settings")
+    .updateOne({ id: "store" }, { $set: seedData.storeSettings }, { upsert: true });
+  await db
+    .collection("categories")
+    .deleteMany({ id: { $in: seedData.categories.map((item) => item.id) } });
   await db.collection("brands").deleteMany({ id: { $in: seedData.brands.map((item) => item.id) } });
-  await db.collection("products").deleteMany({ id: { $in: seedData.products.map((item) => item.id) } });
-  await db.collection("productVariants").deleteMany({ id: { $in: seedData.variants.map((item) => item.id) } });
-  await db.collection("inventoryItems").deleteMany({ id: { $in: seedData.inventoryItems.map((item) => item.id) } });
-  await db.collection("compatibilityGroups").deleteMany({ id: { $in: seedData.compatibilityGroups.map((item) => item.id) } });
+  await db
+    .collection("products")
+    .deleteMany({ id: { $in: seedData.products.map((item) => item.id) } });
+  await db
+    .collection("productVariants")
+    .deleteMany({ id: { $in: seedData.variants.map((item) => item.id) } });
+  await db
+    .collection("inventoryItems")
+    .deleteMany({ id: { $in: seedData.inventoryItems.map((item) => item.id) } });
+  await db
+    .collection("compatibilityGroups")
+    .deleteMany({ id: { $in: seedData.compatibilityGroups.map((item) => item.id) } });
   await db.collection("categories").insertMany(seedData.categories);
   await db.collection("brands").insertMany(seedData.brands);
   await db.collection("products").insertMany(seedData.products);

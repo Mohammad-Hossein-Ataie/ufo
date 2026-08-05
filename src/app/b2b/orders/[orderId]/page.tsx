@@ -5,7 +5,11 @@ import { B2BOrderChatClient } from "@/components/b2b/b2b-order-chat-client";
 
 export const dynamic = "force-dynamic";
 
-export default async function B2BOrderDetailPage({ params }: { params: Promise<{ orderId: string }> }) {
+export default async function B2BOrderDetailPage({
+  params,
+}: {
+  params: Promise<{ orderId: string }>;
+}) {
   const { orderId } = await params;
   const order = getSubmittedOrder(orderId);
   if (!order || order.channel !== "wholesale") notFound();
@@ -26,7 +30,10 @@ export default async function B2BOrderDetailPage({ params }: { params: Promise<{
           <h2 className="text-xl font-bold">اقلام عمده</h2>
           <div className="mt-4 grid gap-3">
             {order.items.map((item) => (
-              <div key={item.sku} className="flex flex-wrap items-center justify-between gap-3 rounded-md bg-[#F7F7F2] p-3">
+              <div
+                key={item.sku}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-md bg-[#F7F7F2] p-3"
+              >
                 <div>
                   <p className="font-bold">{item.productName}</p>
                   <p className="mt-1 text-sm text-[#596B61]">
@@ -64,7 +71,9 @@ export default async function B2BOrderDetailPage({ params }: { params: Promise<{
             {order.timeline.map((event) => (
               <div key={event.id} className="rounded-md bg-white/10 p-3">
                 <p>{event.labelFa}</p>
-                <time className="mt-1 block text-white/65">{new Date(event.createdAt).toLocaleString("fa-IR")}</time>
+                <time className="mt-1 block text-white/65">
+                  {new Date(event.createdAt).toLocaleString("fa-IR")}
+                </time>
               </div>
             ))}
           </div>

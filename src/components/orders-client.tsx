@@ -17,7 +17,7 @@ const orderStatusLabelsFa: Record<OrderStatus, string> = {
   shipped: "ارسال شده",
   delivered: "تحویل شده",
   cancelled: "لغو شده",
-  returned: "مرجوع شده"
+  returned: "مرجوع شده",
 };
 
 function readPhone(): string {
@@ -76,10 +76,16 @@ export function OrdersClient() {
         <tbody>
           {orders.map((order) => (
             <tr key={order.id} className="border-t border-[#22303D]">
-              <td className="px-4 py-3" dir="ltr">{order.orderNumber}</td>
-              <td className="px-4 py-3"><StatusPill tone="info">{orderStatusLabelsFa[order.status]}</StatusPill></td>
+              <td className="px-4 py-3" dir="ltr">
+                {order.orderNumber}
+              </td>
+              <td className="px-4 py-3">
+                <StatusPill tone="info">{orderStatusLabelsFa[order.status]}</StatusPill>
+              </td>
               <td className="px-4 py-3">{order.etaFa}</td>
-              <td className="px-4 py-3 font-bold"><Price valueRial={order.totalRial} /></td>
+              <td className="px-4 py-3 font-bold">
+                <Price valueRial={order.totalRial} />
+              </td>
               <td className="px-4 py-3">
                 <Link href={`/orders/${order.id}`}>
                   <Button size="sm">مشاهده</Button>

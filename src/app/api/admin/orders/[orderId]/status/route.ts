@@ -11,10 +11,13 @@ const allowedStatuses: OrderStatus[] = [
   "ready_for_pickup",
   "shipped",
   "delivered",
-  "cancelled"
+  "cancelled",
 ];
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ orderId: string }> }) {
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ orderId: string }> },
+) {
   try {
     const { orderId } = await params;
     const payload = (await request.json()) as Record<string, unknown>;

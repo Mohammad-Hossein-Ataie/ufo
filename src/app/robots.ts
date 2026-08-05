@@ -1,11 +1,31 @@
 import type { MetadataRoute } from "next";
+import { canonical } from "@ufo/seo";
 
 export default function robots(): MetadataRoute.Robots {
+  const isProduction = process.env.NODE_ENV === "production";
+  if (!isProduction) {
+    return {
+      rules: [{ userAgent: "*", disallow: "/" }],
+      sitemap: canonical("/sitemap.xml"),
+    };
+  }
+
   return {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/products", "/store", "/blog", "/b2b", "/b2b/catalog"],
+        allow: [
+          "/",
+          "/products",
+          "/products/category",
+          "/store",
+          "/blog",
+          "/b2b",
+          "/b2b/catalog",
+          "/logos",
+          "/images",
+          "/favicons",
+        ],
         disallow: [
           "/admin",
           "/api",
@@ -22,10 +42,11 @@ export default function robots(): MetadataRoute.Robots {
           "/b2b/orders",
           "/b2b/account",
           "/*?sort=",
-          "/*?filter="
-        ]
-      }
+          "/*?filter=",
+          "/*?q=",
+        ],
+      },
     ],
-    sitemap: "https://ufopuff.ir/sitemap.xml"
+    sitemap: canonical("/sitemap.xml"),
   };
 }

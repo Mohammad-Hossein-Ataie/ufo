@@ -7,18 +7,35 @@ import {
   getAvailableStock,
   getInventoryByVariant,
   getPrimaryVariant,
-  searchProducts
+  searchProducts,
 } from "@ufo/domain";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { canonical, itemListJsonLd, jsonLdScriptProps } from "@ufo/seo";
 
-export const metadata: Metadata = {
-  title: "کاتالوگ محصولات",
-  description: "کاتالوگ پاد، ویپ، جویس، کویل و کارتریج با قیمت و موجودی.",
-  alternates: { canonical: "/products" }
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: Promise<{ q?: string; category?: string }>;
+}): Promise<Metadata> {
+  const params = (await searchParams) ?? {};
+  const hasQuery = Boolean(params.q || params.category);
+  return {
+    title: "کاتالوگ محصولات",
+    description: "کاتالوگ پاد، ویپ، سالت نیکوتین، جویس، کویل و کارتریج با قیمت و موجودی.",
+    alternates: { canonical: canonical("/products") },
+    robots: hasQuery ? { index: false, follow: true } : { index: true, follow: true },
+    openGraph: {
+      title: "کاتالوگ محصولات UFO Puff",
+      description: "مشاهده قیمت و موجودی محصولات پاد، ویپ و لوازم جانبی.",
+      url: canonical("/products"),
+      locale: "fa_IR",
+      siteName: "UFO Puff",
+    },
+  };
+}
 
 export default async function ProductsPage({
-  searchParams
+  searchParams,
 }: {
   searchParams?: Promise<{ q?: string; category?: string }>;
 }) {
@@ -30,12 +47,23 @@ export default async function ProductsPage({
     const productCategory = categories.find((item) => item.id === product.categoryId);
     return productCategory?.slug === category;
   });
+  const jsonLd = itemListJsonLd(
+    filtered
+      .slice(0, 24)
+      .map((product) => ({ name: product.nameFa, url: `/products/${product.slug}` })),
+    "کاتالوگ محصولات UFO Puff",
+  );
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10">
+    <main id="main-content" className="mx-auto max-w-7xl px-4 py-10">
+      <script {...jsonLdScriptProps(jsonLd)} />
       <div className="grid gap-4 lg:grid-cols-[18rem_1fr]">
         <aside className="h-fit rounded-md border border-[#22303D] bg-[#0D1117] p-4">
-          <h1 className="text-xl font-black">کاتالوگ</h1>
+          <h1 className="text-xl font-black">کاتالوگ محصولات</h1>
+          <p className="mt-3 text-sm leading-7 text-[#9BA7B4]">
+            این صفحه برای مقایسه سریع قیمت، موجودی و دسته‌بندی محصولات تک‌فروشی UFO Puff طراحی شده
+            است.
+          </p>
           <form action="/products" className="mt-4 grid gap-3">
             <label className="grid gap-2 text-sm">
               جستجو
@@ -58,7 +86,7 @@ export default async function ProductsPage({
               <Link
                 key={item.id}
                 className="rounded-md px-3 py-2 hover:bg-white/10"
-                href={`/products?category=${item.slug}`}
+                href={`/products/category/${item.slug}`}
               >
                 {item.nameFa}
               </Link>
@@ -97,7 +125,9 @@ export default async function ProductsPage({
                   actions={
                     <div key={`actions-${product.id}`} className="flex flex-wrap gap-2">
                       <Link href={`/products/${product.slug}`}>
-                        <Button size="sm" variant="ghost">جزئیات</Button>
+                        <Button size="sm" variant="ghost">
+                          جزئیات
+                        </Button>
                       </Link>
                       <AddToCartButton variantId={variant.id} label="خرید سریع" />
                     </div>

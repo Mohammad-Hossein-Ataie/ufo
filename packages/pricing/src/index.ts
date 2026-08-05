@@ -5,5 +5,5 @@ export {
   formatToman,
   getUnitPriceRial,
   rialToToman,
-  validateWholesaleCartonCount
+  validateWholesaleCartonCount,
 } from "@ufo/domain";

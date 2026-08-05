@@ -27,7 +27,7 @@ export const envSchema = z.object({
   STORE_OWNER_NAME: z.string().default("امیر محمودی"),
   STORE_PHONE: z.string().default("09362157181"),
   STORE_ADDRESS: z.string().default("تهران، بازار مولوی، پاساژ صفویه"),
-  STORE_TELEGRAM: z.string().url().default("https://t.me/vapeufostoree")
+  STORE_TELEGRAM: z.string().url().default("https://t.me/vapeufostoree"),
 });
 
 export type RuntimeEnv = z.infer<typeof envSchema>;
@@ -45,23 +45,23 @@ export const defaultStoreSettings: StoreSettings = {
   telegramUrl: "https://t.me/vapeufostoree",
   workingHours: "شنبه تا پنجشنبه، ۱۰ تا ۲۰",
   legalNotice:
-    "فروش فقط برای افراد بالای ۱۸ سال انجام می‌شود. محصولات دخانی و نیکوتین‌دار برای ترک یا درمان توصیه نمی‌شوند."
+    "فروش فقط برای افراد بالای ۱۸ سال انجام می‌شود. محصولات دخانی و نیکوتین‌دار برای ترک یا درمان توصیه نمی‌شوند.",
 };
 
 export const appHosts = {
   retail: "ufopuff.ir",
   b2b: "ufopuff.ir",
-  admin: "ufopuff.ir"
+  admin: "ufopuff.ir",
 } as const;
 
 export const appPaths = {
   retail: "/",
   b2b: "/b2b",
-  admin: "/admin"
+  admin: "/admin",
 } as const;
 
 export const localPorts = {
   retail: 3000,
   b2b: 3000,
-  admin: 3000
+  admin: 3000,
 } as const;

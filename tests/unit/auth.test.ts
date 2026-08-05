@@ -11,14 +11,14 @@ describe("auth", () => {
     const { challenge, code } = await createOtpChallenge({
       phone: "09362157181",
       secret: "test-secret-for-otp",
-      now: new Date("2026-08-02T08:00:00.000Z")
+      now: new Date("2026-08-02T08:00:00.000Z"),
     });
     await expect(
       verifyOtpChallenge({
         challenge,
         code,
         secret: "test-secret-for-otp",
-        now: new Date("2026-08-02T08:01:00.000Z")
+        now: new Date("2026-08-02T08:01:00.000Z"),
       }),
     ).resolves.toEqual(challenge);
   });

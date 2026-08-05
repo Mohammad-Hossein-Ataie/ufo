@@ -17,7 +17,7 @@ const orderStatusLabelsFa: Record<OrderStatus, string> = {
   shipped: "ارسال شده",
   delivered: "تحویل شده",
   cancelled: "لغو شده",
-  returned: "مرجوع شده"
+  returned: "مرجوع شده",
 };
 
 function readPhone(): string {
@@ -76,13 +76,24 @@ export function B2BOrdersClient() {
         <tbody>
           {orders.map((order) => (
             <tr key={order.id} className="border-t border-[#E2E4D8]">
-              <td className="px-4 py-3" dir="ltr">{order.orderNumber}</td>
-              <td className="px-4 py-3"><StatusPill tone="info">{orderStatusLabelsFa[order.status]}</StatusPill></td>
+              <td className="px-4 py-3" dir="ltr">
+                {order.orderNumber}
+              </td>
+              <td className="px-4 py-3">
+                <StatusPill tone="info">{orderStatusLabelsFa[order.status]}</StatusPill>
+              </td>
               <td className="px-4 py-3">{order.etaFa}</td>
-              <td className="px-4 py-3 font-bold"><Price valueRial={order.totalRial} /></td>
+              <td className="px-4 py-3 font-bold">
+                <Price valueRial={order.totalRial} />
+              </td>
               <td className="px-4 py-3">
                 <Link href={`/b2b/orders/${order.id}`}>
-                  <Button size="sm" className="border-[#1F8A5B] bg-[#1F8A5B] text-white hover:bg-[#176D48]">مشاهده</Button>
+                  <Button
+                    size="sm"
+                    className="border-[#1F8A5B] bg-[#1F8A5B] text-white hover:bg-[#176D48]"
+                  >
+                    مشاهده
+                  </Button>
                 </Link>
               </td>
             </tr>

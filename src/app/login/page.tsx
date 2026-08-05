@@ -4,7 +4,7 @@ import { PhoneLoginClient } from "@/components/phone-login-client";
 
 export const metadata: Metadata = {
   title: "ورود",
-  robots: { index: false, follow: false }
+  robots: { index: false, follow: false },
 };
 
 export default function LoginPage() {

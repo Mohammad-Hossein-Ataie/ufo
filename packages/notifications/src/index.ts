@@ -31,7 +31,7 @@ export class MockSmsProvider implements SmsProvider {
     this.sent.push({
       phone: normalizedPhone,
       messageFa: `${productNameFa} دوباره موجود شد.`,
-      type: "restock"
+      type: "restock",
     });
     return { providerId: `mock_sms_${this.sent.length}` };
   }
@@ -43,7 +43,7 @@ export class MockAnalyticsProvider implements AnalyticsProvider {
   async track(event: AnalyticsEvent): Promise<void> {
     this.events.push({
       ...event,
-      properties: removeSensitiveAnalyticsProperties(event.properties)
+      properties: removeSensitiveAnalyticsProperties(event.properties),
     });
   }
 }

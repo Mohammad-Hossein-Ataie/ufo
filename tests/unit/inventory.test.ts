@@ -13,7 +13,7 @@ describe("inventory reservations", () => {
       reserveInventory({
         item: inventoryItem,
         quantity: inventoryItem.onHand + 1,
-        channel: "retail"
+        channel: "retail",
       }),
     ).toThrow("oversell");
   });
@@ -23,9 +23,11 @@ describe("inventory reservations", () => {
       item: inventoryItem,
       quantity: 2,
       channel: "retail",
-      now: new Date("2026-08-02T08:00:00.000Z")
+      now: new Date("2026-08-02T08:00:00.000Z"),
     });
     expect(result.item.reserved).toBe(inventoryItem.reserved + 2);
-    expect(releaseReservation(result.item, result.reservation).reserved).toBe(inventoryItem.reserved);
+    expect(releaseReservation(result.item, result.reservation).reserved).toBe(
+      inventoryItem.reserved,
+    );
   });
 });

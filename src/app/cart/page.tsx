@@ -3,7 +3,7 @@ import { CartClient } from "@/components/cart-client";
 
 export const metadata: Metadata = {
   title: "سبد خرید",
-  robots: { index: false, follow: false }
+  robots: { index: false, follow: false },
 };
 
 export default function CartPage() {

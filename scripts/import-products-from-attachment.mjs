@@ -59,11 +59,18 @@ function uniqueId(base, seen) {
 }
 
 function splitName(name) {
-  const latin = name.match(/[a-zA-Z][a-zA-Z0-9\s.-]*/g)?.join(" ").replace(/\s+/g, " ").trim();
-  const fa = name.replace(/[a-zA-Z][a-zA-Z0-9\s.-]*/g, "").replace(/\s+/g, " ").trim();
+  const latin = name
+    .match(/[a-zA-Z][a-zA-Z0-9\s.-]*/g)
+    ?.join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const fa = name
+    .replace(/[a-zA-Z][a-zA-Z0-9\s.-]*/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
   return {
     fa: fa || name,
-    latin: latin || undefined
+    latin: latin || undefined,
   };
 }
 
@@ -98,7 +105,7 @@ function inferBrand(name) {
     "kent",
     "flum",
     "monster",
-    "voopoo"
+    "voopoo",
   ];
   return candidates.find((candidate) => latin.includes(candidate)) ?? "ufo-import";
 }
@@ -193,19 +200,27 @@ parsed.forEach((item, productIndex) => {
     tags: [
       item.category === "pod" ? "پاد دائمی" : "یکبارمصرف",
       brand,
-      ...(puffCount ? [`${puffCount}`, `${toPersianDigits(puffCount)} پاف`] : [])
+      ...(puffCount ? [`${puffCount}`, `${toPersianDigits(puffCount)} پاف`] : []),
     ],
     attributes: [
       { nameFa: "نوع", valueFa: item.category === "pod" ? "پاد دائمی" : "یکبارمصرف" },
-      ...(puffCount ? [{ nameFa: "پاف", valueFa: toPersianDigits(puffCount), technicalValue: String(puffCount) }] : []),
-      ...(latin ? [{ nameFa: "نام لاتین", valueFa: latin, technicalValue: latin }] : [])
+      ...(puffCount
+        ? [
+            {
+              nameFa: "پاف",
+              valueFa: toPersianDigits(puffCount),
+              technicalValue: String(puffCount),
+            },
+          ]
+        : []),
+      ...(latin ? [{ nameFa: "نام لاتین", valueFa: latin, technicalValue: latin }] : []),
     ],
     isActive: true,
     isAgeRestricted: true,
     seoTitle: `${fa} | UFO Puff`,
     seoDescription: shortDescriptionFa,
     createdAt: importedAt,
-    updatedAt: importedAt
+    updatedAt: importedAt,
   });
 
   item.flavors.forEach((flavor, flavorIndex) => {
@@ -218,7 +233,7 @@ parsed.forEach((item, productIndex) => {
       productId,
       nameFa: flavor,
       sku: `UFO-${item.category === "pod" ? "POD" : "DSP"}-${String(productIndex + 1).padStart(3, "0")}-${String(
-        flavorIndex + 1
+        flavorIndex + 1,
       ).padStart(2, "0")}`,
       retailPriceRial: price,
       wholesalePriceRial: Math.round(price * 0.84),
@@ -227,9 +242,17 @@ parsed.forEach((item, productIndex) => {
       minWholesaleCartonCount: item.category === "pod" ? 1 : 2,
       attributes: [
         { nameFa: item.category === "pod" ? "مدل" : "طعم", valueFa: flavor },
-        ...(puffCount ? [{ nameFa: "پاف", valueFa: toPersianDigits(puffCount), technicalValue: String(puffCount) }] : [])
+        ...(puffCount
+          ? [
+              {
+                nameFa: "پاف",
+                valueFa: toPersianDigits(puffCount),
+                technicalValue: String(puffCount),
+              },
+            ]
+          : []),
       ],
-      isActive: true
+      isActive: true,
     });
     inventoryItems.push({
       id: `inv-${variantId.replace(/^var-/, "")}`,
@@ -238,7 +261,7 @@ parsed.forEach((item, productIndex) => {
       reserved: 0,
       preorderEnabled: true,
       restockThreshold: item.category === "pod" ? 4 : 20,
-      updatedAt: importedAt
+      updatedAt: importedAt,
     });
   });
 });
@@ -254,4 +277,6 @@ export const importedInventoryItems: InventoryItem[] = ${JSON.stringify(inventor
 `;
 
 writeFileSync(outputPath, `${content}\n`, "utf8");
-console.log(`Imported ${products.length} products and ${variants.length} variants into ${outputPath}`);
+console.log(
+  `Imported ${products.length} products and ${variants.length} variants into ${outputPath}`,
+);

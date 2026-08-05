@@ -18,14 +18,25 @@ interface RetailSession {
   phone: string;
 }
 
-const shippingOptions: Array<{ code: ShippingMethodCode; title: string; costRial: number; eta: string }> = [
+const shippingOptions: Array<{
+  code: ShippingMethodCode;
+  title: string;
+  costRial: number;
+  eta: string;
+}> = [
   { code: "tipax", title: "تیپاکس", costRial: 1_650_000, eta: "۲ تا ۴ روز کاری" },
-  { code: "tehran_courier", title: "پیک تهران", costRial: 950_000, eta: "همان روز یا روز کاری بعد" },
-  { code: "pickup", title: "تحویل حضوری", costRial: 0, eta: "هماهنگی همان روز" }
+  {
+    code: "tehran_courier",
+    title: "پیک تهران",
+    costRial: 950_000,
+    eta: "همان روز یا روز کاری بعد",
+  },
+  { code: "pickup", title: "تحویل حضوری", costRial: 0, eta: "هماهنگی همان روز" },
 ];
 
 function readCart(): CartLine[] {
-  const raw = window.localStorage.getItem("ufo-retail-cart") ?? window.localStorage.getItem("ufo-cart");
+  const raw =
+    window.localStorage.getItem("ufo-retail-cart") ?? window.localStorage.getItem("ufo-cart");
   if (!raw) return [];
   try {
     const parsed: unknown = JSON.parse(raw);
@@ -33,7 +44,11 @@ function readCart(): CartLine[] {
     return parsed.filter((line): line is CartLine => {
       if (typeof line !== "object" || line === null) return false;
       const record = line as Record<string, unknown>;
-      return typeof record.variantId === "string" && typeof record.quantity === "number" && record.channel === "retail";
+      return (
+        typeof record.variantId === "string" &&
+        typeof record.quantity === "number" &&
+        record.channel === "retail"
+      );
     });
   } catch {
     return [];
@@ -78,20 +93,23 @@ export function CheckoutClient() {
       cart
         .map((line) => {
           const variant = variants.find((item) => item.id === line.variantId);
-          const product = variant ? products.find((item) => item.id === variant.productId) : undefined;
+          const product = variant
+            ? products.find((item) => item.id === variant.productId)
+            : undefined;
           if (!variant || !product) return null;
           return {
             ...line,
             product,
             variant,
-            totalRial: variant.retailPriceRial * line.quantity
+            totalRial: variant.retailPriceRial * line.quantity,
           };
         })
         .filter((line): line is NonNullable<typeof line> => line !== null),
     [cart],
   );
 
-  const shipping = shippingOptions.find((item) => item.code === shippingMethod) ?? shippingOptions[0]!;
+  const shipping =
+    shippingOptions.find((item) => item.code === shippingMethod) ?? shippingOptions[0]!;
   const subtotalRial = lines.reduce((sum, line) => sum + line.totalRial, 0);
   const totalRial = subtotalRial + shipping.costRial;
 
@@ -110,10 +128,13 @@ export function CheckoutClient() {
         address,
         shippingMethod,
         receiptNote,
-        lines: cart.map((line) => ({ variantId: line.variantId, quantity: line.quantity }))
-      })
+        lines: cart.map((line) => ({ variantId: line.variantId, quantity: line.quantity })),
+      }),
     });
-    const payload = (await response.json().catch(() => ({}))) as { order?: { id: string }; error?: string };
+    const payload = (await response.json().catch(() => ({}))) as {
+      order?: { id: string };
+      error?: string;
+    };
     setIsSubmitting(false);
     if (!response.ok || !payload.order) {
       setError(payload.error ?? "ثبت سفارش انجام نشد.");
@@ -144,11 +165,21 @@ export function CheckoutClient() {
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="grid gap-2">
             نام گیرنده
-            <Input value={customerName} onChange={(event) => setCustomerName(event.target.value)} required />
+            <Input
+              value={customerName}
+              onChange={(event) => setCustomerName(event.target.value)}
+              required
+            />
           </label>
           <label className="grid gap-2">
             موبایل
-            <Input value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" dir="ltr" required />
+            <Input
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              inputMode="tel"
+              dir="ltr"
+              required
+            />
           </label>
         </div>
         <label className="grid gap-2">
@@ -165,7 +196,10 @@ export function CheckoutClient() {
             روش ارسال
           </legend>
           {shippingOptions.map((method) => (
-            <label key={method.code} className="flex min-h-12 items-center justify-between gap-3 rounded-md border border-[#22303D] px-3">
+            <label
+              key={method.code}
+              className="flex min-h-12 items-center justify-between gap-3 rounded-md border border-[#22303D] px-3"
+            >
               <span className="flex items-center gap-2">
                 <input
                   type="radio"

@@ -3,7 +3,10 @@ import type { ShippingAddress, ShippingMethodCode, ShippingQuote } from "@ufo/ty
 
 export interface ShippingProvider {
   quote(address: ShippingAddress, method: ShippingMethodCode): Promise<ShippingQuote>;
-  createShipment(orderId: string, method: ShippingMethodCode): Promise<{ shipmentId: string; trackingCode?: string }>;
+  createShipment(
+    orderId: string,
+    method: ShippingMethodCode,
+  ): Promise<{ shipmentId: string; trackingCode?: string }>;
 }
 
 export interface TipaxProvider {
@@ -19,22 +22,31 @@ export class MockShippingProvider implements ShippingProvider {
     return quoteShipping(address, method);
   }
 
-  async createShipment(orderId: string, method: ShippingMethodCode): Promise<{ shipmentId: string; trackingCode?: string }> {
+  async createShipment(
+    orderId: string,
+    method: ShippingMethodCode,
+  ): Promise<{ shipmentId: string; trackingCode?: string }> {
     return {
       shipmentId: `ship_${orderId}_${method}`,
-      ...(method === "pickup" ? {} : { trackingCode: `MOCK-${orderId.slice(-6)}` })
+      ...(method === "pickup" ? {} : { trackingCode: `MOCK-${orderId.slice(-6)}` }),
     };
   }
 }
 
 export class MockTipaxProvider implements TipaxProvider {
-  async createTipaxShipment(orderId: string, _address: ShippingAddress): Promise<{ trackingCode: string }> {
+  async createTipaxShipment(
+    orderId: string,
+    _address: ShippingAddress,
+  ): Promise<{ trackingCode: string }> {
     return { trackingCode: `TIPAX-MOCK-${orderId.slice(-6)}` };
   }
 }
 
 export class MockCourierProvider implements CourierProvider {
-  async createTehranCourier(orderId: string, _address: ShippingAddress): Promise<{ courierId: string }> {
+  async createTehranCourier(
+    orderId: string,
+    _address: ShippingAddress,
+  ): Promise<{ courierId: string }> {
     return { courierId: `TEH-MOCK-${orderId.slice(-6)}` };
   }
 }

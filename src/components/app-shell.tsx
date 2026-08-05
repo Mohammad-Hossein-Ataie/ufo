@@ -13,7 +13,7 @@ const retailFooterLinks = [
   { href: "/products", label: "محصولات", icon: ShoppingBag },
   { href: "/orders", label: "پیگیری سفارش", icon: Clock3 },
   { href: "/login", label: "حساب مشتری", icon: ShieldCheck },
-  { href: "/support", label: "پشتیبانی", icon: MessageCircle },
+  { href: "/store/tehran-molavi", label: "پشتیبانی", icon: MessageCircle },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -30,6 +30,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (pathname.startsWith("/b2b")) {
     return (
       <div className="min-h-screen bg-[#F7F7F2] text-[#14201B]">
+        <a href="#main-content" className="skip-link">
+          پرش به محتوای اصلی
+        </a>
         <B2BHeader />
         {children}
       </div>
@@ -38,6 +41,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <a href="#main-content" className="skip-link">
+        پرش به محتوای اصلی
+      </a>
       <SiteHeader />
       {children}
       <footer className="border-t border-[#22303D] bg-[#0D1117] text-[#D9E2EC]">

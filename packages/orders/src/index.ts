@@ -4,7 +4,7 @@ import {
   createOrderItemSnapshot,
   products,
   quoteShipping,
-  variants
+  variants,
 } from "@ufo/domain";
 import type {
   Order,
@@ -13,17 +13,10 @@ import type {
   PaymentMethod,
   SalesChannel,
   ShippingAddress,
-  ShippingMethodCode
+  ShippingMethodCode,
 } from "@ufo/types";
 import { normalizeIranPhone } from "@ufo/validation";
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  renameSync,
-  rmSync,
-  writeFileSync
-} from "node:fs";
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
 export { createOrder, createOrderItemSnapshot, createOrderNumber } from "@ufo/domain";
@@ -100,13 +93,13 @@ export const orderStatusLabelsFa: Record<OrderStatus, string> = {
   shipped: "ارسال شده",
   delivered: "تحویل شده",
   cancelled: "لغو شده",
-  returned: "مرجوع شده"
+  returned: "مرجوع شده",
 };
 
 export const paymentStatusLabelsFa: Record<PaymentReviewStatus, string> = {
   pending_review: "در انتظار بررسی رسید",
   approved: "پرداخت تایید شد",
-  rejected: "پرداخت رد شد"
+  rejected: "پرداخت رد شد",
 };
 
 function findWorkspaceRoot(start = process.cwd()): string {
@@ -120,7 +113,10 @@ function findWorkspaceRoot(start = process.cwd()): string {
 }
 
 export function getOrderStorePath(): string {
-  return resolve(process.env.UFO_MOCK_DATA_DIR ?? join(findWorkspaceRoot(), "mock-data"), "orders.json");
+  return resolve(
+    process.env.UFO_MOCK_DATA_DIR ?? join(findWorkspaceRoot(), "mock-data"),
+    "orders.json",
+  );
 }
 
 function readStore(): OrderStoreFile {
@@ -143,7 +139,12 @@ function writeStore(store: OrderStoreFile): void {
   renameSync(tempPath, storePath);
 }
 
-function createEvent(orderId: string, status: OrderStatus, actor: OrderTimelineEvent["actor"], labelFa: string): OrderTimelineEvent {
+function createEvent(
+  orderId: string,
+  status: OrderStatus,
+  actor: OrderTimelineEvent["actor"],
+  labelFa: string,
+): OrderTimelineEvent {
   const now = new Date().toISOString();
   return {
     id: `evt_${crypto.randomUUID()}`,
@@ -151,11 +152,14 @@ function createEvent(orderId: string, status: OrderStatus, actor: OrderTimelineE
     actor,
     labelFa,
     status,
-    createdAt: now
+    createdAt: now,
   };
 }
 
-function createItemSnapshots(lines: CartSubmissionLine[], channel: SalesChannel): OrderItemSnapshot[] {
+function createItemSnapshots(
+  lines: CartSubmissionLine[],
+  channel: SalesChannel,
+): OrderItemSnapshot[] {
   if (lines.length === 0) throw new Error("سبد خرید خالی است.");
 
   return lines.map((line) => {
@@ -176,13 +180,19 @@ function createItemSnapshots(lines: CartSubmissionLine[], channel: SalesChannel)
   });
 }
 
-function updatePaymentStatus(status: OrderStatus, current: PaymentReviewStatus): PaymentReviewStatus {
-  if (["confirmed", "processing", "ready_for_pickup", "shipped", "delivered"].includes(status)) return "approved";
+function updatePaymentStatus(
+  status: OrderStatus,
+  current: PaymentReviewStatus,
+): PaymentReviewStatus {
+  if (["confirmed", "processing", "ready_for_pickup", "shipped", "delivered"].includes(status))
+    return "approved";
   if (status === "cancelled" || status === "returned") return "rejected";
   return current;
 }
 
-export function listSubmittedOrders(filters: { channel?: SalesChannel; phone?: string } = {}): SubmittedOrder[] {
+export function listSubmittedOrders(
+  filters: { channel?: SalesChannel; phone?: string } = {},
+): SubmittedOrder[] {
   const phone = filters.phone ? normalizeIranPhone(filters.phone) : undefined;
   return readStore()
     .orders.filter((order) => {
@@ -206,11 +216,12 @@ export function createSubmittedOrder(input: CreateSubmittedOrderInput): Submitte
     {
       ...input.address,
       receiverName: input.address.receiverName || customerName,
-      receiverPhone: input.address.receiverPhone || phone
+      receiverPhone: input.address.receiverPhone || phone,
     },
     input.shippingMethod,
   );
-  if (!quote.available) throw new Error(quote.reasonFa ?? "این روش ارسال برای آدرس انتخاب‌شده فعال نیست.");
+  if (!quote.available)
+    throw new Error(quote.reasonFa ?? "این روش ارسال برای آدرس انتخاب‌شده فعال نیست.");
 
   const store = readStore();
   const items = createItemSnapshots(input.lines, input.channel);
@@ -223,7 +234,7 @@ export function createSubmittedOrder(input: CreateSubmittedOrderInput): Submitte
     userId: `phone_${phone}`,
     shippingRial: quote.costRial,
     paymentMethod: input.paymentMethod ?? "card_to_card",
-    shippingMethod: quote.method
+    shippingMethod: quote.method,
   });
   const totals = calculateOrderTotals(items, quote.costRial);
   const submitted: SubmittedOrder = {
@@ -235,30 +246,41 @@ export function createSubmittedOrder(input: CreateSubmittedOrderInput): Submitte
     customer: {
       phone,
       fullName: customerName,
-      ...(input.businessName?.trim() ? { businessName: input.businessName.trim() } : {})
+      ...(input.businessName?.trim() ? { businessName: input.businessName.trim() } : {}),
     },
     shippingAddress: {
       ...input.address,
       receiverName: input.address.receiverName || customerName,
-      receiverPhone: phone
+      receiverPhone: phone,
     },
     shippingTitleFa: quote.titleFa,
     etaFa: quote.etaFa,
     paymentStatus: "pending_review",
     receiptNote: input.receiptNote?.trim() ?? "",
     timeline: [
-      createEvent(id, "payment_under_review", "customer", "سفارش ثبت شد و رسید پرداخت برای بررسی ادمین ارسال شد.")
+      createEvent(
+        id,
+        "payment_under_review",
+        "customer",
+        "سفارش ثبت شد و رسید پرداخت برای بررسی ادمین ارسال شد.",
+      ),
     ],
-    chat: []
+    chat: [],
   };
 
   writeStore({ orders: [submitted, ...store.orders] });
   return submitted;
 }
 
-export function updateSubmittedOrderStatus(orderId: string, status: OrderStatus, labelFa?: string): SubmittedOrder {
+export function updateSubmittedOrderStatus(
+  orderId: string,
+  status: OrderStatus,
+  labelFa?: string,
+): SubmittedOrder {
   const store = readStore();
-  const index = store.orders.findIndex((order) => order.id === orderId || order.orderNumber === orderId);
+  const index = store.orders.findIndex(
+    (order) => order.id === orderId || order.orderNumber === orderId,
+  );
   if (index < 0) throw new Error("سفارش پیدا نشد.");
 
   const current = store.orders[index];
@@ -269,9 +291,14 @@ export function updateSubmittedOrderStatus(orderId: string, status: OrderStatus,
     paymentStatus: updatePaymentStatus(status, current.paymentStatus),
     updatedAt: new Date().toISOString(),
     timeline: [
-      createEvent(current.id, status, "admin", labelFa ?? `وضعیت سفارش به «${orderStatusLabelsFa[status]}» تغییر کرد.`),
-      ...current.timeline
-    ]
+      createEvent(
+        current.id,
+        status,
+        "admin",
+        labelFa ?? `وضعیت سفارش به «${orderStatusLabelsFa[status]}» تغییر کرد.`,
+      ),
+      ...current.timeline,
+    ],
   };
 
   const orders = [...store.orders];
@@ -292,7 +319,9 @@ export function appendChatMessage(args: {
   const body = args.body.trim();
   if (!body) throw new Error("متن پیام خالی است.");
   const store = readStore();
-  const index = store.orders.findIndex((order) => order.id === args.orderId || order.orderNumber === args.orderId);
+  const index = store.orders.findIndex(
+    (order) => order.id === args.orderId || order.orderNumber === args.orderId,
+  );
   if (index < 0) throw new Error("سفارش پیدا نشد.");
   const current = store.orders[index];
   if (!current) throw new Error("سفارش پیدا نشد.");
@@ -302,13 +331,13 @@ export function appendChatMessage(args: {
     orderId: current.id,
     sender: args.sender,
     body,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   };
 
   const next: SubmittedOrder = {
     ...current,
     updatedAt: message.createdAt,
-    chat: [...current.chat, message]
+    chat: [...current.chat, message],
   };
   const orders = [...store.orders];
   orders[index] = next;

@@ -9,7 +9,7 @@ const moduleNames: Record<string, string> = {
   invoices: "فاکتورها",
   reports: "گزارش‌ها",
   roles: "نقش‌ها",
-  "audit-logs": "Audit Log"
+  "audit-logs": "Audit Log",
 };
 
 export default async function AdminModulePage({ params }: { params: Promise<{ module: string }> }) {
@@ -23,7 +23,8 @@ export default async function AdminModulePage({ params }: { params: Promise<{ mo
       </div>
       <section className="mt-6 rounded-md border border-[#D7DDE4] bg-white p-5">
         <p className="leading-8 text-[#5F6C79]">
-          این ماژول به shell مدیریت، RBAC سمت سرور، audit log و repository layer متصل می‌شود. CRUD کامل هر entity از همین الگو توسعه می‌یابد.
+          این ماژول به shell مدیریت، RBAC سمت سرور، audit log و repository layer متصل می‌شود. CRUD
+          کامل هر entity از همین الگو توسعه می‌یابد.
         </p>
       </section>
     </main>

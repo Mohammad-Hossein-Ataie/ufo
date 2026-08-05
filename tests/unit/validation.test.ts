@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { normalizeIranPhone, normalizePersianText, toEnglishDigits, toPersianDigits } from "@ufo/validation";
+import {
+  normalizeIranPhone,
+  normalizePersianText,
+  toEnglishDigits,
+  toPersianDigits,
+} from "@ufo/validation";
 
 describe("Persian validation helpers", () => {
   it("normalizes Persian and Arabic characters", () => {

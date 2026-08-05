@@ -1,1 +1,6 @@
-export { getAvailableStock, getInventoryByVariant, releaseReservation, reserveInventory } from "@ufo/domain";
+export {
+  getAvailableStock,
+  getInventoryByVariant,
+  releaseReservation,
+  reserveInventory,
+} from "@ufo/domain";

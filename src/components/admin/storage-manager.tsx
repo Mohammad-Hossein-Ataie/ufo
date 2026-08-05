@@ -41,7 +41,7 @@ export function StorageManager() {
     setLoading(true);
     const response = await fetch("/api/admin/storage/delete", {
       method: "DELETE",
-      body: JSON.stringify({ key })
+      body: JSON.stringify({ key }),
     });
     const data = (await response.json()) as { message?: string; error?: string };
     setMessage(data.message ?? data.error ?? "پاسخ نامشخص");
@@ -51,7 +51,7 @@ export function StorageManager() {
   async function downloadFile(key: string) {
     const response = await fetch("/api/admin/storage/presigned", {
       method: "POST",
-      body: JSON.stringify({ key })
+      body: JSON.stringify({ key }),
     });
     const data = (await response.json()) as { url?: string; error?: string };
     if (data.url) window.open(data.url, "_blank", "noopener,noreferrer");
@@ -71,11 +71,17 @@ export function StorageManager() {
             <Upload size={17} />
             آپلود
           </Button>
-          <IconButton label="به‌روزرسانی" className="border-[#D7DDE4] bg-[#EEF3F8] text-[#17202A]" onClick={() => void fetchFiles()}>
+          <IconButton
+            label="به‌روزرسانی"
+            className="border-[#D7DDE4] bg-[#EEF3F8] text-[#17202A]"
+            onClick={() => void fetchFiles()}
+          >
             <RefreshCw size={17} />
           </IconButton>
         </div>
-        <p className="text-sm text-[#5F6C79]" role="status">{message}</p>
+        <p className="text-sm text-[#5F6C79]" role="status">
+          {message}
+        </p>
       </div>
       <div className="overflow-x-auto rounded-md border border-[#D7DDE4] bg-white">
         <table className="min-w-[620px] w-full text-sm">
@@ -90,15 +96,27 @@ export function StorageManager() {
           <tbody>
             {files.map((entry) => (
               <tr key={entry.key} className="border-t border-[#E2E7ED]">
-                <td className="px-4 py-3" dir="ltr">{entry.key}</td>
-                <td className="px-4 py-3">{entry.size ? new Intl.NumberFormat("fa-IR").format(entry.size) : "-"}</td>
+                <td className="px-4 py-3" dir="ltr">
+                  {entry.key}
+                </td>
+                <td className="px-4 py-3">
+                  {entry.size ? new Intl.NumberFormat("fa-IR").format(entry.size) : "-"}
+                </td>
                 <td className="px-4 py-3">{entry.lastModified ?? "-"}</td>
                 <td className="px-4 py-3">
                   <div className="flex gap-2">
-                    <IconButton label="دانلود" className="border-[#D7DDE4] bg-[#EEF3F8] text-[#17202A]" onClick={() => void downloadFile(entry.key)}>
+                    <IconButton
+                      label="دانلود"
+                      className="border-[#D7DDE4] bg-[#EEF3F8] text-[#17202A]"
+                      onClick={() => void downloadFile(entry.key)}
+                    >
                       <Download size={17} />
                     </IconButton>
-                    <IconButton label="حذف" className="border-rose-200 bg-rose-50 text-rose-700" onClick={() => void deleteFile(entry.key)}>
+                    <IconButton
+                      label="حذف"
+                      className="border-rose-200 bg-rose-50 text-rose-700"
+                      onClick={() => void deleteFile(entry.key)}
+                    >
                       <Trash2 size={17} />
                     </IconButton>
                   </div>

@@ -12,11 +12,16 @@ import type {
   SalesChannel,
   ShippingAddress,
   ShippingQuote,
-  StoreSettings
+  StoreSettings,
 } from "@ufo/types";
 import { defaultStoreSettings } from "@ufo/config";
 import { isTehran, normalizeIranPhone, toPersianDigits } from "@ufo/validation";
-import { importedBrands, importedInventoryItems, importedProducts, importedVariants } from "./imported-products";
+import {
+  importedBrands,
+  importedInventoryItems,
+  importedProducts,
+  importedVariants,
+} from "./imported-products";
 
 export const storeSettings: StoreSettings = defaultStoreSettings;
 
@@ -27,7 +32,7 @@ export const categories: Category[] = [
     slug: "pod",
     descriptionFa: "دستگاه‌های پاد سیستم برای مصرف روزمره با انتخاب دقیق کارتریج.",
     seoTitle: "خرید پاد با ضمانت اصالت | UFO Puff",
-    seoDescription: "کاتالوگ پاد با موجودی و قیمت به‌روز برای خرید تکی و عمده."
+    seoDescription: "کاتالوگ پاد با موجودی و قیمت به‌روز برای خرید تکی و عمده.",
   },
   {
     id: "cat-vape",
@@ -35,7 +40,7 @@ export const categories: Category[] = [
     slug: "vape",
     descriptionFa: "ویپ و ماد برای کاربران باتجربه با مشخصات فنی شفاف.",
     seoTitle: "خرید ویپ در تهران | UFO Puff",
-    seoDescription: "ویپ، ماد و لوازم سازگار با ارسال تیپاکس و پیک تهران."
+    seoDescription: "ویپ، ماد و لوازم سازگار با ارسال تیپاکس و پیک تهران.",
   },
   {
     id: "cat-disposable",
@@ -43,7 +48,7 @@ export const categories: Category[] = [
     slug: "disposable",
     descriptionFa: "پادهای یک‌بارمصرف منتخب با موجودی قابل اتکا.",
     seoTitle: "خرید پاد یک‌بارمصرف | UFO Puff",
-    seoDescription: "قیمت و موجودی پاد یک‌بارمصرف برای مصرف‌کننده و همکار."
+    seoDescription: "قیمت و موجودی پاد یک‌بارمصرف برای مصرف‌کننده و همکار.",
   },
   {
     id: "cat-eliquid",
@@ -51,7 +56,7 @@ export const categories: Category[] = [
     slug: "e-liquid",
     descriptionFa: "جویس و سالت نیکوتین با دسته‌بندی طعم و نیکوتین.",
     seoTitle: "خرید جویس و سالت | UFO Puff",
-    seoDescription: "جویس، سالت نیکوتین و مایعات منتخب با توضیحات فارسی."
+    seoDescription: "جویس، سالت نیکوتین و مایعات منتخب با توضیحات فارسی.",
   },
   {
     id: "cat-salt-nicotine",
@@ -59,7 +64,7 @@ export const categories: Category[] = [
     slug: "salt-nicotine",
     descriptionFa: "سالت نیکوتین‌های وارداتی با برند، طعم و قیمت دقیق.",
     seoTitle: "خرید سالت نیکوتین | UFO Puff",
-    seoDescription: "کاتالوگ سالت نیکوتین با قیمت تک‌فروشی، برند و توضیحات فارسی."
+    seoDescription: "کاتالوگ سالت نیکوتین با قیمت تک‌فروشی، برند و توضیحات فارسی.",
   },
   {
     id: "cat-coil",
@@ -67,7 +72,7 @@ export const categories: Category[] = [
     slug: "coil",
     descriptionFa: "کویل‌های سازگار با دستگاه‌ها و کارتریج‌های پرفروش.",
     seoTitle: "خرید کویل ویپ | UFO Puff",
-    seoDescription: "کویل‌های سازگار با دستگاه‌های رایج، همراه با راهنمای سازگاری."
+    seoDescription: "کویل‌های سازگار با دستگاه‌های رایج، همراه با راهنمای سازگاری.",
   },
   {
     id: "cat-cartridge",
@@ -75,7 +80,7 @@ export const categories: Category[] = [
     slug: "cartridge",
     descriptionFa: "کارتریج پاد با سازگاری مشخص و موجودی قابل کنترل.",
     seoTitle: "خرید کارتریج پاد | UFO Puff",
-    seoDescription: "کارتریج‌های پاد با مشخصات سازگاری برای جلوگیری از خرید اشتباه."
+    seoDescription: "کارتریج‌های پاد با مشخصات سازگاری برای جلوگیری از خرید اشتباه.",
   },
   {
     id: "cat-lighter",
@@ -83,15 +88,15 @@ export const categories: Category[] = [
     slug: "lighter",
     descriptionFa: "فندک و اکسسوری فروشگاهی برای خرید تکی و عمده.",
     seoTitle: "خرید فندک و اکسسوری | UFO Puff",
-    seoDescription: "فندک و لوازم جانبی با سفارش سریع برای خریداران عمده."
-  }
+    seoDescription: "فندک و لوازم جانبی با سفارش سریع برای خریداران عمده.",
+  },
 ];
 
 export const brands: Brand[] = [
   { id: "brand-ufo", nameFa: "UFO Selection", slug: "ufo-selection" },
   { id: "brand-orbit", nameFa: "Orbit Lab", slug: "orbit-lab" },
   { id: "brand-neon", nameFa: "Neon Cloud", slug: "neon-cloud" },
-  ...importedBrands
+  ...importedBrands,
 ];
 
 const now = new Date("2026-08-02T00:00:00.000Z").toISOString();
@@ -111,14 +116,14 @@ const baseProducts: Product[] = [
     tags: ["پاد", "کارتریج", "روزمره"],
     attributes: [
       { nameFa: "توان", valueFa: "۱۸ وات", technicalValue: "18W" },
-      { nameFa: "باتری", valueFa: "۸۰۰ میلی‌آمپر", technicalValue: "800mAh" }
+      { nameFa: "باتری", valueFa: "۸۰۰ میلی‌آمپر", technicalValue: "800mAh" },
     ],
     isActive: true,
     isAgeRestricted: true,
     seoTitle: "خرید کیت پاد Nebula | UFO Puff",
     seoDescription: "کیت پاد Nebula با موجودی به‌روز، مناسب خرید تکی و همکاری.",
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
   },
   {
     id: "prod-comet-disposable",
@@ -133,14 +138,14 @@ const baseProducts: Product[] = [
     tags: ["یک‌بارمصرف", "عمده", "پرفروش"],
     attributes: [
       { nameFa: "پاف", valueFa: "۶۰۰۰", technicalValue: "6000" },
-      { nameFa: "ظرفیت", valueFa: "۱۴ میلی‌لیتر", technicalValue: "14ml" }
+      { nameFa: "ظرفیت", valueFa: "۱۴ میلی‌لیتر", technicalValue: "14ml" },
     ],
     isActive: true,
     isAgeRestricted: true,
     seoTitle: "خرید پاد یک‌بارمصرف Comet 6000 | UFO Puff",
     seoDescription: "پاد یک‌بارمصرف Comet 6000 با قیمت همکاری و موجودی قابل رزرو.",
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
   },
   {
     id: "prod-orbit-coil",
@@ -155,14 +160,14 @@ const baseProducts: Product[] = [
     tags: ["کویل", "سازگاری", "مصرفی"],
     attributes: [
       { nameFa: "اهم", valueFa: "۰.۸", technicalValue: "0.8ohm" },
-      { nameFa: "بسته", valueFa: "۵ عددی", technicalValue: "5pcs" }
+      { nameFa: "بسته", valueFa: "۵ عددی", technicalValue: "5pcs" },
     ],
     isActive: true,
     isAgeRestricted: true,
     seoTitle: "خرید کویل مش Orbit | UFO Puff",
     seoDescription: "کویل مش Orbit با مشخصات فنی و راهنمای سازگاری فارسی.",
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
   },
   {
     id: "prod-salt-mint",
@@ -178,15 +183,15 @@ const baseProducts: Product[] = [
     tags: ["سالت", "نعناع", "۳۰ میل"],
     attributes: [
       { nameFa: "حجم", valueFa: "۳۰ میلی‌لیتر", technicalValue: "30ml" },
-      { nameFa: "نیکوتین", valueFa: "۲۵ میلی‌گرم", technicalValue: "25mg" }
+      { nameFa: "نیکوتین", valueFa: "۲۵ میلی‌گرم", technicalValue: "25mg" },
     ],
     isActive: true,
     isAgeRestricted: true,
     seoTitle: "خرید سالت نیکوتین نعناع | UFO Puff",
     seoDescription: "سالت نیکوتین ۳۰ میلی‌لیتر با نمایش دقیق مشخصات و هشدار قانونی.",
     createdAt: now,
-    updatedAt: now
-  }
+    updatedAt: now,
+  },
 ];
 
 export const products: Product[] = [...baseProducts, ...importedProducts];
@@ -203,7 +208,7 @@ const baseVariants: ProductVariant[] = [
     cartonSize: 12,
     minWholesaleCartonCount: 2,
     attributes: [{ nameFa: "رنگ", valueFa: "مشکی", technicalValue: "Black" }],
-    isActive: true
+    isActive: true,
   },
   {
     id: "var-comet-blueberry",
@@ -215,7 +220,7 @@ const baseVariants: ProductVariant[] = [
     cartonSize: 20,
     minWholesaleCartonCount: 3,
     attributes: [{ nameFa: "طعم", valueFa: "بلوبری آیس", technicalValue: "Blueberry Ice" }],
-    isActive: true
+    isActive: true,
   },
   {
     id: "var-orbit-08",
@@ -227,7 +232,7 @@ const baseVariants: ProductVariant[] = [
     cartonSize: 10,
     minWholesaleCartonCount: 2,
     attributes: [{ nameFa: "مقاومت", valueFa: "۰.۸ اهم", technicalValue: "0.8ohm" }],
-    isActive: true
+    isActive: true,
   },
   {
     id: "var-mint-25mg",
@@ -239,8 +244,8 @@ const baseVariants: ProductVariant[] = [
     cartonSize: 10,
     minWholesaleCartonCount: 4,
     attributes: [{ nameFa: "نیکوتین", valueFa: "۲۵ میلی‌گرم", technicalValue: "25mg" }],
-    isActive: true
-  }
+    isActive: true,
+  },
 ];
 
 export const variants: ProductVariant[] = [...baseVariants, ...importedVariants];
@@ -253,7 +258,7 @@ const baseInventoryItems: InventoryItem[] = [
     reserved: 4,
     preorderEnabled: true,
     restockThreshold: 8,
-    updatedAt: now
+    updatedAt: now,
   },
   {
     id: "inv-comet-blueberry",
@@ -262,7 +267,7 @@ const baseInventoryItems: InventoryItem[] = [
     reserved: 20,
     preorderEnabled: true,
     restockThreshold: 30,
-    updatedAt: now
+    updatedAt: now,
   },
   {
     id: "inv-orbit-08",
@@ -271,7 +276,7 @@ const baseInventoryItems: InventoryItem[] = [
     reserved: 0,
     preorderEnabled: true,
     restockThreshold: 10,
-    updatedAt: now
+    updatedAt: now,
   },
   {
     id: "inv-mint-25mg",
@@ -280,8 +285,8 @@ const baseInventoryItems: InventoryItem[] = [
     reserved: 3,
     preorderEnabled: false,
     restockThreshold: 12,
-    updatedAt: now
-  }
+    updatedAt: now,
+  },
 ];
 
 export const inventoryItems: InventoryItem[] = [...baseInventoryItems, ...importedInventoryItems];
@@ -292,8 +297,8 @@ export const compatibilityGroups: CompatibilityGroup[] = [
     nameFa: "سازگاری Nebula و Orbit",
     productIds: ["prod-nebula-pod", "prod-orbit-coil"],
     variantIds: ["var-nebula-black", "var-orbit-08"],
-    noteFa: "کویل Orbit 0.8 برای کارتریج‌های سری Nebula مناسب است."
-  }
+    noteFa: "کویل Orbit 0.8 برای کارتریج‌های سری Nebula مناسب است.",
+  },
 ];
 
 export function findProduct(slug: string): Product | undefined {
@@ -360,7 +365,7 @@ export function validateWholesaleCartonCount(
   }
   return {
     quantity: calculateCartonQuantity(variant, cartonCount),
-    minCartonCount: variant.minWholesaleCartonCount
+    minCartonCount: variant.minWholesaleCartonCount,
   };
 }
 
@@ -376,7 +381,7 @@ export function createOrderItemSnapshot(args: {
   const quantity =
     args.channel === "wholesale"
       ? validateWholesaleCartonCount(args.variant, args.cartonCount ?? 0).quantity
-      : args.quantity ?? 1;
+      : (args.quantity ?? 1);
   const unitPriceRial = getUnitPriceRial(args.variant, args.channel);
   const totalRial = unitPriceRial * quantity - discountRial;
   assertMoneyRial(totalRial);
@@ -393,19 +398,19 @@ export function createOrderItemSnapshot(args: {
     ...(args.channel === "wholesale" ? { cartonSize: args.variant.cartonSize } : {}),
     ...(args.channel === "wholesale" && args.cartonCount ? { cartonCount: args.cartonCount } : {}),
     discountRial,
-    totalRial
+    totalRial,
   };
 }
 
-export function calculateOrderTotals(items: OrderItemSnapshot[], shippingRial = 0): {
+export function calculateOrderTotals(
+  items: OrderItemSnapshot[],
+  shippingRial = 0,
+): {
   subtotalRial: number;
   discountRial: number;
   totalRial: number;
 } {
-  const subtotalRial = items.reduce(
-    (sum, item) => sum + item.unitPriceRial * item.quantity,
-    0,
-  );
+  const subtotalRial = items.reduce((sum, item) => sum + item.unitPriceRial * item.quantity, 0);
   const discountRial = items.reduce((sum, item) => sum + item.discountRial, 0);
   const totalRial = subtotalRial - discountRial + shippingRial;
   return { subtotalRial, discountRial, totalRial };
@@ -438,16 +443,16 @@ export function reserveInventory(args: {
     channel: args.channel,
     ...(args.cartId ? { cartId: args.cartId } : {}),
     ...(args.orderId ? { orderId: args.orderId } : {}),
-    expiresAt
+    expiresAt,
   };
 
   return {
     item: {
       ...args.item,
       reserved: args.item.reserved + args.quantity,
-      updatedAt: nowDate.toISOString()
+      updatedAt: nowDate.toISOString(),
     },
-    reservation
+    reservation,
   };
 }
 
@@ -459,11 +464,15 @@ export function releaseReservation(
   return {
     ...item,
     reserved: Math.max(0, item.reserved - reservation.quantity),
-    updatedAt: nowDate.toISOString()
+    updatedAt: nowDate.toISOString(),
   };
 }
 
-export function createOrderNumber(channel: SalesChannel, sequence: number, date = new Date()): string {
+export function createOrderNumber(
+  channel: SalesChannel,
+  sequence: number,
+  date = new Date(),
+): string {
   const ymd = date.toISOString().slice(0, 10).replace(/-/g, "");
   const prefix = channel === "wholesale" ? "B2B" : "RTL";
   return `${prefix}-${ymd}-${String(sequence).padStart(5, "0")}`;
@@ -498,11 +507,14 @@ export function createOrder(args: {
     paymentMethod: args.paymentMethod ?? "card_to_card",
     shippingMethod: args.shippingMethod ?? "tipax",
     createdAt: nowDate.toISOString(),
-    updatedAt: nowDate.toISOString()
+    updatedAt: nowDate.toISOString(),
   };
 }
 
-export function quoteShipping(address: ShippingAddress, method: "tipax" | "tehran_courier" | "pickup"): ShippingQuote {
+export function quoteShipping(
+  address: ShippingAddress,
+  method: "tipax" | "tehran_courier" | "pickup",
+): ShippingQuote {
   const phone = normalizeIranPhone(address.receiverPhone);
   const receiverName = address.receiverName.trim();
   if (!receiverName || !phone) throw new Error("اطلاعات گیرنده کامل نیست.");
@@ -513,7 +525,7 @@ export function quoteShipping(address: ShippingAddress, method: "tipax" | "tehra
       titleFa: "تحویل حضوری",
       costRial: 0,
       etaFa: "هماهنگی همان روز",
-      available: true
+      available: true,
     };
   }
 
@@ -525,7 +537,7 @@ export function quoteShipping(address: ShippingAddress, method: "tipax" | "tehra
       costRial: available ? 950_000 : 0,
       etaFa: available ? "همان روز یا روز کاری بعد" : "فقط برای تهران فعال است",
       available,
-      ...(available ? {} : { reasonFa: "پیک فقط برای شهر تهران قابل انتخاب است." })
+      ...(available ? {} : { reasonFa: "پیک فقط برای شهر تهران قابل انتخاب است." }),
     };
   }
 
@@ -534,7 +546,7 @@ export function quoteShipping(address: ShippingAddress, method: "tipax" | "tehra
     titleFa: "تیپاکس",
     costRial: 1_650_000,
     etaFa: "۲ تا ۴ روز کاری",
-    available: true
+    available: true,
   };
 }
 
@@ -557,7 +569,7 @@ export function createInvoice(args: {
     secureTokenHash: args.secureTokenHash,
     totalRial: args.order.totalRial,
     issuedAt: nowDate.toISOString(),
-    expiresAt
+    expiresAt,
   };
 }
 
@@ -580,5 +592,5 @@ export const seedData = {
   products,
   variants,
   inventoryItems,
-  compatibilityGroups
+  compatibilityGroups,
 };

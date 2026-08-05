@@ -12,8 +12,8 @@ export default [
       "dist/**",
       "coverage/**",
       "node_modules/**",
-      "playwright-report/**"
-    ]
+      "playwright-report/**",
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -22,11 +22,11 @@ export default [
     languageOptions: {
       globals: {
         ...globals.browser,
-        ...globals.node
-      }
+        ...globals.node,
+      },
     },
     plugins: {
-      "@next/next": nextPlugin
+      "@next/next": nextPlugin,
     },
     rules: {
       ...nextPlugin.configs.recommended.rules,
@@ -36,11 +36,11 @@ export default [
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
-          "argsIgnorePattern": "^_",
-          "varsIgnorePattern": "^_"
-        }
-      ]
-    }
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+    },
   },
-  prettier
+  prettier,
 ];

@@ -8,7 +8,10 @@ export interface ChatMessage {
 
 export interface ChatProvider {
   startConversation(phone: string): Promise<{ conversationId: string }>;
-  sendMessage(conversationId: string, message: Omit<ChatMessage, "id" | "conversationId" | "createdAt">): Promise<ChatMessage>;
+  sendMessage(
+    conversationId: string,
+    message: Omit<ChatMessage, "id" | "conversationId" | "createdAt">,
+  ): Promise<ChatMessage>;
   listMessages(conversationId: string): Promise<ChatMessage[]>;
 }
 
@@ -29,7 +32,7 @@ export class MockChatProvider implements ChatProvider {
       ...message,
       id: `msg_${Date.now()}`,
       conversationId,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
     const messages = this.messages.get(conversationId) ?? [];
     messages.push(entry);

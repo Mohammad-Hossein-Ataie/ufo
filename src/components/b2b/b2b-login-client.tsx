@@ -26,14 +26,17 @@ export function B2BLoginClient() {
         businessName: businessName.trim() || "همکار عمده",
         managerName: managerName.trim() || "مسئول خرید",
         phone: normalizedPhone,
-        loggedInAt: new Date().toISOString()
+        loggedInAt: new Date().toISOString(),
       }),
     );
     window.location.href = searchParams.get("next") || "/b2b/quick-order";
   }
 
   return (
-    <form onSubmit={submit} className="mt-6 grid gap-4 rounded-md border border-[#D5D9C9] bg-white p-5">
+    <form
+      onSubmit={submit}
+      className="mt-6 grid gap-4 rounded-md border border-[#D5D9C9] bg-white p-5"
+    >
       {error ? (
         <Alert title="شماره نامعتبر" tone="danger">
           {error}
@@ -41,7 +44,11 @@ export function B2BLoginClient() {
       ) : null}
       <label className="grid gap-2">
         نام فروشگاه
-        <Input value={businessName} onChange={(event) => setBusinessName(event.target.value)} required />
+        <Input
+          value={businessName}
+          onChange={(event) => setBusinessName(event.target.value)}
+          required
+        />
       </label>
       <label className="grid gap-2">
         نام مسئول خرید

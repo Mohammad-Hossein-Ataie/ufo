@@ -28,11 +28,13 @@ export const rolePermissions: Record<UserRole, string[]> = {
   order_manager: ["order:write", "shipment:write"],
   finance_manager: ["payment:review", "invoice:write"],
   admin: ["admin:read", "admin:write"],
-  super_admin: ["*"]
+  super_admin: ["*"],
 };
 
 export function can(roleList: UserRole[], permission: string): boolean {
-  return roleList.some((role) => rolePermissions[role]?.includes("*") || rolePermissions[role]?.includes(permission));
+  return roleList.some(
+    (role) => rolePermissions[role]?.includes("*") || rolePermissions[role]?.includes(permission),
+  );
 }
 
 export function requirePermission(roleList: UserRole[], permission: string): void {
@@ -75,8 +77,8 @@ export async function createOtpChallenge(args: {
       attempts: 0,
       maxAttempts: 5,
       expiresAt,
-      createdAt: nowDate.toISOString()
-    }
+      createdAt: nowDate.toISOString(),
+    },
   };
 }
 
@@ -113,6 +115,6 @@ export function createSessionClaims(args: {
     phone: normalizeIranPhone(args.phone),
     roles: args.roles,
     issuedAt: nowDate.toISOString(),
-    expiresAt
+    expiresAt,
   };
 }

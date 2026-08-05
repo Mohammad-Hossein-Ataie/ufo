@@ -24,10 +24,14 @@ export function Button({
     <button
       className={cn(
         "inline-flex min-h-11 items-center justify-center gap-2 rounded-md border px-4 font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-        variant === "primary" && "border-cyan-300 bg-cyan-300 text-slate-950 hover:bg-cyan-200 focus-visible:outline-cyan-200",
-        variant === "secondary" && "border-slate-300 bg-white text-slate-950 hover:bg-slate-100 focus-visible:outline-slate-300",
-        variant === "ghost" && "border-transparent bg-transparent text-current hover:bg-white/10 focus-visible:outline-current",
-        variant === "danger" && "border-rose-400 bg-rose-500 text-white hover:bg-rose-400 focus-visible:outline-rose-300",
+        variant === "primary" &&
+          "border-cyan-300 bg-cyan-300 text-slate-950 hover:bg-cyan-200 focus-visible:outline-cyan-200",
+        variant === "secondary" &&
+          "border-slate-300 bg-white text-slate-950 hover:bg-slate-100 focus-visible:outline-slate-300",
+        variant === "ghost" &&
+          "border-transparent bg-transparent text-current hover:bg-white/10 focus-visible:outline-current",
+        variant === "danger" &&
+          "border-rose-400 bg-rose-500 text-white hover:bg-rose-400 focus-visible:outline-rose-300",
         size === "sm" && "min-h-10 px-3 text-sm",
         size === "md" && "text-sm",
         size === "lg" && "min-h-12 px-5 text-base",
@@ -82,7 +86,7 @@ export function Textarea({ className, ...props }: ComponentPropsWithoutRef<"text
 
 export function Badge({
   children,
-  tone = "neutral"
+  tone = "neutral",
 }: {
   children: ReactNode;
   tone?: "neutral" | "success" | "warning" | "danger" | "info";
@@ -115,7 +119,7 @@ export function Price({ valueRial, className }: { valueRial: number; className?:
 export function Alert({
   title,
   children,
-  tone = "info"
+  tone = "info",
 }: {
   title: string;
   children: ReactNode;
@@ -166,7 +170,7 @@ export function ProductCard({
   media,
   price,
   badge,
-  actions
+  actions,
 }: {
   title: string;
   description: string;
@@ -201,7 +205,7 @@ export function StockStatus({ available }: { available: number }) {
 
 export function StatusPill({
   children,
-  tone = "neutral"
+  tone = "neutral",
 }: {
   children: ReactNode;
   tone?: "neutral" | "success" | "warning" | "danger" | "info";
@@ -230,7 +234,7 @@ export const Dialog = {
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     );
-  }
+  },
 };
 
 export const Tabs = {
@@ -247,7 +251,7 @@ export const Tabs = {
       />
     );
   },
-  Content: TabsPrimitive.Content
+  Content: TabsPrimitive.Content,
 };
 
 export const Tooltip = {
@@ -262,5 +266,5 @@ export const Tooltip = {
         </TooltipPrimitive.Content>
       </TooltipPrimitive.Portal>
     );
-  }
+  },
 };

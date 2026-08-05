@@ -101,39 +101,48 @@ const inlineSpecSections = {
       "باتری ۸۰۰ میلی‌آمپرساعتی مناسب استفاده روزانه",
       "حداکثر توان ۲۰ وات با خروجی پایدار",
       "فعال‌سازی خودکار با مکش و شارژ سریع USB-C",
-      "سازگار با کارتریج‌های GeekVape U"
+      "سازگار با کارتریج‌های GeekVape U",
     ],
-    packageItemsFa: ["۱ عدد دستگاه GeekVape AU", "۲ عدد کارتریج U ۰.۷ و ۱.۱ اهم", "۱ عدد کابل USB-C"],
+    packageItemsFa: [
+      "۱ عدد دستگاه GeekVape AU",
+      "۲ عدد کارتریج U ۰.۷ و ۱.۱ اهم",
+      "۱ عدد کابل USB-C",
+    ],
     specs: [
       ["ظرفیت باتری", "۸۰۰mAh"],
       ["توان خروجی", "حداکثر ۲۰ وات"],
       ["ظرفیت کارتریج", "۲ میلی‌لیتر"],
       ["پورت شارژ", "USB-C"],
-      ["نوع فعال‌سازی", "Auto Draw"]
-    ]
+      ["نوع فعال‌سازی", "Auto Draw"],
+    ],
   },
   "geekvape-aq-kit": {
     highlightsFa: [
       "باتری ۱۰۰۰ میلی‌آمپرساعتی برای استفاده طولانی",
       "۳ سطح تنظیم توان و کنترل جریان هوا",
       "سازگار با کارتریج‌های سری Q با فناوری VPU",
-      "بدنه مقاوم Tri-Proof و شارژ سریع USB-C"
+      "بدنه مقاوم Tri-Proof و شارژ سریع USB-C",
     ],
-    packageItemsFa: ["۱ عدد دستگاه Venax AQ", "۱ عدد کارتریج Q", "۱ عدد کابل USB-C", "۱ عدد درپوش دهانه"],
+    packageItemsFa: [
+      "۱ عدد دستگاه Venax AQ",
+      "۱ عدد کارتریج Q",
+      "۱ عدد کابل USB-C",
+      "۱ عدد درپوش دهانه",
+    ],
     specs: [
       ["ظرفیت باتری", "۱۰۰۰mAh"],
       ["توان خروجی", "۵ تا ۲۰ وات"],
       ["ظرفیت کارتریج", "۲ میلی‌لیتر"],
       ["پورت شارژ", "USB-C"],
-      ["تنظیم Airflow", "دارد"]
-    ]
+      ["تنظیم Airflow", "دارد"],
+    ],
   },
   "uwell-a2s": {
     highlightsFa: [
       "باتری ۵۲۰ میلی‌آمپرساعتی برای استفاده روزمره",
       "توان خروجی ۱۵ وات و فعال‌سازی خودکار با مکش",
       "فناوری Pro-FOCS برای طعم‌دهی شفاف",
-      "کارتریج شفاف برای مشاهده سطح مایع"
+      "کارتریج شفاف برای مشاهده سطح مایع",
     ],
     packageItemsFa: ["۱ عدد دستگاه Uwell Caliburn A2S", "۲ عدد کارتریج A2S", "دفترچه راهنما"],
     specs: [
@@ -141,9 +150,9 @@ const inlineSpecSections = {
       ["توان خروجی", "۱۵ وات"],
       ["ظرفیت کارتریج", "۲ میلی‌لیتر"],
       ["مقاومت کویل", "۰.۹ اهم"],
-      ["پورت شارژ", "USB-C"]
-    ]
-  }
+      ["پورت شارژ", "USB-C"],
+    ],
+  },
 };
 
 function normalizeDigits(value) {
@@ -161,7 +170,9 @@ function toPersianDigits(value) {
 
 function priceTokenToRial(token) {
   if (!token?.trim()) return undefined;
-  const normalized = normalizeDigits(token).toLowerCase().replace(/[,،\s]/g, "");
+  const normalized = normalizeDigits(token)
+    .toLowerCase()
+    .replace(/[,،\s]/g, "");
   const number = normalized.replace(/t|تومان/g, "");
   if (!number) return undefined;
   if (number.includes(".")) return Math.round(Number(number) * 1_000_000) * 10;
@@ -213,12 +224,14 @@ function brandFromName(nameFa, nameEn = "") {
     ["lostvape", "لاست ویپ", "Lost Vape", "lost vape"],
     ["argus", "آرگاس", "Argus"],
     ["al-fakher", "الفاخر", "Al Fakher"],
-    ["bugatti", "بوگاتی", "Bugatti"]
+    ["bugatti", "بوگاتی", "Bugatti"],
   ];
   const found = brands.find(([slug, fa, en, ...aliases]) =>
     [slug, fa, en, ...aliases].some((alias) => text.includes(alias.toLowerCase())),
   );
-  return found ? { id: `brand-${found[0]}`, slug: found[0], nameFa: found[2] } : { id: "brand-ufo", slug: "ufo-selection", nameFa: "UFO Selection" };
+  return found
+    ? { id: `brand-${found[0]}`, slug: found[0], nameFa: found[2] }
+    : { id: "brand-ufo", slug: "ufo-selection", nameFa: "UFO Selection" };
 }
 
 function extractPuffCount(nameFa, nameEn = "") {
@@ -227,7 +240,9 @@ function extractPuffCount(nameFa, nameEn = "") {
   if (kMatch?.[1]) return Math.round(Number(kMatch[1]) * 1000);
   const hazarMatch = normalized.match(/(\d+)\s*هزار/);
   if (hazarMatch?.[1]) return Number(hazarMatch[1]) * 1000;
-  const puffs = [...normalized.matchAll(/(\d{3,6})\s*(?:پاف|puff)?/gi)].map((match) => Number(match[1]));
+  const puffs = [...normalized.matchAll(/(\d{3,6})\s*(?:پاف|puff)?/gi)].map((match) =>
+    Number(match[1]),
+  );
   return puffs.find((value) => value >= 300);
 }
 
@@ -313,7 +328,10 @@ function parseSpecSections(...texts) {
   const sections = new Map();
   const headingPattern = /^(?:[A-Za-z].{2,70}|\S.{1,42}\([^)]+\))$/;
   for (const text of texts) {
-    const lines = text.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+    const lines = text
+      .split(/\n+/)
+      .map((line) => line.trim())
+      .filter(Boolean);
     let current;
     for (const line of lines) {
       const looksLikeHeading =
@@ -341,7 +359,9 @@ function findSpecFor(row, sections) {
     if (exact) return exact;
   }
   const compactName = slugify(row.nameEn || row.nameFa);
-  return Array.from(sections.entries()).find(([key]) => key.includes(compactName) || compactName.includes(key))?.[1];
+  return Array.from(sections.entries()).find(
+    ([key]) => key.includes(compactName) || compactName.includes(key),
+  )?.[1];
 }
 
 function wholesaleFallback(retailPriceRial) {
@@ -353,10 +373,14 @@ function makeProducts() {
     [resolve(dataRoot, "PodSalt_Products.docx"), "فایل PodSalt_Products.docx"],
     [resolve(dataRoot, "Nasty_Products.docx"), "فایل Nasty_Products.docx"],
     [resolve(dataRoot, "VGOD.txt"), "فایل VGOD.txt"],
-    [resolve(dataRoot, "Dr_vape.txt"), "فایل Dr_vape.txt"]
+    [resolve(dataRoot, "Dr_vape.txt"), "فایل Dr_vape.txt"],
   ];
   const saltRows = saltSources.flatMap(([path, source]) => {
-    const text = path.endsWith(".docx") ? extractDocxText(path) : existsSync(path) ? readFileSync(path, "utf8") : "";
+    const text = path.endsWith(".docx")
+      ? extractDocxText(path)
+      : existsSync(path)
+        ? readFileSync(path, "utf8")
+        : "";
     return parseSaltText(text, source);
   });
 
@@ -368,7 +392,7 @@ function makeProducts() {
   const rows = [
     ...parsePipePriceRows(disposablePriceLines, "لیست قیمت تک‌فروشی کارفرما"),
     ...parsePipePriceRows(podPriceLines, "لیست پاد دائمی کارفرما"),
-    ...saltRows
+    ...saltRows,
   ];
 
   const seenProductIds = new Set();
@@ -380,11 +404,27 @@ function makeProducts() {
   const inventoryItems = [];
 
   rows.forEach((row, index) => {
-    const isSalt = row.source.includes("VGOD") || row.source.includes("Dr_vape") || row.source.includes("PodSalt") || row.source.includes("Nasty_Products");
+    const isSalt =
+      row.source.includes("VGOD") ||
+      row.source.includes("Dr_vape") ||
+      row.source.includes("PodSalt") ||
+      row.source.includes("Nasty_Products");
     const isPod = !isSalt && podPriceLines.includes(row.nameFa);
     const isCartridge = /کارتریج|cartridge/i.test(`${row.nameFa} ${row.nameEn}`);
-    const categoryId = isSalt ? "cat-salt-nicotine" : isCartridge ? "cat-cartridge" : isPod ? "cat-pod" : "cat-disposable";
-    const productKind = isSalt ? "salt-nicotine" : isCartridge ? "cartridge" : isPod ? "pod-device" : "disposable";
+    const categoryId = isSalt
+      ? "cat-salt-nicotine"
+      : isCartridge
+        ? "cat-cartridge"
+        : isPod
+          ? "cat-pod"
+          : "cat-disposable";
+    const productKind = isSalt
+      ? "salt-nicotine"
+      : isCartridge
+        ? "cartridge"
+        : isPod
+          ? "pod-device"
+          : "disposable";
     const brand = brandFromName(row.nameFa, row.nameEn);
     brandMap.set(brand.id, brand);
     const puffCount = extractPuffCount(row.nameFa, row.nameEn);
@@ -415,33 +455,70 @@ function makeProducts() {
       productKind,
       salesChannels: ["retail"],
       shortDescriptionFa,
-      descriptionFa: sectionBody.length > 0
-        ? sectionBody.join(" ")
-        : `${row.nameFa}${row.nameEn ? ` (${row.nameEn})` : ""} بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.`,
+      descriptionFa:
+        sectionBody.length > 0
+          ? sectionBody.join(" ")
+          : `${row.nameFa}${row.nameEn ? ` (${row.nameEn})` : ""} بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.`,
       image: defaultImage,
       images: [defaultImage],
       tags: [
         isSalt ? "سالت نیکوتین" : isPod ? "پاد دائمی" : "یکبارمصرف",
         brand.nameFa,
         ...(row.nameEn ? row.nameEn.toLowerCase().split(/\s+/).filter(Boolean).slice(0, 4) : []),
-        ...(puffText ? [puffText, String(puffCount)] : [])
+        ...(puffText ? [puffText, String(puffCount)] : []),
       ],
       attributes: [
-        { nameFa: "نوع", valueFa: isSalt ? "سالت نیکوتین" : isPod ? "پاد دائمی" : isCartridge ? "کارتریج" : "یکبارمصرف" },
-        ...(puffCount ? [{ nameFa: "پاف", valueFa: toPersianDigits(puffCount), technicalValue: String(puffCount) }] : []),
-        ...(row.nameEn ? [{ nameFa: "نام لاتین", valueFa: row.nameEn, technicalValue: row.nameEn }] : [])
+        {
+          nameFa: "نوع",
+          valueFa: isSalt
+            ? "سالت نیکوتین"
+            : isPod
+              ? "پاد دائمی"
+              : isCartridge
+                ? "کارتریج"
+                : "یکبارمصرف",
+        },
+        ...(puffCount
+          ? [
+              {
+                nameFa: "پاف",
+                valueFa: toPersianDigits(puffCount),
+                technicalValue: String(puffCount),
+              },
+            ]
+          : []),
+        ...(row.nameEn
+          ? [{ nameFa: "نام لاتین", valueFa: row.nameEn, technicalValue: row.nameEn }]
+          : []),
       ],
       specs: inline?.specs.map(([labelFa, valueFa]) => ({ labelFa, valueFa })) ?? [],
-      highlightsFa: inline?.highlightsFa ?? sectionBody.filter((line) => line.startsWith("✔")).slice(0, 5).map((line) => line.replace(/^✔️?\s*/, "")),
-      packageItemsFa: inline?.packageItemsFa ?? sectionBody.find((line) => line.includes("محتویات بسته"))?.replace(/^.*?:\s*/, "").split(/[،,]/).map((item) => item.trim()).filter(Boolean),
+      highlightsFa:
+        inline?.highlightsFa ??
+        sectionBody
+          .filter((line) => line.startsWith("✔"))
+          .slice(0, 5)
+          .map((line) => line.replace(/^✔️?\s*/, "")),
+      packageItemsFa:
+        inline?.packageItemsFa ??
+        sectionBody
+          .find((line) => line.includes("محتویات بسته"))
+          ?.replace(/^.*?:\s*/, "")
+          .split(/[،,]/)
+          .map((item) => item.trim())
+          .filter(Boolean),
       sourceNoteFa: row.source,
-      ...(hasPrice ? {} : { adminNotesFa: "قیمت این محصول در لیست کارفرما خالی بود و قبل از فعال‌سازی باید تکمیل شود." }),
+      ...(hasPrice
+        ? {}
+        : {
+            adminNotesFa:
+              "قیمت این محصول در لیست کارفرما خالی بود و قبل از فعال‌سازی باید تکمیل شود.",
+          }),
       isActive: hasPrice,
       isAgeRestricted: true,
       seoTitle: `${title} | UFO Puff`,
       seoDescription: shortDescriptionFa,
       createdAt: importedAt,
-      updatedAt: importedAt
+      updatedAt: importedAt,
     });
 
     variants.push({
@@ -451,15 +528,25 @@ function makeProducts() {
       sku: `UFO-${productKind.toUpperCase().replace(/[^A-Z]+/g, "-")}-${String(index + 1).padStart(4, "0")}`,
       retailPriceRial,
       wholesalePriceRial: wholesaleFallback(retailPriceRial),
-      ...(hasPrice ? { compareAtPriceRial: Math.round((retailPriceRial * 1.06) / 10_000) * 10_000 } : {}),
+      ...(hasPrice
+        ? { compareAtPriceRial: Math.round((retailPriceRial * 1.06) / 10_000) * 10_000 }
+        : {}),
       cartonSize: isSalt ? 10 : isPod ? 6 : puffCount && puffCount >= 40_000 ? 10 : 20,
       minWholesaleCartonCount: isSalt ? 3 : isPod ? 1 : 2,
       wholesaleEnabled: false,
       attributes: [
         { nameFa: isSalt ? "حجم" : "مدل", valueFa: isSalt ? "۳۰ میلی‌لیتر" : "استاندارد" },
-        ...(puffCount ? [{ nameFa: "پاف", valueFa: toPersianDigits(puffCount), technicalValue: String(puffCount) }] : [])
+        ...(puffCount
+          ? [
+              {
+                nameFa: "پاف",
+                valueFa: toPersianDigits(puffCount),
+                technicalValue: String(puffCount),
+              },
+            ]
+          : []),
       ],
-      isActive: hasPrice
+      isActive: hasPrice,
     });
 
     inventoryItems.push({
@@ -469,7 +556,7 @@ function makeProducts() {
       reserved: 0,
       preorderEnabled: true,
       restockThreshold: isSalt ? 6 : isPod ? 3 : 10,
-      updatedAt: importedAt
+      updatedAt: importedAt,
     });
   });
 
@@ -477,7 +564,7 @@ function makeProducts() {
     brands: Array.from(brandMap.values()).filter((brand) => brand.id !== "brand-ufo"),
     products,
     variants,
-    inventoryItems
+    inventoryItems,
   };
 }
 
@@ -496,4 +583,6 @@ export const importedInventoryItems: InventoryItem[] = ${JSON.stringify(inventor
 `;
 
 writeFileSync(outputPath, `${content}\n`, "utf8");
-console.log(`Imported ${products.length} products, ${variants.length} variants, ${brands.length} brands.`);
+console.log(
+  `Imported ${products.length} products, ${variants.length} variants, ${brands.length} brands.`,
+);

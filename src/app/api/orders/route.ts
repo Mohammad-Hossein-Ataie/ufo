@@ -19,8 +19,10 @@ function cartLines(value: unknown): CartSubmissionLine[] {
     .map((line) => {
       if (typeof line !== "object" || line === null) return null;
       const record = line as Record<string, unknown>;
-      const quantity = typeof record.quantity === "number" ? record.quantity : Number(record.quantity);
-      if (typeof record.variantId !== "string" || !Number.isInteger(quantity) || quantity <= 0) return null;
+      const quantity =
+        typeof record.quantity === "number" ? record.quantity : Number(record.quantity);
+      if (typeof record.variantId !== "string" || !Number.isInteger(quantity) || quantity <= 0)
+        return null;
       return { variantId: record.variantId, quantity };
     })
     .filter((line): line is CartSubmissionLine => line !== null);
@@ -50,12 +52,12 @@ export async function POST(request: Request) {
         city,
         line1: addressLine,
         receiverName: customerName,
-        receiverPhone: phone
+        receiverPhone: phone,
       },
       lines: cartLines(payload.lines),
       shippingMethod: shippingMethod(payload.shippingMethod),
       paymentMethod: "card_to_card",
-      receiptNote: stringValue(payload.receiptNote)
+      receiptNote: stringValue(payload.receiptNote),
     });
     return NextResponse.json({ order }, { status: 201 });
   } catch (error) {

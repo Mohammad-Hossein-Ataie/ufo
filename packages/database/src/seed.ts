@@ -9,7 +9,7 @@ async function main() {
         {
           products: seedData.products.length,
           variants: seedData.variants.length,
-          inventoryItems: seedData.inventoryItems.length
+          inventoryItems: seedData.inventoryItems.length,
         },
         null,
         2,

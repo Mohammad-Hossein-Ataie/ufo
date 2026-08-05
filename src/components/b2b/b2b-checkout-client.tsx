@@ -20,14 +20,25 @@ interface B2BSession {
   phone: string;
 }
 
-const shippingOptions: Array<{ code: ShippingMethodCode; title: string; costRial: number; eta: string }> = [
+const shippingOptions: Array<{
+  code: ShippingMethodCode;
+  title: string;
+  costRial: number;
+  eta: string;
+}> = [
   { code: "tipax", title: "تیپاکس", costRial: 1_650_000, eta: "۲ تا ۴ روز کاری" },
-  { code: "tehran_courier", title: "پیک تهران", costRial: 950_000, eta: "همان روز یا روز کاری بعد" },
-  { code: "pickup", title: "تحویل حضوری", costRial: 0, eta: "هماهنگی همان روز" }
+  {
+    code: "tehran_courier",
+    title: "پیک تهران",
+    costRial: 950_000,
+    eta: "همان روز یا روز کاری بعد",
+  },
+  { code: "pickup", title: "تحویل حضوری", costRial: 0, eta: "هماهنگی همان روز" },
 ];
 
 function readCart(): CartLine[] {
-  const raw = window.localStorage.getItem("ufo-b2b-cart") ?? window.localStorage.getItem("ufo-cart");
+  const raw =
+    window.localStorage.getItem("ufo-b2b-cart") ?? window.localStorage.getItem("ufo-cart");
   if (!raw) return [];
   try {
     const parsed: unknown = JSON.parse(raw);
@@ -57,7 +68,7 @@ function readSession(): B2BSession | null {
           channel: "wholesale",
           phone: parsed.phone,
           businessName: parsed.businessName ?? "",
-          managerName: parsed.managerName ?? ""
+          managerName: parsed.managerName ?? "",
         }
       : null;
   } catch {
@@ -92,20 +103,23 @@ export function B2BCheckoutClient() {
       cart
         .map((line) => {
           const variant = variants.find((item) => item.id === line.variantId);
-          const product = variant ? products.find((item) => item.id === variant.productId) : undefined;
+          const product = variant
+            ? products.find((item) => item.id === variant.productId)
+            : undefined;
           if (!variant || !product) return null;
           return {
             ...line,
             product,
             variant,
-            totalRial: variant.wholesalePriceRial * line.quantity
+            totalRial: variant.wholesalePriceRial * line.quantity,
           };
         })
         .filter((line): line is NonNullable<typeof line> => line !== null),
     [cart],
   );
 
-  const shipping = shippingOptions.find((item) => item.code === shippingMethod) ?? shippingOptions[0]!;
+  const shipping =
+    shippingOptions.find((item) => item.code === shippingMethod) ?? shippingOptions[0]!;
   const subtotalRial = lines.reduce((sum, line) => sum + line.totalRial, 0);
   const totalRial = subtotalRial + shipping.costRial;
 
@@ -127,11 +141,14 @@ export function B2BCheckoutClient() {
         lines: cart.map((line) => ({
           variantId: line.variantId,
           quantity: line.quantity,
-          cartonCount: line.cartonCount
-        }))
-      })
+          cartonCount: line.cartonCount,
+        })),
+      }),
     });
-    const payload = (await response.json().catch(() => ({}))) as { order?: { id: string }; error?: string };
+    const payload = (await response.json().catch(() => ({}))) as {
+      order?: { id: string };
+      error?: string;
+    };
     setIsSubmitting(false);
     if (!response.ok || !payload.order) {
       setError(payload.error ?? "ثبت سفارش عمده انجام نشد.");
@@ -161,16 +178,30 @@ export function B2BCheckoutClient() {
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="grid gap-2">
             نام فروشگاه
-            <Input value={businessName} onChange={(event) => setBusinessName(event.target.value)} required />
+            <Input
+              value={businessName}
+              onChange={(event) => setBusinessName(event.target.value)}
+              required
+            />
           </label>
           <label className="grid gap-2">
             موبایل
-            <Input value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" dir="ltr" required />
+            <Input
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              inputMode="tel"
+              dir="ltr"
+              required
+            />
           </label>
         </div>
         <label className="grid gap-2">
           مسئول خرید
-          <Input value={managerName} onChange={(event) => setManagerName(event.target.value)} required />
+          <Input
+            value={managerName}
+            onChange={(event) => setManagerName(event.target.value)}
+            required
+          />
         </label>
         <label className="grid gap-2">
           شهر
@@ -186,7 +217,10 @@ export function B2BCheckoutClient() {
             نحوه ارسال
           </legend>
           {shippingOptions.map((method) => (
-            <label key={method.code} className="flex min-h-12 items-center justify-between gap-3 rounded-md border border-[#D5D9C9] px-3">
+            <label
+              key={method.code}
+              className="flex min-h-12 items-center justify-between gap-3 rounded-md border border-[#D5D9C9] px-3"
+            >
               <span className="flex items-center gap-2">
                 <input
                   type="radio"
@@ -220,7 +254,9 @@ export function B2BCheckoutClient() {
               <span>
                 {line.product.nameFa}
                 <br />
-                <small className="text-white/65">{line.cartonCount.toLocaleString("fa-IR")} کارتن</small>
+                <small className="text-white/65">
+                  {line.cartonCount.toLocaleString("fa-IR")} کارتن
+                </small>
               </span>
               <Price valueRial={line.totalRial} />
             </div>
@@ -241,7 +277,11 @@ export function B2BCheckoutClient() {
           </div>
           <p className="mt-2 text-white/65">زمان تخمینی ارسال: {shipping.eta}</p>
         </div>
-        <Button type="submit" className="mt-5 w-full border-[#E8C547] bg-[#E8C547] text-[#14201B] hover:bg-[#F0D86D]" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          className="mt-5 w-full border-[#E8C547] bg-[#E8C547] text-[#14201B] hover:bg-[#F0D86D]"
+          disabled={isSubmitting}
+        >
           <Send size={18} />
           {isSubmitting ? "در حال ثبت..." : "ثبت سفارش عمده"}
         </Button>

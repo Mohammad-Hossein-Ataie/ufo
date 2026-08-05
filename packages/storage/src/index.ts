@@ -4,7 +4,7 @@ import {
   ListBucketsCommand,
   ListObjectsV2Command,
   PutObjectCommand,
-  S3Client
+  S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -42,9 +42,9 @@ export function createS3Client(config: LiaraStorageConfig): S3Client {
     endpoint: config.endpoint,
     credentials: {
       accessKeyId: config.accessKey,
-      secretAccessKey: config.secretKey
+      secretAccessKey: config.secretKey,
     },
-    forcePathStyle: true
+    forcePathStyle: true,
   });
 }
 
@@ -61,7 +61,7 @@ export class LiaraStorageProvider implements StorageProvider {
         Bucket: this.config.bucketName,
         Key: input.key,
         Body: input.body,
-        ContentType: input.contentType
+        ContentType: input.contentType,
       }),
     );
     return { key: input.key, size: input.body.byteLength, contentType: input.contentType };
@@ -71,13 +71,13 @@ export class LiaraStorageProvider implements StorageProvider {
     const data = await this.client.send(
       new ListObjectsV2Command({
         Bucket: this.config.bucketName,
-        ...(prefix ? { Prefix: prefix } : {})
+        ...(prefix ? { Prefix: prefix } : {}),
       }),
     );
     return (data.Contents ?? []).map((file) => ({
       key: file.Key ?? "",
       ...(typeof file.Size === "number" ? { size: file.Size } : {}),
-      ...(file.LastModified ? { lastModified: file.LastModified.toISOString() } : {})
+      ...(file.LastModified ? { lastModified: file.LastModified.toISOString() } : {}),
     }));
   }
 
@@ -108,7 +108,7 @@ export class MemoryStorageProvider implements StorageProvider {
       size: input.body.byteLength,
       contentType: input.contentType,
       lastModified: new Date().toISOString(),
-      body: input.body
+      body: input.body,
     };
     this.files.set(input.key, file);
     return file;

@@ -13,7 +13,8 @@ interface CartLine {
 }
 
 function readCart(): CartLine[] {
-  const raw = window.localStorage.getItem("ufo-retail-cart") ?? window.localStorage.getItem("ufo-cart");
+  const raw =
+    window.localStorage.getItem("ufo-retail-cart") ?? window.localStorage.getItem("ufo-cart");
   if (!raw) return [];
   try {
     const parsed: unknown = JSON.parse(raw);
@@ -53,7 +54,9 @@ export function CartClient() {
       cart
         .map((line) => {
           const variant = variants.find((item) => item.id === line.variantId);
-          const product = variant ? products.find((item) => item.id === variant.productId) : undefined;
+          const product = variant
+            ? products.find((item) => item.id === variant.productId)
+            : undefined;
           if (!variant || !product) return null;
           const unitPriceRial =
             line.channel === "wholesale" ? variant.wholesalePriceRial : variant.retailPriceRial;
@@ -62,7 +65,7 @@ export function CartClient() {
             product,
             variant,
             unitPriceRial,
-            totalRial: unitPriceRial * line.quantity
+            totalRial: unitPriceRial * line.quantity,
           };
         })
         .filter((line): line is NonNullable<typeof line> => line !== null),
@@ -80,7 +83,7 @@ export function CartClient() {
       unitPriceRial: line.unitPriceRial,
       quantity: line.quantity,
       discountRial: 0,
-      totalRial: line.totalRial
+      totalRial: line.totalRial,
     })),
   );
 

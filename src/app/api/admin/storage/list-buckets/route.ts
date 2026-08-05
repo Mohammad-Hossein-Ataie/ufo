@@ -8,6 +8,9 @@ export async function GET() {
     const buckets = await getStorageProvider().listBuckets();
     return NextResponse.json({ buckets });
   } catch {
-    return NextResponse.json({ error: "دریافت bucketها ناموفق بود.", buckets: [] }, { status: 500 });
+    return NextResponse.json(
+      { error: "دریافت bucketها ناموفق بود.", buckets: [] },
+      { status: 500 },
+    );
   }
 }

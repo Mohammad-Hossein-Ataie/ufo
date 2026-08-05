@@ -2,7 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { Button, Price } from "@ufo/ui";
-import { calculateCartonQuantity, products, validateWholesaleCartonCount, variants } from "@ufo/domain";
+import {
+  calculateCartonQuantity,
+  products,
+  validateWholesaleCartonCount,
+  variants,
+} from "@ufo/domain";
 
 type CartonState = Record<string, number>;
 
@@ -17,13 +22,23 @@ export function QuickOrderClient() {
 
   const lines = useMemo(
     () =>
-      variants.filter((variant) => variant.wholesaleEnabled !== false).map((variant) => {
-        const product = products.find((item) => item.id === variant.productId);
-        if (product?.salesChannels && !product.salesChannels.includes("wholesale")) return undefined;
-        const cartonCount = cartons[variant.id] ?? variant.minWholesaleCartonCount;
-        const quantity = calculateCartonQuantity(variant, cartonCount);
-        return { variant, product, cartonCount, quantity, totalRial: quantity * variant.wholesalePriceRial };
-      }).filter((line): line is NonNullable<typeof line> => Boolean(line)),
+      variants
+        .filter((variant) => variant.wholesaleEnabled !== false)
+        .map((variant) => {
+          const product = products.find((item) => item.id === variant.productId);
+          if (product?.salesChannels && !product.salesChannels.includes("wholesale"))
+            return undefined;
+          const cartonCount = cartons[variant.id] ?? variant.minWholesaleCartonCount;
+          const quantity = calculateCartonQuantity(variant, cartonCount);
+          return {
+            variant,
+            product,
+            cartonCount,
+            quantity,
+            totalRial: quantity * variant.wholesalePriceRial,
+          };
+        })
+        .filter((line): line is NonNullable<typeof line> => Boolean(line)),
     [cartons],
   );
 
@@ -40,7 +55,7 @@ export function QuickOrderClient() {
         variantId: line.variant.id,
         quantity: line.quantity,
         cartonCount: line.cartonCount,
-        channel: "wholesale"
+        channel: "wholesale",
       };
     });
     window.localStorage.setItem("ufo-b2b-cart", JSON.stringify(payload));
@@ -66,8 +81,12 @@ export function QuickOrderClient() {
             {lines.map((line) => (
               <tr key={line.variant.id} className="border-t border-[#E2E4D8]">
                 <td className="px-4 py-3 font-bold">{line.product?.nameFa ?? "محصول"}</td>
-                <td className="px-4 py-3" dir="ltr">{line.variant.sku}</td>
-                <td className="px-4 py-3">{new Intl.NumberFormat("fa-IR").format(line.variant.cartonSize)}</td>
+                <td className="px-4 py-3" dir="ltr">
+                  {line.variant.sku}
+                </td>
+                <td className="px-4 py-3">
+                  {new Intl.NumberFormat("fa-IR").format(line.variant.cartonSize)}
+                </td>
                 <td className="px-4 py-3">
                   <input
                     type="number"
@@ -77,16 +96,26 @@ export function QuickOrderClient() {
                     className="h-11 w-24 rounded-md border border-[#C8CDBD] px-3"
                   />
                 </td>
-                <td className="px-4 py-3"><Price valueRial={line.variant.wholesalePriceRial} /></td>
-                <td className="px-4 py-3 font-bold"><Price valueRial={line.totalRial} /></td>
+                <td className="px-4 py-3">
+                  <Price valueRial={line.variant.wholesalePriceRial} />
+                </td>
+                <td className="px-4 py-3 font-bold">
+                  <Price valueRial={line.totalRial} />
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <aside className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-[#D5D9C9] bg-[#14201B] p-4 text-white">
-        <span className="text-lg font-bold">جمع سفارش: <Price valueRial={totalRial} /></span>
-        <Button type="button" className="border-[#E8C547] bg-[#E8C547] text-[#14201B] hover:bg-[#F0D86D]" onClick={saveWholesaleCart}>
+        <span className="text-lg font-bold">
+          جمع سفارش: <Price valueRial={totalRial} />
+        </span>
+        <Button
+          type="button"
+          className="border-[#E8C547] bg-[#E8C547] text-[#14201B] hover:bg-[#F0D86D]"
+          onClick={saveWholesaleCart}
+        >
           انتقال به سبد عمده
         </Button>
       </aside>

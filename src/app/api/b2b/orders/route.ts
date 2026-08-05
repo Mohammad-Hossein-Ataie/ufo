@@ -19,8 +19,10 @@ function cartLines(value: unknown): CartSubmissionLine[] {
   value.forEach((line) => {
     if (typeof line !== "object" || line === null) return;
     const record = line as Record<string, unknown>;
-    const quantity = typeof record.quantity === "number" ? record.quantity : Number(record.quantity);
-    const cartonCount = typeof record.cartonCount === "number" ? record.cartonCount : Number(record.cartonCount);
+    const quantity =
+      typeof record.quantity === "number" ? record.quantity : Number(record.quantity);
+    const cartonCount =
+      typeof record.cartonCount === "number" ? record.cartonCount : Number(record.cartonCount);
     if (
       typeof record.variantId !== "string" ||
       !Number.isInteger(quantity) ||
@@ -46,7 +48,10 @@ export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as Record<string, unknown>;
     const businessName = stringValue(payload.businessName).trim();
-    const customerName = stringValue(payload.customerName || payload.managerName, "مسئول خرید").trim();
+    const customerName = stringValue(
+      payload.customerName || payload.managerName,
+      "مسئول خرید",
+    ).trim();
     const phone = stringValue(payload.phone).trim();
     const city = stringValue(payload.city, "تهران");
     const addressLine = stringValue(payload.address || payload.line1).trim();
@@ -61,12 +66,12 @@ export async function POST(request: Request) {
         city,
         line1: addressLine,
         receiverName: customerName,
-        receiverPhone: phone
+        receiverPhone: phone,
       },
       lines: cartLines(payload.lines),
       shippingMethod: shippingMethod(payload.shippingMethod),
       paymentMethod: "card_to_card",
-      receiptNote: stringValue(payload.receiptNote)
+      receiptNote: stringValue(payload.receiptNote),
     });
     return NextResponse.json({ order }, { status: 201 });
   } catch (error) {
