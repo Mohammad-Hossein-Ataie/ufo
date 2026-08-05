@@ -1,0 +1,11 @@
+{
+  "platform": "node",
+  "port": 3000,
+  "node": {
+    "mirror": false
+  },
+  "build": {
+    "command": "npm ci && npm run build"
+  },
+  "start": "npm run start"
+}
