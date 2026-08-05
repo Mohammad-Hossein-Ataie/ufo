@@ -5237,7 +5237,7 @@ export const importedProducts: Product[] = [
     "slug": "podsalt-fizzy-watermelon-gummy",
     "nameFa": "سالت پادسالت آدامس هندوانه یخ",
     "nameEn": "podsalt fizzy watermelon gummy",
-    "brandId": "brand-ufo",
+    "brandId": "brand-pod-salt",
     "categoryId": "cat-salt-nicotine",
     "productKind": "salt-nicotine",
     "salesChannels": [
@@ -5251,7 +5251,7 @@ export const importedProducts: Product[] = [
     ],
     "tags": [
       "سالت نیکوتین",
-      "UFO Selection",
+      "Pod Salt",
       "podsalt",
       "fizzy",
       "watermelon",
@@ -5283,7 +5283,7 @@ export const importedProducts: Product[] = [
     "slug": "podsalt-raspberry-gummy",
     "nameFa": "سالت پادسالت ادامس رزبری",
     "nameEn": "podsalt raspberry gummy",
-    "brandId": "brand-ufo",
+    "brandId": "brand-pod-salt",
     "categoryId": "cat-salt-nicotine",
     "productKind": "salt-nicotine",
     "salesChannels": [
@@ -5297,7 +5297,7 @@ export const importedProducts: Product[] = [
     ],
     "tags": [
       "سالت نیکوتین",
-      "UFO Selection",
+      "Pod Salt",
       "podsalt",
       "raspberry",
       "gummy"
@@ -13209,7 +13209,7 @@ export const importedProducts: Product[] = [
     "slug": "dr-vapes-pink-frozen-remix-2",
     "nameFa": "نیکوتین سالت آبنبات انگور فرنگی یخ",
     "nameEn": "DR.VAPES PINK FROZEN REMIX",
-    "brandId": "brand-ufo",
+    "brandId": "brand-dr-vapes",
     "categoryId": "cat-salt-nicotine",
     "productKind": "salt-nicotine",
     "salesChannels": [
@@ -13223,7 +13223,7 @@ export const importedProducts: Product[] = [
     ],
     "tags": [
       "سالت نیکوتین",
-      "UFO Selection",
+      "Dr Vapes",
       "dr.vapes",
       "pink",
       "frozen",
@@ -13255,7 +13255,7 @@ export const importedProducts: Product[] = [
     "slug": "dr-vapes-pink-sour",
     "nameFa": "نیکوتین سالت آبنبات ترش انگور فرنگی",
     "nameEn": "DR.VAPES PINK SOUR",
-    "brandId": "brand-ufo",
+    "brandId": "brand-dr-vapes",
     "categoryId": "cat-salt-nicotine",
     "productKind": "salt-nicotine",
     "salesChannels": [
@@ -13269,7 +13269,7 @@ export const importedProducts: Product[] = [
     ],
     "tags": [
       "سالت نیکوتین",
-      "UFO Selection",
+      "Dr Vapes",
       "dr.vapes",
       "pink",
       "sour"
@@ -13300,7 +13300,7 @@ export const importedProducts: Product[] = [
     "slug": "dr-vapes-pink-remix",
     "nameFa": "نیکوتین سالت آبنبات ترش انگور فرنگی و پشمک",
     "nameEn": "DR.VAPES PINK REMIX",
-    "brandId": "brand-ufo",
+    "brandId": "brand-dr-vapes",
     "categoryId": "cat-salt-nicotine",
     "productKind": "salt-nicotine",
     "salesChannels": [
@@ -13314,7 +13314,7 @@ export const importedProducts: Product[] = [
     ],
     "tags": [
       "سالت نیکوتین",
-      "UFO Selection",
+      "Dr Vapes",
       "dr.vapes",
       "pink",
       "remix"
@@ -13345,7 +13345,7 @@ export const importedProducts: Product[] = [
     "slug": "dr-vapes-bubblegum-kings-cola-ice-30ml",
     "nameFa": "نیکوتین سالت آدامس بادکنکی کولا یخ",
     "nameEn": "DR.VAPES BUBBLEGUM KINGS COLA ICE 30ML",
-    "brandId": "brand-ufo",
+    "brandId": "brand-dr-vapes",
     "categoryId": "cat-salt-nicotine",
     "productKind": "salt-nicotine",
     "salesChannels": [
@@ -13359,7 +13359,7 @@ export const importedProducts: Product[] = [
     ],
     "tags": [
       "سالت نیکوتین",
-      "UFO Selection",
+      "Dr Vapes",
       "dr.vapes",
       "bubblegum",
       "kings",
@@ -13391,7 +13391,7 @@ export const importedProducts: Product[] = [
     "slug": "dr-vapes-bubblegum-kings-banana-ice",
     "nameFa": "نیکوتین سالت آدامس بادکنکی موز یخ",
     "nameEn": "DR.VAPES BUBBLEGUM KINGS BANANA ICE",
-    "brandId": "brand-ufo",
+    "brandId": "brand-dr-vapes",
     "categoryId": "cat-salt-nicotine",
     "productKind": "salt-nicotine",
     "salesChannels": [
@@ -13405,7 +13405,7 @@ export const importedProducts: Product[] = [
     ],
     "tags": [
       "سالت نیکوتین",
-      "UFO Selection",
+      "Dr Vapes",
       "dr.vapes",
       "bubblegum",
       "kings",
@@ -13437,7 +13437,7 @@ export const importedProducts: Product[] = [
     "slug": "dr-vapes-pink-colada",
     "nameFa": "نیکوتین سالت آناناس خامه نارگیلی",
     "nameEn": "DR.VAPES PINK COLADA",
-    "brandId": "brand-ufo",
+    "brandId": "brand-dr-vapes",
     "categoryId": "cat-salt-nicotine",
     "productKind": "salt-nicotine",
     "salesChannels": [
@@ -13451,7 +13451,7 @@ export const importedProducts: Product[] = [
     ],
     "tags": [
       "سالت نیکوتین",
-      "UFO Selection",
+      "Dr Vapes",
       "dr.vapes",
       "pink",
       "colada"
@@ -13482,7 +13482,7 @@ export const importedProducts: Product[] = [
     "slug": "dr-vapes-pink-extra",
     "nameFa": "نیکوتین سالت پشمک انگور فرنگی",
     "nameEn": "DR.VAPES PINK EXTRA",
-    "brandId": "brand-ufo",
+    "brandId": "brand-dr-vapes",
     "categoryId": "cat-salt-nicotine",
     "productKind": "salt-nicotine",
     "salesChannels": [
@@ -13496,7 +13496,7 @@ export const importedProducts: Product[] = [
     ],
     "tags": [
       "سالت نیکوتین",
-      "UFO Selection",
+      "Dr Vapes",
       "dr.vapes",
       "pink",
       "extra"
@@ -13527,7 +13527,7 @@ export const importedProducts: Product[] = [
     "slug": "dr-vapes-blue-raspberry-ice",
     "nameFa": "نیکوتین سالت تمشک آبی یخ",
     "nameEn": "DR.VAPES BLUE RASPBERRY ICE",
-    "brandId": "brand-ufo",
+    "brandId": "brand-dr-vapes",
     "categoryId": "cat-salt-nicotine",
     "productKind": "salt-nicotine",
     "salesChannels": [
@@ -13541,7 +13541,7 @@ export const importedProducts: Product[] = [
     ],
     "tags": [
       "سالت نیکوتین",
-      "UFO Selection",
+      "Dr Vapes",
       "dr.vapes",
       "blue",
       "raspberry",
@@ -13573,7 +13573,7 @@ export const importedProducts: Product[] = [
     "slug": "dr-vapes-tb-kings-original",
     "nameFa": "نیکوتین سالت تنباکو کارامل فندق",
     "nameEn": "DR.VAPES TB KINGS ORIGINAL",
-    "brandId": "brand-ufo",
+    "brandId": "brand-dr-vapes",
     "categoryId": "cat-salt-nicotine",
     "productKind": "salt-nicotine",
     "salesChannels": [
@@ -13587,7 +13587,7 @@ export const importedProducts: Product[] = [
     ],
     "tags": [
       "سالت نیکوتین",
-      "UFO Selection",
+      "Dr Vapes",
       "dr.vapes",
       "tb",
       "kings",
@@ -13664,7 +13664,7 @@ export const importedProducts: Product[] = [
     "slug": "dr-vapes-black-custard",
     "nameFa": "نیکوتین سالت کاستارد وانیل",
     "nameEn": "DR.VAPES BLACK CUSTARD",
-    "brandId": "brand-ufo",
+    "brandId": "brand-dr-vapes",
     "categoryId": "cat-salt-nicotine",
     "productKind": "salt-nicotine",
     "salesChannels": [
@@ -13678,7 +13678,7 @@ export const importedProducts: Product[] = [
     ],
     "tags": [
       "سالت نیکوتین",
-      "UFO Selection",
+      "Dr Vapes",
       "dr.vapes",
       "black",
       "custard"

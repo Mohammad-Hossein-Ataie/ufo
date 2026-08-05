@@ -204,18 +204,20 @@ function brandFromName(nameFa, nameEn = "") {
     ["ivg", "آی وی جی", "IVG"],
     ["primobar", "پریموبار", "Primobar"],
     ["geekbar", "گیک‌بار", "Geek Bar"],
-    ["geekvape", "گیک ویپ", "GeekVape"],
+    ["geekvape", "گیک ویپ", "GeekVape", "geek vape"],
     ["uwell", "یوول", "Uwell"],
     ["vgod", "ویگاد", "VGOD"],
-    ["dr-vapes", "دکتر ویپز", "Dr Vapes"],
-    ["pod-salt", "پاد سالت", "Pod Salt"],
+    ["dr-vapes", "دکتر ویپز", "Dr Vapes", "dr.vapes", "drvapes"],
+    ["pod-salt", "پاد سالت", "Pod Salt", "podsalt", "پادسالت"],
     ["vaporesso", "ویپرسو", "Vaporesso"],
-    ["lostvape", "لاست ویپ", "Lost Vape"],
+    ["lostvape", "لاست ویپ", "Lost Vape", "lost vape"],
     ["argus", "آرگاس", "Argus"],
     ["al-fakher", "الفاخر", "Al Fakher"],
     ["bugatti", "بوگاتی", "Bugatti"]
   ];
-  const found = brands.find(([slug, fa, en]) => text.includes(slug) || text.includes(fa) || text.includes(en.toLowerCase()));
+  const found = brands.find(([slug, fa, en, ...aliases]) =>
+    [slug, fa, en, ...aliases].some((alias) => text.includes(alias.toLowerCase())),
+  );
   return found ? { id: `brand-${found[0]}`, slug: found[0], nameFa: found[2] } : { id: "brand-ufo", slug: "ufo-selection", nameFa: "UFO Selection" };
 }
 

@@ -297,7 +297,7 @@ export const compatibilityGroups: CompatibilityGroup[] = [
 ];
 
 export function findProduct(slug: string): Product | undefined {
-  return products.find((product) => product.slug === slug);
+  return products.find((product) => product.slug === slug && product.isActive);
 }
 
 export function getProductVariants(productId: string): ProductVariant[] {
@@ -563,8 +563,9 @@ export function createInvoice(args: {
 
 export function searchProducts(query: string): Product[] {
   const normalizedQuery = query.trim().toLowerCase();
-  if (!normalizedQuery) return products;
-  return products.filter((product) =>
+  const activeProducts = products.filter((product) => product.isActive);
+  if (!normalizedQuery) return activeProducts;
+  return activeProducts.filter((product) =>
     [product.nameFa, product.shortDescriptionFa, product.slug, ...product.tags]
       .join(" ")
       .toLowerCase()
