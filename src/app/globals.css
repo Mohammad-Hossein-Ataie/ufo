@@ -6,10 +6,136 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Retail (dark) design tokens — single source of truth for the customer-facing
+ * storefront. Mirrors DESIGN_SYSTEM.md. Reuse these on the product page and
+ * checkout instead of hardcoding new hex values.
+ */
 :root {
   color-scheme: dark;
   background: #05070b;
   color: #f5f7fa;
+
+  --retail-bg: #05070b;
+  --retail-surface: #0d1117;
+  --retail-surface-alt: #141a22;
+  --retail-border: #22303d;
+  --retail-text-primary: #f5f7fa;
+  --retail-text-secondary: #9ba7b4;
+  --retail-text-muted: #6b7787;
+  --retail-accent: #00d9ff; /* cyan — primary CTA / links */
+  --retail-accent-hover: #63e6ff;
+  --retail-accent-2: #20f28b; /* emerald — success / secondary highlight */
+  --retail-radius: 14px;
+  --retail-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --retail-shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.55);
+  --retail-glow-accent: 0 0 0 1px rgba(0, 217, 255, 0.35), 0 8px 30px rgba(0, 217, 255, 0.28);
+}
+
+/* Elevated panel that separates a section from the near-black page background. */
+.section-surface {
+  background: var(--retail-surface);
+  border-block: 1px solid var(--retail-border);
+}
+
+.section-surface-alt {
+  background: linear-gradient(180deg, var(--retail-surface) 0%, var(--retail-surface-alt) 100%);
+}
+
+/* Hairline divider/border using the shared border token. */
+.hairline {
+  border-color: var(--retail-border);
+}
+
+/* Soft cyan glow for the primary CTA on the dark background. */
+.glow-accent {
+  box-shadow: var(--retail-glow-accent);
+}
+
+/* Atmospheric multi-stop overlay for the hero, keeps text WCAG-AA legible. */
+.hero-overlay {
+  background:
+    linear-gradient(180deg, rgba(5, 7, 11, 0.35) 0%, rgba(5, 7, 11, 0.55) 55%, var(--retail-bg) 100%),
+    radial-gradient(120% 90% at 15% 20%, rgba(0, 217, 255, 0.16) 0%, transparent 60%);
+}
+
+/* Subtle accent halo used behind hero copy / feature groupings. */
+.accent-halo {
+  background: radial-gradient(60% 60% at 50% 40%, rgba(0, 217, 255, 0.14) 0%, transparent 70%);
+}
+
+/* Reusable interactive card: lifts and picks up an accent edge on hover. */
+.card-interactive {
+  border: 1px solid var(--retail-border);
+  border-radius: var(--retail-radius);
+  background: var(--retail-surface);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.card-interactive:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0, 217, 255, 0.55);
+  box-shadow: var(--retail-shadow-lg);
+}
+
+.showcase-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.reveal-up {
+  animation: reveal-up 0.65s ease both;
+}
+
+.reveal-up-delay-1 {
+  animation: reveal-up 0.65s ease 0.1s both;
+}
+
+.reveal-up-delay-2 {
+  animation: reveal-up 0.65s ease 0.2s both;
+}
+
+.float-slow {
+  animation: float-slow 5s ease-in-out infinite;
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-interactive:hover {
+    transform: none;
+  }
+
+  .reveal-up,
+  .reveal-up-delay-1,
+  .reveal-up-delay-2,
+  .float-slow {
+    animation: none;
+  }
 }
 
 * {

@@ -120,6 +120,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <div className="mt-6">
             <AddToCartButton
               variantId={variant.id}
+              maxQuantity={available > 0 ? available : undefined}
               label={available > 0 ? "افزودن به سبد" : "ثبت پیش‌سفارش"}
             />
           </div>
