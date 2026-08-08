@@ -6,12 +6,12 @@ import { canonical, siteOrigin } from "@ufo/seo";
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin()),
   title: {
-    default: "UFO Puff | فروشگاه پاد و ویپ",
-    template: "%s | UFO Puff",
+    default: "یوفوپاف | UFO Puff | فروشگاه پاد و ویپ",
+    template: "%s | یوفوپاف UFO Puff",
   },
   description:
-    "فروشگاه فارسی پاد، ویپ، جویس و لوازم جانبی با مسیر جدا برای فروش تکی، عمده و ادمین.",
-  applicationName: "UFO Puff",
+    "یوفوپاف UFO Puff فروشگاه فارسی پاد، ویپ، جویس و لوازم جانبی با مسیر جدا برای فروش تکی، عمده و ادمین.",
+  applicationName: "یوفوپاف UFO Puff",
   manifest: "/favicons/site.webmanifest",
   icons: {
     icon: [
@@ -29,16 +29,16 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "UFO Puff",
-    description: "فروشگاه فارسی پاد و ویپ با موجودی و قیمت شفاف.",
+    title: "یوفوپاف | UFO Puff",
+    description: "یوفوپاف، فروشگاه فارسی پاد و ویپ با موجودی و قیمت شفاف.",
     url: canonical("/"),
-    siteName: "UFO Puff",
-    images: [{ url: "/logos/logo.png", width: 500, height: 500, alt: "UFO Puff" }],
+    siteName: "یوفوپاف | UFO Puff",
+    images: [{ url: "/logos/logo.png", width: 500, height: 500, alt: "لوگوی یوفوپاف UFO Puff" }],
     locale: "fa_IR",
     type: "website",
   },
   appleWebApp: {
-    title: "UFO Puff",
+    title: "یوفوپاف",
     capable: true,
     statusBarStyle: "black-translucent",
   },

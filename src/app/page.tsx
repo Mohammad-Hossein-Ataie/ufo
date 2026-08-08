@@ -112,18 +112,18 @@ export default function HomePage() {
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-retail-border bg-white/5 px-3 py-1 text-xs font-medium text-retail-secondary backdrop-blur">
               <Sparkles size={14} className="text-retail-accent-2" aria-hidden="true" />
-              فروش تکی و عمده پاد و ویپ
+              یوفوپاف؛ فروش تکی و عمده پاد و ویپ
             </span>
             <h1 className="mt-5 text-4xl font-black leading-[1.2] tracking-tight text-white sm:text-5xl md:text-6xl">
-              کاتالوگ شفاف پاد و ویپ،
+              کاتالوگ شفاف یوفوپاف برای پاد و ویپ،
               <span className="bg-gradient-to-l from-retail-accent to-retail-accent-2 bg-clip-text text-transparent">
                 {" "}
                 از انتخاب تا تحویل
               </span>
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-8 text-[#D9E2EC]">
-              پاد، ویپ، جویس و لوازم جانبی با موجودی لحظه‌ای، قیمت شفاف و کنترل سازگاری —
-              برای خرید تکی مطمئن و سفارش عمده‌ی سریع.
+              پاد، ویپ، جویس و لوازم جانبی با موجودی لحظه‌ای، قیمت شفاف و کنترل سازگاری — برای خرید
+              تکی مطمئن و سفارش عمده‌ی سریع.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/products">

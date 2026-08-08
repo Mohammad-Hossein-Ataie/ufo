@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Button, EmptyState, Price } from "@ufo/ui";
@@ -108,9 +109,18 @@ export function CartClient() {
         {lines.map((line) => (
           <article
             key={`${line.variantId}-${line.channel}`}
-            className="grid gap-3 rounded-md border border-[#22303D] bg-[#0D1117] p-4 sm:grid-cols-[1fr_auto]"
+            className="grid gap-4 rounded-md border border-[#22303D] bg-[#0D1117] p-4 sm:grid-cols-[7rem_1fr_auto]"
           >
-            <div>
+            <div className="relative aspect-square overflow-hidden rounded-md border border-[#22303D] bg-[#141A22]">
+              <Image
+                src={line.product.image}
+                alt={line.product.nameFa}
+                fill
+                sizes="(min-width: 640px) 7rem, 100vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="min-w-0">
               <h2 className="font-bold">{line.product.nameFa}</h2>
               <p className="mt-1 text-sm text-[#9BA7B4]">
                 {line.variant.nameFa} · {line.variant.sku}

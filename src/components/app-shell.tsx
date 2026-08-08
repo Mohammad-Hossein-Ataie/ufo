@@ -11,9 +11,9 @@ import { storeSettings } from "@ufo/domain";
 
 const retailFooterLinks = [
   { href: "/products", label: "محصولات", icon: ShoppingBag },
-  { href: "/orders", label: "پیگیری سفارش", icon: Clock3 },
+  { href: "/cart", label: "سبد خرید", icon: Clock3 },
   { href: "/login", label: "حساب مشتری", icon: ShieldCheck },
-  { href: "/store/tehran-molavi", label: "پشتیبانی", icon: MessageCircle },
+  { href: "/store/tehran-molavi", label: "درباره یوفوپاف", icon: MessageCircle },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -61,7 +61,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 />
               </span>
               <span>
-                <span className="block text-lg font-black text-white">UFO Puff</span>
+                <span className="block text-lg font-black text-white">یوفوپاف | UFO Puff</span>
                 <span className="block text-sm text-[#9BA7B4]">فروشگاه تخصصی پاد و ویپ</span>
               </span>
             </Link>
@@ -111,7 +111,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <div className="border-t border-[#22303D]">
           <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 text-xs text-[#9BA7B4] sm:flex-row sm:items-center sm:justify-between">
-            <span>© UFO Puff</span>
+            <span>© یوفوپاف | UFO Puff</span>
             <span className="inline-flex items-center gap-2">
               <ShieldCheck size={16} aria-hidden="true" />
               فروش فقط برای افراد بالای ۱۸ سال
