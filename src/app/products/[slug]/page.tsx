@@ -15,6 +15,83 @@ import {
 import { breadcrumbJsonLd, jsonLdScriptProps, productJsonLd } from "@ufo/seo";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 
+const imageBlockPattern = /^!\[(?<alt>.*)]\((?<url>.+)\)$/;
+const videoBlockPattern = /^\[ویدیو.*]\((?<url>.+)\)$/;
+
+function youtubeEmbedUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.includes("youtube.com")) {
+      const videoId = parsed.searchParams.get("v");
+      return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+    }
+    if (parsed.hostname.includes("youtu.be")) {
+      return `https://www.youtube.com/embed/${parsed.pathname.replace("/", "")}`;
+    }
+  } catch {
+    return url;
+  }
+  return url;
+}
+
+function renderRichDescription(description: string) {
+  const blocks = description
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+
+  return blocks.map((block, index) => {
+    const imageMatch = block.match(imageBlockPattern);
+    if (imageMatch?.groups?.url) {
+      return (
+        <figure
+          key={`${block}-${index}`}
+          className="overflow-hidden rounded-md border border-[#22303D] bg-[#0D1117]"
+        >
+          <div className="relative aspect-[16/10]">
+            <Image
+              src={imageMatch.groups.url}
+              alt={imageMatch.groups.alt || "تصویر توضیحات محصول"}
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </div>
+        </figure>
+      );
+    }
+
+    const videoMatch = block.match(videoBlockPattern);
+    if (videoMatch?.groups?.url) {
+      const url = videoMatch.groups.url;
+      const isFileVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
+      return isFileVideo ? (
+        <video
+          key={`${block}-${index}`}
+          className="aspect-video w-full rounded-md border border-[#22303D] bg-black"
+          src={url}
+          controls
+        />
+      ) : (
+        <iframe
+          key={`${block}-${index}`}
+          className="aspect-video w-full rounded-md border border-[#22303D] bg-black"
+          src={youtubeEmbedUrl(url)}
+          title="ویدیو محصول"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      );
+    }
+
+    return (
+      <p key={`${block}-${index}`} className="leading-8 text-[#D9E2EC]">
+        {block}
+      </p>
+    );
+  });
+}
+
 export function generateStaticParams() {
   return products.filter((product) => product.isActive).map((product) => ({ slug: product.slug }));
 }
@@ -27,6 +104,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = findProduct(slug);
   if (!product) return {};
+  const images = product.images?.length ? product.images : [product.image];
   return {
     title: product.seoTitle,
     description: product.seoDescription,
@@ -34,7 +112,7 @@ export async function generateMetadata({
     openGraph: {
       title: product.seoTitle,
       description: product.seoDescription,
-      images: [product.image],
+      images,
     },
   };
 }
@@ -48,6 +126,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const available = inventory ? getAvailableStock(inventory) : 0;
   const brand = brands.find((item) => item.id === product.brandId);
   const category = categories.find((item) => item.id === product.categoryId);
+  const galleryImages = product.images?.length ? product.images : [product.image];
+  const primaryGalleryImage = galleryImages[0] ?? product.image;
   const relatedProducts = products
     .filter(
       (item) => item.isActive && item.id !== product.id && item.categoryId === product.categoryId,
@@ -80,10 +160,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <span>{product.nameFa}</span>
       </nav>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_28rem]">
-        <section className="overflow-hidden rounded-md border border-[#22303D] bg-[#0D1117]">
+        <section className="grid gap-3 overflow-hidden rounded-md border border-[#22303D] bg-[#0D1117] p-3">
           <div className="relative aspect-[4/3]">
             <Image
-              src={product.image}
+              src={primaryGalleryImage}
               alt={product.nameFa}
               fill
               priority
@@ -91,6 +171,24 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               sizes="(min-width: 1024px) 60vw, 100vw"
             />
           </div>
+          {galleryImages.length > 1 ? (
+            <div className="grid grid-cols-4 gap-2">
+              {galleryImages.slice(1, 5).map((image, index) => (
+                <div
+                  key={`${image}-${index}`}
+                  className="relative aspect-square overflow-hidden rounded-md border border-[#22303D] bg-[#141A22]"
+                >
+                  <Image
+                    src={image}
+                    alt={`${product.nameFa} ${index + 2}`}
+                    fill
+                    sizes="140px"
+                    className="object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : null}
         </section>
         <aside className="h-fit rounded-md border border-[#22303D] bg-[#141A22] p-5">
           <div className="flex flex-wrap items-center gap-2">
@@ -132,7 +230,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <section className="mt-10 grid gap-6 lg:grid-cols-2">
         <div>
           <h2 className="text-2xl font-black">توضیحات</h2>
-          <p className="mt-3 leading-8 text-[#D9E2EC]">{product.descriptionFa}</p>
+          <div className="mt-3 grid gap-4">{renderRichDescription(product.descriptionFa)}</div>
         </div>
         <div>
           <h2 className="text-2xl font-black">مشخصات</h2>

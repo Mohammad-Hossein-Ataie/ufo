@@ -20,6 +20,7 @@ function parseInput(productId: string, body: unknown): AdminProductInput {
     shortDescriptionFa: value.shortDescriptionFa,
     descriptionFa: value.descriptionFa,
     image: value.image,
+    images: Array.isArray(value.images) ? value.images.map(String) : [],
     tags: Array.isArray(value.tags) ? value.tags : [],
     specs: Array.isArray(value.specs) ? value.specs : [],
     retailPriceRial: Number(value.retailPriceRial ?? 0),

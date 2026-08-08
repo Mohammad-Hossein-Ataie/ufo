@@ -31,6 +31,7 @@ export interface AdminProductInput {
   shortDescriptionFa?: string | undefined;
   descriptionFa?: string | undefined;
   image?: string | undefined;
+  images?: string[] | undefined;
   tags?: string[] | undefined;
   specs?: ProductSpec[] | undefined;
   retailPriceRial: number;
@@ -105,6 +106,10 @@ function buildDocuments(
     input.inventoryId || current?.inventory.id || `inv-admin-${slug}-${Date.now()}`;
   const brandId = input.brandId || current?.product.brandId || "brand-ufo";
   const image = input.image?.trim() || current?.product.image || "/images/ufo-hero.png";
+  const images = [
+    image,
+    ...(input.images ?? current?.product.images ?? []).map((item) => item.trim()).filter(Boolean),
+  ].filter((item, index, list) => list.indexOf(item) === index);
   const tags = input.tags?.filter(Boolean) ?? current?.product.tags ?? [];
   const retailPriceRial = input.retailPriceRial;
   const wholesalePriceRial =
@@ -129,7 +134,7 @@ function buildDocuments(
       input.shortDescriptionFa?.trim() ||
       `${input.nameFa.trim()} از پنل ادمین ثبت شده است.`,
     image,
-    images: [image],
+    images,
     tags,
     attributes: [
       { nameFa: "نوع", valueFa: getCategoryName(input.categoryId) },
