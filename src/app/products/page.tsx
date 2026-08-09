@@ -11,8 +11,10 @@ import {
   X,
 } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { CatalogColorFilter } from "@/components/catalog-color-filter";
 import { CatalogPagination } from "@/components/catalog-pagination";
 import { CatalogPriceRangeFilter } from "@/components/catalog-price-range-filter";
+import { getProductImage } from "@/lib/product-images";
 import { canonical, itemListJsonLd, jsonLdScriptProps } from "@ufo/seo";
 import { Badge, Button, EmptyState, Price, ProductCard, StockStatus } from "@ufo/ui";
 import {
@@ -304,18 +306,11 @@ export default async function ProductsPage({
               </label>
               <label className="grid gap-2 text-sm text-retail-secondary">
                 رنگ
-                <select
-                  name="color"
-                  defaultValue={params.color ?? ""}
-                  className="min-h-11 rounded-md border border-retail-border bg-retail-bg px-3 text-white outline-none focus:border-retail-accent focus:ring-2 focus:ring-retail-accent/30"
-                >
-                  <option value="">همه رنگ‌ها</option>
-                  {productColorPalette.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.labelFa}
-                    </option>
-                  ))}
-                </select>
+                <CatalogColorFilter
+                  defaultValue={params.color}
+                  options={productColorPalette}
+                  tone="dark"
+                />
               </label>
             </div>
 
@@ -394,7 +389,7 @@ export default async function ProductsPage({
                       media={
                         <Image
                           key={`media-${product.id}`}
-                          src={product.image}
+                          src={getProductImage(product)}
                           alt={product.nameFa}
                           width={520}
                           height={390}

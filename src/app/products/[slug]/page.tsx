@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeCheck, Box, Film, ListChecks, ShieldCheck } from "lucide-react";
 import { ProductPurchasePanel } from "@/components/product-purchase-panel";
+import { getProductImage, getProductImages } from "@/lib/product-images";
 import {
   brands,
   categories,
@@ -107,7 +108,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = findProduct(slug);
   if (!product) return {};
-  const images = product.images?.length ? product.images : [product.image];
+  const images = getProductImages(product);
   return {
     title: product.seoTitle,
     description: product.seoDescription,
@@ -130,7 +131,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const available = inventory ? getAvailableStock(inventory) : 0;
   const brand = brands.find((item) => item.id === product.brandId);
   const category = categories.find((item) => item.id === product.categoryId);
-  const galleryImages = product.images?.length ? product.images : [product.image];
+  const galleryImages = getProductImages(product);
   const colorOptions = getProductColorOptions(product);
   const relatedProducts = products
     .filter(
@@ -170,7 +171,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <div className="overflow-hidden rounded-md border border-[#22303D] bg-[#0D1117] p-3">
               <div className="relative aspect-[4/3] overflow-hidden rounded-md bg-[#141A22]">
                 <Image
-                  src={galleryImages[0] ?? product.image}
+                  src={galleryImages[0] ?? getProductImage(product)}
                   alt={product.nameFa}
                   fill
                   priority
@@ -366,7 +367,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     description={related.shortDescriptionFa}
                     media={
                       <Image
-                        src={related.image}
+                        src={getProductImage(related)}
                         alt={related.nameFa}
                         width={520}
                         height={390}

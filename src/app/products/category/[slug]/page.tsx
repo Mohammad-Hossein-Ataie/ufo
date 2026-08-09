@@ -11,6 +11,7 @@ import {
   getPrimaryVariant,
   products,
 } from "@ufo/domain";
+import { getProductImage } from "@/lib/product-images";
 import {
   breadcrumbJsonLd,
   categoryMetadata,
@@ -105,7 +106,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               description={product.shortDescriptionFa}
               media={
                 <Image
-                  src={product.image}
+                  src={getProductImage(product)}
                   alt={product.nameFa}
                   width={520}
                   height={390}

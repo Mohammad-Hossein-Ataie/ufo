@@ -12,8 +12,10 @@ import {
   Truck,
   X,
 } from "lucide-react";
+import { CatalogColorFilter } from "@/components/catalog-color-filter";
 import { CatalogPagination } from "@/components/catalog-pagination";
 import { CatalogPriceRangeFilter } from "@/components/catalog-price-range-filter";
+import { getProductImage } from "@/lib/product-images";
 import { canonical } from "@ufo/seo";
 import { Button, EmptyState, Price, ProductCard } from "@ufo/ui";
 import {
@@ -338,18 +340,11 @@ export default async function B2BCatalogPage({
               </label>
               <label className="grid gap-2 text-sm font-bold text-[#405148]">
                 رنگ
-                <select
-                  name="color"
-                  defaultValue={params.color ?? ""}
-                  className="min-h-11 rounded-md border border-[#C8D6C7] bg-[#F7F7F2] px-3 outline-none focus:border-[#1F8A5B] focus:ring-2 focus:ring-[#1F8A5B]/20"
-                >
-                  <option value="">همه رنگ‌ها</option>
-                  {productColorPalette.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.labelFa}
-                    </option>
-                  ))}
-                </select>
+                <CatalogColorFilter
+                  defaultValue={params.color}
+                  options={productColorPalette}
+                  tone="light"
+                />
               </label>
             </div>
 
@@ -434,7 +429,7 @@ export default async function B2BCatalogPage({
                       media={
                         <Image
                           key={`media-${product.id}`}
-                          src={product.image}
+                          src={getProductImage(product)}
                           alt={product.nameFa}
                           width={520}
                           height={390}

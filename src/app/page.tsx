@@ -18,7 +18,7 @@ import {
   Warehouse,
   Zap,
 } from "lucide-react";
-import { Button, Price, ProductCard, StockStatus } from "@ufo/ui";
+import { Button, Price, StockStatus } from "@ufo/ui";
 import {
   brands,
   categories,
@@ -28,13 +28,14 @@ import {
   products,
 } from "@ufo/domain";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { categoryImageBySlug, getProductImage } from "@/lib/product-images";
 import { faqPageJsonLd, jsonLdScriptProps, organizationJsonLd, websiteJsonLd } from "@ufo/seo";
 
 const homeFaq = [
   {
     question: "UFO Puff چه محصولاتی عرضه می‌کند؟",
     answer:
-      "کاتالوگ UFO Puff شامل پاد، ویپ، سالت نیکوتین، جویس، کارتریج، کویل و لوازم جانبی مرتبط است.",
+      "کاتالوگ یوفوپاف شامل پاد، ویپ، سالت نیکوتین، جویس، کارتریج، کویل و لوازم جانبی مرتبط است.",
   },
   {
     question: "قیمت محصولات چگونه نمایش داده می‌شود؟",
@@ -61,7 +62,7 @@ const trustStrip = [
   {
     icon: Warehouse,
     title: "موجودی مشترک",
-    text: "رزرو سفارش برای جلوگیری از oversell طراحی شده است.",
+    text: "رزرو سفارش برای جلوگیری از فروش بیش از موجودی طراحی شده است.",
   },
 ];
 
@@ -74,7 +75,6 @@ const stats = [
   { value: `${categories.length}`, label: "دسته‌بندی کالا" },
 ];
 
-// Curated icon per category slug — falls back to a neutral box icon.
 const categoryIcons: Record<string, typeof Boxes> = {
   pod: Cpu,
   vape: Zap,
@@ -86,6 +86,17 @@ const categoryIcons: Record<string, typeof Boxes> = {
   lighter: Flame,
 };
 
+const categoryAccent: Record<string, string> = {
+  pod: "from-cyan-300/35",
+  vape: "from-yellow-300/35",
+  disposable: "from-yellow-300/30",
+  "e-liquid": "from-cyan-300/30",
+  "salt-nicotine": "from-purple-400/25",
+  coil: "from-cyan-300/25",
+  cartridge: "from-sky-300/25",
+  lighter: "from-yellow-300/30",
+};
+
 export default function HomePage() {
   const featured = products.filter((product) => product.isActive).slice(0, 4);
 
@@ -95,7 +106,6 @@ export default function HomePage() {
       <script {...jsonLdScriptProps(websiteJsonLd())} />
       <script {...jsonLdScriptProps(faqPageJsonLd(homeFaq))} />
 
-      {/* Hero */}
       <section className="relative isolate overflow-hidden">
         <Image
           src="/images/ufo-hero.png"
@@ -122,8 +132,8 @@ export default function HomePage() {
               </span>
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-8 text-[#D9E2EC]">
-              پاد، ویپ، جویس و لوازم جانبی با موجودی لحظه‌ای، قیمت شفاف و کنترل سازگاری — برای خرید
-              تکی مطمئن و سفارش عمده‌ی سریع.
+              پاد، ویپ، جویس و لوازم جانبی با موجودی لحظه‌ای، قیمت شفاف و کنترل سازگاری؛ برای خرید
+              تکی مطمئن و سفارش عمده سریع.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/products">
@@ -155,7 +165,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trust strip */}
       <section className="section-surface">
         <div className="mx-auto grid max-w-7xl gap-3 px-4 py-6 md:grid-cols-3">
           {trustStrip.map((item) => (
@@ -175,11 +184,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured products */}
       <section className="mx-auto max-w-7xl px-4 py-16">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-black text-white sm:text-3xl">محصولات منتخب</h2>
+            <h2 className="text-2xl font-black text-white sm:text-3xl">محصولات منتخب یوفوپاف</h2>
             <p className="mt-2 text-retail-secondary">
               قیمت‌ها در دیتابیس ریالی ذخیره و در UI به تومان نمایش داده می‌شوند.
             </p>
@@ -197,38 +205,86 @@ export default function HomePage() {
             const variant = getPrimaryVariant(product.id);
             const inventory = getInventoryByVariant(variant.id);
             const available = inventory ? getAvailableStock(inventory) : 0;
+            const category = categories.find((item) => item.id === product.categoryId);
+            const imageSrc = getProductImage(product);
             return (
-              <div
+              <article
                 key={product.id}
-                className="rounded-retail transition-shadow duration-200 hover:shadow-retail-lg"
+                className="group relative isolate grid h-full overflow-hidden rounded-retail bg-[#0C1218] shadow-[inset_0_0_0_1px_rgba(34,211,238,0.16),0_18px_44px_rgba(0,0,0,0.24)] transition duration-300 hover:-translate-y-1 hover:shadow-[inset_0_0_0_1px_rgba(34,211,238,0.42),0_24px_60px_rgba(0,0,0,0.32)]"
               >
-                <ProductCard
-                  title={product.nameFa}
-                  description={product.shortDescriptionFa}
-                  media={
-                    <Image
-                      key={`media-${product.id}`}
-                      src={product.image}
-                      alt={product.nameFa}
-                      width={520}
-                      height={390}
-                      className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
-                    />
-                  }
-                  badge={<StockStatus key={`stock-${product.id}`} available={available} />}
-                  price={<Price key={`price-${product.id}`} valueRial={variant.retailPriceRial} />}
-                  actions={<AddToCartButton key={`cart-${variant.id}`} variantId={variant.id} />}
+                <Link
+                  href={`/products/${product.slug}`}
+                  className="absolute inset-0 z-10 rounded-retail focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
+                  aria-label={`مشاهده جزئیات ${product.nameFa}`}
                 />
-              </div>
+                <div className="relative aspect-[4/3] overflow-hidden bg-retail-surface-alt">
+                  <Image
+                    src={imageSrc}
+                    alt={product.nameFa}
+                    fill
+                    loading="lazy"
+                    className="object-cover transition duration-500 group-hover:scale-[1.05]"
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                  />
+                  <div
+                    className="absolute inset-0 bg-gradient-to-t from-[#0C1218] via-transparent to-black/10"
+                    aria-hidden="true"
+                  />
+                  <div className="absolute right-3 top-3 z-20">
+                    <StockStatus available={available} />
+                  </div>
+                  {category ? (
+                    <span className="absolute bottom-3 left-3 z-20 rounded-full bg-black/45 px-3 py-1 text-xs font-bold text-[#D9E2EC] backdrop-blur">
+                      {category.nameFa}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="grid min-h-[19rem] grid-rows-[auto_auto_1fr_auto] gap-3 p-4">
+                  <div>
+                    <h3 className="line-clamp-2 text-lg font-black leading-8 text-white">
+                      {product.nameFa}
+                    </h3>
+                    {product.nameEn ? (
+                      <p className="mt-1 line-clamp-1 text-xs font-medium text-retail-muted">
+                        {product.nameEn}
+                      </p>
+                    ) : null}
+                  </div>
+                  <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-retail-secondary">
+                    {product.shortDescriptionFa}
+                  </p>
+                  <div className="mt-auto flex items-end justify-between gap-3 border-t border-white/10 pt-3">
+                    <span className="text-xs text-retail-muted">قیمت خرید تکی</span>
+                    <Price
+                      valueRial={variant.retailPriceRial}
+                      className="text-lg font-black text-white"
+                    />
+                  </div>
+                  <div className="relative z-20 grid gap-2">
+                    <AddToCartButton variantId={variant.id} />
+                    <Link
+                      href={`/products/${product.slug}`}
+                      className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md text-sm font-bold text-retail-accent transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
+                    >
+                      جزئیات
+                      <ArrowLeft size={16} aria-hidden="true" />
+                    </Link>
+                  </div>
+                </div>
+              </article>
             );
           })}
         </div>
       </section>
 
-      {/* Categories */}
       <section className="mx-auto max-w-7xl px-4 pb-16">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2 className="text-2xl font-black text-white sm:text-3xl">خرید بر اساس دسته‌بندی</h2>
+          <div>
+            <h2 className="text-2xl font-black text-white sm:text-3xl">خرید بر اساس دسته‌بندی</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-7 text-retail-secondary">
+              دسته‌های اصلی یوفوپاف با تصویر جداگانه، ارتفاع یکدست و مسیر مستقیم به کاتالوگ.
+            </p>
+          </div>
           <Link
             href="/products"
             className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-bold text-retail-accent transition hover:text-retail-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
@@ -240,28 +296,49 @@ export default function HomePage() {
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {categories.map((category) => {
             const Icon = categoryIcons[category.slug] ?? Boxes;
+            const imageSrc = categoryImageBySlug[category.slug] ?? "/images/categories/default.png";
+            const accent = categoryAccent[category.slug] ?? "from-cyan-300/25";
+
             return (
               <Link
                 key={category.id}
                 href={`/products/category/${category.slug}`}
-                className="card-interactive group flex flex-col gap-3 p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
+                className="group relative isolate flex min-h-[17rem] overflow-hidden rounded-retail border border-retail-border bg-retail-surface p-5 transition duration-300 hover:-translate-y-1 hover:border-retail-accent/70 hover:shadow-retail-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
               >
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-retail-accent/10 text-retail-accent transition group-hover:bg-retail-accent/20">
-                  <Icon size={22} aria-hidden="true" />
-                </span>
-                <h3 className="font-bold text-white">{category.nameFa}</h3>
-                <p className="text-sm leading-6 text-retail-secondary">{category.descriptionFa}</p>
-                <span className="mt-auto inline-flex items-center gap-1 pt-1 text-sm font-medium text-retail-accent opacity-0 transition group-hover:opacity-100">
-                  مشاهده
-                  <ArrowLeft size={15} aria-hidden="true" />
-                </span>
+                <Image
+                  src={imageSrc}
+                  alt={`دسته ${category.nameFa} در فروشگاه یوفوپاف`}
+                  fill
+                  loading="lazy"
+                  className="-z-20 object-cover transition duration-500 group-hover:scale-[1.04]"
+                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                />
+                <span
+                  className={`absolute inset-0 -z-10 bg-gradient-to-t ${accent} via-black/45 to-black/10`}
+                  aria-hidden="true"
+                />
+                <span
+                  className="absolute inset-x-0 bottom-0 -z-10 h-28 bg-gradient-to-t from-black/90 to-transparent"
+                  aria-hidden="true"
+                />
+                <div className="mt-auto flex min-h-[7.5rem] w-full flex-col justify-end">
+                  <h3 className="text-2xl font-black text-white drop-shadow-sm">
+                    {category.nameFa}
+                  </h3>
+                  <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-[#D9E2EC]">
+                    {category.descriptionFa}
+                  </p>
+                  <span className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-2 text-sm font-bold text-retail-accent backdrop-blur transition group-hover:bg-retail-accent group-hover:text-retail-bg">
+                    کلیک کنید
+                    <Icon size={16} aria-hidden="true" />
+                  </span>
+                </div>
               </Link>
             );
           })}
         </div>
       </section>
 
-      {/* Trust / social proof */}
       <section className="section-surface-alt border-y border-retail-border">
         <div className="mx-auto max-w-7xl px-4 py-16">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -295,7 +372,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Newsletter / final CTA */}
       <section className="mx-auto max-w-7xl px-4 py-16">
         <div className="relative overflow-hidden rounded-retail border border-retail-border bg-retail-surface p-8 sm:p-10">
           <div className="accent-halo pointer-events-none absolute inset-0" aria-hidden="true" />
@@ -305,8 +381,8 @@ export default function HomePage() {
                 از موجودی تازه و تخفیف‌ها باخبر شوید
               </h2>
               <p className="mt-3 leading-7 text-retail-secondary">
-                شماره تماس خود را ثبت کنید تا کاتالوگ به‌روز، محصولات جدید و پیشنهادهای همکاری را
-                دریافت کنید.
+                شماره تماس خود را ثبت کنید تا کاتالوگ به‌روز، محصولات جدید و پیشنهادهای همکاری
+                یوفوپاف را دریافت کنید.
               </p>
             </div>
             <form className="flex w-full max-w-md items-center gap-2" aria-label="عضویت در خبرنامه">
@@ -318,7 +394,7 @@ export default function HomePage() {
                 type="tel"
                 inputMode="tel"
                 dir="ltr"
-                placeholder="۰۹xxxxxxxxx"
+                placeholder="09xxxxxxxxx"
                 className="min-h-11 w-full rounded-md border border-retail-border bg-retail-surface-alt px-3 text-white outline-none transition placeholder:text-retail-muted focus:border-retail-accent focus:ring-2 focus:ring-retail-accent/40"
               />
               <Button type="submit" className="shrink-0">
@@ -329,7 +405,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FAQ */}
       <section className="mx-auto max-w-7xl px-4 pb-20">
         <h2 className="text-2xl font-black text-white sm:text-3xl">پرسش‌های رایج خرید</h2>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
