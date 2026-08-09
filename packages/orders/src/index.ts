@@ -50,6 +50,16 @@ export interface ChatMessageRecord {
   orderId: string;
   sender: ChatSender;
   body: string;
+  attachments?: Array<{
+    url: string;
+    key?: string;
+    name?: string;
+    contentType?: string;
+  }>;
+  replyToId?: string;
+  editedAt?: string;
+  readByAdminAt?: string;
+  readByCustomerAt?: string;
   createdAt: string;
 }
 
@@ -315,9 +325,12 @@ export function appendChatMessage(args: {
   orderId: string;
   sender: ChatSender;
   body: string;
+  attachments?: ChatMessageRecord["attachments"];
+  replyToId?: string;
 }): ChatMessageRecord {
   const body = args.body.trim();
-  if (!body) throw new Error("متن پیام خالی است.");
+  const attachments = args.attachments?.filter((item) => item.url.trim()) ?? [];
+  if (!body && attachments.length === 0) throw new Error("متن پیام یا تصویر الزامی است.");
   const store = readStore();
   const index = store.orders.findIndex(
     (order) => order.id === args.orderId || order.orderNumber === args.orderId,
@@ -331,6 +344,11 @@ export function appendChatMessage(args: {
     orderId: current.id,
     sender: args.sender,
     body,
+    ...(attachments.length > 0 ? { attachments } : {}),
+    ...(args.replyToId ? { replyToId: args.replyToId } : {}),
+    ...(args.sender === "admin"
+      ? { readByAdminAt: new Date().toISOString() }
+      : { readByCustomerAt: new Date().toISOString() }),
     createdAt: new Date().toISOString(),
   };
 
@@ -343,6 +361,62 @@ export function appendChatMessage(args: {
   orders[index] = next;
   writeStore({ orders });
   return message;
+}
+
+export function editChatMessage(args: {
+  orderId: string;
+  messageId: string;
+  sender: ChatSender;
+  body: string;
+}): ChatMessageRecord {
+  const body = args.body.trim();
+  if (!body) throw new Error("متن پیام خالی است.");
+  const store = readStore();
+  const orderIndex = store.orders.findIndex(
+    (order) => order.id === args.orderId || order.orderNumber === args.orderId,
+  );
+  if (orderIndex < 0) throw new Error("سفارش پیدا نشد.");
+  const current = store.orders[orderIndex];
+  if (!current) throw new Error("سفارش پیدا نشد.");
+  const message = current.chat.find((entry) => entry.id === args.messageId);
+  if (!message) throw new Error("پیام پیدا نشد.");
+  if (message.sender !== args.sender) throw new Error("ویرایش این پیام مجاز نیست.");
+
+  const editedAt = new Date().toISOString();
+  const nextMessage: ChatMessageRecord = { ...message, body, editedAt };
+  const next: SubmittedOrder = {
+    ...current,
+    updatedAt: editedAt,
+    chat: current.chat.map((entry) => (entry.id === args.messageId ? nextMessage : entry)),
+  };
+  const orders = [...store.orders];
+  orders[orderIndex] = next;
+  writeStore({ orders });
+  return nextMessage;
+}
+
+export function markChatMessagesRead(orderId: string, reader: ChatSender): ChatMessageRecord[] {
+  const store = readStore();
+  const orderIndex = store.orders.findIndex(
+    (order) => order.id === orderId || order.orderNumber === orderId,
+  );
+  if (orderIndex < 0) return [];
+  const current = store.orders[orderIndex];
+  if (!current) return [];
+  const readAt = new Date().toISOString();
+  const chat = current.chat.map((message) => {
+    if (reader === "admin" && message.sender === "customer" && !message.readByAdminAt) {
+      return { ...message, readByAdminAt: readAt };
+    }
+    if (reader === "customer" && message.sender === "admin" && !message.readByCustomerAt) {
+      return { ...message, readByCustomerAt: readAt };
+    }
+    return message;
+  });
+  const orders = [...store.orders];
+  orders[orderIndex] = { ...current, chat, updatedAt: readAt };
+  writeStore({ orders });
+  return chat;
 }
 
 export function resetSubmittedOrderStoreForTests(): void {
