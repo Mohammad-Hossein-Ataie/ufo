@@ -77,7 +77,10 @@ export async function generateMetadata({
 }
 
 function parseToman(value?: string) {
-  const parsed = Number(value?.replace(/[^\d]/g, ""));
+  const normalized = value
+    ?.replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)));
+  const parsed = Number(normalized?.replace(/[^\d]/g, ""));
   return Number.isFinite(parsed) && parsed > 0 ? parsed * 10 : undefined;
 }
 
@@ -102,7 +105,18 @@ function makeHref(params: ProductSearchParams, page: number) {
   return `/products${suffix ? `?${suffix}` : ""}`;
 }
 
-function filterProducts(params: ProductSearchParams) {
+function getPriceBoundsToman(items: Product[]) {
+  const prices = items.map((product) => Math.round(getRetailPrice(product) / 10));
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+  if (!Number.isFinite(minPrice) || !Number.isFinite(maxPrice)) {
+    return { min: 0, max: 25_000_000 };
+  }
+  if (minPrice === maxPrice) return { min: Math.max(0, minPrice - 50_000), max: maxPrice + 50_000 };
+  return { min: Math.max(0, minPrice), max: maxPrice };
+}
+
+function filterProducts(params: ProductSearchParams, includePriceFilter = true) {
   const minPrice = parseToman(params.minPrice);
   const maxPrice = parseToman(params.maxPrice);
 
@@ -121,6 +135,7 @@ function filterProducts(params: ProductSearchParams) {
         !params.color || getProductColorOptions(product).some((color) => color.id === params.color),
     )
     .filter((product) => {
+      if (!includePriceFilter) return true;
       const price = getRetailPrice(product);
       return (!minPrice || price >= minPrice) && (!maxPrice || price <= maxPrice);
     })
@@ -146,6 +161,8 @@ export default async function ProductsPage({
   searchParams?: Promise<ProductSearchParams>;
 }) {
   const params = (await searchParams) ?? {};
+  const priceScope = filterProducts(params, false);
+  const priceBounds = getPriceBoundsToman(priceScope);
   const filtered = filterProducts(params);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(Math.max(Number(params.page ?? 1) || 1, 1), totalPages);
@@ -203,12 +220,12 @@ export default async function ProductsPage({
       </section>
 
       <div className="mx-auto grid max-w-7xl gap-5 px-4 py-8 lg:grid-cols-[20rem_1fr] lg:py-10">
-        <aside className="h-fit rounded-retail border border-retail-border bg-retail-surface p-4 shadow-retail-lg lg:sticky lg:top-24">
+        <aside className="h-fit rounded-retail border border-retail-border bg-retail-surface p-4 shadow-retail-lg lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:overscroll-contain">
           <div className="flex items-center gap-2 border-b border-retail-border pb-4">
             <SlidersHorizontal size={18} className="text-retail-accent" aria-hidden="true" />
             <h2 className="font-black text-white">فیلتر محصولات</h2>
           </div>
-          <form action="/products" className="mt-4 grid gap-3">
+          <form action="/products" className="mt-4 grid gap-3 pb-2">
             <label className="grid gap-2 text-sm text-retail-secondary">
               جستجو
               <span className="relative">
@@ -305,7 +322,8 @@ export default async function ProductsPage({
             <CatalogPriceRangeFilter
               defaultMin={params.minPrice}
               defaultMax={params.maxPrice}
-              max={25_000_000}
+              min={priceBounds.min}
+              max={priceBounds.max}
               tone="dark"
             />
 

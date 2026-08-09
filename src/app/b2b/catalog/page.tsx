@@ -64,7 +64,10 @@ export const metadata: Metadata = {
 };
 
 function parseToman(value?: string) {
-  const parsed = Number(value?.replace(/[^\d]/g, ""));
+  const normalized = value
+    ?.replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)));
+  const parsed = Number(normalized?.replace(/[^\d]/g, ""));
   return Number.isFinite(parsed) && parsed > 0 ? parsed * 10 : undefined;
 }
 
@@ -83,6 +86,19 @@ function getWholesalePrice(product: Product) {
   return getWholesaleVariant(product)?.wholesalePriceRial ?? 0;
 }
 
+function getWholesalePriceBoundsToman(items: Product[]) {
+  const prices = items
+    .map((product) => Math.round(getWholesalePrice(product) / 10))
+    .filter((price) => price > 0);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+  if (!Number.isFinite(minPrice) || !Number.isFinite(maxPrice)) {
+    return { min: 0, max: 25_000_000 };
+  }
+  if (minPrice === maxPrice) return { min: Math.max(0, minPrice - 50_000), max: maxPrice + 50_000 };
+  return { min: Math.max(0, minPrice), max: maxPrice };
+}
+
 function makeHref(params: B2BCatalogSearchParams, page: number) {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -94,7 +110,7 @@ function makeHref(params: B2BCatalogSearchParams, page: number) {
   return `/b2b/catalog${suffix ? `?${suffix}` : ""}`;
 }
 
-function filterWholesaleProducts(params: B2BCatalogSearchParams) {
+function filterWholesaleProducts(params: B2BCatalogSearchParams, includePriceFilter = true) {
   const minPrice = parseToman(params.minPrice);
   const maxPrice = parseToman(params.maxPrice);
 
@@ -114,6 +130,7 @@ function filterWholesaleProducts(params: B2BCatalogSearchParams) {
         !params.color || getProductColorOptions(product).some((color) => color.id === params.color),
     )
     .filter((product) => {
+      if (!includePriceFilter) return true;
       const price = getWholesalePrice(product);
       return (!minPrice || price >= minPrice) && (!maxPrice || price <= maxPrice);
     })
@@ -142,6 +159,8 @@ export default async function B2BCatalogPage({
   searchParams?: Promise<B2BCatalogSearchParams>;
 }) {
   const params = (await searchParams) ?? {};
+  const priceScope = filterWholesaleProducts(params, false);
+  const priceBounds = getWholesalePriceBoundsToman(priceScope);
   const filtered = filterWholesaleProducts(params);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(Math.max(Number(params.page ?? 1) || 1, 1), totalPages);
@@ -235,12 +254,12 @@ export default async function B2BCatalogPage({
       </section>
 
       <div className="mx-auto grid max-w-7xl gap-5 px-4 py-8 lg:grid-cols-[20rem_1fr] lg:py-10">
-        <aside className="h-fit rounded-md border border-[#D5D9C9] bg-white p-4 shadow-[0_16px_40px_rgba(20,32,27,0.08)] lg:sticky lg:top-24">
+        <aside className="h-fit rounded-md border border-[#D5D9C9] bg-white p-4 shadow-[0_16px_40px_rgba(20,32,27,0.08)] lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:overscroll-contain">
           <div className="flex items-center gap-2 border-b border-[#D5D9C9] pb-4">
             <SlidersHorizontal size={18} className="text-[#1F8A5B]" aria-hidden="true" />
             <h2 className="font-black">فیلتر کاتالوگ عمده</h2>
           </div>
-          <form action="/b2b/catalog" className="mt-4 grid gap-3">
+          <form action="/b2b/catalog" className="mt-4 grid gap-3 pb-2">
             <label className="grid gap-2 text-sm font-bold text-[#405148]">
               جستجو
               <span className="relative">
@@ -337,7 +356,8 @@ export default async function B2BCatalogPage({
             <CatalogPriceRangeFilter
               defaultMin={params.minPrice}
               defaultMax={params.maxPrice}
-              max={25_000_000}
+              min={priceBounds.min}
+              max={priceBounds.max}
               tone="light"
             />
 
