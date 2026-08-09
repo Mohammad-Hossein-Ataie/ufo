@@ -24,6 +24,7 @@ function parseInput(body: unknown): AdminProductInput {
     images: Array.isArray(value.images) ? value.images.map(String) : [],
     tags: Array.isArray(value.tags) ? value.tags : [],
     specs: Array.isArray(value.specs) ? value.specs : [],
+    colorIds: Array.isArray(value.colorIds) ? value.colorIds.map(String) : [],
     retailPriceRial: Number(value.retailPriceRial ?? 0),
     wholesalePriceRial:
       value.wholesalePriceRial === undefined ? undefined : Number(value.wholesalePriceRial),

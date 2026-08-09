@@ -10,6 +10,7 @@ interface CartLine {
   variantId: string;
   quantity: number;
   channel: SalesChannel;
+  colorId?: string;
 }
 
 interface RetailSession {
@@ -47,7 +48,8 @@ function readCart(): CartLine[] {
       return (
         typeof record.variantId === "string" &&
         typeof record.quantity === "number" &&
-        record.channel === "retail"
+        record.channel === "retail" &&
+        (!("colorId" in record) || typeof record.colorId === "string")
       );
     });
   } catch {
@@ -128,7 +130,11 @@ export function CheckoutClient() {
         address,
         shippingMethod,
         receiptNote,
-        lines: cart.map((line) => ({ variantId: line.variantId, quantity: line.quantity })),
+        lines: cart.map((line) => ({
+          variantId: line.variantId,
+          quantity: line.quantity,
+          ...(line.colorId ? { colorId: line.colorId } : {}),
+        })),
       }),
     });
     const payload = (await response.json().catch(() => ({}))) as {

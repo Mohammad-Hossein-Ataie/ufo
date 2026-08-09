@@ -23,7 +23,11 @@ function cartLines(value: unknown): CartSubmissionLine[] {
         typeof record.quantity === "number" ? record.quantity : Number(record.quantity);
       if (typeof record.variantId !== "string" || !Number.isInteger(quantity) || quantity <= 0)
         return null;
-      return { variantId: record.variantId, quantity };
+      return {
+        variantId: record.variantId,
+        quantity,
+        ...(typeof record.colorId === "string" ? { colorId: record.colorId } : {}),
+      };
     })
     .filter((line): line is CartSubmissionLine => line !== null);
 }

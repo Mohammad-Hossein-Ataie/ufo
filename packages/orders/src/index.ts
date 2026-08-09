@@ -2,6 +2,7 @@ import {
   calculateOrderTotals,
   createOrder,
   createOrderItemSnapshot,
+  getProductColorOptions,
   products,
   quoteShipping,
   variants,
@@ -28,6 +29,7 @@ export interface CartSubmissionLine {
   variantId: string;
   quantity: number;
   cartonCount?: number;
+  colorId?: string;
 }
 
 export interface OrderCustomerSnapshot {
@@ -186,7 +188,24 @@ function createItemSnapshots(
     if (!Number.isInteger(line.quantity) || line.quantity <= 0) {
       throw new Error("تعداد محصول باید عدد صحیح و مثبت باشد.");
     }
-    return createOrderItemSnapshot({ product, variant, channel, quantity: line.quantity });
+    const snapshot = createOrderItemSnapshot({
+      product,
+      variant,
+      channel,
+      quantity: line.quantity,
+    });
+    const color = line.colorId
+      ? getProductColorOptions(product).find((item) => item.id === line.colorId)
+      : undefined;
+    return color
+      ? {
+          ...snapshot,
+          selectedAttributes: [
+            ...snapshot.selectedAttributes,
+            { nameFa: "رنگ", valueFa: color.labelFa, technicalValue: color.id },
+          ],
+        }
+      : snapshot;
   });
 }
 

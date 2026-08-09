@@ -1,5 +1,13 @@
 import { ensureIndexes, getDb } from "@ufo/database";
-import { brands, categories, inventoryItems, products, variants } from "@ufo/domain";
+import {
+  brands,
+  categories,
+  inventoryItems,
+  productColorAttributeTechnicalValue,
+  productColorPalette,
+  products,
+  variants,
+} from "@ufo/domain";
 import type {
   InventoryItem,
   Product,
@@ -34,6 +42,7 @@ export interface AdminProductInput {
   images?: string[] | undefined;
   tags?: string[] | undefined;
   specs?: ProductSpec[] | undefined;
+  colorIds?: string[] | undefined;
   retailPriceRial: number;
   wholesalePriceRial?: number | undefined;
   wholesaleEnabled?: boolean | undefined;
@@ -111,6 +120,10 @@ function buildDocuments(
     ...(input.images ?? current?.product.images ?? []).map((item) => item.trim()).filter(Boolean),
   ].filter((item, index, list) => list.indexOf(item) === index);
   const tags = input.tags?.filter(Boolean) ?? current?.product.tags ?? [];
+  const colorIds = (input.colorIds ?? [])
+    .map((item) => item.trim())
+    .filter((item, index, list) => item && list.indexOf(item) === index)
+    .filter((item) => productColorPalette.some((color) => color.id === item));
   const retailPriceRial = input.retailPriceRial;
   const wholesalePriceRial =
     input.wholesalePriceRial ?? current?.variant.wholesalePriceRial ?? retailPriceRial;
@@ -144,6 +157,15 @@ function buildDocuments(
               nameFa: "نام لاتین",
               valueFa: input.nameEn.trim(),
               technicalValue: input.nameEn.trim(),
+            },
+          ]
+        : []),
+      ...(colorIds.length > 0
+        ? [
+            {
+              nameFa: "رنگ‌های قابل سفارش",
+              valueFa: colorIds.join(","),
+              technicalValue: productColorAttributeTechnicalValue,
             },
           ]
         : []),

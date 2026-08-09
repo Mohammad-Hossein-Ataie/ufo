@@ -8,6 +8,7 @@ import type {
   Order,
   OrderItemSnapshot,
   Product,
+  ProductKind,
   ProductVariant,
   SalesChannel,
   ShippingAddress,
@@ -117,6 +118,11 @@ const baseProducts: Product[] = [
     attributes: [
       { nameFa: "توان", valueFa: "۱۸ وات", technicalValue: "18W" },
       { nameFa: "باتری", valueFa: "۸۰۰ میلی‌آمپر", technicalValue: "800mAh" },
+      {
+        nameFa: "رنگ‌های قابل سفارش",
+        valueFa: "black,silver,green",
+        technicalValue: "product-colors",
+      },
     ],
     isActive: true,
     isAgeRestricted: true,
@@ -139,6 +145,11 @@ const baseProducts: Product[] = [
     attributes: [
       { nameFa: "پاف", valueFa: "۶۰۰۰", technicalValue: "6000" },
       { nameFa: "ظرفیت", valueFa: "۱۴ میلی‌لیتر", technicalValue: "14ml" },
+      {
+        nameFa: "رنگ‌های قابل سفارش",
+        valueFa: "black,blue,green,purple",
+        technicalValue: "product-colors",
+      },
     ],
     isActive: true,
     isAgeRestricted: true,
@@ -582,6 +593,75 @@ export function searchProducts(query: string): Product[] {
       .join(" ")
       .toLowerCase()
       .includes(normalizedQuery),
+  );
+}
+
+export interface ProductColorOption {
+  id: string;
+  labelFa: string;
+  hex: string;
+}
+
+export const productColorAttributeTechnicalValue = "product-colors";
+
+export const productColorPalette: ProductColorOption[] = [
+  { id: "black", labelFa: "مشکی", hex: "#111827" },
+  { id: "silver", labelFa: "نقره‌ای", hex: "#CBD5E1" },
+  { id: "white", labelFa: "سفید", hex: "#F8FAFC" },
+  { id: "blue", labelFa: "آبی", hex: "#2563EB" },
+  { id: "green", labelFa: "سبز", hex: "#16A34A" },
+  { id: "red", labelFa: "قرمز", hex: "#DC2626" },
+  { id: "purple", labelFa: "بنفش", hex: "#7C3AED" },
+  { id: "gold", labelFa: "طلایی", hex: "#D97706" },
+];
+
+export const productColorEligibleKinds: ProductKind[] = [
+  "pod-device",
+  "vape-device",
+  "disposable",
+  "accessory",
+];
+
+export const suggestedProductColorOptionsByKind: Partial<Record<ProductKind, string[]>> = {
+  "pod-device": ["black", "silver", "blue", "green", "purple"],
+  "vape-device": ["black", "silver", "blue", "red", "gold"],
+  disposable: ["black", "white", "blue", "green", "purple"],
+  accessory: ["black", "silver", "blue", "red", "gold"],
+};
+
+export const suggestedProductColorOptionsByCategoryId: Record<string, string[]> = {
+  "cat-pod": ["black", "silver", "blue", "green", "purple"],
+  "cat-vape": ["black", "silver", "blue", "red", "gold"],
+  "cat-disposable": ["black", "white", "blue", "green", "purple"],
+  "cat-lighter": ["black", "silver", "blue", "red", "gold"],
+};
+
+export function getProductColorOptions(product: Product): ProductColorOption[] {
+  const colorAttribute = product.attributes.find(
+    (attribute) => attribute.technicalValue === productColorAttributeTechnicalValue,
+  );
+  const colorIds = colorAttribute?.valueFa
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (!colorIds?.length) return [];
+  return colorIds
+    .map((colorId) => productColorPalette.find((color) => color.id === colorId))
+    .filter((color): color is ProductColorOption => Boolean(color));
+}
+
+export function getProductColorById(colorId: string): ProductColorOption | undefined {
+  return productColorPalette.find((color) => color.id === colorId);
+}
+
+export function getSuggestedProductColorIds(product: Product): string[] {
+  const kind = product.productKind;
+  return (
+    (kind && productColorEligibleKinds.includes(kind)
+      ? suggestedProductColorOptionsByKind[kind]
+      : undefined) ??
+    suggestedProductColorOptionsByCategoryId[product.categoryId] ??
+    []
   );
 }
 

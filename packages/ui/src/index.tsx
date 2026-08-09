@@ -180,15 +180,17 @@ export function ProductCard({
   actions?: ReactNode;
 }) {
   return (
-    <article className="group grid overflow-hidden rounded-md border border-current/15 bg-current/[0.03]">
+    <article className="group grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-md border border-current/15 bg-current/[0.03]">
       <div className="aspect-[4/3] overflow-hidden bg-black/20">{media}</div>
-      <div className="grid gap-3 p-4">
-        <div className="flex min-h-8 items-start justify-between gap-3">
-          <h3 className="text-base font-bold leading-7">{title}</h3>
+      <div className="grid h-full grid-rows-[auto_auto_1fr] gap-3 p-4">
+        <div className="flex min-h-14 items-start justify-between gap-3">
+          <h3 className="line-clamp-2 text-base font-bold leading-7">{title}</h3>
           {badge}
         </div>
-        <p className="min-h-12 text-sm leading-6 text-current/70">{description}</p>
-        <div className="flex items-center justify-between gap-3">
+        <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-current/70">
+          {description}
+        </p>
+        <div className="mt-auto grid gap-3">
           <div className="font-bold">{price}</div>
           {actions}
         </div>

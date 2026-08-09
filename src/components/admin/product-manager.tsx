@@ -11,6 +11,7 @@ import {
   ImagePlus,
   LayoutGrid,
   Link2,
+  Palette,
   Plus,
   Save,
   Search,
@@ -20,6 +21,11 @@ import {
   X,
 } from "lucide-react";
 import { Badge, Button, IconButton, Input, Price, Textarea } from "@ufo/ui";
+import {
+  getProductColorOptions,
+  getSuggestedProductColorIds,
+  productColorPalette,
+} from "@ufo/domain";
 import type {
   Brand,
   Category,
@@ -59,6 +65,7 @@ interface FormState {
   restockThreshold: number;
   image: string;
   images: string[];
+  colorIds: string[];
   tagsText: string;
   specsText: string;
   shortDescriptionFa: string;
@@ -94,6 +101,7 @@ const emptyForm: FormState = {
   restockThreshold: 5,
   image: "/images/ufo-hero.png",
   images: ["/images/ufo-hero.png"],
+  colorIds: [],
   tagsText: "",
   specsText: "",
   shortDescriptionFa: "",
@@ -132,6 +140,7 @@ function uniqueImages(images: string[]) {
 
 function rowToForm(row: AdminProductRecord): FormState {
   const images = uniqueImages([row.product.image, ...(row.product.images ?? [])]);
+  const colorIds = getProductColorOptions(row.product).map((color) => color.id);
   return {
     id: row.product.id,
     variantId: row.variant.id,
@@ -153,6 +162,7 @@ function rowToForm(row: AdminProductRecord): FormState {
     restockThreshold: row.inventory.restockThreshold,
     image: images[0] ?? row.product.image,
     images,
+    colorIds,
     tagsText: row.product.tags.join("، "),
     specsText: specsToText(row.product.specs),
     shortDescriptionFa: row.product.shortDescriptionFa,
@@ -248,6 +258,43 @@ export function ProductManager() {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
+  function toggleColor(colorId: string) {
+    setForm((current) => {
+      const exists = current.colorIds.includes(colorId);
+      return {
+        ...current,
+        colorIds: exists
+          ? current.colorIds.filter((item) => item !== colorId)
+          : [...current.colorIds, colorId],
+      };
+    });
+  }
+
+  function applySuggestedColors() {
+    const pseudoProduct = {
+      id: form.id ?? "draft",
+      slug: form.slug,
+      nameFa: form.nameFa,
+      brandId: form.brandId,
+      categoryId: form.categoryId,
+      productKind: form.productKind,
+      salesChannels: [],
+      shortDescriptionFa: "",
+      descriptionFa: "",
+      image: form.image,
+      images: form.images,
+      tags: [],
+      attributes: [],
+      isActive: true,
+      isAgeRestricted: true,
+      seoTitle: "",
+      seoDescription: "",
+      createdAt: "",
+      updatedAt: "",
+    };
+    update("colorIds", getSuggestedProductColorIds(pseudoProduct));
+  }
+
   function openCreate() {
     setForm(emptyForm);
     setManualImageUrl("");
@@ -316,6 +363,7 @@ export function ProductManager() {
         .map((tag) => tag.trim())
         .filter(Boolean),
       specs: textToSpecs(form.specsText),
+      colorIds: form.colorIds,
       retailPriceRial: Math.round(form.retailPriceToman) * 10,
       wholesalePriceRial: Math.round(form.wholesalePriceToman) * 10,
       wholesaleEnabled: form.wholesaleEnabled,
@@ -481,6 +529,7 @@ export function ProductManager() {
               {filtered.slice(0, 140).map((row) => {
                 const channels = row.product.salesChannels ?? ["retail", "wholesale"];
                 const available = row.inventory.onHand - row.inventory.reserved;
+                const colors = getProductColorOptions(row.product);
                 return (
                   <tr key={row.product.id} className="border-t border-[#E2E7ED] align-middle">
                     <td className="px-4 py-3">
@@ -499,6 +548,29 @@ export function ProductManager() {
                           <p className="truncate text-xs text-[#5F6C79]" dir="ltr">
                             {row.variant.sku}
                           </p>
+                          {colors.length > 0 ? (
+                            <div className="mt-2 flex flex-wrap items-center gap-1">
+                              {colors.slice(0, 5).map((color) => (
+                                <span
+                                  key={color.id}
+                                  className="inline-flex items-center gap-1 rounded-full border border-[#D7DDE4] bg-white px-2 py-1 text-[11px] text-[#4C5A67]"
+                                  title={color.labelFa}
+                                >
+                                  <span
+                                    className="h-3 w-3 rounded-full border border-slate-300"
+                                    style={{ backgroundColor: color.hex }}
+                                    aria-hidden="true"
+                                  />
+                                  {color.labelFa}
+                                </span>
+                              ))}
+                              {colors.length > 5 ? (
+                                <span className="text-[11px] text-[#5F6C79]">
+                                  +{formatNumber(colors.length - 5)}
+                                </span>
+                              ) : null}
+                            </div>
+                          ) : null}
                         </div>
                       </div>
                     </td>
@@ -667,6 +739,77 @@ export function ProductManager() {
                         onChange={(event) => update("shortDescriptionFa", event.target.value)}
                       />
                     </label>
+                  </section>
+
+                  <section className="rounded-md border border-[#D7DDE4] p-4">
+                    <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <Palette size={18} className="text-[#168BFF]" aria-hidden="true" />
+                        <div>
+                          <h3 className="font-black">رنگ‌های قابل سفارش</h3>
+                          <p className="mt-1 text-xs leading-5 text-[#5F6C79]">
+                            فقط وقتی رنگی انتخاب شود، بخش رنگ در صفحه محصول و کارت‌های لیست نمایش
+                            داده می‌شود. برای کویل و کارتریج می‌توانید این بخش را خالی بگذارید.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="secondary"
+                          onClick={applySuggestedColors}
+                        >
+                          پیشنهاد بر اساس نوع
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          className="border border-[#D7DDE4] text-[#17202A] hover:bg-[#EEF3F8]"
+                          onClick={() => update("colorIds", [])}
+                        >
+                          بدون رنگ
+                        </Button>
+                      </div>
+                    </div>
+                    <div
+                      className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
+                      role="group"
+                      aria-label="رنگ‌های محصول"
+                    >
+                      {productColorPalette.map((color) => {
+                        const active = form.colorIds.includes(color.id);
+                        return (
+                          <button
+                            key={color.id}
+                            type="button"
+                            onClick={() => toggleColor(color.id)}
+                            className={`flex min-h-11 items-center justify-between gap-2 rounded-md border px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
+                              active
+                                ? "border-cyan-500 bg-cyan-50 text-cyan-950"
+                                : "border-[#D7DDE4] bg-white text-[#17202A] hover:bg-[#F4F6F8]"
+                            }`}
+                            aria-pressed={active}
+                          >
+                            <span className="inline-flex items-center gap-2">
+                              <span
+                                className="h-5 w-5 rounded-full border border-slate-300"
+                                style={{ backgroundColor: color.hex }}
+                                aria-hidden="true"
+                              />
+                              {color.labelFa}
+                            </span>
+                            {active ? <Check size={16} aria-hidden="true" /> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="mt-3 text-xs text-[#5F6C79]" role="status">
+                      {form.colorIds.length > 0
+                        ? `${formatNumber(form.colorIds.length)} رنگ برای این محصول فعال است.`
+                        : "برای این محصول رنگی تعریف نشده است."}
+                    </p>
                   </section>
 
                   <section className="rounded-md border border-[#D7DDE4] p-4">

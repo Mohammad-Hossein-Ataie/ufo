@@ -9,6 +9,7 @@ interface CartLine {
   variantId: string;
   quantity: number;
   channel: SalesChannel;
+  colorId?: string;
 }
 
 const cartKeys: Record<SalesChannel, string> = {
@@ -25,7 +26,8 @@ function isCartLine(value: unknown): value is CartLine {
     "channel" in value &&
     typeof value.variantId === "string" &&
     typeof value.quantity === "number" &&
-    (value.channel === "retail" || value.channel === "wholesale")
+    (value.channel === "retail" || value.channel === "wholesale") &&
+    (!("colorId" in value) || typeof value.colorId === "string")
   );
 }
 
@@ -50,6 +52,7 @@ export function AddToCartButton({
   label = "افزودن",
   enableQuantity = channel === "retail",
   maxQuantity,
+  selectedColorIds = [],
 }: {
   variantId: string;
   quantity?: number;
@@ -57,24 +60,36 @@ export function AddToCartButton({
   label?: string;
   enableQuantity?: boolean;
   maxQuantity?: number | undefined;
+  selectedColorIds?: string[];
 }) {
   const [added, setAdded] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState(0);
   const formatter = new Intl.NumberFormat("fa-IR");
   const firstQuantity = Math.max(1, Math.floor(quantity));
   const canIncrease = typeof maxQuantity !== "number" || selectedQuantity < maxQuantity;
+  const colorIds: Array<string | undefined> =
+    selectedColorIds.length > 0 ? selectedColorIds : [undefined];
 
   function addToCart(addQuantity = quantity) {
     const cart = readCart(channel);
-    const existing = cart.find((line) => line.variantId === variantId && line.channel === channel);
     const quantityToAdd = Math.max(1, Math.floor(addQuantity));
-    const nextCart = existing
-      ? cart.map((line) =>
-          line.variantId === variantId && line.channel === channel
-            ? { ...line, quantity: line.quantity + quantityToAdd }
-            : line,
-        )
-      : [...cart, { variantId, quantity: quantityToAdd, channel }];
+    let nextCart = [...cart];
+    for (const colorId of colorIds) {
+      const existing = nextCart.find(
+        (line) =>
+          line.variantId === variantId && line.channel === channel && line.colorId === colorId,
+      );
+      nextCart = existing
+        ? nextCart.map((line) =>
+            line.variantId === variantId && line.channel === channel && line.colorId === colorId
+              ? { ...line, quantity: line.quantity + quantityToAdd }
+              : line,
+          )
+        : [
+            ...nextCart,
+            { variantId, quantity: quantityToAdd, channel, ...(colorId ? { colorId } : {}) },
+          ];
+    }
     window.localStorage.setItem(cartKeys[channel], JSON.stringify(nextCart));
     window.dispatchEvent(new CustomEvent(`${cartKeys[channel]}-updated`));
     window.dispatchEvent(new CustomEvent("ufo-cart-updated"));
@@ -85,17 +100,25 @@ export function AddToCartButton({
   function setRetailQuantity(nextQuantity: number) {
     const safeQuantity = Math.max(0, Math.floor(nextQuantity));
     const cart = readCart(channel);
-    const existing = cart.find((line) => line.variantId === variantId && line.channel === channel);
-    const nextCart =
-      safeQuantity === 0
-        ? cart.filter((line) => !(line.variantId === variantId && line.channel === channel))
-        : existing
-          ? cart.map((line) =>
-              line.variantId === variantId && line.channel === channel
-                ? { ...line, quantity: safeQuantity }
-                : line,
-            )
-          : [...cart, { variantId, quantity: safeQuantity, channel }];
+    let nextCart = cart.filter(
+      (line) =>
+        !(
+          line.variantId === variantId &&
+          line.channel === channel &&
+          colorIds.includes(line.colorId)
+        ),
+    );
+    if (safeQuantity > 0) {
+      nextCart = [
+        ...nextCart,
+        ...colorIds.map((colorId) => ({
+          variantId,
+          quantity: safeQuantity,
+          channel,
+          ...(colorId ? { colorId } : {}),
+        })),
+      ];
+    }
     window.localStorage.setItem(cartKeys[channel], JSON.stringify(nextCart));
     window.dispatchEvent(new CustomEvent(`${cartKeys[channel]}-updated`));
     window.dispatchEvent(new CustomEvent("ufo-cart-updated"));
