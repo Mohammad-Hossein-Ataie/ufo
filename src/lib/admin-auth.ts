@@ -32,6 +32,7 @@ function parseDotEnv(value: string): Record<string, string> {
 }
 
 function readLocalEnv(): Record<string, string> {
+  if (process.env.NODE_ENV === "production") return {};
   const envPath = join(findWorkspaceRoot(), ".env.local");
   if (!existsSync(envPath)) return {};
   return parseDotEnv(readFileSync(envPath, "utf8"));

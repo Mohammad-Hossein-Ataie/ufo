@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s | یوفوپاف UFO Puff",
   },
   description:
-    "یوفوپاف UFO Puff فروشگاه فارسی پاد، ویپ، جویس و لوازم جانبی با مسیر جدا برای فروش تکی، عمده و ادمین.",
+    "خرید پاد، ویپ، جویس و لوازم جانبی از یوفوپاف با قیمت به‌صرفه، موجودی به‌روز، ضمانت اصالت و ارسال سریع؛ مناسب خرید تکی و همکاری.",
   applicationName: "یوفوپاف UFO Puff",
   manifest: "/favicons/site.webmanifest",
   icons: {
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "یوفوپاف | UFO Puff",
-    description: "یوفوپاف، فروشگاه فارسی پاد و ویپ با موجودی و قیمت شفاف.",
+    description: "خرید پاد، ویپ و جویس با قیمت به‌صرفه، موجودی به‌روز، ضمانت اصالت و ارسال سریع از یوفوپاف.",
     url: canonical("/"),
     siteName: "یوفوپاف | UFO Puff",
     images: [{ url: "/logos/logo.png", width: 500, height: 500, alt: "لوگوی یوفوپاف UFO Puff" }],

@@ -72,7 +72,7 @@ const stats = [
   { value: "+۵٬۰۰۰", label: "مشتری فعال" },
   { value: "+۱۲٬۰۰۰", label: "سفارش پردازش‌شده" },
   { value: "۴٫۸ / ۵", label: "رضایت خرید" },
-  { value: `${categories.length}`, label: "دسته‌بندی کالا" },
+  { value: categories.length.toLocaleString("fa-IR"), label: "دسته‌بندی کالا" },
 ];
 
 const categoryIcons: Record<string, typeof Boxes> = {
