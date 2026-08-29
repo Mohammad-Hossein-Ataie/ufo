@@ -106,11 +106,11 @@ export default function B2BHomePage() {
               کاتالوگ همکاری، قیمت کارتن، حداقل سفارش و پیش‌فاکتور در یک مسیر روشن برای فروشگاه‌ها و
               خریداران عمده آماده شده است.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-10 flex flex-wrap gap-4">
               <Link href="/b2b/quick-order">
                 <Button
                   size="lg"
-                  className="border-[#1F8A5B] bg-[#1F8A5B] text-white hover:bg-[#176D48]"
+                  className="min-h-14 border-[#1F8A5B] bg-[#1F8A5B] px-7 text-lg font-black text-white shadow-[0_16px_34px_rgba(31,138,91,0.24)] hover:bg-[#176D48]"
                 >
                   سفارش سریع
                   <ArrowLeft size={18} aria-hidden="true" />
@@ -120,15 +120,18 @@ export default function B2BHomePage() {
                 <Button
                   size="lg"
                   variant="ghost"
-                  className="border-[#C8D6C7] bg-white text-[#14201B] hover:bg-[#EEF0E5]"
+                  className="min-h-14 border-[#C8D6C7] bg-white px-7 text-lg font-black text-[#14201B] shadow-sm hover:bg-[#EEF0E5]"
                 >
                   مشاهده کاتالوگ عمده
                 </Button>
               </Link>
             </div>
-            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#596B61]">
+            <ul className="mt-10 grid gap-3 border-t border-[#D5D9C9] pt-7 text-sm text-[#596B61] sm:grid-cols-2">
               {["قیمت همکاری", "حداقل کارتن", "پیش‌فاکتور", "پشتیبانی مستقیم"].map((item) => (
-                <li key={item} className="inline-flex items-center gap-2">
+                <li
+                  key={item}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-md bg-white/70 px-3 shadow-sm"
+                >
                   <BadgeCheck size={16} className="text-[#1F8A5B]" aria-hidden="true" />
                   {item}
                 </li>

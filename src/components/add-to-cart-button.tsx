@@ -49,8 +49,8 @@ export function AddToCartButton({
   variantId,
   quantity = 1,
   channel = "retail",
-  label = "افزودن",
-  enableQuantity = channel === "retail",
+  label = "افزودن به سبد خرید",
+  enableQuantity = false,
   maxQuantity,
   selectedColorIds = [],
 }: {
@@ -134,7 +134,7 @@ export function AddToCartButton({
           type="button"
           size="sm"
           onClick={() => setRetailQuantity(firstQuantity)}
-          className="min-w-32"
+          className="min-w-40"
         >
           <ShoppingCart size={16} aria-hidden="true" />
           {label}
@@ -173,7 +173,7 @@ export function AddToCartButton({
           type="button"
           size="sm"
           onClick={() => setRetailQuantity(selectedQuantity)}
-          className="min-w-32"
+          className="min-w-40"
         >
           <ShoppingCart size={16} aria-hidden="true" />
           {added

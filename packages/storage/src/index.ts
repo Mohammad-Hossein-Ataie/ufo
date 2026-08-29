@@ -36,6 +36,59 @@ export interface LiaraStorageConfig {
   secretKey: string;
 }
 
+function trimTrailingSlash(value: string): string {
+  return value.replace(/\/$/, "");
+}
+
+export function getPublicObjectUrl(
+  key: string,
+  env: NodeJS.ProcessEnv = process.env,
+): string | undefined {
+  const publicBaseUrl = env.LIARA_PUBLIC_BASE_URL?.trim();
+  if (!publicBaseUrl) return undefined;
+  return `${trimTrailingSlash(publicBaseUrl)}/${key.replace(/^\/+/, "")}`;
+}
+
+export function rewriteLiaraPublicUrl(
+  value: string,
+  env: NodeJS.ProcessEnv = process.env,
+): string {
+  const publicBaseUrl = env.LIARA_PUBLIC_BASE_URL?.trim();
+  const bucketName = env.LIARA_BUCKET_NAME?.trim();
+  if (!publicBaseUrl || !bucketName) return value;
+
+  let source: URL;
+  let target: URL;
+  try {
+    source = new URL(value);
+    target = new URL(publicBaseUrl);
+  } catch {
+    return value;
+  }
+
+  const liaraHostnames = new Set([
+    "storage.c2.liara.space",
+    "storage.c2.liara.site",
+    "storage.iran.liara.space",
+    "storage.iran.liara.site",
+    `${bucketName}.storage.iran.liara.space`,
+    `${bucketName}.storage.iran.liara.site`,
+    `${bucketName}.storage.c2.liara.space`,
+    `${bucketName}.storage.c2.liara.site`,
+  ]);
+  if (!liaraHostnames.has(source.hostname)) return value;
+
+  const bucketPrefix = `/${bucketName}/`;
+  const keyPath = source.pathname.startsWith(bucketPrefix)
+    ? source.pathname.slice(bucketPrefix.length)
+    : source.pathname.replace(/^\/+/, "");
+  if (!keyPath) return value;
+
+  const rewritten = new URL(`${trimTrailingSlash(target.toString())}/${keyPath}`);
+  rewritten.search = source.search;
+  return rewritten.toString();
+}
+
 export function createS3Client(config: LiaraStorageConfig): S3Client {
   return new S3Client({
     region: "default",

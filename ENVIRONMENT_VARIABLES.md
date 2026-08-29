@@ -16,11 +16,11 @@ Do not commit real credentials. Use `.env.local` locally and Liara environment s
 
 ## Liara Object Storage
 
-- `LIARA_ENDPOINT`: example `https://storage.c2.liara.site`
+- `LIARA_ENDPOINT`: SDK endpoint, example `https://storage.c2.liara.site`.
 - `LIARA_BUCKET_NAME`: bucket name
 - `LIARA_ACCESS_KEY`: secret value
 - `LIARA_SECRET_KEY`: secret value
-- `LIARA_PUBLIC_BASE_URL`: optional public URL prefix for uploaded product images.
+- `LIARA_PUBLIC_BASE_URL`: optional public URL prefix for uploaded product images. Use the bucket custom domain, for example `https://bucket.ufopuff.com`, so public image URLs do not depend on the filtered Liara default domain. If SSL is not active for the custom domain yet, HTTP may work directly, but HTTPS pages can block HTTP images as mixed content.
 - `STORAGE_PROVIDER`: `mock` or `liara`
 
 ## Auth

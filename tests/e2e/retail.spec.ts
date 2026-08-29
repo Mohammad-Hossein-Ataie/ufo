@@ -7,10 +7,10 @@ test("single Next app exposes retail, B2B and admin routes", async ({ page }) =>
   });
 
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "UFO Puff", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /کاتالوگ شفاف یوفوپاف/ })).toBeVisible();
 
   await page.goto("/b2b");
-  await expect(page.getByText("UFO Puff B2B").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /خرید عمده پاد و ویپ/ })).toBeVisible();
 
   await page.goto("/admin/login");
   await expect(page).toHaveURL(/\/admin\/login$/);

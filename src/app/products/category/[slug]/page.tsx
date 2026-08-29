@@ -94,7 +94,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           ادعای درمانی برای آن‌ها مطرح نمی‌شود.
         </p>
       </section>
-      <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {categoryProducts.map((product) => {
           const variant = getPrimaryVariant(product.id);
           const inventory = getInventoryByVariant(variant.id);
@@ -116,13 +116,13 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               badge={<StockStatus available={available} />}
               price={<Price valueRial={variant.retailPriceRial} />}
               actions={
-                <div className="flex flex-wrap gap-2">
+                <div className="grid w-full gap-2">
                   <Link href={`/products/${product.slug}`}>
-                    <Button size="sm" variant="ghost">
+                    <Button size="sm" variant="ghost" className="w-full">
                       جزئیات
                     </Button>
                   </Link>
-                  <AddToCartButton variantId={variant.id} label="خرید سریع" />
+                  <AddToCartButton variantId={variant.id} label="افزودن به سبد خرید" />
                 </div>
               }
             />

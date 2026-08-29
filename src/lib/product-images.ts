@@ -1,4 +1,5 @@
 import { categories } from "@ufo/domain";
+import { rewriteLiaraPublicUrl } from "@ufo/storage";
 import type { Product } from "@ufo/types";
 
 const genericProductImages = new Set(["", "/images/ufo-hero.png"]);
@@ -21,11 +22,13 @@ export function getCategoryImage(categoryId: string) {
 }
 
 export function getProductImage(product: Pick<Product, "categoryId" | "image">) {
-  if (!genericProductImages.has(product.image)) return product.image;
+  if (!genericProductImages.has(product.image)) return rewriteLiaraPublicUrl(product.image);
   return getCategoryImage(product.categoryId) ?? "/images/categories/lighter.png";
 }
 
 export function getProductImages(product: Pick<Product, "categoryId" | "image" | "images">) {
-  const images = product.images.filter((image) => !genericProductImages.has(image));
+  const images = product.images
+    .filter((image) => !genericProductImages.has(image))
+    .map((image) => rewriteLiaraPublicUrl(image));
   return images.length > 0 ? images : [getProductImage(product)];
 }

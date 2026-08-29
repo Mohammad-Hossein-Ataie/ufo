@@ -56,6 +56,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "storage.c2.liara.site",
       },
+      {
+        protocol: "https",
+        hostname: "bucket.ufopuff.com",
+      },
+      {
+        protocol: "http",
+        hostname: "bucket.ufopuff.com",
+      },
     ],
   },
 };

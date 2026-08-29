@@ -80,6 +80,7 @@ export function ProductPurchasePanel({
           variantId={variantId}
           maxQuantity={maxQuantity}
           label={label}
+          enableQuantity
           selectedColorIds={selectedColorId ? [selectedColorId] : []}
         />
       )}

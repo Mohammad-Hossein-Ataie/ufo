@@ -411,7 +411,7 @@ export default async function B2BCatalogPage({
               بازه قیمت، برند یا وضعیت موجودی را تغییر دهید تا گزینه‌های بیشتری ببینید.
             </EmptyState>
           ) : (
-            <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 xl:grid-cols-4">
               {pagedProducts.map((product) => {
                 const variant = getWholesaleVariant(product);
                 if (!variant) return null;
@@ -474,7 +474,7 @@ export default async function B2BCatalogPage({
                               size="sm"
                               className="w-full border-[#1F8A5B] bg-[#1F8A5B] text-white hover:bg-[#176D48]"
                             >
-                              افزودن کارتن
+                              افزودن کارتن به سفارش
                               <ArrowLeft size={16} aria-hidden="true" />
                             </Button>
                           </Link>

@@ -373,7 +373,7 @@ export default async function ProductsPage({
               بازه قیمت، برند یا دسته‌بندی را تغییر دهید تا نتایج بیشتری ببینید.
             </EmptyState>
           ) : (
-            <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {pagedProducts.map((product) => {
                 const variant = getPrimaryVariant(product.id);
                 const available = getProductStock(product);
@@ -429,7 +429,7 @@ export default async function ProductsPage({
                           </Link>
                           <AddToCartButton
                             variantId={variant.id}
-                            label="خرید سریع"
+                            label="افزودن به سبد خرید"
                             maxQuantity={available > 0 ? available : undefined}
                           />
                         </div>

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStorageProvider } from "@ufo/storage";
+import { getPublicObjectUrl, getStorageProvider } from "@ufo/storage";
 
 export const runtime = "nodejs";
 
@@ -37,15 +37,13 @@ export async function POST(req: Request) {
       body: bytes,
       contentType: file.type,
     });
-    const publicBaseUrl = process.env.LIARA_PUBLIC_BASE_URL?.replace(/\/$/, "");
+    const publicUrl = getPublicObjectUrl(key);
     return NextResponse.json({
       message: "تصویر چت آپلود شد.",
       file: {
         ...stored,
         name: file.name,
-        ...(publicBaseUrl
-          ? { url: `${publicBaseUrl}/${key}` }
-          : { url: `/api/chat/upload?key=${encodeURIComponent(key)}` }),
+        url: publicUrl ?? `/api/chat/upload?key=${encodeURIComponent(key)}`,
       },
     });
   } catch {

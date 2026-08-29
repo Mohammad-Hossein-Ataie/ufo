@@ -14,6 +14,7 @@ export const envSchema = z.object({
   LIARA_BUCKET_NAME: z.string().optional(),
   LIARA_ACCESS_KEY: z.string().optional(),
   LIARA_SECRET_KEY: z.string().optional(),
+  LIARA_PUBLIC_BASE_URL: optionalUrl.default(""),
   SESSION_SECRET: z.string().min(16).optional(),
   OTP_SECRET: z.string().min(16).optional(),
   SUPER_ADMIN_PHONE: z.string().optional(),

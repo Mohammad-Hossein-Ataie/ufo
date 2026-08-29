@@ -2,20 +2,20 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
-  BadgeCheck,
   Boxes,
   Cog,
+  CreditCard,
   Cpu,
   Droplets,
   Flame,
   FlaskConical,
+  Headphones,
   PackageCheck,
   ShieldCheck,
   Sparkles,
   Store,
   Truck,
   Users,
-  Warehouse,
   Zap,
 } from "lucide-react";
 import { Button, Price, StockStatus } from "@ufo/ui";
@@ -50,23 +50,26 @@ const homeFaq = [
 
 const trustStrip = [
   {
-    icon: ShieldCheck,
-    title: "کنترل اصالت",
-    text: "رسید و سفارش پیش از تایید نهایی بررسی می‌شود.",
-  },
-  {
     icon: Truck,
-    title: "ارسال منعطف",
-    text: "تیپاکس، پیک تهران و تحویل حضوری قابل انتخاب است.",
+    title: "ارسال سریع",
+    text: "مسیر ارسال و تحویل از همان ابتدای خرید روشن است.",
   },
   {
-    icon: Warehouse,
-    title: "موجودی مشترک",
-    text: "رزرو سفارش برای جلوگیری از فروش بیش از موجودی طراحی شده است.",
+    icon: ShieldCheck,
+    title: "اصالت کالا",
+    text: "سفارش پیش از تایید نهایی با اطلاعات محصول تطبیق داده می‌شود.",
+  },
+  {
+    icon: CreditCard,
+    title: "پرداخت امن",
+    text: "فرآیند پرداخت و رسید با مسیر قابل پیگیری انجام می‌شود.",
+  },
+  {
+    icon: Headphones,
+    title: "پشتیبانی مستقیم",
+    text: "قبل و بعد از خرید، وضعیت سفارش قابل پیگیری است.",
   },
 ];
-
-const heroHighlights = ["ضمانت اصالت", "ارسال سریع", "پرداخت امن", "پشتیبانی مستقیم"];
 
 const stats = [
   { value: "+۵٬۰۰۰", label: "مشتری فعال" },
@@ -135,9 +138,9 @@ export default function HomePage() {
               پاد، ویپ، جویس و لوازم جانبی با موجودی لحظه‌ای، قیمت شفاف و کنترل سازگاری؛ برای خرید
               تکی مطمئن و سفارش عمده سریع.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-10 flex flex-wrap gap-4">
               <Link href="/products">
-                <Button size="lg" className="glow-accent">
+                <Button size="lg" className="glow-accent min-h-14 px-7 text-lg font-black">
                   مشاهده محصولات
                   <ArrowLeft size={18} aria-hidden="true" />
                 </Button>
@@ -146,33 +149,25 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="ghost"
-                  className="border-retail-border bg-white/5 text-white backdrop-blur hover:bg-white/10"
+                  className="min-h-14 border-retail-border bg-white/10 px-7 text-lg font-black text-white backdrop-blur hover:bg-white/15"
                 >
                   <Store size={18} aria-hidden="true" />
                   خرید عمده (B2B)
                 </Button>
               </Link>
             </div>
-            <ul className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-retail-secondary">
-              {heroHighlights.map((item) => (
-                <li key={item} className="inline-flex items-center gap-2">
-                  <BadgeCheck size={16} className="text-retail-accent-2" aria-hidden="true" />
-                  {item}
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </section>
 
       <section className="section-surface">
-        <div className="mx-auto grid max-w-7xl gap-3 px-4 py-6 md:grid-cols-3">
+        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
           {trustStrip.map((item) => (
             <div
               key={item.title}
-              className="flex gap-3 rounded-retail border border-retail-border bg-white/[0.02] p-4"
+              className="flex min-h-32 gap-3 rounded-retail border border-retail-border bg-[#101923] p-5 shadow-retail transition hover:border-retail-accent/50"
             >
-              <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-retail-accent-2/10">
+              <span className="mt-0.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-retail-accent-2/10">
                 <item.icon className="text-retail-accent-2" size={20} aria-hidden="true" />
               </span>
               <div>
@@ -184,100 +179,102 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-black text-white sm:text-3xl">محصولات منتخب یوفوپاف</h2>
-            <p className="mt-2 text-retail-secondary">
-              قیمت‌ها در دیتابیس ریالی ذخیره و در UI به تومان نمایش داده می‌شوند.
-            </p>
+      <section className="section-surface-alt border-y border-retail-border">
+        <div className="mx-auto max-w-7xl px-4 py-16">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-black text-white sm:text-3xl">محصولات منتخب یوفوپاف</h2>
+              <p className="mt-2 text-retail-secondary">
+                قیمت‌ها در دیتابیس ریالی ذخیره و در UI به تومان نمایش داده می‌شوند.
+              </p>
+            </div>
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-bold text-retail-accent transition hover:text-retail-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
+            >
+              مشاهده همه
+              <ArrowLeft size={16} aria-hidden="true" />
+            </Link>
           </div>
-          <Link
-            href="/products"
-            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-bold text-retail-accent transition hover:text-retail-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
-          >
-            مشاهده همه
-            <ArrowLeft size={16} aria-hidden="true" />
-          </Link>
-        </div>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {featured.map((product) => {
-            const variant = getPrimaryVariant(product.id);
-            const inventory = getInventoryByVariant(variant.id);
-            const available = inventory ? getAvailableStock(inventory) : 0;
-            const category = categories.find((item) => item.id === product.categoryId);
-            const imageSrc = getProductImage(product);
-            return (
-              <article
-                key={product.id}
-                className="group relative isolate grid h-full overflow-hidden rounded-retail bg-[#0C1218] shadow-[inset_0_0_0_1px_rgba(34,211,238,0.16),0_18px_44px_rgba(0,0,0,0.24)] transition duration-300 hover:-translate-y-1 hover:shadow-[inset_0_0_0_1px_rgba(34,211,238,0.42),0_24px_60px_rgba(0,0,0,0.32)]"
-              >
-                <Link
-                  href={`/products/${product.slug}`}
-                  className="absolute inset-0 z-10 rounded-retail focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
-                  aria-label={`مشاهده جزئیات ${product.nameFa}`}
-                />
-                <div className="relative aspect-[4/3] overflow-hidden bg-retail-surface-alt">
-                  <Image
-                    src={imageSrc}
-                    alt={product.nameFa}
-                    fill
-                    loading="lazy"
-                    className="object-cover transition duration-500 group-hover:scale-[1.05]"
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {featured.map((product) => {
+              const variant = getPrimaryVariant(product.id);
+              const inventory = getInventoryByVariant(variant.id);
+              const available = inventory ? getAvailableStock(inventory) : 0;
+              const category = categories.find((item) => item.id === product.categoryId);
+              const imageSrc = getProductImage(product);
+              return (
+                <article
+                  key={product.id}
+                  className="group relative isolate grid h-full overflow-hidden rounded-retail bg-[#0C1218] shadow-[inset_0_0_0_1px_rgba(34,211,238,0.16),0_18px_44px_rgba(0,0,0,0.24)] transition duration-300 hover:-translate-y-1 hover:shadow-[inset_0_0_0_1px_rgba(34,211,238,0.42),0_24px_60px_rgba(0,0,0,0.32)]"
+                >
+                  <Link
+                    href={`/products/${product.slug}`}
+                    className="absolute inset-0 z-10 rounded-retail focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
+                    aria-label={`مشاهده جزئیات ${product.nameFa}`}
                   />
-                  <div
-                    className="absolute inset-0 bg-gradient-to-t from-[#0C1218] via-transparent to-black/10"
-                    aria-hidden="true"
-                  />
-                  <div className="absolute right-3 top-3 z-20">
-                    <StockStatus available={available} />
-                  </div>
-                  {category ? (
-                    <span className="absolute bottom-3 left-3 z-20 rounded-full bg-black/45 px-3 py-1 text-xs font-bold text-[#D9E2EC] backdrop-blur">
-                      {category.nameFa}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="grid min-h-[19rem] grid-rows-[auto_auto_1fr_auto] gap-3 p-4">
-                  <div>
-                    <h3 className="line-clamp-2 text-lg font-black leading-8 text-white">
-                      {product.nameFa}
-                    </h3>
-                    {product.nameEn ? (
-                      <p className="mt-1 line-clamp-1 text-xs font-medium text-retail-muted">
-                        {product.nameEn}
-                      </p>
+                  <div className="relative aspect-[4/3] overflow-hidden bg-retail-surface-alt">
+                    <Image
+                      src={imageSrc}
+                      alt={product.nameFa}
+                      fill
+                      loading="lazy"
+                      className="object-cover transition duration-500 group-hover:scale-[1.05]"
+                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                    />
+                    <div
+                      className="absolute inset-0 bg-gradient-to-t from-[#0C1218] via-transparent to-black/10"
+                      aria-hidden="true"
+                    />
+                    <div className="absolute right-3 top-3 z-20">
+                      <StockStatus available={available} />
+                    </div>
+                    {category ? (
+                      <span className="absolute bottom-3 left-3 z-20 rounded-full bg-black/45 px-3 py-1 text-xs font-bold text-[#D9E2EC] backdrop-blur">
+                        {category.nameFa}
+                      </span>
                     ) : null}
                   </div>
-                  <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-retail-secondary">
-                    {product.shortDescriptionFa}
-                  </p>
-                  <div className="mt-auto flex items-end justify-between gap-3 border-t border-white/10 pt-3">
-                    <span className="text-xs text-retail-muted">قیمت خرید تکی</span>
-                    <Price
-                      valueRial={variant.retailPriceRial}
-                      className="text-lg font-black text-white"
-                    />
+                  <div className="grid min-h-[19rem] grid-rows-[auto_auto_1fr_auto] gap-3 p-4">
+                    <div>
+                      <h3 className="line-clamp-2 text-lg font-black leading-8 text-white">
+                        {product.nameFa}
+                      </h3>
+                      {product.nameEn ? (
+                        <p className="mt-1 line-clamp-1 text-xs font-medium text-retail-muted">
+                          {product.nameEn}
+                        </p>
+                      ) : null}
+                    </div>
+                    <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-retail-secondary">
+                      {product.shortDescriptionFa}
+                    </p>
+                    <div className="mt-auto flex items-end justify-between gap-3 border-t border-white/10 pt-3">
+                      <span className="text-xs text-retail-muted">قیمت خرید تکی</span>
+                      <Price
+                        valueRial={variant.retailPriceRial}
+                        className="text-lg font-black text-white"
+                      />
+                    </div>
+                    <div className="relative z-20 grid gap-2">
+                      <AddToCartButton variantId={variant.id} />
+                      <Link
+                        href={`/products/${product.slug}`}
+                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md text-sm font-bold text-retail-accent transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
+                      >
+                        جزئیات
+                        <ArrowLeft size={16} aria-hidden="true" />
+                      </Link>
+                    </div>
                   </div>
-                  <div className="relative z-20 grid gap-2">
-                    <AddToCartButton variantId={variant.id} />
-                    <Link
-                      href={`/products/${product.slug}`}
-                      className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md text-sm font-bold text-retail-accent transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
-                    >
-                      جزئیات
-                      <ArrowLeft size={16} aria-hidden="true" />
-                    </Link>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
+                </article>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-16">
+      <section className="mx-auto max-w-7xl px-4 py-16">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-black text-white sm:text-3xl">خرید بر اساس دسته‌بندی</h2>
@@ -293,7 +290,7 @@ export default function HomePage() {
             <ArrowLeft size={16} aria-hidden="true" />
           </Link>
         </div>
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {categories.map((category) => {
             const Icon = categoryIcons[category.slug] ?? Boxes;
             const imageSrc = categoryImageBySlug[category.slug] ?? "/images/categories/default.png";
@@ -328,8 +325,8 @@ export default function HomePage() {
                   <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-[#D9E2EC]">
                     {category.descriptionFa}
                   </p>
-                  <span className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-2 text-sm font-bold text-retail-accent backdrop-blur transition group-hover:bg-retail-accent group-hover:text-retail-bg">
-                    کلیک کنید
+                  <span className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-retail-accent/35 bg-[#081018]/80 px-4 py-2 text-sm font-bold text-retail-accent backdrop-blur transition group-hover:bg-retail-accent group-hover:text-retail-bg">
+                    مشاهده محصولات
                     <Icon size={16} aria-hidden="true" />
                   </span>
                 </div>

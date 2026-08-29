@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStorageProvider } from "@ufo/storage";
+import { getPublicObjectUrl, getStorageProvider } from "@ufo/storage";
 
 export const runtime = "nodejs";
 
@@ -20,12 +20,12 @@ export async function POST(req: Request) {
       body: bytes,
       contentType: file.type || "application/octet-stream",
     });
-    const publicBaseUrl = process.env.LIARA_PUBLIC_BASE_URL?.replace(/\/$/, "");
+    const publicUrl = getPublicObjectUrl(key);
     return NextResponse.json({
       message: "فایل آپلود شد.",
       file: {
         ...stored,
-        ...(publicBaseUrl ? { url: `${publicBaseUrl}/${key}` } : {}),
+        ...(publicUrl ? { url: publicUrl } : {}),
       },
     });
   } catch {
