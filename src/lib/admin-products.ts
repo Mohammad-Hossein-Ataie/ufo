@@ -250,6 +250,11 @@ function upsertMemory<T extends { id: string }>(items: T[], next: T): T[] {
   return items.map((item) => (item.id === next.id ? next : item));
 }
 
+export function mergeCatalogRecords<T extends { id: string }>(baseItems: T[], overrideItems: T[]): T[] {
+  const overrideIds = new Set(overrideItems.map((item) => item.id));
+  return [...overrideItems, ...baseItems.filter((item) => !overrideIds.has(item.id))];
+}
+
 export async function listAdminProducts(): Promise<AdminProductRecord[]> {
   if (!hasUsableMongoUri()) {
     return combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems);
@@ -275,7 +280,11 @@ export async function listAdminProducts(): Promise<AdminProductRecord[]> {
     return combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems);
   }
 
-  return combineRows(productList, variantList, inventoryList);
+  return combineRows(
+    mergeCatalogRecords(products, productList),
+    mergeCatalogRecords(variants, variantList),
+    mergeCatalogRecords(inventoryItems, inventoryList),
+  );
 }
 
 export async function saveAdminProduct(input: AdminProductInput): Promise<AdminProductRecord> {
