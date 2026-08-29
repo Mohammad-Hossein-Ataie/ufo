@@ -1,21 +1,17 @@
 import { ProductManager } from "@/components/admin/product-manager";
+import { AdminPage, AdminPageHeader } from "@/components/admin/admin-ui";
 
 export const dynamic = "force-dynamic";
 
 export default function AdminProductsPage() {
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black">مدیریت محصولات</h1>
-          <p className="mt-2 text-[#5F6C79]">
-            ایجاد، ویرایش، قیمت‌گذاری و فعال‌سازی کانال تک‌فروشی یا عمده برای محصولات.
-          </p>
-        </div>
-      </div>
-      <div className="mt-6">
-        <ProductManager />
-      </div>
-    </main>
+    <AdminPage>
+      <AdminPageHeader
+        eyebrow="کاتالوگ فروش"
+        title="مدیریت محصولات"
+        description="محصول، قیمت، کانال فروش، تصویر و وضعیت انتشار را در یک فضای فشرده و قابل جست‌وجو مدیریت کنید."
+      />
+      <ProductManager />
+    </AdminPage>
   );
 }

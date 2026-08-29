@@ -118,9 +118,16 @@ const globalForMongo = globalThis as typeof globalThis & {
   __ufoMongoClientPromise?: Promise<MongoClient>;
 };
 
+export function hasUsableMongoUri(uri = process.env.MONGODB_URI): uri is string {
+  const value = uri?.trim();
+  if (!value) return false;
+  if (value.includes("USER:PASSWORD") || value.includes("HOST:PORT")) return false;
+  return /^mongodb(\+srv)?:\/\//i.test(value);
+}
+
 export async function getMongoClient(uri = process.env.MONGODB_URI): Promise<MongoClient> {
-  if (!uri) {
-    throw new Error("MONGODB_URI تنظیم نشده است.");
+  if (!hasUsableMongoUri(uri)) {
+    throw new Error("MONGODB_URI تنظیم نشده یا معتبر نیست.");
   }
   if (!globalForMongo.__ufoMongoClientPromise) {
     globalForMongo.__ufoMongoClientPromise = new MongoClient(uri).connect();
@@ -223,7 +230,7 @@ export async function createRepositories(): Promise<{
   products: ProductRepository;
   settings: SettingsRepository;
 }> {
-  if (!process.env.MONGODB_URI) {
+  if (!hasUsableMongoUri()) {
     return {
       products: new MemoryProductRepository(),
       settings: {

@@ -16,6 +16,7 @@ import {
   Warehouse,
 } from "lucide-react";
 import { Price, StatusPill } from "@ufo/ui";
+import { AdminPage } from "@/components/admin/admin-ui";
 import { categories, inventoryItems, products, variants } from "@ufo/domain";
 import { listSubmittedOrders, orderStatusLabelsFa, type SubmittedOrder } from "@ufo/orders";
 import type { InventoryItem, OrderStatus, ProductVariant, SalesChannel } from "@ufo/types";
@@ -225,7 +226,7 @@ export default function AdminDashboardPage() {
     .slice(0, 5);
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8">
+    <AdminPage>
       <section className="rounded-md border border-[#D7DDE4] bg-white p-5 shadow-sm">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
@@ -255,7 +256,7 @@ export default function AdminDashboardPage() {
         </div>
       </section>
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {kpis.map((stat) => (
           <article
             key={stat.title}
@@ -275,7 +276,7 @@ export default function AdminDashboardPage() {
         ))}
       </section>
 
-      <section className="mt-6 grid gap-4 lg:grid-cols-2">
+      <section className="grid gap-4 lg:grid-cols-2">
         {channelCards.map((item) => (
           <Link
             key={item.title}
@@ -298,7 +299,7 @@ export default function AdminDashboardPage() {
         ))}
       </section>
 
-      <section className="mt-6 grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
         <article className="rounded-md border border-[#D7DDE4] bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-xl font-black">قیف وضعیت سفارش‌ها</h2>
@@ -359,7 +360,7 @@ export default function AdminDashboardPage() {
         </article>
       </section>
 
-      <section className="mt-6 grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
+      <section className="grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
         <article className="rounded-md border border-[#D7DDE4] bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-xl font-black">سفارش‌های اخیر</h2>
@@ -467,6 +468,6 @@ export default function AdminDashboardPage() {
           </article>
         </div>
       </section>
-    </main>
+    </AdminPage>
   );
 }

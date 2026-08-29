@@ -1,8 +1,8 @@
-import { getDb, seedDatabase } from "./index.js";
+import { getDb, hasUsableMongoUri, seedDatabase } from "./index.js";
 import { seedData } from "@ufo/domain";
 
 async function main() {
-  if (!process.env.MONGODB_URI) {
+  if (!hasUsableMongoUri()) {
     console.log("MONGODB_URI تنظیم نشده است؛ seed واقعی انجام نشد.");
     console.log(
       JSON.stringify(

@@ -1,3 +1,4 @@
+import { AdminPage, AdminPageHeader, AdminPanel } from "@/components/admin/admin-ui";
 import { StatusPill } from "@ufo/ui";
 
 const moduleNames: Record<string, string> = {
@@ -16,17 +17,19 @@ export default async function AdminModulePage({ params }: { params: Promise<{ mo
   const { module } = await params;
   const title = moduleNames[module] ?? module;
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-3xl font-black">{title}</h1>
-        <StatusPill tone="info">MVP مدیریتی</StatusPill>
-      </div>
-      <section className="mt-6 rounded-md border border-[#D7DDE4] bg-white p-5">
-        <p className="leading-8 text-[#5F6C79]">
-          این ماژول به shell مدیریت، RBAC سمت سرور، audit log و repository layer متصل می‌شود. CRUD
-          کامل هر entity از همین الگو توسعه می‌یابد.
+    <AdminPage>
+      <AdminPageHeader
+        eyebrow="ماژول مدیریتی"
+        title={title}
+        description="برای این بخش هنوز ابزار عملیاتی قابل استفاده در کد موجود نیست؛ بنابراین کنترل نمایشی یا قابلیت غیرواقعی اضافه نشده است."
+        actions={<StatusPill tone="info">در انتظار پیاده‌سازی</StatusPill>}
+      />
+      <AdminPanel className="p-6">
+        <p className="max-w-2xl text-sm leading-7 text-slate-600">
+          وقتی backend و داده واقعی این بخش آماده شود، همین صفحه می‌تواند با الگوی جدول، فیلتر،
+          وضعیت و عملیات امن پنل ادمین توسعه پیدا کند.
         </p>
-      </section>
-    </main>
+      </AdminPanel>
+    </AdminPage>
   );
 }

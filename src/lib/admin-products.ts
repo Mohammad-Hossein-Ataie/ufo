@@ -1,4 +1,4 @@
-import { ensureIndexes, getDb } from "@ufo/database";
+import { ensureIndexes, getDb, hasUsableMongoUri } from "@ufo/database";
 import {
   brands,
   categories,
@@ -251,16 +251,30 @@ function upsertMemory<T extends { id: string }>(items: T[], next: T): T[] {
 }
 
 export async function listAdminProducts(): Promise<AdminProductRecord[]> {
-  if (!process.env.MONGODB_URI) {
+  if (!hasUsableMongoUri()) {
     return combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems);
   }
-  const db = await getDb();
-  await ensureIndexes(db);
-  const [productList, variantList, inventoryList] = await Promise.all([
-    db.collection<Product>("products").find({}).sort({ updatedAt: -1 }).toArray(),
-    db.collection<ProductVariant>("productVariants").find({}).toArray(),
-    db.collection<InventoryItem>("inventoryItems").find({}).toArray(),
-  ]);
+  let productList: Product[];
+  let variantList: ProductVariant[];
+  let inventoryList: InventoryItem[];
+
+  try {
+    const db = await getDb();
+    await ensureIndexes(db);
+    [productList, variantList, inventoryList] = await Promise.all([
+      db.collection<Product>("products").find({}).sort({ updatedAt: -1 }).toArray(),
+      db.collection<ProductVariant>("productVariants").find({}).toArray(),
+      db.collection<InventoryItem>("inventoryItems").find({}).toArray(),
+    ]);
+  } catch (error) {
+    console.error("Admin products read failed; using bundled catalog fallback", error);
+    return combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems);
+  }
+
+  if (productList.length === 0 && variantList.length === 0 && inventoryList.length === 0) {
+    return combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems);
+  }
+
   return combineRows(productList, variantList, inventoryList);
 }
 
@@ -270,7 +284,7 @@ export async function saveAdminProduct(input: AdminProductInput): Promise<AdminP
     : undefined;
   const row = buildDocuments(input, current);
 
-  if (!process.env.MONGODB_URI) {
+  if (!hasUsableMongoUri()) {
     memoryState.products = upsertMemory(memoryState.products, row.product);
     memoryState.variants = upsertMemory(memoryState.variants, row.variant);
     memoryState.inventoryItems = upsertMemory(memoryState.inventoryItems, row.inventory);
