@@ -5,6 +5,28 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "ufopuff.ir" }],
+        destination: "https://ufopuff.com/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.ufopuff.ir" }],
+        destination: "https://ufopuff.com/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.ufopuff.com" }],
+        destination: "https://ufopuff.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
   turbopack: {
     root: projectRoot,
   },

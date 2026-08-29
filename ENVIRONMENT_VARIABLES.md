@@ -5,9 +5,9 @@ Do not commit real credentials. Use `.env.local` locally and Liara environment s
 ## Core
 
 - `NODE_ENV`
-- `APP_BASE_URL`
-- `B2B_BASE_URL`: same host with `/b2b`, for example `http://localhost:3000/b2b`.
-- `ADMIN_BASE_URL`: same host with `/admin`, for example `http://localhost:3000/admin`.
+- `APP_BASE_URL`: production canonical origin, `https://ufopuff.com`.
+- `B2B_BASE_URL`: same host with `/b2b`, for example `https://ufopuff.com/b2b` in production or `http://localhost:3000/b2b` locally.
+- `ADMIN_BASE_URL`: same host with `/admin`, for example `https://ufopuff.com/admin` in production or `http://localhost:3000/admin` locally.
 
 ## MongoDB
 

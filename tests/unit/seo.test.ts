@@ -4,6 +4,7 @@ import { products, variants } from "@ufo/domain";
 
 describe("seo helpers", () => {
   it("builds stable absolute canonical URLs without query strings", () => {
+    expect(siteOrigin("")).toBe("https://ufopuff.com");
     expect(siteOrigin("https://example.com/shop?x=1")).toBe("https://example.com");
     expect(canonical("/products?sort=cheap", "https://example.com")).toBe(
       "https://example.com/products",

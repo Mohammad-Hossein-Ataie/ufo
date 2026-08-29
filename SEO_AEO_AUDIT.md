@@ -58,7 +58,8 @@ The data model stores money as integer Rial and renders Toman in UI. Products ca
 
 ## Manual Verification Checklist
 
-- Verify `APP_BASE_URL=https://ufopuff.ir` in production.
+- Verify `APP_BASE_URL=https://ufopuff.com` in production.
+- Verify `ufopuff.ir`, `www.ufopuff.ir` and `www.ufopuff.com` return 301 redirects to the same path on `https://ufopuff.com`.
 - Open `/robots.txt` and confirm non-public routes are excluded.
 - Open `/sitemap.xml` and confirm only active products and clean category pages appear.
 - Submit sitemap in Google Search Console and Bing Webmaster Tools.

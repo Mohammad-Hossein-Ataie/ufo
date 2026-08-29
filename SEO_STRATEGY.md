@@ -34,7 +34,8 @@
 
 ## Canonical Rules
 
-- canonical باید از `APP_BASE_URL` ساخته شود و در نبود مقدار معتبر روی `https://ufopuff.ir` fallback کند.
+- canonical باید از `APP_BASE_URL` ساخته شود و در نبود مقدار معتبر روی `https://ufopuff.com` fallback کند.
+- hostهای `ufopuff.ir`، `www.ufopuff.ir` و `www.ufopuff.com` باید با redirect دائمی 301 به `https://ufopuff.com` منتقل شوند.
 - queryهای داخلی مثل `q`, `sort` و `filter` در canonical حفظ نمی‌شوند.
 - صفحات دسته مسیر تمیز `/products/category/[slug]` دارند؛ لینک‌های داخلی نباید به query دسته‌بندی متکی باشند.
 - `/b2b/catalog` به دلیل نمایش قیمت همکاری noindex است و در sitemap قرار نمی‌گیرد.

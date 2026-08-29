@@ -14,9 +14,9 @@
 
 ## مسیرهای production
 
-- فروش تکی: `https://ufopuff.ir/`
-- فروش عمده: `https://ufopuff.ir/b2b`
-- پنل ادمین: `https://ufopuff.ir/admin`
+- فروش تکی: `https://ufopuff.com/`
+- فروش عمده: `https://ufopuff.com/b2b`
+- پنل ادمین: `https://ufopuff.com/admin`
 
 ## دستورهای Liara
 
@@ -52,6 +52,9 @@ registry=https://package-mirror.liara.ir/repository/npm/
 
 - `MONGODB_URI`
 - `MONGODB_DB_NAME`
+- `APP_BASE_URL=https://ufopuff.com`
+- `B2B_BASE_URL=https://ufopuff.com/b2b`
+- `ADMIN_BASE_URL=https://ufopuff.com/admin`
 - `ADMIN_USERNAME`
 - `ADMIN_PASSWORD`
 - `ADMIN_PHONE`
@@ -64,4 +67,4 @@ registry=https://package-mirror.liara.ir/repository/npm/
 
 ## DNS
 
-فقط دامنه‌ی `ufopuff.ir` را به همین Liara app وصل کنید. فروش عمده و پنل ادمین روی مسیرهای `/b2b` و `/admin` هستند و subdomain جدا لازم ندارند.
+دامنه‌ی اصلی `ufopuff.com` است. `www.ufopuff.com`، `ufopuff.ir` و `www.ufopuff.ir` باید با 301 به همان مسیر روی `https://ufopuff.com` redirect شوند. فروش عمده و پنل ادمین روی مسیرهای `/b2b` و `/admin` هستند و subdomain جدا لازم ندارند.

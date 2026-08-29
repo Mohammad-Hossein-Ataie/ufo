@@ -49,9 +49,9 @@ export const defaultStoreSettings: StoreSettings = {
 };
 
 export const appHosts = {
-  retail: "ufopuff.ir",
-  b2b: "ufopuff.ir",
-  admin: "ufopuff.ir",
+  retail: "ufopuff.com",
+  b2b: "ufopuff.com",
+  admin: "ufopuff.com",
 } as const;
 
 export const appPaths = {
