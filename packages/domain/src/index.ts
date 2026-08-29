@@ -609,6 +609,7 @@ export const productColorPalette: ProductColorOption[] = [
   { id: "silver", labelFa: "نقره‌ای", hex: "#CBD5E1" },
   { id: "white", labelFa: "سفید", hex: "#F8FAFC" },
   { id: "blue", labelFa: "آبی", hex: "#2563EB" },
+  { id: "turquoise", labelFa: "فیروزه‌ای", hex: "#22C7D9" },
   { id: "green", labelFa: "سبز", hex: "#16A34A" },
   { id: "red", labelFa: "قرمز", hex: "#DC2626" },
   { id: "purple", labelFa: "بنفش", hex: "#7C3AED" },
@@ -629,16 +630,25 @@ export const productColorEligibleKinds: ProductKind[] = [
 ];
 
 export const suggestedProductColorOptionsByKind: Partial<Record<ProductKind, string[]>> = {
-  "pod-device": ["black", "silver", "blue", "green", "purple", "pink", "multicolor"],
-  "vape-device": ["black", "silver", "blue", "red", "pink", "gold", "multicolor"],
-  disposable: ["black", "white", "blue", "green", "purple", "pink", "multicolor"],
+  "pod-device": ["black", "silver", "blue", "turquoise", "green", "purple", "pink", "multicolor"],
+  "vape-device": ["black", "silver", "blue", "turquoise", "red", "pink", "gold", "multicolor"],
+  disposable: ["black", "white", "blue", "turquoise", "green", "purple", "pink", "multicolor"],
   accessory: ["black", "silver", "blue", "red", "pink", "gold", "multicolor"],
 };
 
 export const suggestedProductColorOptionsByCategoryId: Record<string, string[]> = {
-  "cat-pod": ["black", "silver", "blue", "green", "purple", "pink", "multicolor"],
-  "cat-vape": ["black", "silver", "blue", "red", "pink", "gold", "multicolor"],
-  "cat-disposable": ["black", "white", "blue", "green", "purple", "pink", "multicolor"],
+  "cat-pod": ["black", "silver", "blue", "turquoise", "green", "purple", "pink", "multicolor"],
+  "cat-vape": ["black", "silver", "blue", "turquoise", "red", "pink", "gold", "multicolor"],
+  "cat-disposable": [
+    "black",
+    "white",
+    "blue",
+    "turquoise",
+    "green",
+    "purple",
+    "pink",
+    "multicolor",
+  ],
   "cat-lighter": ["black", "silver", "blue", "red", "pink", "gold", "multicolor"],
 };
 
