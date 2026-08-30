@@ -1,0 +1,497 @@
+Now that the generic product variant architecture and admin editor are complete, redesign the STOREFRONT behavior and UI.
+
+Do not change the data architecture again unless you discover an actual bug.
+
+Main targets:
+
+- product listing page
+- filter sidebar
+- product cards
+- product detail page
+- gallery
+- variant selector
+- related products
+
+==================================================
+MOST IMPORTANT RULE
+==================================================
+
+The storefront must render product options based on `variantType`.
+
+Never assume color.
+
+variantType = flavor
+=> FlavorSelector
+
+variantType = color
+=> ColorSelector
+
+variantType = none
+=> no variant selector
+
+==================================================
+FLAVOR PRODUCT DETAIL
+==================================================
+
+For products such as:
+
+- disposable pod
+- salt
+- juice
+
+replace the current:
+
+«انتخاب رنگ»
+
+UI completely.
+
+It must instead say:
+
+«انتخاب طعم»
+
+Show flavor cards/chips.
+
+Each flavor should have:
+
+- flavor name
+- icon/visual
+- selected state
+- unavailable state if applicable
+- keyboard focus state
+
+For example:
+
+┌──────────────────┐
+│ 🍉 هندوانه یخ  ✓ │
+└──────────────────┘
+
+But use real icons/visuals rather than emoji if possible.
+
+==================================================
+FLAVOR VISUAL SYSTEM
+==================================================
+
+Implement a reusable flavor visual resolver.
+
+Examples conceptually:
+
+watermelon -> watermelon visual
+watermelon ice -> watermelon + cold/snow accent
+blueberry -> blueberry
+blueberry ice -> blueberry + cold accent
+mint -> mint
+grape -> grape
+mango -> mango
+strawberry -> strawberry
+kiwi -> kiwi
+
+Do not put huge conditional JSX blocks in ProductDetail.
+
+Build a reusable helper/component.
+
+Support fallback.
+
+Flavor visuals are presentation mapping only.
+
+The actual available flavors MUST come from product/backend data.
+
+==================================================
+IMAGE SWITCHING
+==================================================
+
+For FLAVOR products:
+
+clicking/selecting a flavor should:
+
+1. select that variant
+2. locate an image associated with that flavor
+3. update the primary gallery image
+4. update active thumbnail
+5. update SKU/stock/price if variant-specific
+6. update add-to-cart payload
+
+Example:
+
+هندوانه یخ selected
+=> watermelon product image
+
+بلوبری یخ selected
+=> blueberry product image
+
+For COLOR products, equivalent behavior should continue using color.
+
+==================================================
+NO ARRAY-POSITION MAGIC
+==================================================
+
+Do not associate:
+
+first flavor => first image
+second flavor => second image
+
+Association must come from the explicit admin mapping.
+
+Only use legacy positional fallback for old data if absolutely needed for backwards compatibility.
+
+==================================================
+PRODUCT DETAIL REDESIGN
+==================================================
+
+The existing detail page in the screenshot still looks almost unchanged and overly boxy.
+
+Make a clearly visible redesign.
+
+Current problems:
+
+- too many rectangular bordered panels
+- purchase panel looks like an admin form
+- weak product/price hierarchy
+- oversized empty gallery surface
+- variant selector is visually primitive
+- specs and description feel disconnected
+- related products dominate vertically
+- insufficient breathing room
+- CTA doesn't visually anchor the purchase flow
+
+Redesign it.
+
+==================================================
+DESKTOP PRODUCT HERO
+==================================================
+
+Create a cohesive product hero.
+
+Suggested layout:
+
+┌─────────────────────────────────────────────────────┐
+│ Gallery                     Product information      │
+│                             badges                  │
+│ Main image                  title                   │
+│                             subtitle/model          │
+│ thumbnails                  short description       │
+│                             price                   │
+│                             availability            │
+│                             flavor/color selector   │
+│                             CTA                     │
+│                             warning                 │
+└─────────────────────────────────────────────────────┘
+
+For RTL place/order appropriately according to current direction.
+
+Do not wrap every inner group inside a separate strong bordered box.
+
+==================================================
+IMAGE AREA
+==================================================
+
+The current screenshot has a large dark container around a square image.
+
+Improve this.
+
+Use:
+
+- natural/intrinsic ratio
+- object-fit: contain
+- sensible max-width
+- sensible max-height
+- minimal empty padding
+- responsive sizing
+
+The IMAGE should visually determine much of the gallery size rather than an arbitrary huge container.
+
+For a square product image, aim for a clean approximately square display.
+
+==================================================
+VARIANT PICKER
+==================================================
+
+FLAVOR:
+
+Use compact visual cards.
+
+Example:
+
+طعم را انتخاب کنید
+
+[ icon هندوانه یخ ]
+[ icon بلوبری یخ ]
+[ icon نعناع ]
+[ icon انگور یخ ]
+
+Selected:
+strong enough to recognize immediately, but not neon.
+
+Out of stock:
+disabled and clearly marked.
+
+COLOR:
+
+Use cleaner swatches + labels.
+
+Do not reuse flavor design blindly for colors.
+
+==================================================
+PRICE & CTA
+==================================================
+
+The most important visual sequence should be:
+
+product title
+↓
+price
+↓
+variant selection
+↓
+add to cart
+
+Price should be stronger than SKU and stock metadata.
+
+SKU should be secondary.
+
+CTA should use the cyan accent as the main action.
+
+If no required variant selected:
+
+Flavor:
+«ابتدا طعم را انتخاب کنید»
+
+Color:
+«ابتدا رنگ را انتخاب کنید»
+
+After selection:
+
+«افزودن به سبد خرید»
+
+==================================================
+LISTING PAGE
+==================================================
+
+Update product cards based on variant type.
+
+FLAVOR PRODUCTS:
+
+Remove color-dot rows entirely.
+
+Instead show something like:
+
+🍉 🫐 🌿 +۳
+۵ طعم موجود
+
+Again, use the project's visual/icon components rather than emoji in production.
+
+Or use compact flavor chips if visually cleaner.
+
+COLOR PRODUCTS:
+
+Color swatches are allowed.
+
+NONE PRODUCTS:
+
+Do not show an empty variants section.
+
+==================================================
+FILTER SIDEBAR
+==================================================
+
+The filter sidebar currently has a generic رنگ section.
+
+Filtering needs to reflect the actual catalog.
+
+Add:
+
+طعم
+
+for flavor-based products.
+
+Keep:
+
+رنگ
+
+for genuine color products.
+
+Both filters may coexist globally if the catalog contains both types.
+
+Flavor filter values must come from backend/database aggregation.
+
+Do not hardcode flavor names.
+
+Examples:
+
+طعم
+□ هندوانه یخ
+□ بلوبری یخ
+□ نعناع
+□ انگور
+...
+
+رنگ
+□ مشکی
+□ آبی
+□ نقره‌ای
+...
+
+==================================================
+CARDS VISUAL REDESIGN
+==================================================
+
+The current cards are too border-heavy and dense.
+
+Make a noticeable improvement:
+
+- softer borders
+- slightly increased internal spacing
+- more breathing room around title
+- shorter description
+- clearer price
+- simpler metadata
+- cleaner variant summary
+- polished hover state
+- consistent image aspect ratio
+- consistent card heights
+- clear CTA
+
+Do not radically change brand identity.
+
+==================================================
+DESCRIPTION / SPECS
+==================================================
+
+The product information area currently uses very large boxes for little content.
+
+Redesign into cleaner information sections.
+
+Possible structure:
+
+توضیحات
+مشخصات
+
+Use tabs or compact sections only if it genuinely improves UX.
+
+Do not add complexity for the sake of it.
+
+==================================================
+RELATED PRODUCTS
+==================================================
+
+Reduce visual heaviness.
+
+Reuse the improved product-card component where possible.
+
+Do not maintain two completely separate card designs.
+
+==================================================
+ANIMATION
+==================================================
+
+Add subtle meaningful motion:
+
+150–220ms
+
+- flavor selection
+- color selection
+- thumbnail selection
+- image crossfade
+- card hover
+- CTA state
+
+No bouncing.
+No huge scale effects.
+No gaming-style glow.
+
+Respect prefers-reduced-motion.
+
+==================================================
+USER SELECT
+==================================================
+
+Disable accidental selection on:
+
+- buttons
+- chips
+- variant cards
+- thumbnails
+- nav controls
+- badges
+
+Do not disable text selection for product descriptions/SKU/content.
+
+==================================================
+MOBILE
+==================================================
+
+Product detail mobile order should approximately be:
+
+1. image/gallery
+2. product title
+3. price
+4. variant selector
+5. CTA
+6. warning
+7. details
+8. related products
+
+Variant controls must have at least comfortable touch targets.
+
+No horizontal page overflow.
+
+==================================================
+VISUAL ACCEPTANCE CRITERIA
+==================================================
+
+This is important:
+
+The task is NOT complete if screenshots look almost identical to before.
+
+There must be a clearly visible improvement to:
+
+[ ] product hero hierarchy
+[ ] gallery sizing
+[ ] flavor selector
+[ ] CTA
+[ ] product card spacing
+[ ] card variant metadata
+[ ] filter options
+[ ] description/specs
+[ ] related products
+
+Also verify:
+
+[ ] Disposable uses flavor
+[ ] Salt uses flavor
+[ ] Juice uses flavor
+[ ] Vape device uses color
+[ ] flavor selection changes mapped product image
+[ ] color selection changes mapped product image
+[ ] selected option enters cart correctly
+[ ] flavor filter works
+[ ] color filter works
+[ ] old products remain functional
+[ ] RTL is correct
+[ ] mobile is correct
+
+==================================================
+TEST
+==================================================
+
+Run the existing:
+
+typecheck
+lint
+build
+
+and relevant tests.
+
+Fix introduced problems.
+
+At the end, give me:
+
+1. exact files changed
+2. before/after behavioral differences
+3. flavor implementation
+4. color implementation
+5. filter changes
+6. gallery changes
+7. responsive changes
+8. checks/tests executed
+
+Do not stop at recommendations. Implement all relevant changes.

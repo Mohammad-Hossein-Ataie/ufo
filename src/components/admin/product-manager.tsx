@@ -5,9 +5,11 @@ import Image from "next/image";
 import { useEffect, useMemo, useState, type DragEvent } from "react";
 import {
   Check,
+  CircleOff,
   Edit3,
   FileImage,
   Filter,
+  GripVertical,
   ImagePlus,
   LayoutGrid,
   Link2,
@@ -15,6 +17,7 @@ import {
   Plus,
   Save,
   Search,
+  Sparkles,
   Trash2,
   UploadCloud,
   Video,
@@ -36,6 +39,7 @@ import type {
   Category,
   InventoryItem,
   Product,
+  ProductFlavor,
   ProductKind,
   ProductSpec,
   ProductVariant,
@@ -221,30 +225,42 @@ export function ProductManager() {
   const [rows, setRows] = useState<AdminProductRecord[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [flavors, setFlavors] = useState<ProductFlavor[]>(productFlavorCatalog);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [variantTypeTouched, setVariantTypeTouched] = useState(false);
   const [query, setQuery] = useState("");
+  const [flavorQuery, setFlavorQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [channelFilter, setChannelFilter] = useState<"all" | SalesChannel>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [status, setStatus] = useState("در حال بارگذاری...");
   const [loading, setLoading] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isFlavorDialogOpen, setIsFlavorDialogOpen] = useState(false);
+  const [newFlavor, setNewFlavor] = useState({ nameFa: "", nameEn: "", slug: "", iconKey: "" });
   const [isDragging, setIsDragging] = useState(false);
   const [manualImageUrl, setManualImageUrl] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
 
   async function fetchRows() {
     setLoading(true);
-    const response = await fetch("/api/admin/products", { cache: "no-store" });
+    const [response, flavorsResponse] = await Promise.all([
+      fetch("/api/admin/products", { cache: "no-store" }),
+      fetch("/api/admin/flavors", { cache: "no-store" }),
+    ]);
     const data = (await response.json()) as {
       rows?: AdminProductRecord[];
       categories?: Category[];
       brands?: Brand[];
       error?: string;
     };
+    const flavorData = (await flavorsResponse.json().catch(() => ({}))) as {
+      flavors?: ProductFlavor[];
+    };
     setRows(data.rows ?? []);
     setCategories(data.categories ?? []);
     setBrands(data.brands ?? []);
+    setFlavors(flavorData.flavors ?? productFlavorCatalog);
     setStatus(data.error ?? "محصولات به‌روز شد.");
     setLoading(false);
   }
@@ -296,9 +312,16 @@ export function ProductManager() {
     setForm((current) => ({
       ...current,
       productKind,
-      variantType: getDefaultProductVariantType({ categoryId: current.categoryId, productKind }),
-      variantValueIds: [],
-      variantImages: {},
+      ...(current.id || variantTypeTouched
+        ? {}
+        : {
+            variantType: getDefaultProductVariantType({
+              categoryId: current.categoryId,
+              productKind,
+            }),
+            variantValueIds: [],
+            variantImages: {},
+          }),
     }));
   }
 
@@ -306,19 +329,40 @@ export function ProductManager() {
     setForm((current) => ({
       ...current,
       categoryId,
-      variantType: getDefaultProductVariantType({ categoryId, productKind: current.productKind }),
-      variantValueIds: [],
-      variantImages: {},
+      ...(current.id || variantTypeTouched
+        ? {}
+        : {
+            variantType: getDefaultProductVariantType({
+              categoryId,
+              productKind: current.productKind,
+            }),
+            variantValueIds: [],
+            variantImages: {},
+          }),
     }));
   }
 
   function setVariantType(variantType: ProductVariantType) {
-    setForm((current) => ({
-      ...current,
-      variantType,
-      variantValueIds: [],
-      variantImages: {},
-    }));
+    setForm((current) => {
+      if (current.variantType === variantType) return current;
+      const hasVariantData =
+        current.variantValueIds.length > 0 || Object.keys(current.variantImages).length > 0;
+      if (
+        hasVariantData &&
+        !window.confirm(
+          "با تغییر نوع تنوع محصول، انتخاب‌ها و ارتباط فعلی تصاویر با گزینه‌های قبلی دیگر استفاده نخواهد شد. ادامه می‌دهید؟",
+        )
+      ) {
+        return current;
+      }
+      setVariantTypeTouched(true);
+      return {
+        ...current,
+        variantType,
+        variantValueIds: [],
+        variantImages: {},
+      };
+    });
   }
 
   function toggleVariantValue(valueId: string) {
@@ -379,6 +423,8 @@ export function ProductManager() {
         productKind: emptyForm.productKind,
       }),
     });
+    setVariantTypeTouched(false);
+    setFlavorQuery("");
     setManualImageUrl("");
     setVideoUrl("");
     setIsEditorOpen(true);
@@ -386,6 +432,8 @@ export function ProductManager() {
 
   function openEdit(row: AdminProductRecord) {
     setForm(rowToForm(row));
+    setVariantTypeTouched(true);
+    setFlavorQuery("");
     setManualImageUrl("");
     setVideoUrl("");
     setIsEditorOpen(true);
@@ -446,6 +494,10 @@ export function ProductManager() {
   }
 
   async function saveProduct() {
+    if (variantValidationMessage) {
+      setStatus(variantValidationMessage);
+      return;
+    }
     setLoading(true);
     const salesChannels: SalesChannel[] = [
       ...(form.retailEnabled ? ["retail" as const] : []),
@@ -538,25 +590,84 @@ export function ProductManager() {
     void uploadImages(event.dataTransfer.files);
   }
 
+  async function createFlavor() {
+    if (!newFlavor.nameFa.trim()) {
+      setStatus("نام فارسی طعم الزامی است.");
+      return;
+    }
+    setLoading(true);
+    const response = await fetch("/api/admin/flavors", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newFlavor),
+    });
+    const data = (await response.json().catch(() => ({}))) as {
+      flavor?: ProductFlavor;
+      message?: string;
+      error?: string;
+    };
+    if (response.ok && data.flavor) {
+      setFlavors((current) => {
+        const exists = current.some((flavor) => flavor.id === data.flavor!.id);
+        return exists
+          ? current.map((flavor) => (flavor.id === data.flavor!.id ? data.flavor! : flavor))
+          : [...current, data.flavor!];
+      });
+      setForm((current) => ({
+        ...current,
+        variantType: "flavor",
+        variantValueIds: current.variantValueIds.includes(data.flavor!.id)
+          ? current.variantValueIds
+          : [...current.variantValueIds, data.flavor!.id],
+      }));
+      setVariantTypeTouched(true);
+      setNewFlavor({ nameFa: "", nameEn: "", slug: "", iconKey: "" });
+      setIsFlavorDialogOpen(false);
+    }
+    setStatus(data.message ?? data.error ?? "پاسخ نامشخص");
+    setLoading(false);
+  }
+
   const wholesaleCartonToman = form.wholesalePriceToman * Math.max(1, form.cartonSize);
   const minimumWholesaleToman = wholesaleCartonToman * Math.max(1, form.minWholesaleCartonCount);
   const variantValueOptions =
     form.variantType === "flavor"
-      ? productFlavorCatalog.map((flavor) => ({
+      ? flavors.map((flavor) => ({
           id: flavor.id,
           labelFa: flavor.nameFa,
+          description: flavor.nameEn ?? flavor.slug,
           swatch: undefined,
+          iconKey: flavor.iconKey,
         }))
       : form.variantType === "color"
         ? productColorPalette.map((color) => ({
             id: color.id,
             labelFa: color.labelFa,
+            description: color.id,
             swatch: color.hex,
+            iconKey: undefined,
           }))
         : [];
   const activeVariantOptions = variantValueOptions.filter((option) =>
     form.variantValueIds.includes(option.id),
   );
+  const normalizedFlavorQuery = flavorQuery.trim().toLowerCase();
+  const filteredVariantOptions =
+    form.variantType === "flavor" && normalizedFlavorQuery
+      ? variantValueOptions.filter((option) =>
+          [option.labelFa, option.description, option.iconKey]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase()
+            .includes(normalizedFlavorQuery),
+        )
+      : variantValueOptions;
+  const variantValidationMessage =
+    form.variantType === "flavor" && form.variantValueIds.length === 0
+      ? "برای محصول طعم‌دار، حداقل یک طعم انتخاب کنید."
+      : form.variantType === "color" && form.variantValueIds.length === 0
+        ? "برای محصول رنگ‌دار، حداقل یک رنگ انتخاب کنید."
+        : "";
   const variantTypeLabel =
     form.variantType === "flavor" ? "Ø·Ø¹Ù…" : form.variantType === "color" ? "Ø±Ù†Ú¯" : "";
 
@@ -881,7 +992,186 @@ export function ProductManager() {
                     </label>
                   </section>
 
-                  <section className="rounded-md border border-[#D7DDE4] p-4">
+                  <section className="rounded-md border border-[#D7DDE4] bg-[#F8FAFC] p-4">
+                    <div className="mb-4 flex items-center gap-2">
+                      <Palette size={18} className="text-[#168BFF]" aria-hidden="true" />
+                      <h3 className="font-black">نوع تنوع محصول</h3>
+                    </div>
+                    <div className="grid gap-2 md:grid-cols-3" role="radiogroup" aria-label="نوع تنوع محصول">
+                      {[
+                        { value: "none" as const, label: "بدون تنوع", icon: CircleOff },
+                        { value: "flavor" as const, label: "طعم", icon: Sparkles },
+                        { value: "color" as const, label: "رنگ", icon: Palette },
+                      ].map((option) => {
+                        const Icon = option.icon;
+                        const active = form.variantType === option.value;
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => setVariantType(option.value)}
+                            className={`flex min-h-14 items-center justify-between gap-3 rounded-md border px-3 text-sm font-black transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
+                              active
+                                ? "border-[#168BFF] bg-white text-[#0B5CAD] shadow-sm ring-2 ring-[#168BFF]/15"
+                                : "border-[#D7DDE4] bg-white text-[#17202A] hover:bg-[#EEF3F8]"
+                            }`}
+                            role="radio"
+                            aria-checked={active}
+                          >
+                            <span className="inline-flex items-center gap-2">
+                              <Icon size={18} aria-hidden="true" />
+                              {option.label}
+                            </span>
+                            {active ? <Check size={16} aria-hidden="true" /> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {variantValidationMessage ? (
+                      <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900">
+                        {variantValidationMessage}
+                      </p>
+                    ) : null}
+                  </section>
+
+                  {form.variantType !== "none" ? (
+                    <section className="rounded-md border border-[#D7DDE4] p-4">
+                      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          {form.variantType === "flavor" ? (
+                            <Sparkles size={18} className="text-[#168BFF]" aria-hidden="true" />
+                          ) : (
+                            <Palette size={18} className="text-[#168BFF]" aria-hidden="true" />
+                          )}
+                          <div>
+                            <h3 className="font-black">
+                              {form.variantType === "flavor" ? "طعم‌های محصول" : "رنگ‌های محصول"}
+                            </h3>
+                            <p className="mt-1 text-xs text-[#5F6C79]">
+                              {form.variantType === "flavor"
+                                ? "طعم‌های قابل انتخاب را از رکوردهای طعم ذخیره‌شده انتخاب کنید."
+                                : "رنگ‌های واقعی محصول را با سواچ رنگ انتخاب کنید."}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {form.variantType === "flavor" ? (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => setIsFlavorDialogOpen(true)}
+                            >
+                              <Plus size={16} aria-hidden="true" />
+                              افزودن طعم جدید
+                            </Button>
+                          ) : null}
+                          <Button type="button" size="sm" variant="secondary" onClick={applySuggestedVariantValues}>
+                            پیشنهاد بر اساس نوع
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            className="border border-[#D7DDE4] text-[#17202A] hover:bg-[#EEF3F8]"
+                            onClick={() => update("variantValueIds", [])}
+                          >
+                            پاک کردن انتخاب‌ها
+                          </Button>
+                        </div>
+                      </div>
+
+                      {form.variantType === "flavor" ? (
+                        <label className="relative mb-3 block">
+                          <span className="sr-only">جستجوی طعم</span>
+                          <Search
+                            className="pointer-events-none absolute right-3 top-3 text-[#5F6C79]"
+                            size={18}
+                            aria-hidden="true"
+                          />
+                          <Input
+                            className="pr-10"
+                            value={flavorQuery}
+                            onChange={(event) => setFlavorQuery(event.target.value)}
+                            placeholder="جستجوی طعم..."
+                          />
+                        </label>
+                      ) : null}
+
+                      {activeVariantOptions.length > 0 ? (
+                        <div className="mb-3 flex flex-wrap gap-2">
+                          {activeVariantOptions.map((option) => (
+                            <span
+                              key={option.id}
+                              className="inline-flex min-h-9 items-center gap-2 rounded-md border border-[#B8C4D2] bg-white px-2 text-xs font-bold text-[#17202A]"
+                            >
+                              {option.swatch ? (
+                                <span
+                                  className="h-4 w-4 rounded-full border border-slate-300"
+                                  style={
+                                    option.swatch.startsWith("linear-gradient")
+                                      ? { backgroundImage: option.swatch }
+                                      : { backgroundColor: option.swatch }
+                                  }
+                                  aria-hidden="true"
+                                />
+                              ) : (
+                                <Sparkles size={14} className="text-[#168BFF]" aria-hidden="true" />
+                              )}
+                              {option.labelFa}
+                              <button
+                                type="button"
+                                className="rounded p-1 text-[#5F6C79] hover:bg-[#EEF3F8] hover:text-[#17202A]"
+                                onClick={() => toggleVariantValue(option.id)}
+                                aria-label={`حذف ${option.labelFa}`}
+                              >
+                                <X size={13} aria-hidden="true" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      <div className="grid max-h-64 gap-2 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-3">
+                        {filteredVariantOptions.map((option) => {
+                          const active = form.variantValueIds.includes(option.id);
+                          return (
+                            <button
+                              key={option.id}
+                              type="button"
+                              onClick={() => toggleVariantValue(option.id)}
+                              className={`flex min-h-12 items-center justify-between gap-2 rounded-md border px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
+                                active
+                                  ? "border-cyan-500 bg-cyan-50 text-cyan-950"
+                                  : "border-[#D7DDE4] bg-white text-[#17202A] hover:bg-[#F4F6F8]"
+                              }`}
+                              aria-pressed={active}
+                            >
+                              <span className="min-w-0 inline-flex items-center gap-2">
+                                {option.swatch ? (
+                                  <span
+                                    className="h-5 w-5 shrink-0 rounded-full border border-slate-300"
+                                    style={
+                                      option.swatch.startsWith("linear-gradient")
+                                        ? { backgroundImage: option.swatch }
+                                        : { backgroundColor: option.swatch }
+                                    }
+                                    aria-hidden="true"
+                                  />
+                                ) : (
+                                  <Sparkles size={16} className="shrink-0 text-[#168BFF]" aria-hidden="true" />
+                                )}
+                                <span className="truncate">{option.labelFa}</span>
+                              </span>
+                              {active ? <Check size={16} className="shrink-0" aria-hidden="true" /> : null}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </section>
+                  ) : null}
+
+                  <section className="hidden">
                     <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                       <div className="flex items-center gap-2">
                         <Palette size={18} className="text-[#168BFF]" aria-hidden="true" />
@@ -1035,13 +1325,17 @@ export function ProductManager() {
                         افزودن URL
                       </Button>
                     </div>
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                       {form.images.map((url) => (
                         <div
                           key={url}
-                          className="overflow-hidden rounded-md border border-[#D7DDE4] bg-[#F8FAFC]"
+                          className={`overflow-hidden rounded-md border bg-white shadow-sm ${
+                            url === form.image
+                              ? "border-[#168BFF] ring-2 ring-[#168BFF]/15"
+                              : "border-[#D7DDE4]"
+                          }`}
                         >
-                          <div className="relative aspect-[4/3]">
+                          <div className="relative aspect-[4/3] bg-[#EEF3F8]">
                             <Image
                               src={url}
                               alt="تصویر محصول"
@@ -1049,6 +1343,14 @@ export function ProductManager() {
                               sizes="220px"
                               className="object-cover"
                             />
+                            <div className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/70 bg-white/90 text-[#5F6C79] shadow-sm">
+                              <GripVertical size={16} aria-hidden="true" />
+                            </div>
+                            {url === form.image ? (
+                              <div className="absolute bottom-2 right-2 rounded-md bg-[#168BFF] px-2 py-1 text-xs font-black text-white shadow-sm">
+                                تصویر اصلی
+                              </div>
+                            ) : null}
                           </div>
                           <div className="flex items-center justify-between gap-2 p-2">
                             {url === form.image ? (
