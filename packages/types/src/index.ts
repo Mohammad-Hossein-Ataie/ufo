@@ -87,10 +87,21 @@ export type ProductKind =
   | "cartridge"
   | "accessory";
 
+export type ProductVariantType = "flavor" | "color" | "none";
+
 export interface ProductSpec {
   labelFa: string;
   valueFa: string;
   technicalValue?: string;
+}
+
+export interface ProductFlavor {
+  id: string;
+  nameFa: string;
+  slug: string;
+  nameEn?: string;
+  iconKey?: string;
+  metadata?: Record<string, string>;
 }
 
 export interface Product {
@@ -106,6 +117,10 @@ export interface Product {
   descriptionFa: string;
   image: string;
   images: string[];
+  variantType?: ProductVariantType;
+  variantValueIds?: string[];
+  variantImages?: Record<string, string>;
+  colorImages?: Record<string, string>;
   tags: string[];
   attributes: ProductAttribute[];
   specs?: ProductSpec[];

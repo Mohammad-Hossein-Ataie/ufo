@@ -2,9 +2,12 @@ import { ensureIndexes, getDb, hasUsableMongoUri } from "@ufo/database";
 import {
   brands,
   categories,
+  getDefaultProductVariantType,
   inventoryItems,
   productColorAttributeTechnicalValue,
   productColorPalette,
+  productFlavorAttributeTechnicalValue,
+  productFlavorCatalog,
   products,
   variants,
 } from "@ufo/domain";
@@ -14,6 +17,7 @@ import type {
   ProductKind,
   ProductSpec,
   ProductVariant,
+  ProductVariantType,
   SalesChannel,
 } from "@ufo/types";
 
@@ -40,6 +44,10 @@ export interface AdminProductInput {
   descriptionFa?: string | undefined;
   image?: string | undefined;
   images?: string[] | undefined;
+  variantType?: ProductVariantType | undefined;
+  variantValueIds?: string[] | undefined;
+  variantImages?: Record<string, string> | undefined;
+  colorImages?: Record<string, string> | undefined;
   tags?: string[] | undefined;
   specs?: ProductSpec[] | undefined;
   colorIds?: string[] | undefined;
@@ -102,6 +110,44 @@ function assertInput(input: AdminProductInput) {
   }
 }
 
+function uniqueIds(ids: string[] | undefined): string[] {
+  return [...new Set((ids ?? []).map((item) => item.trim()).filter(Boolean))];
+}
+
+function getCurrentVariantValueIds(product: Product | undefined, variantType: ProductVariantType) {
+  if (!product || variantType === "none") return [];
+  if (product.variantType === variantType && product.variantValueIds?.length) {
+    return product.variantValueIds;
+  }
+  const technicalValue =
+    variantType === "color"
+      ? productColorAttributeTechnicalValue
+      : productFlavorAttributeTechnicalValue;
+  return (
+    product.attributes
+      .find((attribute) => attribute.technicalValue === technicalValue)
+      ?.valueFa.split(",") ?? []
+  );
+}
+
+function variantAttribute(variantType: ProductVariantType, valueIds: string[]) {
+  if (variantType === "color" && valueIds.length > 0) {
+    return {
+      nameFa: "Ø±Ù†Ú¯â€ŒÙ‡Ø§ÛŒ Ù‚Ø§Ø¨Ù„ Ø³ÙØ§Ø±Ø´",
+      valueFa: valueIds.join(","),
+      technicalValue: productColorAttributeTechnicalValue,
+    };
+  }
+  if (variantType === "flavor" && valueIds.length > 0) {
+    return {
+      nameFa: "Ø·Ø¹Ù…â€ŒÙ‡Ø§ÛŒ Ù‚Ø§Ø¨Ù„ Ø³ÙØ§Ø±Ø´",
+      valueFa: valueIds.join(","),
+      technicalValue: productFlavorAttributeTechnicalValue,
+    };
+  }
+  return undefined;
+}
+
 function buildDocuments(
   input: AdminProductInput,
   current?: AdminProductRecord,
@@ -120,16 +166,48 @@ function buildDocuments(
     ...(input.images ?? current?.product.images ?? []).map((item) => item.trim()).filter(Boolean),
   ].filter((item, index, list) => list.indexOf(item) === index);
   const tags = input.tags?.filter(Boolean) ?? current?.product.tags ?? [];
-  const colorIds = (input.colorIds ?? [])
-    .map((item) => item.trim())
-    .filter((item, index, list) => item && list.indexOf(item) === index)
-    .filter((item) => productColorPalette.some((color) => color.id === item));
+  const variantType =
+    input.variantType ??
+    current?.product.variantType ??
+    getDefaultProductVariantType({ categoryId: input.categoryId, productKind: input.productKind });
+  const allowedVariantIds =
+    variantType === "color"
+      ? productColorPalette.map((color) => color.id)
+      : variantType === "flavor"
+        ? productFlavorCatalog.map((flavor) => flavor.id)
+        : [];
+  const rawVariantValueIds =
+    input.variantValueIds ??
+    (variantType === "color" ? input.colorIds : undefined) ??
+    getCurrentVariantValueIds(current?.product, variantType);
+  const variantValueIds = uniqueIds(rawVariantValueIds).filter((item) =>
+    allowedVariantIds.includes(item),
+  );
   const retailPriceRial = input.retailPriceRial;
   const wholesalePriceRial =
     input.wholesalePriceRial ?? current?.variant.wholesalePriceRial ?? retailPriceRial;
   const salesChannels: SalesChannel[] =
     input.salesChannels.length > 0 ? input.salesChannels : ["retail"];
   const wholesaleEnabled = input.wholesaleEnabled ?? salesChannels.includes("wholesale");
+  const rawVariantImages =
+    input.variantImages ??
+    input.colorImages ??
+    current?.product.variantImages ??
+    current?.product.colorImages ??
+    {};
+  const variantImages = Object.fromEntries(
+    Object.entries(rawVariantImages)
+      .map(([valueId, imageValue]) => [valueId.trim(), imageValue.trim()] as const)
+      .filter(
+        ([valueId, imageValue]) =>
+          valueId &&
+          imageValue &&
+          variantValueIds.includes(valueId) &&
+          (images.includes(imageValue) || /^https?:\/\//i.test(imageValue)),
+      ),
+  );
+  const colorImages = variantType === "color" ? variantImages : {};
+  const optionAttribute = variantAttribute(variantType, variantValueIds);
 
   const product: Product = {
     id: productId,
@@ -148,6 +226,10 @@ function buildDocuments(
       `${input.nameFa.trim()} از پنل ادمین ثبت شده است.`,
     image,
     images,
+    variantType,
+    ...(variantValueIds.length > 0 ? { variantValueIds } : {}),
+    ...(Object.keys(variantImages).length > 0 ? { variantImages } : {}),
+    ...(Object.keys(colorImages).length > 0 ? { colorImages } : {}),
     tags,
     attributes: [
       { nameFa: "نوع", valueFa: getCategoryName(input.categoryId) },
@@ -160,15 +242,7 @@ function buildDocuments(
             },
           ]
         : []),
-      ...(colorIds.length > 0
-        ? [
-            {
-              nameFa: "رنگ‌های قابل سفارش",
-              valueFa: colorIds.join(","),
-              technicalValue: productColorAttributeTechnicalValue,
-            },
-          ]
-        : []),
+      ...(optionAttribute ? [optionAttribute] : []),
     ],
     specs: input.specs ?? current?.product.specs ?? [],
     sourceNoteFa: current?.product.sourceNoteFa ?? "ثبت‌شده از پنل ادمین",
@@ -244,13 +318,21 @@ function combineRows(
     .filter((row): row is AdminProductRecord => Boolean(row));
 }
 
+function withoutMongoId<T extends { id: string }>(item: T): T {
+  const { _id: _ignored, ...plainItem } = item as T & { _id?: unknown };
+  return plainItem as T;
+}
+
 function upsertMemory<T extends { id: string }>(items: T[], next: T): T[] {
   const index = items.findIndex((item) => item.id === next.id);
   if (index === -1) return [next, ...items];
   return items.map((item) => (item.id === next.id ? next : item));
 }
 
-export function mergeCatalogRecords<T extends { id: string }>(baseItems: T[], overrideItems: T[]): T[] {
+export function mergeCatalogRecords<T extends { id: string }>(
+  baseItems: T[],
+  overrideItems: T[],
+): T[] {
   const overrideIds = new Set(overrideItems.map((item) => item.id));
   return [...overrideItems, ...baseItems.filter((item) => !overrideIds.has(item.id))];
 }
@@ -266,11 +348,14 @@ export async function listAdminProducts(): Promise<AdminProductRecord[]> {
   try {
     const db = await getDb();
     await ensureIndexes(db);
-    [productList, variantList, inventoryList] = await Promise.all([
+    const [mongoProducts, mongoVariants, mongoInventoryItems] = await Promise.all([
       db.collection<Product>("products").find({}).sort({ updatedAt: -1 }).toArray(),
       db.collection<ProductVariant>("productVariants").find({}).toArray(),
       db.collection<InventoryItem>("inventoryItems").find({}).toArray(),
     ]);
+    productList = mongoProducts.map(withoutMongoId);
+    variantList = mongoVariants.map(withoutMongoId);
+    inventoryList = mongoInventoryItems.map(withoutMongoId);
   } catch (error) {
     console.error("Admin products read failed; using bundled catalog fallback", error);
     return combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems);

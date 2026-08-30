@@ -1,8 +1,22 @@
 import { NextResponse } from "next/server";
 import { saveAdminProduct, type AdminProductInput } from "@/lib/admin-products";
+import type { ProductVariantType } from "@ufo/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+function parseImageMap(value: unknown): Record<string, string> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value)
+      .map(([valueId, image]) => [valueId, String(image ?? "").trim()] as const)
+      .filter(([valueId, image]) => valueId && image),
+  );
+}
+
+function parseVariantType(value: unknown): ProductVariantType | undefined {
+  return value === "flavor" || value === "color" || value === "none" ? value : undefined;
+}
 
 function parseInput(productId: string, body: unknown): AdminProductInput {
   const value = body as Partial<AdminProductInput>;
@@ -21,6 +35,13 @@ function parseInput(productId: string, body: unknown): AdminProductInput {
     descriptionFa: value.descriptionFa,
     image: value.image,
     images: Array.isArray(value.images) ? value.images.map(String) : [],
+    variantType: parseVariantType(value.variantType),
+    variantValueIds: Array.isArray(value.variantValueIds)
+      ? value.variantValueIds.map(String)
+      : undefined,
+    variantImages:
+      value.variantImages === undefined ? undefined : parseImageMap(value.variantImages),
+    colorImages: value.colorImages === undefined ? undefined : parseImageMap(value.colorImages),
     tags: Array.isArray(value.tags) ? value.tags : [],
     specs: Array.isArray(value.specs) ? value.specs : [],
     colorIds: Array.isArray(value.colorIds) ? value.colorIds.map(String) : [],

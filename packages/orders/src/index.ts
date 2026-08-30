@@ -2,6 +2,7 @@ import {
   calculateOrderTotals,
   createOrder,
   createOrderItemSnapshot,
+  getProductFlavorOptions,
   getProductColorOptions,
   products,
   quoteShipping,
@@ -12,6 +13,7 @@ import type {
   OrderItemSnapshot,
   OrderStatus,
   PaymentMethod,
+  ProductVariantType,
   SalesChannel,
   ShippingAddress,
   ShippingMethodCode,
@@ -29,6 +31,10 @@ export interface CartSubmissionLine {
   variantId: string;
   quantity: number;
   cartonCount?: number;
+  selectedVariant?: {
+    type: Exclude<ProductVariantType, "none">;
+    valueId: string;
+  };
   colorId?: string;
 }
 
@@ -180,32 +186,48 @@ function createItemSnapshots(
     const product = products.find((item) => item.id === variant.productId);
     if (!product) throw new Error("محصول پیدا نشد.");
 
+    const option =
+      line.selectedVariant ??
+      (line.colorId ? ({ type: "color", valueId: line.colorId } as const) : undefined);
+    const selectedValue =
+      option?.type === "flavor"
+        ? getProductFlavorOptions(product).find((item) => item.id === option.valueId)
+        : option?.type === "color"
+          ? getProductColorOptions(product).find((item) => item.id === option.valueId)
+          : undefined;
+    const withSelectedOption = (snapshot: OrderItemSnapshot) =>
+      option && selectedValue
+        ? {
+            ...snapshot,
+            selectedAttributes: [
+              ...snapshot.selectedAttributes,
+              {
+                nameFa: option.type === "flavor" ? "طعم" : "رنگ",
+                valueFa: "labelFa" in selectedValue ? selectedValue.labelFa : selectedValue.nameFa,
+                technicalValue: option.valueId,
+              },
+            ],
+          }
+        : snapshot;
+
     if (channel === "wholesale") {
       const cartonCount = line.cartonCount ?? Math.ceil(line.quantity / variant.cartonSize);
-      return createOrderItemSnapshot({ product, variant, channel, cartonCount });
+      return withSelectedOption(
+        createOrderItemSnapshot({ product, variant, channel, cartonCount }),
+      );
     }
 
     if (!Number.isInteger(line.quantity) || line.quantity <= 0) {
       throw new Error("تعداد محصول باید عدد صحیح و مثبت باشد.");
     }
-    const snapshot = createOrderItemSnapshot({
-      product,
-      variant,
-      channel,
-      quantity: line.quantity,
-    });
-    const color = line.colorId
-      ? getProductColorOptions(product).find((item) => item.id === line.colorId)
-      : undefined;
-    return color
-      ? {
-          ...snapshot,
-          selectedAttributes: [
-            ...snapshot.selectedAttributes,
-            { nameFa: "رنگ", valueFa: color.labelFa, technicalValue: color.id },
-          ],
-        }
-      : snapshot;
+    return withSelectedOption(
+      createOrderItemSnapshot({
+        product,
+        variant,
+        channel,
+        quantity: line.quantity,
+      }),
+    );
   });
 }
 

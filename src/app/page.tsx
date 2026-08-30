@@ -19,17 +19,13 @@ import {
   Zap,
 } from "lucide-react";
 import { Button, Price, StockStatus } from "@ufo/ui";
-import {
-  brands,
-  categories,
-  getAvailableStock,
-  getInventoryByVariant,
-  getPrimaryVariant,
-  products,
-} from "@ufo/domain";
+import { brands, categories } from "@ufo/domain";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
 import { categoryImageBySlug, getProductImage } from "@/lib/product-images";
 import { faqPageJsonLd, jsonLdScriptProps, organizationJsonLd, websiteJsonLd } from "@ufo/seo";
+
+export const dynamic = "force-dynamic";
 
 const homeFaq = [
   {
@@ -100,8 +96,12 @@ const categoryAccent: Record<string, string> = {
   lighter: "from-yellow-300/30",
 };
 
-export default function HomePage() {
-  const featured = products.filter((product) => product.isActive).slice(0, 4);
+export default async function HomePage() {
+  const featured = (await listCatalogRows())
+    .filter(
+      (row) => row.product.isActive && (row.product.salesChannels?.includes("retail") ?? true),
+    )
+    .slice(0, 4);
 
   return (
     <main id="main-content">
@@ -197,10 +197,10 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((product) => {
-              const variant = getPrimaryVariant(product.id);
-              const inventory = getInventoryByVariant(variant.id);
-              const available = inventory ? getAvailableStock(inventory) : 0;
+            {featured.map((row) => {
+              const product = row.product;
+              const variant = row.variant;
+              const available = getCatalogRowStock(row);
               const category = categories.find((item) => item.id === product.categoryId);
               const imageSrc = getProductImage(product);
               return (

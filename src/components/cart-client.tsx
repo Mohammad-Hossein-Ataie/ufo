@@ -4,14 +4,34 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Button, EmptyState, Price } from "@ufo/ui";
-import { calculateOrderTotals, getProductColorById, products, variants } from "@ufo/domain";
-import type { SalesChannel } from "@ufo/types";
+import {
+  calculateOrderTotals,
+  getProductFlavorById,
+  getProductColorById,
+  products,
+  variants,
+} from "@ufo/domain";
+import type { ProductVariantType, SalesChannel } from "@ufo/types";
+
+interface SelectedVariant {
+  type: Exclude<ProductVariantType, "none">;
+  valueId: string;
+}
 
 interface CartLine {
   variantId: string;
   quantity: number;
   channel: SalesChannel;
+  selectedVariant?: SelectedVariant;
   colorId?: string;
+}
+
+function isSelectedVariant(value: unknown): value is SelectedVariant {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return (
+    (record.type === "flavor" || record.type === "color") && typeof record.valueId === "string"
+  );
 }
 
 function readCart(): CartLine[] {
@@ -28,6 +48,7 @@ function readCart(): CartLine[] {
         typeof record.variantId === "string" &&
         typeof record.quantity === "number" &&
         record.channel === "retail" &&
+        (!("selectedVariant" in record) || isSelectedVariant(record.selectedVariant)) &&
         (!("colorId" in record) || typeof record.colorId === "string")
       );
     });
@@ -63,11 +84,21 @@ export function CartClient() {
           if (!variant || !product) return null;
           const unitPriceRial =
             line.channel === "wholesale" ? variant.wholesalePriceRial : variant.retailPriceRial;
+          const selectedVariant =
+            line.selectedVariant ??
+            (line.colorId ? ({ type: "color", valueId: line.colorId } as const) : undefined);
+          const selectedOption =
+            selectedVariant?.type === "flavor"
+              ? getProductFlavorById(selectedVariant.valueId)
+              : selectedVariant?.type === "color"
+                ? getProductColorById(selectedVariant.valueId)
+                : undefined;
           return {
             ...line,
             product,
             variant,
-            color: line.colorId ? getProductColorById(line.colorId) : undefined,
+            selectedVariant,
+            selectedOption,
             unitPriceRial,
             totalRial: unitPriceRial * line.quantity,
           };
@@ -111,7 +142,7 @@ export function CartClient() {
       <div className="grid gap-3">
         {lines.map((line) => (
           <article
-            key={`${line.variantId}-${line.channel}-${line.colorId ?? "default"}`}
+            key={`${line.variantId}-${line.channel}-${line.selectedVariant?.type ?? "none"}-${line.selectedVariant?.valueId ?? line.colorId ?? "default"}`}
             className="grid gap-4 rounded-md border border-[#22303D] bg-[#0D1117] p-4 sm:grid-cols-[7rem_1fr_auto]"
           >
             <div className="relative aspect-square overflow-hidden rounded-md border border-[#22303D] bg-[#141A22]">
@@ -131,14 +162,23 @@ export function CartClient() {
               <p className="mt-2 text-sm text-[#D9E2EC]">
                 تعداد: {new Intl.NumberFormat("fa-IR").format(line.quantity)}
               </p>
-              {line.color ? (
+              {line.selectedOption ? (
                 <p className="mt-2 inline-flex items-center gap-2 rounded-md border border-[#22303D] px-2 py-1 text-xs text-[#D9E2EC]">
-                  <span
-                    className="h-4 w-4 rounded-full border border-white/30"
-                    style={{ backgroundColor: line.color.hex }}
-                    aria-hidden="true"
-                  />
-                  رنگ: {line.color.labelFa}
+                  {line.selectedVariant?.type === "color" && "hex" in line.selectedOption ? (
+                    <span
+                      className="h-4 w-4 rounded-full border border-white/30"
+                      style={
+                        line.selectedOption.hex.startsWith("linear-gradient")
+                          ? { backgroundImage: line.selectedOption.hex }
+                          : { backgroundColor: line.selectedOption.hex }
+                      }
+                      aria-hidden="true"
+                    />
+                  ) : null}
+                  {line.selectedVariant?.type === "flavor" ? "طعم" : "رنگ"}:{" "}
+                  {"labelFa" in line.selectedOption
+                    ? line.selectedOption.labelFa
+                    : line.selectedOption.nameFa}
                 </p>
               ) : null}
             </div>

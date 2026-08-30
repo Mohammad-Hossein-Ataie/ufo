@@ -15,21 +15,21 @@ import {
 import { CatalogColorFilter } from "@/components/catalog-color-filter";
 import { CatalogPagination } from "@/components/catalog-pagination";
 import { CatalogPriceRangeFilter } from "@/components/catalog-price-range-filter";
+import { getCatalogRowStock, listCatalogRows, searchCatalogRows } from "@/lib/catalog-data";
 import { getProductImage } from "@/lib/product-images";
+import type { AdminProductRecord } from "@/lib/admin-products";
 import { canonical } from "@ufo/seo";
 import { Button, EmptyState, Price, ProductCard } from "@ufo/ui";
 import {
   brands,
   categories,
-  getAvailableStock,
-  getInventoryByVariant,
   getProductColorOptions,
-  products,
+  getProductVariantOptions,
   productColorPalette,
-  searchProducts,
-  variants,
 } from "@ufo/domain";
-import type { Product, ProductKind, ProductVariant } from "@ufo/types";
+import type { ProductKind, ProductVariant } from "@ufo/types";
+
+export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = 12;
 
@@ -73,22 +73,19 @@ function parseToman(value?: string) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed * 10 : undefined;
 }
 
-function getWholesaleVariant(product: Product): ProductVariant | undefined {
-  return variants.find((item) => item.productId === product.id && item.wholesaleEnabled !== false);
+function getWholesaleVariant(row: AdminProductRecord): ProductVariant | undefined {
+  return row.variant.wholesaleEnabled !== false ? row.variant : undefined;
 }
 
-function getWholesaleStock(product: Product) {
-  const variant = getWholesaleVariant(product);
-  if (!variant) return 0;
-  const inventory = getInventoryByVariant(variant.id);
-  return inventory ? getAvailableStock(inventory) : 0;
+function getWholesaleStock(row: AdminProductRecord) {
+  return getWholesaleVariant(row) ? getCatalogRowStock(row) : 0;
 }
 
-function getWholesalePrice(product: Product) {
-  return getWholesaleVariant(product)?.wholesalePriceRial ?? 0;
+function getWholesalePrice(row: AdminProductRecord) {
+  return getWholesaleVariant(row)?.wholesalePriceRial ?? 0;
 }
 
-function getWholesalePriceBoundsToman(items: Product[]) {
+function getWholesalePriceBoundsToman(items: AdminProductRecord[]) {
   const prices = items
     .map((product) => Math.round(getWholesalePrice(product) / 10))
     .filter((price) => price > 0);
@@ -112,32 +109,37 @@ function makeHref(params: B2BCatalogSearchParams, page: number) {
   return `/b2b/catalog${suffix ? `?${suffix}` : ""}`;
 }
 
-function filterWholesaleProducts(params: B2BCatalogSearchParams, includePriceFilter = true) {
+function filterWholesaleProducts(
+  rows: AdminProductRecord[],
+  params: B2BCatalogSearchParams,
+  includePriceFilter = true,
+) {
   const minPrice = parseToman(params.minPrice);
   const maxPrice = parseToman(params.maxPrice);
 
-  return searchProducts(params.q ?? "")
-    .filter((product) => product.isActive)
-    .filter((product) => product.salesChannels?.includes("wholesale") ?? true)
-    .filter((product) => Boolean(getWholesaleVariant(product)))
-    .filter((product) => {
+  return searchCatalogRows(rows, params.q ?? "")
+    .filter((row) => row.product.isActive)
+    .filter((row) => row.product.salesChannels?.includes("wholesale") ?? true)
+    .filter((row) => Boolean(getWholesaleVariant(row)))
+    .filter((row) => {
       if (!params.category) return true;
-      const category = categories.find((item) => item.id === product.categoryId);
+      const category = categories.find((item) => item.id === row.product.categoryId);
       return category?.slug === params.category;
     })
-    .filter((product) => !params.brand || product.brandId === params.brand)
-    .filter((product) => !params.kind || product.productKind === params.kind)
+    .filter((row) => !params.brand || row.product.brandId === params.brand)
+    .filter((row) => !params.kind || row.product.productKind === params.kind)
     .filter(
-      (product) =>
-        !params.color || getProductColorOptions(product).some((color) => color.id === params.color),
+      (row) =>
+        !params.color ||
+        getProductColorOptions(row.product).some((color) => color.id === params.color),
     )
-    .filter((product) => {
+    .filter((row) => {
       if (!includePriceFilter) return true;
-      const price = getWholesalePrice(product);
+      const price = getWholesalePrice(row);
       return (!minPrice || price >= minPrice) && (!maxPrice || price <= maxPrice);
     })
-    .filter((product) => {
-      const stock = getWholesaleStock(product);
+    .filter((row) => {
+      const stock = getWholesaleStock(row);
       if (params.stock === "available") return stock > 0;
       if (params.stock === "low") return stock > 0 && stock < 10;
       if (params.stock === "preorder") return stock <= 0;
@@ -151,7 +153,7 @@ function filterWholesaleProducts(params: B2BCatalogSearchParams, includePriceFil
       if (params.sort === "stock-desc") return getWholesaleStock(right) - getWholesaleStock(left);
       if (params.sort === "carton-size")
         return (rightVariant?.cartonSize ?? 0) - (leftVariant?.cartonSize ?? 0);
-      return left.nameFa.localeCompare(right.nameFa, "fa");
+      return left.product.nameFa.localeCompare(right.product.nameFa, "fa");
     });
 }
 
@@ -161,16 +163,17 @@ export default async function B2BCatalogPage({
   searchParams?: Promise<B2BCatalogSearchParams>;
 }) {
   const params = (await searchParams) ?? {};
-  const priceScope = filterWholesaleProducts(params, false);
+  const rows = await listCatalogRows();
+  const priceScope = filterWholesaleProducts(rows, params, false);
   const priceBounds = getWholesalePriceBoundsToman(priceScope);
-  const filtered = filterWholesaleProducts(params);
+  const filtered = filterWholesaleProducts(rows, params);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(Math.max(Number(params.page ?? 1) || 1, 1), totalPages);
   const pagedProducts = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  const wholesaleProducts = products.filter(
-    (product) => product.salesChannels?.includes("wholesale") ?? true,
+  const wholesaleProducts = rows.filter(
+    (row) => row.product.salesChannels?.includes("wholesale") ?? true,
   );
-  const wholesaleVariants = variants.filter((item) => item.wholesaleEnabled !== false);
+  const wholesaleVariants = rows.filter((row) => row.variant.wholesaleEnabled !== false);
 
   return (
     <main id="main-content" className="bg-[#F7F7F2] text-[#14201B]">
@@ -412,12 +415,13 @@ export default async function B2BCatalogPage({
             </EmptyState>
           ) : (
             <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 xl:grid-cols-4">
-              {pagedProducts.map((product) => {
-                const variant = getWholesaleVariant(product);
+              {pagedProducts.map((row) => {
+                const product = row.product;
+                const variant = getWholesaleVariant(row);
                 if (!variant) return null;
-                const available = getWholesaleStock(product);
+                const available = getWholesaleStock(row);
                 const unitToman = Math.round(variant.wholesalePriceRial / variant.cartonSize / 10);
-                const colors = getProductColorOptions(product);
+                const variantOptions = getProductVariantOptions(product);
                 return (
                   <div
                     key={product.id}
@@ -451,22 +455,30 @@ export default async function B2BCatalogPage({
                             <BadgeCheck size={15} className="text-[#1F8A5B]" aria-hidden="true" />
                             SKU: <span dir="ltr">{variant.sku}</span>
                           </div>
-                          {colors.length > 0 ? (
+                          {variantOptions.length > 0 ? (
                             <div className="flex min-h-6 flex-wrap items-center gap-1 text-xs text-[#596B61]">
-                              {colors.slice(0, 5).map((color) => (
+                              {variantOptions.slice(0, 5).map((option) => (
                                 <span
-                                  key={color.id}
+                                  key={option.id}
                                   className="inline-flex items-center gap-1 rounded-full border border-[#D5D9C9] bg-white px-2 py-1"
                                 >
-                                  <span
-                                    className="h-3 w-3 rounded-full border border-slate-300"
-                                    style={{ backgroundColor: color.hex }}
-                                    aria-hidden="true"
-                                  />
-                                  {color.labelFa}
+                                  {option.swatch ? (
+                                    <span
+                                      className="h-3 w-3 rounded-full border border-slate-300"
+                                      style={
+                                        option.swatch.startsWith("linear-gradient")
+                                          ? { backgroundImage: option.swatch }
+                                          : { backgroundColor: option.swatch }
+                                      }
+                                      aria-hidden="true"
+                                    />
+                                  ) : null}
+                                  {option.labelFa}
                                 </span>
                               ))}
-                              {colors.length > 5 ? <span>+{colors.length - 5}</span> : null}
+                              {variantOptions.length > 5 ? (
+                                <span>+{variantOptions.length - 5}</span>
+                              ) : null}
                             </div>
                           ) : null}
                           <Link href="/b2b/quick-order">

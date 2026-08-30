@@ -22,9 +22,14 @@ import {
 } from "lucide-react";
 import { Badge, Button, IconButton, Input, Price, Textarea } from "@ufo/ui";
 import {
+  getDefaultProductVariantType,
   getProductColorOptions,
-  getSuggestedProductColorIds,
+  getProductFlavorOptions,
+  getProductVariantType,
+  getProductVariantOptions,
+  getSuggestedProductVariantValueIds,
   productColorPalette,
+  productFlavorCatalog,
 } from "@ufo/domain";
 import type {
   Brand,
@@ -34,6 +39,7 @@ import type {
   ProductKind,
   ProductSpec,
   ProductVariant,
+  ProductVariantType,
   SalesChannel,
 } from "@ufo/types";
 
@@ -65,7 +71,9 @@ interface FormState {
   restockThreshold: number;
   image: string;
   images: string[];
-  colorIds: string[];
+  variantType: ProductVariantType;
+  variantValueIds: string[];
+  variantImages: Record<string, string>;
   tagsText: string;
   specsText: string;
   shortDescriptionFa: string;
@@ -101,7 +109,9 @@ const emptyForm: FormState = {
   restockThreshold: 5,
   image: "/images/ufo-hero.png",
   images: ["/images/ufo-hero.png"],
-  colorIds: [],
+  variantType: "flavor",
+  variantValueIds: [],
+  variantImages: {},
   tagsText: "",
   specsText: "",
   shortDescriptionFa: "",
@@ -138,9 +148,27 @@ function uniqueImages(images: string[]) {
     .filter((item, index, list) => item && list.indexOf(item) === index);
 }
 
+function getInitialVariantImages(
+  valueIds: string[],
+  images: string[],
+  existing: Record<string, string> | undefined,
+) {
+  return Object.fromEntries(
+    valueIds
+      .map((valueId, index) => [valueId, existing?.[valueId] ?? images[index]] as const)
+      .filter((entry): entry is readonly [string, string] => Boolean(entry[1])),
+  );
+}
+
 function rowToForm(row: AdminProductRecord): FormState {
   const images = uniqueImages([row.product.image, ...(row.product.images ?? [])]);
-  const colorIds = getProductColorOptions(row.product).map((color) => color.id);
+  const variantType = getProductVariantType(row.product);
+  const variantValueIds =
+    variantType === "flavor"
+      ? getProductFlavorOptions(row.product).map((flavor) => flavor.id)
+      : variantType === "color"
+        ? getProductColorOptions(row.product).map((color) => color.id)
+        : [];
   return {
     id: row.product.id,
     variantId: row.variant.id,
@@ -162,7 +190,13 @@ function rowToForm(row: AdminProductRecord): FormState {
     restockThreshold: row.inventory.restockThreshold,
     image: images[0] ?? row.product.image,
     images,
-    colorIds,
+    variantType,
+    variantValueIds,
+    variantImages: getInitialVariantImages(
+      variantValueIds,
+      images,
+      row.product.variantImages ?? row.product.colorImages,
+    ),
     tagsText: row.product.tags.join("، "),
     specsText: specsToText(row.product.specs),
     shortDescriptionFa: row.product.shortDescriptionFa,
@@ -258,19 +292,51 @@ export function ProductManager() {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
-  function toggleColor(colorId: string) {
+  function updateProductKind(productKind: ProductKind) {
+    setForm((current) => ({
+      ...current,
+      productKind,
+      variantType: getDefaultProductVariantType({ categoryId: current.categoryId, productKind }),
+      variantValueIds: [],
+      variantImages: {},
+    }));
+  }
+
+  function updateCategory(categoryId: string) {
+    setForm((current) => ({
+      ...current,
+      categoryId,
+      variantType: getDefaultProductVariantType({ categoryId, productKind: current.productKind }),
+      variantValueIds: [],
+      variantImages: {},
+    }));
+  }
+
+  function setVariantType(variantType: ProductVariantType) {
+    setForm((current) => ({
+      ...current,
+      variantType,
+      variantValueIds: [],
+      variantImages: {},
+    }));
+  }
+
+  function toggleVariantValue(valueId: string) {
     setForm((current) => {
-      const exists = current.colorIds.includes(colorId);
+      const exists = current.variantValueIds.includes(valueId);
+      const variantImages = { ...current.variantImages };
+      if (exists) delete variantImages[valueId];
       return {
         ...current,
-        colorIds: exists
-          ? current.colorIds.filter((item) => item !== colorId)
-          : [...current.colorIds, colorId],
+        variantValueIds: exists
+          ? current.variantValueIds.filter((item) => item !== valueId)
+          : [...current.variantValueIds, valueId],
+        variantImages,
       };
     });
   }
 
-  function applySuggestedColors() {
+  function applySuggestedVariantValues() {
     const pseudoProduct = {
       id: form.id ?? "draft",
       slug: form.slug,
@@ -278,6 +344,7 @@ export function ProductManager() {
       brandId: form.brandId,
       categoryId: form.categoryId,
       productKind: form.productKind,
+      variantType: form.variantType,
       salesChannels: [],
       shortDescriptionFa: "",
       descriptionFa: "",
@@ -292,11 +359,26 @@ export function ProductManager() {
       createdAt: "",
       updatedAt: "",
     };
-    update("colorIds", getSuggestedProductColorIds(pseudoProduct));
+    const variantValueIds = getSuggestedProductVariantValueIds(pseudoProduct);
+    setForm((current) => ({
+      ...current,
+      variantValueIds,
+      variantImages: getInitialVariantImages(
+        variantValueIds,
+        current.images,
+        current.variantImages,
+      ),
+    }));
   }
 
   function openCreate() {
-    setForm(emptyForm);
+    setForm({
+      ...emptyForm,
+      variantType: getDefaultProductVariantType({
+        categoryId: emptyForm.categoryId,
+        productKind: emptyForm.productKind,
+      }),
+    });
     setManualImageUrl("");
     setVideoUrl("");
     setIsEditorOpen(true);
@@ -315,6 +397,12 @@ export function ProductManager() {
       ...current,
       images: nextImages,
       image: nextImages[0] ?? current.image,
+      variantImages: Object.fromEntries(
+        Object.entries(current.variantImages).filter(
+          ([valueId, imageValue]) =>
+            current.variantValueIds.includes(valueId) && nextImages.includes(imageValue),
+        ),
+      ),
     }));
   }
 
@@ -332,6 +420,27 @@ export function ProductManager() {
     setImages([url, ...form.images.filter((item) => item !== url)]);
   }
 
+  function assignImageToVariantValue(image: string, valueId: string) {
+    setForm((current) => {
+      const variantImages = Object.fromEntries(
+        Object.entries(current.variantImages).filter(
+          ([assignedValueId, assignedImage]) =>
+            assignedValueId !== valueId && assignedImage !== image,
+        ),
+      );
+      return {
+        ...current,
+        variantImages: valueId ? { ...variantImages, [valueId]: image } : variantImages,
+      };
+    });
+  }
+
+  function getImageVariantValueId(image: string) {
+    return (
+      Object.entries(form.variantImages).find(([, imageValue]) => imageValue === image)?.[0] ?? ""
+    );
+  }
+
   function appendToDescription(fragment: string) {
     update("descriptionFa", `${form.descriptionFa.trim()}${fragment}`.trim());
   }
@@ -343,6 +452,12 @@ export function ProductManager() {
       ...(form.wholesaleEnabled ? ["wholesale" as const] : []),
     ];
     const images = uniqueImages([form.image, ...form.images]);
+    const variantImages = Object.fromEntries(
+      Object.entries(form.variantImages).filter(
+        ([valueId, imageValue]) =>
+          form.variantValueIds.includes(valueId) && images.includes(imageValue),
+      ),
+    );
     const payload = {
       id: form.id,
       variantId: form.variantId,
@@ -358,12 +473,16 @@ export function ProductManager() {
       descriptionFa: form.descriptionFa,
       image: images[0] ?? form.image,
       images,
+      variantType: form.variantType,
+      variantValueIds: form.variantType === "none" ? [] : form.variantValueIds,
+      variantImages,
       tags: form.tagsText
         .split(/[،,]/)
         .map((tag) => tag.trim())
         .filter(Boolean),
       specs: textToSpecs(form.specsText),
-      colorIds: form.colorIds,
+      colorIds: form.variantType === "color" ? form.variantValueIds : [],
+      colorImages: form.variantType === "color" ? variantImages : {},
       retailPriceRial: Math.round(form.retailPriceToman) * 10,
       wholesalePriceRial: Math.round(form.wholesalePriceToman) * 10,
       wholesaleEnabled: form.wholesaleEnabled,
@@ -423,6 +542,25 @@ export function ProductManager() {
 
   const wholesaleCartonToman = form.wholesalePriceToman * Math.max(1, form.cartonSize);
   const minimumWholesaleToman = wholesaleCartonToman * Math.max(1, form.minWholesaleCartonCount);
+  const variantValueOptions =
+    form.variantType === "flavor"
+      ? productFlavorCatalog.map((flavor) => ({
+          id: flavor.id,
+          labelFa: flavor.nameFa,
+          swatch: undefined,
+        }))
+      : form.variantType === "color"
+        ? productColorPalette.map((color) => ({
+            id: color.id,
+            labelFa: color.labelFa,
+            swatch: color.hex,
+          }))
+        : [];
+  const activeVariantOptions = variantValueOptions.filter((option) =>
+    form.variantValueIds.includes(option.id),
+  );
+  const variantTypeLabel =
+    form.variantType === "flavor" ? "Ø·Ø¹Ù…" : form.variantType === "color" ? "Ø±Ù†Ú¯" : "";
 
   return (
     <div className="grid gap-6">
@@ -529,7 +667,7 @@ export function ProductManager() {
               {filtered.slice(0, 140).map((row) => {
                 const channels = row.product.salesChannels ?? ["retail", "wholesale"];
                 const available = row.inventory.onHand - row.inventory.reserved;
-                const colors = getProductColorOptions(row.product);
+                const variantOptions = getProductVariantOptions(row.product);
                 return (
                   <tr key={row.product.id} className="border-t border-[#E2E7ED] align-middle">
                     <td className="px-4 py-3">
@@ -548,25 +686,31 @@ export function ProductManager() {
                           <p className="truncate text-xs text-[#5F6C79]" dir="ltr">
                             {row.variant.sku}
                           </p>
-                          {colors.length > 0 ? (
+                          {variantOptions.length > 0 ? (
                             <div className="mt-2 flex flex-wrap items-center gap-1">
-                              {colors.slice(0, 5).map((color) => (
+                              {variantOptions.slice(0, 5).map((option) => (
                                 <span
-                                  key={color.id}
+                                  key={option.id}
                                   className="inline-flex items-center gap-1 rounded-full border border-[#D7DDE4] bg-white px-2 py-1 text-[11px] text-[#4C5A67]"
-                                  title={color.labelFa}
+                                  title={option.labelFa}
                                 >
-                                  <span
-                                    className="h-3 w-3 rounded-full border border-slate-300"
-                                    style={{ backgroundColor: color.hex }}
-                                    aria-hidden="true"
-                                  />
-                                  {color.labelFa}
+                                  {option.swatch ? (
+                                    <span
+                                      className="h-3 w-3 rounded-full border border-slate-300"
+                                      style={
+                                        option.swatch.startsWith("linear-gradient")
+                                          ? { backgroundImage: option.swatch }
+                                          : { backgroundColor: option.swatch }
+                                      }
+                                      aria-hidden="true"
+                                    />
+                                  ) : null}
+                                  {option.labelFa}
                                 </span>
                               ))}
-                              {colors.length > 5 ? (
+                              {variantOptions.length > 5 ? (
                                 <span className="text-[11px] text-[#5F6C79]">
-                                  +{formatNumber(colors.length - 5)}
+                                  +{formatNumber(variantOptions.length - 5)}
                                 </span>
                               ) : null}
                             </div>
@@ -691,9 +835,7 @@ export function ProductManager() {
                         <select
                           className="min-h-11 rounded-md border border-slate-300 bg-white px-3"
                           value={form.productKind}
-                          onChange={(event) =>
-                            update("productKind", event.target.value as ProductKind)
-                          }
+                          onChange={(event) => updateProductKind(event.target.value as ProductKind)}
                         >
                           {productKindOptions.map((option) => (
                             <option key={option.value} value={option.value}>
@@ -707,7 +849,7 @@ export function ProductManager() {
                         <select
                           className="min-h-11 rounded-md border border-slate-300 bg-white px-3"
                           value={form.categoryId}
-                          onChange={(event) => update("categoryId", event.target.value)}
+                          onChange={(event) => updateCategory(event.target.value)}
                         >
                           {categories.map((category) => (
                             <option key={category.id} value={category.id}>
@@ -746,7 +888,7 @@ export function ProductManager() {
                       <div className="flex items-center gap-2">
                         <Palette size={18} className="text-[#168BFF]" aria-hidden="true" />
                         <div>
-                          <h3 className="font-black">رنگ‌های قابل سفارش</h3>
+                          <h3 className="font-black">نوع انتخاب محصول</h3>
                           <p className="mt-1 text-xs leading-5 text-[#5F6C79]">
                             فقط وقتی رنگی انتخاب شود، بخش رنگ در صفحه محصول و کارت‌های لیست نمایش
                             داده می‌شود. برای کویل و کارتریج می‌توانید این بخش را خالی بگذارید.
@@ -758,7 +900,7 @@ export function ProductManager() {
                           type="button"
                           size="sm"
                           variant="secondary"
-                          onClick={applySuggestedColors}
+                          onClick={applySuggestedVariantValues}
                         >
                           پیشنهاد بر اساس نوع
                         </Button>
@@ -767,48 +909,86 @@ export function ProductManager() {
                           size="sm"
                           variant="ghost"
                           className="border border-[#D7DDE4] text-[#17202A] hover:bg-[#EEF3F8]"
-                          onClick={() => update("colorIds", [])}
+                          onClick={() => update("variantValueIds", [])}
                         >
                           بدون رنگ
                         </Button>
                       </div>
                     </div>
                     <div
-                      className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
-                      role="group"
-                      aria-label="رنگ‌های محصول"
+                      className="mb-4 grid gap-2 sm:grid-cols-3"
+                      role="radiogroup"
+                      aria-label="نوع تنوع محصول"
                     >
-                      {productColorPalette.map((color) => {
-                        const active = form.colorIds.includes(color.id);
-                        return (
-                          <button
-                            key={color.id}
-                            type="button"
-                            onClick={() => toggleColor(color.id)}
-                            className={`flex min-h-11 items-center justify-between gap-2 rounded-md border px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
-                              active
-                                ? "border-cyan-500 bg-cyan-50 text-cyan-950"
-                                : "border-[#D7DDE4] bg-white text-[#17202A] hover:bg-[#F4F6F8]"
-                            }`}
-                            aria-pressed={active}
-                          >
-                            <span className="inline-flex items-center gap-2">
-                              <span
-                                className="h-5 w-5 rounded-full border border-slate-300"
-                                style={{ backgroundColor: color.hex }}
-                                aria-hidden="true"
-                              />
-                              {color.labelFa}
-                            </span>
-                            {active ? <Check size={16} aria-hidden="true" /> : null}
-                          </button>
-                        );
-                      })}
+                      {[
+                        { value: "none" as const, label: "بدون تنوع" },
+                        { value: "flavor" as const, label: "طعم" },
+                        { value: "color" as const, label: "رنگ" },
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setVariantType(option.value)}
+                          className={`min-h-11 rounded-md border px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
+                            form.variantType === option.value
+                              ? "border-cyan-500 bg-cyan-50 text-cyan-950"
+                              : "border-[#D7DDE4] bg-white text-[#17202A] hover:bg-[#F4F6F8]"
+                          }`}
+                          role="radio"
+                          aria-checked={form.variantType === option.value}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
                     </div>
+                    {form.variantType !== "none" ? (
+                      <div
+                        className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
+                        role="group"
+                        aria-label={
+                          form.variantType === "flavor" ? "طعم‌های محصول" : "رنگ‌های محصول"
+                        }
+                      >
+                        {variantValueOptions.map((option) => {
+                          const active = form.variantValueIds.includes(option.id);
+                          return (
+                            <button
+                              key={option.id}
+                              type="button"
+                              onClick={() => toggleVariantValue(option.id)}
+                              className={`flex min-h-11 items-center justify-between gap-2 rounded-md border px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
+                                active
+                                  ? "border-cyan-500 bg-cyan-50 text-cyan-950"
+                                  : "border-[#D7DDE4] bg-white text-[#17202A] hover:bg-[#F4F6F8]"
+                              }`}
+                              aria-pressed={active}
+                            >
+                              <span className="inline-flex items-center gap-2">
+                                {option.swatch ? (
+                                  <span
+                                    className="h-5 w-5 rounded-full border border-slate-300"
+                                    style={
+                                      option.swatch.startsWith("linear-gradient")
+                                        ? { backgroundImage: option.swatch }
+                                        : { backgroundColor: option.swatch }
+                                    }
+                                    aria-hidden="true"
+                                  />
+                                ) : null}
+                                {option.labelFa}
+                              </span>
+                              {active ? <Check size={16} aria-hidden="true" /> : null}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
                     <p className="mt-3 text-xs text-[#5F6C79]" role="status">
-                      {form.colorIds.length > 0
-                        ? `${formatNumber(form.colorIds.length)} رنگ برای این محصول فعال است.`
-                        : "برای این محصول رنگی تعریف نشده است."}
+                      {form.variantType === "none"
+                        ? "برای این محصول تنوع انتخابی تعریف نشده است."
+                        : form.variantValueIds.length > 0
+                          ? `${formatNumber(form.variantValueIds.length)} ${variantTypeLabel} برای این محصول فعال است.`
+                          : `برای این محصول ${variantTypeLabel} تعریف نشده است.`}
                     </p>
                   </section>
 
@@ -895,6 +1075,31 @@ export function ProductManager() {
                               </IconButton>
                             </div>
                           </div>
+                          {activeVariantOptions.length > 0 ? (
+                            <label className="grid gap-1 border-t border-[#D7DDE4] p-2 text-xs font-bold text-[#5F6C79]">
+                              {form.variantType === "flavor"
+                                ? "طعم مرتبط با این تصویر"
+                                : "رنگ مرتبط با این تصویر"}
+                              <select
+                                className="min-h-9 rounded-md border border-[#D7DDE4] bg-white px-2 text-sm text-[#17202A] focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-100"
+                                value={getImageVariantValueId(url)}
+                                onChange={(event) =>
+                                  assignImageToVariantValue(url, event.target.value)
+                                }
+                              >
+                                <option value="">
+                                  {form.variantType === "flavor"
+                                    ? "بدون طعم اختصاصی"
+                                    : "بدون رنگ اختصاصی"}
+                                </option>
+                                {activeVariantOptions.map((option) => (
+                                  <option key={option.id} value={option.id}>
+                                    {option.labelFa}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          ) : null}
                         </div>
                       ))}
                     </div>

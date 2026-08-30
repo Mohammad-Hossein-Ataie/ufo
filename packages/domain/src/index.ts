@@ -8,7 +8,9 @@ import type {
   Order,
   OrderItemSnapshot,
   Product,
+  ProductFlavor,
   ProductKind,
+  ProductVariantType,
   ProductVariant,
   SalesChannel,
   ShippingAddress,
@@ -602,7 +604,16 @@ export interface ProductColorOption {
   hex: string;
 }
 
+export interface ProductVariantOption {
+  id: string;
+  labelFa: string;
+  type: Exclude<ProductVariantType, "none">;
+  swatch?: string;
+  iconKey?: string;
+}
+
 export const productColorAttributeTechnicalValue = "product-colors";
+export const productFlavorAttributeTechnicalValue = "product-flavors";
 
 export const productColorPalette: ProductColorOption[] = [
   { id: "black", labelFa: "مشکی", hex: "#111827" },
@@ -620,6 +631,35 @@ export const productColorPalette: ProductColorOption[] = [
     labelFa: "چند رنگ",
     hex: "linear-gradient(135deg,#ef4444 0%,#f59e0b 25%,#22c55e 50%,#06b6d4 75%,#8b5cf6 100%)",
   },
+];
+
+export const productFlavorCatalog: ProductFlavor[] = [
+  {
+    id: "watermelon-ice",
+    slug: "watermelon-ice",
+    nameFa: "هندوانه یخ",
+    nameEn: "Watermelon Ice",
+    iconKey: "watermelon",
+  },
+  {
+    id: "blueberry-ice",
+    slug: "blueberry-ice",
+    nameFa: "بلوبری یخ",
+    nameEn: "Blueberry Ice",
+    iconKey: "berry",
+  },
+  { id: "mint", slug: "mint", nameFa: "نعناع", nameEn: "Mint", iconKey: "mint" },
+  { id: "grape-ice", slug: "grape-ice", nameFa: "انگور یخ", nameEn: "Grape Ice", iconKey: "grape" },
+  {
+    id: "strawberry-ice",
+    slug: "strawberry-ice",
+    nameFa: "توت فرنگی یخ",
+    nameEn: "Strawberry Ice",
+    iconKey: "berry",
+  },
+  { id: "mango-ice", slug: "mango-ice", nameFa: "انبه یخ", nameEn: "Mango Ice", iconKey: "mango" },
+  { id: "cola-ice", slug: "cola-ice", nameFa: "کولا یخ", nameEn: "Cola Ice", iconKey: "cola" },
+  { id: "tobacco", slug: "tobacco", nameFa: "تنباکو", nameEn: "Tobacco", iconKey: "leaf" },
 ];
 
 export const productColorEligibleKinds: ProductKind[] = [
@@ -652,15 +692,103 @@ export const suggestedProductColorOptionsByCategoryId: Record<string, string[]> 
   "cat-lighter": ["black", "silver", "blue", "red", "pink", "gold", "multicolor"],
 };
 
-export function getProductColorOptions(product: Product): ProductColorOption[] {
-  const colorAttribute = product.attributes.find(
-    (attribute) => attribute.technicalValue === productColorAttributeTechnicalValue,
+export const defaultVariantTypeByKind: Partial<Record<ProductKind, ProductVariantType>> = {
+  disposable: "flavor",
+  "salt-nicotine": "flavor",
+  "e-liquid": "flavor",
+  "pod-device": "color",
+  "vape-device": "color",
+  accessory: "color",
+};
+
+export const defaultVariantTypeByCategoryId: Record<string, ProductVariantType> = {
+  "cat-disposable": "flavor",
+  "cat-eliquid": "flavor",
+  "cat-salt-nicotine": "flavor",
+  "cat-pod": "color",
+  "cat-vape": "color",
+  "cat-lighter": "color",
+};
+
+export const suggestedProductFlavorOptionsByKind: Partial<Record<ProductKind, string[]>> = {
+  disposable: [
+    "watermelon-ice",
+    "blueberry-ice",
+    "mint",
+    "grape-ice",
+    "strawberry-ice",
+    "mango-ice",
+  ],
+  "salt-nicotine": ["mint", "tobacco", "blueberry-ice", "grape-ice"],
+  "e-liquid": ["watermelon-ice", "blueberry-ice", "mint", "grape-ice", "mango-ice"],
+};
+
+export const suggestedProductFlavorOptionsByCategoryId: Record<string, string[]> = {
+  "cat-disposable": [
+    "watermelon-ice",
+    "blueberry-ice",
+    "mint",
+    "grape-ice",
+    "strawberry-ice",
+    "mango-ice",
+  ],
+  "cat-eliquid": ["watermelon-ice", "blueberry-ice", "mint", "grape-ice", "mango-ice"],
+  "cat-salt-nicotine": ["mint", "tobacco", "blueberry-ice", "grape-ice"],
+};
+
+function uniqueIds(ids: string[] | undefined): string[] {
+  return [...new Set((ids ?? []).map((item) => item.trim()).filter(Boolean))];
+}
+
+function getAttributeIds(product: Product, technicalValue: string): string[] {
+  const attribute = product.attributes.find((item) => item.technicalValue === technicalValue);
+  return uniqueIds(attribute?.valueFa.split(","));
+}
+
+export function getDefaultProductVariantType(
+  product: Pick<Product, "categoryId" | "productKind">,
+): ProductVariantType {
+  return (
+    (product.productKind ? defaultVariantTypeByKind[product.productKind] : undefined) ??
+    defaultVariantTypeByCategoryId[product.categoryId] ??
+    "none"
   );
-  const colorIds = colorAttribute?.valueFa
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-  if (!colorIds?.length) return [];
+}
+
+export function getProductVariantType(product: Product): ProductVariantType {
+  if (product.variantType) return product.variantType;
+  if (getAttributeIds(product, productFlavorAttributeTechnicalValue).length > 0) return "flavor";
+  const defaultType = getDefaultProductVariantType(product);
+  if (
+    defaultType === "color" &&
+    getAttributeIds(product, productColorAttributeTechnicalValue).length > 0
+  ) {
+    return "color";
+  }
+  if (defaultType !== "none") return defaultType;
+  if (getAttributeIds(product, productColorAttributeTechnicalValue).length > 0) return "color";
+  return "none";
+}
+
+export function getProductFlavorOptions(product: Product): ProductFlavor[] {
+  if (getProductVariantType(product) !== "flavor") return [];
+  const flavorIds =
+    uniqueIds(product.variantValueIds).length > 0
+      ? uniqueIds(product.variantValueIds)
+      : getAttributeIds(product, productFlavorAttributeTechnicalValue);
+  if (!flavorIds.length) return [];
+  return flavorIds
+    .map((flavorId) => productFlavorCatalog.find((flavor) => flavor.id === flavorId))
+    .filter((flavor): flavor is ProductFlavor => Boolean(flavor));
+}
+
+export function getProductColorOptions(product: Product): ProductColorOption[] {
+  if (getProductVariantType(product) !== "color") return [];
+  const colorIds =
+    uniqueIds(product.variantValueIds).length > 0
+      ? uniqueIds(product.variantValueIds)
+      : getAttributeIds(product, productColorAttributeTechnicalValue);
+  if (!colorIds.length) return [];
   return colorIds
     .map((colorId) => productColorPalette.find((color) => color.id === colorId))
     .filter((color): color is ProductColorOption => Boolean(color));
@@ -668,6 +796,31 @@ export function getProductColorOptions(product: Product): ProductColorOption[] {
 
 export function getProductColorById(colorId: string): ProductColorOption | undefined {
   return productColorPalette.find((color) => color.id === colorId);
+}
+
+export function getProductFlavorById(flavorId: string): ProductFlavor | undefined {
+  return productFlavorCatalog.find((flavor) => flavor.id === flavorId);
+}
+
+export function getProductVariantOptions(product: Product): ProductVariantOption[] {
+  const variantType = getProductVariantType(product);
+  if (variantType === "flavor") {
+    return getProductFlavorOptions(product).map((flavor) => ({
+      id: flavor.id,
+      labelFa: flavor.nameFa,
+      type: "flavor",
+      ...(flavor.iconKey ? { iconKey: flavor.iconKey } : {}),
+    }));
+  }
+  if (variantType === "color") {
+    return getProductColorOptions(product).map((color) => ({
+      id: color.id,
+      labelFa: color.labelFa,
+      type: "color",
+      swatch: color.hex,
+    }));
+  }
+  return [];
 }
 
 export function getSuggestedProductColorIds(product: Product): string[] {
@@ -681,11 +834,28 @@ export function getSuggestedProductColorIds(product: Product): string[] {
   );
 }
 
+export function getSuggestedProductFlavorIds(product: Product): string[] {
+  const kind = product.productKind;
+  return (
+    (kind ? suggestedProductFlavorOptionsByKind[kind] : undefined) ??
+    suggestedProductFlavorOptionsByCategoryId[product.categoryId] ??
+    []
+  );
+}
+
+export function getSuggestedProductVariantValueIds(product: Product): string[] {
+  const variantType = getProductVariantType(product);
+  if (variantType === "flavor") return getSuggestedProductFlavorIds(product);
+  if (variantType === "color") return getSuggestedProductColorIds(product);
+  return [];
+}
+
 export const seedData = {
   storeSettings,
   categories,
   brands,
   products,
+  productFlavors: productFlavorCatalog,
   variants,
   inventoryItems,
   compatibilityGroups,

@@ -4,13 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button, Price, ProductCard, StockStatus } from "@ufo/ui";
-import {
-  categories,
-  getAvailableStock,
-  getInventoryByVariant,
-  getPrimaryVariant,
-  products,
-} from "@ufo/domain";
+import { categories } from "@ufo/domain";
+import { getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
 import { getProductImage } from "@/lib/product-images";
 import {
   breadcrumbJsonLd,
@@ -21,9 +16,12 @@ import {
 } from "@ufo/seo";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 
-export function generateStaticParams() {
+export const dynamic = "force-dynamic";
+
+export async function generateStaticParams() {
+  const rows = await listCatalogRows();
   const activeCategoryIds = new Set(
-    products.filter((product) => product.isActive).map((product) => product.categoryId),
+    rows.filter((row) => row.product.isActive).map((row) => row.product.categoryId),
   );
   return categories
     .filter((category) => activeCategoryIds.has(category.id))
@@ -45,16 +43,17 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   const category = categories.find((item) => item.slug === slug);
   if (!category) notFound();
-  const categoryProducts = products.filter(
-    (product) => product.isActive && product.categoryId === category.id,
+  const categoryRows = (await listCatalogRows()).filter(
+    (row) => row.product.isActive && row.product.categoryId === category.id,
   );
-  if (categoryProducts.length === 0) notFound();
+  if (categoryRows.length === 0) notFound();
 
   const breadcrumb = breadcrumbJsonLd([
     { name: "خانه", path: "/" },
     { name: "محصولات", path: "/products" },
     { name: category.nameFa, path: `/products/category/${category.slug}` },
   ]);
+  const categoryProducts = categoryRows.map((row) => row.product);
   const itemList = itemListJsonLd(
     categoryProducts
       .slice(0, 24)
@@ -95,10 +94,10 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         </p>
       </section>
       <section className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {categoryProducts.map((product) => {
-          const variant = getPrimaryVariant(product.id);
-          const inventory = getInventoryByVariant(variant.id);
-          const available = inventory ? getAvailableStock(inventory) : 0;
+        {categoryRows.map((row) => {
+          const product = row.product;
+          const variant = row.variant;
+          const available = getCatalogRowStock(row);
           return (
             <ProductCard
               key={product.id}

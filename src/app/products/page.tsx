@@ -14,20 +14,21 @@ import { AddToCartButton } from "@/components/add-to-cart-button";
 import { CatalogColorFilter } from "@/components/catalog-color-filter";
 import { CatalogPagination } from "@/components/catalog-pagination";
 import { CatalogPriceRangeFilter } from "@/components/catalog-price-range-filter";
+import { getCatalogRowStock, listCatalogRows, searchCatalogRows } from "@/lib/catalog-data";
 import { getProductImage } from "@/lib/product-images";
+import type { AdminProductRecord } from "@/lib/admin-products";
 import { canonical, itemListJsonLd, jsonLdScriptProps } from "@ufo/seo";
 import { Badge, Button, EmptyState, Price, ProductCard, StockStatus } from "@ufo/ui";
 import {
   brands,
   categories,
-  getAvailableStock,
-  getInventoryByVariant,
-  getPrimaryVariant,
   getProductColorOptions,
+  getProductVariantOptions,
   productColorPalette,
-  searchProducts,
 } from "@ufo/domain";
-import type { Product, ProductKind } from "@ufo/types";
+import type { ProductKind } from "@ufo/types";
+
+export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = 12;
 
@@ -86,14 +87,8 @@ function parseToman(value?: string) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed * 10 : undefined;
 }
 
-function getProductStock(product: Product) {
-  const variant = getPrimaryVariant(product.id);
-  const inventory = getInventoryByVariant(variant.id);
-  return inventory ? getAvailableStock(inventory) : 0;
-}
-
-function getRetailPrice(product: Product) {
-  return getPrimaryVariant(product.id).retailPriceRial;
+function getRetailPrice(row: AdminProductRecord) {
+  return row.variant.retailPriceRial;
 }
 
 function makeHref(params: ProductSearchParams, page: number) {
@@ -107,8 +102,8 @@ function makeHref(params: ProductSearchParams, page: number) {
   return `/products${suffix ? `?${suffix}` : ""}`;
 }
 
-function getPriceBoundsToman(items: Product[]) {
-  const prices = items.map((product) => Math.round(getRetailPrice(product) / 10));
+function getPriceBoundsToman(items: AdminProductRecord[]) {
+  const prices = items.map((row) => Math.round(getRetailPrice(row) / 10));
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
   if (!Number.isFinite(minPrice) || !Number.isFinite(maxPrice)) {
@@ -118,31 +113,36 @@ function getPriceBoundsToman(items: Product[]) {
   return { min: Math.max(0, minPrice), max: maxPrice };
 }
 
-function filterProducts(params: ProductSearchParams, includePriceFilter = true) {
+function filterProducts(
+  rows: AdminProductRecord[],
+  params: ProductSearchParams,
+  includePriceFilter = true,
+) {
   const minPrice = parseToman(params.minPrice);
   const maxPrice = parseToman(params.maxPrice);
 
-  return searchProducts(params.q ?? "")
-    .filter((product) => product.isActive)
-    .filter((product) => product.salesChannels?.includes("retail") ?? true)
-    .filter((product) => {
+  return searchCatalogRows(rows, params.q ?? "")
+    .filter((row) => row.product.isActive)
+    .filter((row) => row.product.salesChannels?.includes("retail") ?? true)
+    .filter((row) => {
       if (!params.category) return true;
-      const category = categories.find((item) => item.id === product.categoryId);
+      const category = categories.find((item) => item.id === row.product.categoryId);
       return category?.slug === params.category;
     })
-    .filter((product) => !params.brand || product.brandId === params.brand)
-    .filter((product) => !params.kind || product.productKind === params.kind)
+    .filter((row) => !params.brand || row.product.brandId === params.brand)
+    .filter((row) => !params.kind || row.product.productKind === params.kind)
     .filter(
-      (product) =>
-        !params.color || getProductColorOptions(product).some((color) => color.id === params.color),
+      (row) =>
+        !params.color ||
+        getProductColorOptions(row.product).some((color) => color.id === params.color),
     )
-    .filter((product) => {
+    .filter((row) => {
       if (!includePriceFilter) return true;
-      const price = getRetailPrice(product);
+      const price = getRetailPrice(row);
       return (!minPrice || price >= minPrice) && (!maxPrice || price <= maxPrice);
     })
-    .filter((product) => {
-      const stock = getProductStock(product);
+    .filter((row) => {
+      const stock = getCatalogRowStock(row);
       if (params.stock === "available") return stock > 0;
       if (params.stock === "low") return stock > 0 && stock < 10;
       if (params.stock === "preorder") return stock <= 0;
@@ -151,9 +151,10 @@ function filterProducts(params: ProductSearchParams, includePriceFilter = true) 
     .sort((left, right) => {
       if (params.sort === "price-asc") return getRetailPrice(left) - getRetailPrice(right);
       if (params.sort === "price-desc") return getRetailPrice(right) - getRetailPrice(left);
-      if (params.sort === "stock-desc") return getProductStock(right) - getProductStock(left);
-      if (params.sort === "name") return left.nameFa.localeCompare(right.nameFa, "fa");
-      return Number(right.isActive) - Number(left.isActive);
+      if (params.sort === "stock-desc") return getCatalogRowStock(right) - getCatalogRowStock(left);
+      if (params.sort === "name")
+        return left.product.nameFa.localeCompare(right.product.nameFa, "fa");
+      return Number(right.product.isActive) - Number(left.product.isActive);
     });
 }
 
@@ -163,9 +164,10 @@ export default async function ProductsPage({
   searchParams?: Promise<ProductSearchParams>;
 }) {
   const params = (await searchParams) ?? {};
-  const priceScope = filterProducts(params, false);
+  const rows = await listCatalogRows();
+  const priceScope = filterProducts(rows, params, false);
   const priceBounds = getPriceBoundsToman(priceScope);
-  const filtered = filterProducts(params);
+  const filtered = filterProducts(rows, params);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(Math.max(Number(params.page ?? 1) || 1, 1), totalPages);
   const pagedProducts = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -174,7 +176,7 @@ export default async function ProductsPage({
   const jsonLd = itemListJsonLd(
     filtered
       .slice(0, PAGE_SIZE)
-      .map((product) => ({ name: product.nameFa, url: `/products/${product.slug}` })),
+      .map((row) => ({ name: row.product.nameFa, url: `/products/${row.product.slug}` })),
     "کاتالوگ محصولات یوفوپاف",
   );
 
@@ -374,10 +376,11 @@ export default async function ProductsPage({
             </EmptyState>
           ) : (
             <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {pagedProducts.map((product) => {
-                const variant = getPrimaryVariant(product.id);
-                const available = getProductStock(product);
-                const colors = getProductColorOptions(product);
+              {pagedProducts.map((row) => {
+                const product = row.product;
+                const variant = row.variant;
+                const available = getCatalogRowStock(row);
+                const variantOptions = getProductVariantOptions(product);
                 return (
                   <div
                     key={product.id}
@@ -403,22 +406,30 @@ export default async function ProductsPage({
                       }
                       actions={
                         <div key={`actions-${product.id}`} className="grid w-full gap-2">
-                          {colors.length > 0 ? (
+                          {variantOptions.length > 0 ? (
                             <div className="flex min-h-6 flex-wrap items-center gap-1 text-xs text-[#9BA7B4]">
-                              {colors.slice(0, 5).map((color) => (
+                              {variantOptions.slice(0, 5).map((option) => (
                                 <span
-                                  key={color.id}
+                                  key={option.id}
                                   className="inline-flex items-center gap-1 rounded-full border border-[#22303D] bg-white/5 px-2 py-1"
                                 >
-                                  <span
-                                    className="h-3 w-3 rounded-full border border-white/30"
-                                    style={{ backgroundColor: color.hex }}
-                                    aria-hidden="true"
-                                  />
-                                  {color.labelFa}
+                                  {option.swatch ? (
+                                    <span
+                                      className="h-3 w-3 rounded-full border border-white/30"
+                                      style={
+                                        option.swatch.startsWith("linear-gradient")
+                                          ? { backgroundImage: option.swatch }
+                                          : { backgroundColor: option.swatch }
+                                      }
+                                      aria-hidden="true"
+                                    />
+                                  ) : null}
+                                  {option.labelFa}
                                 </span>
                               ))}
-                              {colors.length > 5 ? <span>+{colors.length - 5}</span> : null}
+                              {variantOptions.length > 5 ? (
+                                <span>+{variantOptions.length - 5}</span>
+                              ) : null}
                             </div>
                           ) : null}
                           <Link href={`/products/${product.slug}`} className="w-full">

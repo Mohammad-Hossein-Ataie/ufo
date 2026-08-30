@@ -3,21 +3,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeCheck, Box, Film, ListChecks, ShieldCheck } from "lucide-react";
-import { ProductPurchasePanel } from "@/components/product-purchase-panel";
-import { getProductImage, getProductImages } from "@/lib/product-images";
+import { ProductDetailClient } from "@/components/product-detail-client";
+import { findCatalogRowBySlug, getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
+import { getProductImage, getProductImages, getProductVariantImages } from "@/lib/product-images";
+import { rewriteLiaraPublicUrl } from "@ufo/storage";
 import {
   brands,
   categories,
-  findProduct,
-  getAvailableStock,
-  getInventoryByVariant,
-  getPrimaryVariant,
-  getProductColorOptions,
-  products,
+  getProductVariantOptions,
+  getProductVariantType,
+  productFlavorAttributeTechnicalValue,
   productColorAttributeTechnicalValue,
 } from "@ufo/domain";
 import { breadcrumbJsonLd, jsonLdScriptProps, productJsonLd } from "@ufo/seo";
-import { Alert, Badge, Button, Price, ProductCard, StockStatus } from "@ufo/ui";
+import { Button, Price, ProductCard, StockStatus } from "@ufo/ui";
+
+export const dynamic = "force-dynamic";
 
 const imageBlockPattern = /^!\[(?<alt>.*)]\((?<url>.+)\)$/;
 const videoBlockPattern = /^\[ویدیو.*]\((?<url>.+)\)$/;
@@ -47,6 +48,7 @@ function renderRichDescription(description: string) {
   return blocks.map((block, index) => {
     const imageMatch = block.match(imageBlockPattern);
     if (imageMatch?.groups?.url) {
+      const imageUrl = rewriteLiaraPublicUrl(imageMatch.groups.url);
       return (
         <figure
           key={`${block}-${index}`}
@@ -54,7 +56,7 @@ function renderRichDescription(description: string) {
         >
           <div className="relative aspect-[16/10]">
             <Image
-              src={imageMatch.groups.url}
+              src={imageUrl}
               alt={imageMatch.groups.alt || "تصویر توضیحات محصول"}
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
@@ -96,8 +98,10 @@ function renderRichDescription(description: string) {
   });
 }
 
-export function generateStaticParams() {
-  return products.filter((product) => product.isActive).map((product) => ({ slug: product.slug }));
+export async function generateStaticParams() {
+  return (await listCatalogRows())
+    .filter((row) => row.product.isActive)
+    .map((row) => ({ slug: row.product.slug }));
 }
 
 export async function generateMetadata({
@@ -106,7 +110,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = findProduct(slug);
+  const row = await findCatalogRowBySlug(slug);
+  const product = row?.product;
   if (!product) return {};
   const images = getProductImages(product);
   return {
@@ -123,19 +128,24 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const product = findProduct(slug);
-  if (!product) notFound();
+  const row = await findCatalogRowBySlug(slug);
+  if (!row) notFound();
 
-  const variant = getPrimaryVariant(product.id);
-  const inventory = getInventoryByVariant(variant.id);
-  const available = inventory ? getAvailableStock(inventory) : 0;
+  const product = row.product;
+  const variant = row.variant;
+  const available = getCatalogRowStock(row);
   const brand = brands.find((item) => item.id === product.brandId);
   const category = categories.find((item) => item.id === product.categoryId);
   const galleryImages = getProductImages(product);
-  const colorOptions = getProductColorOptions(product);
-  const relatedProducts = products
+  const variantImages = getProductVariantImages(product);
+  const variantType = getProductVariantType(product);
+  const variantOptions = getProductVariantOptions(product);
+  const relatedRows = (await listCatalogRows())
     .filter(
-      (item) => item.isActive && item.id !== product.id && item.categoryId === product.categoryId,
+      (item) =>
+        item.product.isActive &&
+        item.product.id !== product.id &&
+        item.product.categoryId === product.categoryId,
     )
     .slice(0, 4);
   const jsonLd = productJsonLd(product, variant, available > 0, brand?.nameFa);
@@ -166,81 +176,16 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <span>{product.nameFa}</span>
         </nav>
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_29rem]">
-          <section className="grid gap-3">
-            <div className="overflow-hidden rounded-md border border-[#22303D] bg-[#0D1117] p-3">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-md bg-[#141A22]">
-                <Image
-                  src={galleryImages[0] ?? getProductImage(product)}
-                  alt={product.nameFa}
-                  fill
-                  priority
-                  className="object-cover"
-                  sizes="(min-width: 1024px) 60vw, 100vw"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
-              {galleryImages.map((image, index) => (
-                <div
-                  key={`${image}-${index}`}
-                  className={`relative aspect-square overflow-hidden rounded-md border bg-[#141A22] ${
-                    index === 0 ? "border-cyan-300" : "border-[#22303D]"
-                  }`}
-                >
-                  <Image
-                    src={image}
-                    alt={`${product.nameFa} ${index + 1}`}
-                    fill
-                    sizes="120px"
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <aside className="h-fit rounded-md border border-[#22303D] bg-[#141A22] p-5 shadow-retail-lg lg:sticky lg:top-24">
-            <div className="flex flex-wrap items-center gap-2">
-              <StockStatus available={available} />
-              <Badge tone="warning">۱۸+</Badge>
-              {brand ? <Badge tone="info">{brand.nameFa}</Badge> : null}
-            </div>
-            <h1 className="mt-4 text-3xl font-black leading-[1.4]">{product.nameFa}</h1>
-            {product.nameEn ? (
-              <p className="mt-1 text-sm text-[#9BA7B4]" dir="ltr">
-                {product.nameEn}
-              </p>
-            ) : null}
-            <p className="mt-3 leading-8 text-[#D9E2EC]">{product.shortDescriptionFa}</p>
-            <div className="mt-5 text-2xl font-black text-[#20F28B]">
-              <Price valueRial={variant.retailPriceRial} />
-            </div>
-            <dl className="mt-5 grid gap-3 text-sm">
-              <div className="flex justify-between gap-3 border-t border-[#22303D] pt-3">
-                <dt className="text-[#9BA7B4]">SKU</dt>
-                <dd dir="ltr">{variant.sku}</dd>
-              </div>
-              <div className="flex justify-between gap-3 border-t border-[#22303D] pt-3">
-                <dt className="text-[#9BA7B4]">موجودی قابل فروش</dt>
-                <dd>{new Intl.NumberFormat("fa-IR").format(available)}</dd>
-              </div>
-            </dl>
-            <div className="mt-6">
-              <ProductPurchasePanel
-                variantId={variant.id}
-                colorOptions={colorOptions}
-                maxQuantity={available > 0 ? available : undefined}
-                label={available > 0 ? "افزودن به سبد" : "ثبت پیش‌سفارش"}
-              />
-            </div>
-            <div className="mt-5">
-              <Alert title="هشدار مصرف" tone="warning">
-                این محصول حاوی نیکوتین است و فقط برای افراد بالای ۱۸ سال عرضه می‌شود.
-              </Alert>
-            </div>
-          </aside>
-        </div>
+        <ProductDetailClient
+          product={product}
+          variant={variant}
+          available={available}
+          brandName={brand?.nameFa}
+          galleryImages={galleryImages}
+          variantType={variantType}
+          variantImages={variantImages}
+          variantOptions={variantOptions}
+        />
 
         <section className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_25rem]">
           <div className="rounded-md border border-[#22303D] bg-[#0D1117] p-5">
@@ -267,7 +212,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               ))}
               {product.attributes
                 .filter(
-                  (attribute) => attribute.technicalValue !== productColorAttributeTechnicalValue,
+                  (attribute) =>
+                    attribute.technicalValue !== productColorAttributeTechnicalValue &&
+                    attribute.technicalValue !== productFlavorAttributeTechnicalValue,
                 )
                 .map((attribute) => (
                   <div
@@ -278,21 +225,29 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     <dd>{attribute.valueFa}</dd>
                   </div>
                 ))}
-              {colorOptions.length > 0 ? (
+              {variantOptions.length > 0 ? (
                 <div className="rounded-md border border-[#22303D] p-3">
-                  <dt className="text-[#9BA7B4]">رنگ‌های قابل سفارش</dt>
+                  <dt className="text-[#9BA7B4]">
+                    {variantType === "flavor" ? "طعم‌های قابل انتخاب" : "رنگ‌های قابل سفارش"}
+                  </dt>
                   <dd className="mt-2 flex flex-wrap gap-2">
-                    {colorOptions.map((color) => (
+                    {variantOptions.map((option) => (
                       <span
-                        key={color.id}
+                        key={option.id}
                         className="inline-flex items-center gap-2 rounded-md bg-white/5 px-2 py-1 text-sm"
                       >
-                        <span
-                          className="h-4 w-4 rounded-full border border-white/30"
-                          style={{ backgroundColor: color.hex }}
-                          aria-hidden="true"
-                        />
-                        {color.labelFa}
+                        {option.swatch ? (
+                          <span
+                            className="h-4 w-4 rounded-full border border-white/30"
+                            style={
+                              option.swatch.startsWith("linear-gradient")
+                                ? { backgroundImage: option.swatch }
+                                : { backgroundColor: option.swatch }
+                            }
+                            aria-hidden="true"
+                          />
+                        ) : null}
+                        {option.labelFa}
                       </span>
                     ))}
                   </dd>
@@ -343,7 +298,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </section>
         ) : null}
 
-        {relatedProducts.length > 0 ? (
+        {relatedRows.length > 0 ? (
           <section className="mt-10">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-2xl font-black">محصولات مرتبط</h2>
@@ -356,10 +311,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </Link>
             </div>
             <div className="mt-5 grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {relatedProducts.map((related) => {
-                const relatedVariant = getPrimaryVariant(related.id);
-                const relatedInventory = getInventoryByVariant(relatedVariant.id);
-                const relatedAvailable = relatedInventory ? getAvailableStock(relatedInventory) : 0;
+              {relatedRows.map((relatedRow) => {
+                const related = relatedRow.product;
+                const relatedVariant = relatedRow.variant;
+                const relatedAvailable = getCatalogRowStock(relatedRow);
                 return (
                   <ProductCard
                     key={related.id}

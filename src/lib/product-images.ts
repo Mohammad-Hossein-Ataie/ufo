@@ -32,3 +32,20 @@ export function getProductImages(product: Pick<Product, "categoryId" | "image" |
     .map((image) => rewriteLiaraPublicUrl(image));
   return images.length > 0 ? images : [getProductImage(product)];
 }
+
+export function getProductColorImages(
+  product: Pick<Product, "categoryId" | "image" | "images" | "variantImages" | "colorImages">,
+) {
+  return getProductVariantImages(product);
+}
+
+export function getProductVariantImages(
+  product: Pick<Product, "categoryId" | "image" | "images" | "variantImages" | "colorImages">,
+) {
+  return Object.fromEntries(
+    Object.entries(product.variantImages ?? product.colorImages ?? {})
+      .map(([valueId, image]) => [valueId, image.trim()] as const)
+      .filter(([, image]) => !genericProductImages.has(image))
+      .map(([valueId, image]) => [valueId, rewriteLiaraPublicUrl(image)]),
+  );
+}

@@ -49,10 +49,7 @@ export function getPublicObjectUrl(
   return `${trimTrailingSlash(publicBaseUrl)}/${key.replace(/^\/+/, "")}`;
 }
 
-export function rewriteLiaraPublicUrl(
-  value: string,
-  env: NodeJS.ProcessEnv = process.env,
-): string {
+export function rewriteLiaraPublicUrl(value: string, env: NodeJS.ProcessEnv = process.env): string {
   const publicBaseUrl = env.LIARA_PUBLIC_BASE_URL?.trim();
   const bucketName = env.LIARA_BUCKET_NAME?.trim();
   if (!publicBaseUrl || !bucketName) return value;

@@ -3,13 +3,27 @@
 import { useState } from "react";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { Button } from "@ufo/ui";
-import type { SalesChannel } from "@ufo/types";
+import type { ProductVariantType, SalesChannel } from "@ufo/types";
+
+interface SelectedVariant {
+  type: Exclude<ProductVariantType, "none">;
+  valueId: string;
+}
 
 interface CartLine {
   variantId: string;
   quantity: number;
   channel: SalesChannel;
+  selectedVariant?: SelectedVariant;
   colorId?: string;
+}
+
+function isSelectedVariant(value: unknown): value is SelectedVariant {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return (
+    (record.type === "flavor" || record.type === "color") && typeof record.valueId === "string"
+  );
 }
 
 const cartKeys: Record<SalesChannel, string> = {
@@ -27,6 +41,7 @@ function isCartLine(value: unknown): value is CartLine {
     typeof value.variantId === "string" &&
     typeof value.quantity === "number" &&
     (value.channel === "retail" || value.channel === "wholesale") &&
+    (!("selectedVariant" in value) || isSelectedVariant(value.selectedVariant)) &&
     (!("colorId" in value) || typeof value.colorId === "string")
   );
 }
@@ -52,6 +67,7 @@ export function AddToCartButton({
   label = "افزودن به سبد خرید",
   enableQuantity = false,
   maxQuantity,
+  selectedVariant,
   selectedColorIds = [],
 }: {
   variantId: string;
@@ -60,6 +76,7 @@ export function AddToCartButton({
   label?: string;
   enableQuantity?: boolean;
   maxQuantity?: number | undefined;
+  selectedVariant?: SelectedVariant | undefined;
   selectedColorIds?: string[];
 }) {
   const [added, setAdded] = useState(false);
@@ -67,28 +84,48 @@ export function AddToCartButton({
   const formatter = new Intl.NumberFormat("fa-IR");
   const firstQuantity = Math.max(1, Math.floor(quantity));
   const canIncrease = typeof maxQuantity !== "number" || selectedQuantity < maxQuantity;
-  const colorIds: Array<string | undefined> =
-    selectedColorIds.length > 0 ? selectedColorIds : [undefined];
+  const selectedVariants: Array<SelectedVariant | undefined> =
+    selectedVariant !== undefined
+      ? [selectedVariant]
+      : selectedColorIds.length > 0
+        ? selectedColorIds.map((colorId) => ({ type: "color", valueId: colorId }))
+        : [undefined];
+
+  function variantMatches(line: CartLine, option: SelectedVariant | undefined) {
+    const lineOption =
+      line.selectedVariant ??
+      (line.colorId ? ({ type: "color", valueId: line.colorId } as const) : undefined);
+    return (
+      line.variantId === variantId &&
+      line.channel === channel &&
+      lineOption?.type === option?.type &&
+      lineOption?.valueId === option?.valueId
+    );
+  }
+
+  function linePayload(option: SelectedVariant | undefined, lineQuantity: number): CartLine {
+    return {
+      variantId,
+      quantity: lineQuantity,
+      channel,
+      ...(option ? { selectedVariant: option } : {}),
+      ...(option?.type === "color" ? { colorId: option.valueId } : {}),
+    };
+  }
 
   function addToCart(addQuantity = quantity) {
     const cart = readCart(channel);
     const quantityToAdd = Math.max(1, Math.floor(addQuantity));
     let nextCart = [...cart];
-    for (const colorId of colorIds) {
-      const existing = nextCart.find(
-        (line) =>
-          line.variantId === variantId && line.channel === channel && line.colorId === colorId,
-      );
+    for (const option of selectedVariants) {
+      const existing = nextCart.find((line) => variantMatches(line, option));
       nextCart = existing
         ? nextCart.map((line) =>
-            line.variantId === variantId && line.channel === channel && line.colorId === colorId
+            variantMatches(line, option)
               ? { ...line, quantity: line.quantity + quantityToAdd }
               : line,
           )
-        : [
-            ...nextCart,
-            { variantId, quantity: quantityToAdd, channel, ...(colorId ? { colorId } : {}) },
-          ];
+        : [...nextCart, linePayload(option, quantityToAdd)];
     }
     window.localStorage.setItem(cartKeys[channel], JSON.stringify(nextCart));
     window.dispatchEvent(new CustomEvent(`${cartKeys[channel]}-updated`));
@@ -105,18 +142,13 @@ export function AddToCartButton({
         !(
           line.variantId === variantId &&
           line.channel === channel &&
-          colorIds.includes(line.colorId)
+          selectedVariants.some((option) => variantMatches(line, option))
         ),
     );
     if (safeQuantity > 0) {
       nextCart = [
         ...nextCart,
-        ...colorIds.map((colorId) => ({
-          variantId,
-          quantity: safeQuantity,
-          channel,
-          ...(colorId ? { colorId } : {}),
-        })),
+        ...selectedVariants.map((option) => linePayload(option, safeQuantity)),
       ];
     }
     window.localStorage.setItem(cartKeys[channel], JSON.stringify(nextCart));

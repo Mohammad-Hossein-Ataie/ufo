@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSubmittedOrder, listSubmittedOrders, type CartSubmissionLine } from "@ufo/orders";
-import type { ShippingMethodCode } from "@ufo/types";
+import type { ProductVariantType, ShippingMethodCode } from "@ufo/types";
 
 export const runtime = "nodejs";
 
@@ -11,6 +11,17 @@ function stringValue(value: unknown, fallback = ""): string {
 function shippingMethod(value: unknown): ShippingMethodCode {
   if (value === "tehran_courier" || value === "pickup" || value === "tipax") return value;
   return "tipax";
+}
+
+function selectedVariant(
+  value: unknown,
+): { type: Exclude<ProductVariantType, "none">; valueId: string } | undefined {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const record = value as Record<string, unknown>;
+  if ((record.type === "flavor" || record.type === "color") && typeof record.valueId === "string") {
+    return { type: record.type, valueId: record.valueId };
+  }
+  return undefined;
 }
 
 function cartLines(value: unknown): CartSubmissionLine[] {
@@ -32,7 +43,14 @@ function cartLines(value: unknown): CartSubmissionLine[] {
     ) {
       return;
     }
-    lines.push({ variantId: record.variantId, quantity, cartonCount });
+    const option = selectedVariant(record.selectedVariant);
+    lines.push({
+      variantId: record.variantId,
+      quantity,
+      cartonCount,
+      ...(option ? { selectedVariant: option } : {}),
+      ...(typeof record.colorId === "string" ? { colorId: record.colorId } : {}),
+    });
   });
   return lines;
 }
