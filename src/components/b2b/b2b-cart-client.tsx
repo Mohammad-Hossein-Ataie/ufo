@@ -4,13 +4,29 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Button, EmptyState, Price } from "@ufo/ui";
-import { products, variants } from "@ufo/domain";
+import { getProductColorById, getProductFlavorById, products, variants } from "@ufo/domain";
+import type { ProductVariantType } from "@ufo/types";
+
+interface SelectedVariant {
+  type: Exclude<ProductVariantType, "none">;
+  valueId: string;
+}
 
 interface CartLine {
   variantId: string;
   quantity: number;
   cartonCount: number;
   channel: "wholesale";
+  selectedVariant?: SelectedVariant;
+  colorId?: string;
+}
+
+function isSelectedVariant(value: unknown): value is SelectedVariant {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return (
+    (record.type === "flavor" || record.type === "color") && typeof record.valueId === "string"
+  );
 }
 
 function readCart(): CartLine[] {
@@ -27,7 +43,9 @@ function readCart(): CartLine[] {
         typeof record.variantId === "string" &&
         typeof record.quantity === "number" &&
         typeof record.cartonCount === "number" &&
-        record.channel === "wholesale"
+        record.channel === "wholesale" &&
+        (!("selectedVariant" in record) || isSelectedVariant(record.selectedVariant)) &&
+        (!("colorId" in record) || typeof record.colorId === "string")
       );
     });
   } catch {
@@ -58,10 +76,21 @@ export function B2BCartClient() {
             ? products.find((item) => item.id === variant.productId)
             : undefined;
           if (!variant || !product) return null;
+          const selectedVariant =
+            line.selectedVariant ??
+            (line.colorId ? ({ type: "color", valueId: line.colorId } as const) : undefined);
+          const selectedOption =
+            selectedVariant?.type === "flavor"
+              ? getProductFlavorById(selectedVariant.valueId)
+              : selectedVariant?.type === "color"
+                ? getProductColorById(selectedVariant.valueId)
+                : undefined;
           return {
             ...line,
             variant,
             product,
+            selectedVariant,
+            selectedOption,
             totalRial: variant.wholesalePriceRial * line.quantity,
           };
         })
@@ -90,7 +119,7 @@ export function B2BCartClient() {
       <div className="grid gap-3">
         {lines.map((line) => (
           <article
-            key={line.variantId}
+            key={`${line.variantId}-${line.selectedVariant?.type ?? "none"}-${line.selectedVariant?.valueId ?? line.colorId ?? "default"}`}
             className="grid gap-4 rounded-md border border-[#D5D9C9] bg-white p-4 sm:grid-cols-[7rem_1fr_auto]"
           >
             <div className="relative aspect-square overflow-hidden rounded-md border border-[#D5D9C9] bg-[#EEF0E5]">

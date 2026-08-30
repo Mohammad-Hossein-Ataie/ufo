@@ -4,13 +4,28 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { CreditCard, Send, Truck } from "lucide-react";
 import { Alert, Button, EmptyState, Input, Price, Textarea } from "@ufo/ui";
 import { products, variants } from "@ufo/domain";
-import type { SalesChannel, ShippingMethodCode } from "@ufo/types";
+import type { ProductVariantType, SalesChannel, ShippingMethodCode } from "@ufo/types";
+
+interface SelectedVariant {
+  type: Exclude<ProductVariantType, "none">;
+  valueId: string;
+}
 
 interface CartLine {
   variantId: string;
   quantity: number;
   cartonCount: number;
   channel: SalesChannel;
+  selectedVariant?: SelectedVariant;
+  colorId?: string;
+}
+
+function isSelectedVariant(value: unknown): value is SelectedVariant {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return (
+    (record.type === "flavor" || record.type === "color") && typeof record.valueId === "string"
+  );
 }
 
 interface B2BSession {
@@ -50,7 +65,9 @@ function readCart(): CartLine[] {
         typeof record.variantId === "string" &&
         typeof record.quantity === "number" &&
         typeof record.cartonCount === "number" &&
-        record.channel === "wholesale"
+        record.channel === "wholesale" &&
+        (!("selectedVariant" in record) || isSelectedVariant(record.selectedVariant)) &&
+        (!("colorId" in record) || typeof record.colorId === "string")
       );
     });
   } catch {
@@ -142,6 +159,8 @@ export function B2BCheckoutClient() {
           variantId: line.variantId,
           quantity: line.quantity,
           cartonCount: line.cartonCount,
+          ...(line.selectedVariant ? { selectedVariant: line.selectedVariant } : {}),
+          ...(line.colorId ? { colorId: line.colorId } : {}),
         })),
       }),
     });

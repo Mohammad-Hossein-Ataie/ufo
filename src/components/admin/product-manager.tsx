@@ -481,8 +481,6 @@ export function ProductManager() {
         .map((tag) => tag.trim())
         .filter(Boolean),
       specs: textToSpecs(form.specsText),
-      colorIds: form.variantType === "color" ? form.variantValueIds : [],
-      colorImages: form.variantType === "color" ? variantImages : {},
       retailPriceRial: Math.round(form.retailPriceToman) * 10,
       wholesalePriceRial: Math.round(form.wholesalePriceToman) * 10,
       wholesaleEnabled: form.wholesaleEnabled,

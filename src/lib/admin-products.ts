@@ -206,7 +206,6 @@ function buildDocuments(
           (images.includes(imageValue) || /^https?:\/\//i.test(imageValue)),
       ),
   );
-  const colorImages = variantType === "color" ? variantImages : {};
   const optionAttribute = variantAttribute(variantType, variantValueIds);
 
   const product: Product = {
@@ -229,7 +228,6 @@ function buildDocuments(
     variantType,
     ...(variantValueIds.length > 0 ? { variantValueIds } : {}),
     ...(Object.keys(variantImages).length > 0 ? { variantImages } : {}),
-    ...(Object.keys(colorImages).length > 0 ? { colorImages } : {}),
     tags,
     attributes: [
       { nameFa: "نوع", valueFa: getCategoryName(input.categoryId) },

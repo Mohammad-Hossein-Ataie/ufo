@@ -116,6 +116,8 @@ const baseProducts: Product[] = [
       "Nebula برای مصرف روزمره طراحی شده و با کارتریج‌های سازگار UFO Selection عرضه می‌شود.",
     image: "/images/ufo-hero.png",
     images: ["/images/ufo-hero.png"],
+    variantType: "color",
+    variantValueIds: ["black", "silver", "green"],
     tags: ["پاد", "کارتریج", "روزمره"],
     attributes: [
       { nameFa: "توان", valueFa: "۱۸ وات", technicalValue: "18W" },
@@ -143,14 +145,16 @@ const baseProducts: Product[] = [
     descriptionFa: "Comet 6000 برای فروش سریع فروشگاهی و سفارش‌های تعدادی مناسب است.",
     image: "/images/ufo-hero.png",
     images: ["/images/ufo-hero.png"],
+    variantType: "flavor",
+    variantValueIds: ["blueberry-ice", "watermelon-ice", "mint", "grape-ice"],
     tags: ["یک‌بارمصرف", "عمده", "پرفروش"],
     attributes: [
       { nameFa: "پاف", valueFa: "۶۰۰۰", technicalValue: "6000" },
       { nameFa: "ظرفیت", valueFa: "۱۴ میلی‌لیتر", technicalValue: "14ml" },
       {
-        nameFa: "رنگ‌های قابل سفارش",
-        valueFa: "black,blue,green,purple",
-        technicalValue: "product-colors",
+        nameFa: "طعم‌های قابل سفارش",
+        valueFa: "blueberry-ice,watermelon-ice,mint,grape-ice",
+        technicalValue: "product-flavors",
       },
     ],
     isActive: true,
@@ -170,6 +174,7 @@ const baseProducts: Product[] = [
     descriptionFa: "کویل Orbit با راهنمای سازگاری برای کاهش خطای خرید عرضه می‌شود.",
     image: "/images/ufo-hero.png",
     images: ["/images/ufo-hero.png"],
+    variantType: "none",
     tags: ["کویل", "سازگاری", "مصرفی"],
     attributes: [
       { nameFa: "اهم", valueFa: "۰.۸", technicalValue: "0.8ohm" },
@@ -193,6 +198,8 @@ const baseProducts: Product[] = [
       "این محصول حاوی نیکوتین است و فقط برای افراد بزرگسال عرضه می‌شود. هیچ ادعای درمانی ندارد.",
     image: "/images/ufo-hero.png",
     images: ["/images/ufo-hero.png"],
+    variantType: "flavor",
+    variantValueIds: ["mint", "tobacco"],
     tags: ["سالت", "نعناع", "۳۰ میل"],
     attributes: [
       { nameFa: "حجم", valueFa: "۳۰ میلی‌لیتر", technicalValue: "30ml" },

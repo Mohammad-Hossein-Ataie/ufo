@@ -1,6 +1,12 @@
 import { MongoClient, type Db, type IndexDescription } from "mongodb";
 import { seedData } from "@ufo/domain";
-import type { InventoryItem, Product, ProductVariant, StoreSettings } from "@ufo/types";
+import type {
+  InventoryItem,
+  Product,
+  ProductFlavor,
+  ProductVariant,
+  StoreSettings,
+} from "@ufo/types";
 
 export const collectionNames = [
   "users",
@@ -10,6 +16,7 @@ export const collectionNames = [
   "sessions",
   "otpChallenges",
   "products",
+  "productFlavors",
   "productVariants",
   "brands",
   "categories",
@@ -63,8 +70,10 @@ export const databaseIndexes: Record<CollectionName, IndexDescription[]> = {
   products: [
     { key: { slug: 1 }, unique: true },
     { key: { categoryId: 1, isActive: 1 } },
+    { key: { variantType: 1 } },
     { key: { nameFa: "text", tags: "text" } },
   ],
+  productFlavors: [{ key: { slug: 1 }, unique: true }],
   productVariants: [{ key: { sku: 1 }, unique: true }, { key: { productId: 1, isActive: 1 } }],
   brands: [{ key: { slug: 1 }, unique: true }],
   categories: [{ key: { slug: 1 }, unique: true }],
@@ -264,6 +273,9 @@ export async function seedDatabase(db: Db): Promise<void> {
     .collection("products")
     .deleteMany({ id: { $in: seedData.products.map((item) => item.id) } });
   await db
+    .collection("productFlavors")
+    .deleteMany({ id: { $in: seedData.productFlavors.map((item) => item.id) } });
+  await db
     .collection("productVariants")
     .deleteMany({ id: { $in: seedData.variants.map((item) => item.id) } });
   await db
@@ -275,6 +287,7 @@ export async function seedDatabase(db: Db): Promise<void> {
   await db.collection("categories").insertMany(seedData.categories);
   await db.collection("brands").insertMany(seedData.brands);
   await db.collection("products").insertMany(seedData.products);
+  await db.collection<ProductFlavor>("productFlavors").insertMany(seedData.productFlavors);
   await db.collection("productVariants").insertMany(seedData.variants);
   await db.collection("inventoryItems").insertMany(seedData.inventoryItems);
   await db.collection("compatibilityGroups").insertMany(seedData.compatibilityGroups);

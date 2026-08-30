@@ -56,7 +56,7 @@ export function ProductDetailClient({
     () => buildVariantImageMap(variantOptions, galleryImages, variantImages),
     [variantImages, variantOptions, galleryImages],
   );
-  const imageColorMap = useMemo(() => {
+  const imageVariantValueMap = useMemo(() => {
     const entries = Array.from(variantImageMap.entries()).map(
       ([valueId, image]): [string, string] => [image, valueId],
     );
@@ -78,7 +78,7 @@ export function ProductDetailClient({
 
   function selectImage(image: string) {
     setSelectedImage(image);
-    setSelectedVariantValueId(imageColorMap.get(image) ?? null);
+    setSelectedVariantValueId(imageVariantValueMap.get(image) ?? null);
   }
 
   return (
@@ -104,7 +104,7 @@ export function ProductDetailClient({
           {galleryImages.map((image, index) => {
             const active = selectedImage === image;
             const thumbnailOption = variantOptions.find(
-              (option) => option.id === imageColorMap.get(image),
+              (option) => option.id === imageVariantValueMap.get(image),
             );
             return (
               <button
