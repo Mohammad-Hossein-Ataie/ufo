@@ -2,27 +2,22 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
-import type { ProductColorOption } from "@ufo/domain";
+import { VariantOptionVisual } from "@/components/product-variant-visuals";
+import type { StorefrontVariantOption } from "@/lib/storefront-variants";
 
-interface CatalogColorFilterProps {
+interface CatalogFlavorFilterProps {
   name?: string;
   defaultValue?: string | undefined;
-  options: ProductColorOption[];
+  options: StorefrontVariantOption[];
   tone?: "dark" | "light";
 }
 
-function colorStyle(color: ProductColorOption) {
-  return color.hex.startsWith("linear-gradient")
-    ? { backgroundImage: color.hex }
-    : { backgroundColor: color.hex };
-}
-
-export function CatalogColorFilter({
-  name = "color",
+export function CatalogFlavorFilter({
+  name = "flavor",
   defaultValue,
   options,
   tone = "dark",
-}: CatalogColorFilterProps) {
+}: CatalogFlavorFilterProps) {
   const [value, setValue] = useState(defaultValue ?? "");
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -52,14 +47,8 @@ export function CatalogColorFilter({
         aria-expanded={open}
       >
         <span className="inline-flex min-w-0 items-center gap-2">
-          {selected ? (
-            <span
-              className="h-4 w-4 shrink-0 rounded-full border border-current/25"
-              style={colorStyle(selected)}
-              aria-hidden="true"
-            />
-          ) : null}
-          <span className="truncate">{selected ? selected.labelFa : "همه رنگ‌ها"}</span>
+          {selected ? <VariantOptionVisual option={selected} size="sm" /> : null}
+          <span className="truncate">{selected ? selected.labelFa : "همه طعم‌ها"}</span>
         </span>
         <ChevronDown size={16} aria-hidden="true" />
       </button>
@@ -73,14 +62,15 @@ export function CatalogColorFilter({
           }`}
           role="listbox"
         >
-          {[{ id: "", labelFa: "همه رنگ‌ها", hex: "" }, ...options].map((option) => {
-            const active = option.id === value;
+          {[undefined, ...options].map((option) => {
+            const optionId = option?.id ?? "";
+            const active = optionId === value;
             return (
               <button
-                key={option.id || "all"}
+                key={optionId || "all"}
                 type="button"
                 onClick={() => {
-                  setValue(option.id);
+                  setValue(optionId);
                   setOpen(false);
                 }}
                 className={`flex min-h-10 w-full select-none items-center justify-between gap-3 rounded-md px-3 text-right text-sm font-bold transition motion-reduce:transition-none ${
@@ -96,16 +86,12 @@ export function CatalogColorFilter({
                 aria-selected={active}
               >
                 <span className="inline-flex min-w-0 items-center gap-2">
-                  {option.id ? (
-                    <span
-                      className="h-4 w-4 shrink-0 rounded-full border border-current/25"
-                      style={colorStyle(option)}
-                      aria-hidden="true"
-                    />
+                  {option ? (
+                    <VariantOptionVisual option={option} size="sm" />
                   ) : (
-                    <span className="h-4 w-4 shrink-0 rounded-full border border-current/25 bg-transparent" />
+                    <span className="h-6 w-6 shrink-0 rounded-md border border-current/20" />
                   )}
-                  <span className="truncate">{option.labelFa}</span>
+                  <span className="truncate">{option ? option.labelFa : "همه طعم‌ها"}</span>
                 </span>
                 {active ? <Check size={15} aria-hidden="true" /> : null}
               </button>

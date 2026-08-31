@@ -23,7 +23,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2 rounded-md border px-4 font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex min-h-11 select-none items-center justify-center gap-2 rounded-md border px-4 font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
         variant === "primary" &&
           "border-cyan-300 bg-cyan-300 text-slate-950 hover:bg-cyan-200 focus-visible:outline-cyan-200",
         variant === "secondary" &&
@@ -52,7 +52,7 @@ export function IconButton({
       aria-label={label}
       title={label}
       className={cn(
-        "inline-flex h-11 w-11 items-center justify-center rounded-md border border-white/15 bg-white/5 text-current transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300",
+        "inline-flex h-11 w-11 select-none items-center justify-center rounded-md border border-white/15 bg-white/5 text-current transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300",
         className,
       )}
       {...props}
@@ -94,7 +94,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex min-h-7 items-center rounded-md border px-2 text-xs font-medium",
+        "inline-flex min-h-7 select-none items-center rounded-md border px-2 text-xs font-medium",
         tone === "neutral" && "border-slate-300 bg-slate-100 text-slate-700",
         tone === "success" && "border-emerald-300 bg-emerald-50 text-emerald-800",
         tone === "warning" && "border-amber-300 bg-amber-50 text-amber-800",
@@ -171,6 +171,7 @@ export function ProductCard({
   price,
   badge,
   actions,
+  mediaClassName,
 }: {
   title: string;
   description: string;
@@ -178,20 +179,21 @@ export function ProductCard({
   price: ReactNode;
   badge?: ReactNode;
   actions?: ReactNode;
+  mediaClassName?: string;
 }) {
   return (
-    <article className="group grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-md border border-current/15 bg-current/[0.035] shadow-sm transition duration-200 hover:border-current/25">
-      <div className="aspect-[4/3] overflow-hidden bg-black/20">{media}</div>
-      <div className="grid h-full grid-rows-[auto_auto_1fr] gap-4 p-5">
-        <div className="flex min-h-16 items-start justify-between gap-3">
-          <h3 className="line-clamp-2 text-base font-bold leading-7">{title}</h3>
+    <article className="group grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-current/10 bg-current/[0.028] shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-current/20 hover:bg-current/[0.045] hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+      <div className={cn("aspect-[4/3] overflow-hidden bg-black/10", mediaClassName)}>
+        {media}
+      </div>
+      <div className="grid h-full grid-rows-[auto_auto_1fr] gap-3 p-4 sm:p-5">
+        <div className="flex min-h-14 items-start justify-between gap-3">
+          <h3 className="line-clamp-2 text-base font-black leading-7">{title}</h3>
           {badge}
         </div>
-        <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-current/70">
-          {description}
-        </p>
-        <div className="mt-auto grid gap-4 border-t border-current/10 pt-4">
-          <div className="font-bold">{price}</div>
+        <p className="line-clamp-2 min-h-12 text-sm leading-6 text-current/65">{description}</p>
+        <div className="mt-auto grid gap-3 border-t border-current/10 pt-4">
+          <div className="text-lg font-black">{price}</div>
           {actions}
         </div>
       </div>

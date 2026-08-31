@@ -11,6 +11,7 @@ import {
   products,
   variants,
 } from "@ufo/domain";
+import { listAdminFlavors } from "@/lib/admin-flavors";
 import type {
   InventoryItem,
   Product,
@@ -151,6 +152,7 @@ function variantAttribute(variantType: ProductVariantType, valueIds: string[]) {
 function buildDocuments(
   input: AdminProductInput,
   current?: AdminProductRecord,
+  allowedFlavorIds = productFlavorCatalog.map((flavor) => flavor.id),
 ): AdminProductRecord {
   assertInput(input);
   const date = nowIso();
@@ -174,7 +176,7 @@ function buildDocuments(
     variantType === "color"
       ? productColorPalette.map((color) => color.id)
       : variantType === "flavor"
-        ? productFlavorCatalog.map((flavor) => flavor.id)
+        ? allowedFlavorIds
         : [];
   const rawVariantValueIds =
     input.variantValueIds ??
@@ -183,6 +185,12 @@ function buildDocuments(
   const variantValueIds = uniqueIds(rawVariantValueIds).filter((item) =>
     allowedVariantIds.includes(item),
   );
+  if (variantType === "flavor" && variantValueIds.length === 0) {
+    throw new Error("برای محصول طعم‌دار، حداقل یک طعم انتخاب کنید.");
+  }
+  if (variantType === "color" && variantValueIds.length === 0) {
+    throw new Error("برای محصول رنگ‌دار، حداقل یک رنگ انتخاب کنید.");
+  }
   const retailPriceRial = input.retailPriceRial;
   const wholesalePriceRial =
     input.wholesalePriceRial ?? current?.variant.wholesalePriceRial ?? retailPriceRial;
@@ -374,7 +382,8 @@ export async function saveAdminProduct(input: AdminProductInput): Promise<AdminP
   const current = input.id
     ? (await listAdminProducts()).find((row) => row.product.id === input.id)
     : undefined;
-  const row = buildDocuments(input, current);
+  const allowedFlavorIds = (await listAdminFlavors()).map((flavor) => flavor.id);
+  const row = buildDocuments(input, current, allowedFlavorIds);
 
   if (!hasUsableMongoUri()) {
     memoryState.products = upsertMemory(memoryState.products, row.product);

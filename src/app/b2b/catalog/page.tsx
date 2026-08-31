@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -13,10 +12,23 @@ import {
   X,
 } from "lucide-react";
 import { CatalogColorFilter } from "@/components/catalog-color-filter";
+import { CatalogFlavorFilter } from "@/components/catalog-flavor-filter";
+import { CatalogOptionFilter } from "@/components/catalog-option-filter";
 import { CatalogPagination } from "@/components/catalog-pagination";
 import { CatalogPriceRangeFilter } from "@/components/catalog-price-range-filter";
+import { ProductVariantSummary } from "@/components/product-variant-visuals";
+import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { getCatalogRowStock, listCatalogRows, searchCatalogRows } from "@/lib/catalog-data";
-import { getProductImage } from "@/lib/product-images";
+import { listAdminFlavors } from "@/lib/admin-flavors";
+import {
+  aggregateProductResistanceOptions,
+  getProductResistanceOptions,
+} from "@/lib/catalog-technical-filters";
+import { getCategoryImage, getProductImage } from "@/lib/product-images";
+import {
+  aggregateStorefrontVariantOptions,
+  getStorefrontVariantOptions,
+} from "@/lib/storefront-variants";
 import type { AdminProductRecord } from "@/lib/admin-products";
 import { canonical } from "@ufo/seo";
 import { Button, EmptyState, Price, ProductCard } from "@ufo/ui";
@@ -24,8 +36,6 @@ import {
   brands,
   categories,
   getProductColorOptions,
-  getProductVariantOptions,
-  productColorPalette,
 } from "@ufo/domain";
 import type { ProductKind, ProductVariant } from "@ufo/types";
 
@@ -39,6 +49,8 @@ type B2BCatalogSearchParams = {
   brand?: string;
   kind?: ProductKind;
   color?: string;
+  flavor?: string;
+  resistance?: string;
   stock?: "available" | "low" | "preorder";
   minPrice?: string;
   maxPrice?: string;
@@ -112,6 +124,7 @@ function makeHref(params: B2BCatalogSearchParams, page: number) {
 function filterWholesaleProducts(
   rows: AdminProductRecord[],
   params: B2BCatalogSearchParams,
+  flavors: Awaited<ReturnType<typeof listAdminFlavors>>,
   includePriceFilter = true,
 ) {
   const minPrice = parseToman(params.minPrice);
@@ -132,6 +145,18 @@ function filterWholesaleProducts(
       (row) =>
         !params.color ||
         getProductColorOptions(row.product).some((color) => color.id === params.color),
+    )
+    .filter(
+      (row) =>
+        !params.flavor ||
+        getStorefrontVariantOptions(row.product, flavors).some(
+          (option) => option.type === "flavor" && option.id === params.flavor,
+        ),
+    )
+    .filter(
+      (row) =>
+        !params.resistance ||
+        getProductResistanceOptions(row.product).some((option) => option.id === params.resistance),
     )
     .filter((row) => {
       if (!includePriceFilter) return true;
@@ -162,11 +187,42 @@ export default async function B2BCatalogPage({
 }: {
   searchParams?: Promise<B2BCatalogSearchParams>;
 }) {
-  const params = (await searchParams) ?? {};
+  const rawParams = (await searchParams) ?? {};
   const rows = await listCatalogRows();
-  const priceScope = filterWholesaleProducts(rows, params, false);
+  const flavors = await listAdminFlavors();
+  const activeCategory = categories.find((item) => item.slug === rawParams.category);
+  const specialFilterScope = activeCategory
+    ? rows.filter(
+        (row) =>
+          row.product.isActive &&
+          row.product.categoryId === activeCategory.id &&
+          (row.product.salesChannels?.includes("wholesale") ?? true) &&
+          Boolean(getWholesaleVariant(row)),
+      )
+    : [];
+  const colorFilterOptions = activeCategory
+    ? aggregateStorefrontVariantOptions(specialFilterScope, flavors, "color")
+    : [];
+  const flavorFilterOptions = activeCategory
+    ? aggregateStorefrontVariantOptions(specialFilterScope, flavors, "flavor")
+    : [];
+  const resistanceFilterOptions = activeCategory
+    ? aggregateProductResistanceOptions(specialFilterScope)
+    : [];
+  const colorFilterPalette = colorFilterOptions.map((option) => ({
+    id: option.id,
+    labelFa: option.labelFa,
+    hex: option.swatch ?? "",
+  }));
+  const params: B2BCatalogSearchParams = { ...rawParams };
+  if (!colorFilterOptions.some((option) => option.id === rawParams.color)) delete params.color;
+  if (!flavorFilterOptions.some((option) => option.id === rawParams.flavor)) delete params.flavor;
+  if (!resistanceFilterOptions.some((option) => option.id === rawParams.resistance)) {
+    delete params.resistance;
+  }
+  const priceScope = filterWholesaleProducts(rows, params, flavors, false);
   const priceBounds = getWholesalePriceBoundsToman(priceScope);
-  const filtered = filterWholesaleProducts(rows, params);
+  const filtered = filterWholesaleProducts(rows, params, flavors);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(Math.max(Number(params.page ?? 1) || 1, 1), totalPages);
   const pagedProducts = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -341,14 +397,38 @@ export default async function B2BCatalogPage({
                   <option value="preorder">نیازمند هماهنگی</option>
                 </select>
               </label>
-              <label className="grid gap-2 text-sm font-bold text-[#405148]">
-                رنگ
-                <CatalogColorFilter
-                  defaultValue={params.color}
-                  options={productColorPalette}
-                  tone="light"
-                />
-              </label>
+              {flavorFilterOptions.length > 0 ? (
+                <label className="grid gap-2 text-sm font-bold text-[#405148]">
+                  طعم
+                  <CatalogFlavorFilter
+                    defaultValue={params.flavor}
+                    options={flavorFilterOptions}
+                    tone="light"
+                  />
+                </label>
+              ) : null}
+              {colorFilterPalette.length > 0 ? (
+                <label className="grid gap-2 text-sm font-bold text-[#405148]">
+                  رنگ
+                  <CatalogColorFilter
+                    defaultValue={params.color}
+                    options={colorFilterPalette}
+                    tone="light"
+                  />
+                </label>
+              ) : null}
+              {resistanceFilterOptions.length > 0 ? (
+                <label className="grid gap-2 text-sm font-bold text-[#405148]">
+                  مقاومت
+                  <CatalogOptionFilter
+                    name="resistance"
+                    defaultValue={params.resistance}
+                    options={resistanceFilterOptions}
+                    allLabel="همه اهم‌ها"
+                    tone="light"
+                  />
+                </label>
+              ) : null}
             </div>
 
             <CatalogPriceRangeFilter
@@ -421,7 +501,7 @@ export default async function B2BCatalogPage({
                 if (!variant) return null;
                 const available = getWholesaleStock(row);
                 const unitToman = Math.round(variant.wholesalePriceRial / variant.cartonSize / 10);
-                const variantOptions = getProductVariantOptions(product);
+                const variantOptions = getStorefrontVariantOptions(product, flavors);
                 return (
                   <div
                     key={product.id}
@@ -430,15 +510,17 @@ export default async function B2BCatalogPage({
                     <ProductCard
                       title={product.nameFa}
                       description={`حداقل ${new Intl.NumberFormat("fa-IR").format(variant.minWholesaleCartonCount)} کارتن، هر کارتن ${new Intl.NumberFormat("fa-IR").format(variant.cartonSize)} عدد؛ هر عدد حدود ${new Intl.NumberFormat("fa-IR").format(unitToman)} تومان`}
+                      mediaClassName="bg-black"
                       media={
-                        <Image
+                        <StorefrontProductImage
                           key={`media-${product.id}`}
                           src={getProductImage(product)}
+                          fallbackSrc={
+                            getCategoryImage(product.categoryId) ?? "/images/categories/lighter.png"
+                          }
                           alt={product.nameFa}
-                          width={520}
-                          height={390}
-                          loading="lazy"
-                          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
+                          sizes="(min-width: 1280px) 22vw, (min-width: 768px) 42vw, 92vw"
+                          className="h-full w-full object-contain p-4 transition duration-200 group-hover:scale-[1.03] motion-reduce:transition-none"
                         />
                       }
                       badge={
@@ -455,32 +537,7 @@ export default async function B2BCatalogPage({
                             <BadgeCheck size={15} className="text-[#1F8A5B]" aria-hidden="true" />
                             SKU: <span dir="ltr">{variant.sku}</span>
                           </div>
-                          {variantOptions.length > 0 ? (
-                            <div className="flex min-h-6 flex-wrap items-center gap-1 text-xs text-[#596B61]">
-                              {variantOptions.slice(0, 5).map((option) => (
-                                <span
-                                  key={option.id}
-                                  className="inline-flex items-center gap-1 rounded-full border border-[#D5D9C9] bg-white px-2 py-1"
-                                >
-                                  {option.swatch ? (
-                                    <span
-                                      className="h-3 w-3 rounded-full border border-slate-300"
-                                      style={
-                                        option.swatch.startsWith("linear-gradient")
-                                          ? { backgroundImage: option.swatch }
-                                          : { backgroundColor: option.swatch }
-                                      }
-                                      aria-hidden="true"
-                                    />
-                                  ) : null}
-                                  {option.labelFa}
-                                </span>
-                              ))}
-                              {variantOptions.length > 5 ? (
-                                <span>+{variantOptions.length - 5}</span>
-                              ) : null}
-                            </div>
-                          ) : null}
+                          <ProductVariantSummary options={variantOptions} tone="light" />
                           <Link href="/b2b/quick-order">
                             <Button
                               size="sm"

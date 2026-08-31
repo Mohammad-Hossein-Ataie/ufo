@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -12,21 +11,28 @@ import {
 } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { CatalogColorFilter } from "@/components/catalog-color-filter";
+import { CatalogFlavorFilter } from "@/components/catalog-flavor-filter";
+import { CatalogOptionFilter } from "@/components/catalog-option-filter";
 import { CatalogPagination } from "@/components/catalog-pagination";
 import { CatalogPriceRangeFilter } from "@/components/catalog-price-range-filter";
+import { ProductVariantSummary } from "@/components/product-variant-visuals";
+import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { getCatalogRowStock, listCatalogRows, searchCatalogRows } from "@/lib/catalog-data";
-import { getProductImage } from "@/lib/product-images";
+import { listAdminFlavors } from "@/lib/admin-flavors";
+import {
+  aggregateProductResistanceOptions,
+  getProductResistanceOptions,
+} from "@/lib/catalog-technical-filters";
+import { getCategoryImage, getProductImage } from "@/lib/product-images";
+import {
+  aggregateStorefrontVariantOptions,
+  getStorefrontVariantOptions,
+} from "@/lib/storefront-variants";
 import type { AdminProductRecord } from "@/lib/admin-products";
 import { canonical, itemListJsonLd, jsonLdScriptProps } from "@ufo/seo";
 import { Badge, Button, EmptyState, Price, ProductCard, StockStatus } from "@ufo/ui";
-import {
-  brands,
-  categories,
-  getProductColorOptions,
-  getProductVariantOptions,
-  productColorPalette,
-} from "@ufo/domain";
-import type { ProductKind } from "@ufo/types";
+import { brands, categories, getProductColorOptions } from "@ufo/domain";
+import type { ProductFlavor, ProductKind } from "@ufo/types";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +44,8 @@ type ProductSearchParams = {
   brand?: string;
   kind?: ProductKind;
   color?: string;
+  flavor?: string;
+  resistance?: string;
   stock?: "available" | "low" | "preorder";
   minPrice?: string;
   maxPrice?: string;
@@ -116,6 +124,7 @@ function getPriceBoundsToman(items: AdminProductRecord[]) {
 function filterProducts(
   rows: AdminProductRecord[],
   params: ProductSearchParams,
+  flavors: ProductFlavor[],
   includePriceFilter = true,
 ) {
   const minPrice = parseToman(params.minPrice);
@@ -135,6 +144,18 @@ function filterProducts(
       (row) =>
         !params.color ||
         getProductColorOptions(row.product).some((color) => color.id === params.color),
+    )
+    .filter(
+      (row) =>
+        !params.flavor ||
+        getStorefrontVariantOptions(row.product, flavors).some(
+          (option) => option.type === "flavor" && option.id === params.flavor,
+        ),
+    )
+    .filter(
+      (row) =>
+        !params.resistance ||
+        getProductResistanceOptions(row.product).some((option) => option.id === params.resistance),
     )
     .filter((row) => {
       if (!includePriceFilter) return true;
@@ -163,15 +184,39 @@ export default async function ProductsPage({
 }: {
   searchParams?: Promise<ProductSearchParams>;
 }) {
-  const params = (await searchParams) ?? {};
+  const rawParams = (await searchParams) ?? {};
   const rows = await listCatalogRows();
-  const priceScope = filterProducts(rows, params, false);
+  const flavors = await listAdminFlavors();
+  const activeCategory = categories.find((item) => item.slug === rawParams.category);
+  const specialFilterScope = activeCategory
+    ? rows.filter((row) => row.product.isActive && row.product.categoryId === activeCategory.id)
+    : [];
+  const colorFilterOptions = activeCategory
+    ? aggregateStorefrontVariantOptions(specialFilterScope, flavors, "color")
+    : [];
+  const flavorFilterOptions = activeCategory
+    ? aggregateStorefrontVariantOptions(specialFilterScope, flavors, "flavor")
+    : [];
+  const resistanceFilterOptions = activeCategory
+    ? aggregateProductResistanceOptions(specialFilterScope)
+    : [];
+  const colorFilterPalette = colorFilterOptions.map((option) => ({
+    id: option.id,
+    labelFa: option.labelFa,
+    hex: option.swatch ?? "",
+  }));
+  const params: ProductSearchParams = { ...rawParams };
+  if (!colorFilterOptions.some((option) => option.id === rawParams.color)) delete params.color;
+  if (!flavorFilterOptions.some((option) => option.id === rawParams.flavor)) delete params.flavor;
+  if (!resistanceFilterOptions.some((option) => option.id === rawParams.resistance)) {
+    delete params.resistance;
+  }
+  const priceScope = filterProducts(rows, params, flavors, false);
   const priceBounds = getPriceBoundsToman(priceScope);
-  const filtered = filterProducts(rows, params);
+  const filtered = filterProducts(rows, params, flavors);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(Math.max(Number(params.page ?? 1) || 1, 1), totalPages);
   const pagedProducts = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  const activeCategory = categories.find((item) => item.slug === params.category);
   const activeBrand = brands.find((item) => item.id === params.brand);
   const jsonLd = itemListJsonLd(
     filtered
@@ -187,7 +232,7 @@ export default async function ProductsPage({
       <section className="showcase-grid border-b border-retail-border bg-retail-surface">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 lg:grid-cols-[1fr_22rem] lg:py-14">
           <div className="reveal-up">
-            <span className="inline-flex items-center gap-2 rounded-full border border-retail-border bg-white/5 px-3 py-1 text-xs font-medium text-retail-secondary">
+            <span className="inline-flex select-none items-center gap-2 rounded-full border border-retail-border bg-white/5 px-3 py-1 text-xs font-medium text-retail-secondary">
               <Sparkles size={14} className="text-retail-accent-2" aria-hidden="true" />
               کاتالوگ خرده‌فروشی یوفوپاف
             </span>
@@ -195,13 +240,12 @@ export default async function ProductsPage({
               انتخاب سریع پاد، ویپ و لوازم مصرفی با فیلتر دقیق
             </h1>
             <p className="mt-3 max-w-3xl leading-8 text-retail-secondary">
-              محصول را بر اساس برند، دسته، موجودی و بازه قیمت محدود کنید؛ هر صفحه فقط تعداد مشخصی
-              کارت نشان می‌دهد تا خرید بدون اسکرول طولانی انجام شود.
+              محصول را بر اساس برند، دسته، طعم، رنگ، موجودی و بازه قیمت محدود کنید.
             </p>
           </div>
           <div className="reveal-up-delay-1 grid gap-3 rounded-retail border border-retail-border bg-retail-bg/70 p-5">
             <div className="flex items-center gap-3">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-retail-accent/10 text-retail-accent">
+              <span className="inline-flex h-11 w-11 select-none items-center justify-center rounded-full bg-retail-accent/10 text-retail-accent">
                 <ShieldCheck size={22} aria-hidden="true" />
               </span>
               <div>
@@ -214,8 +258,16 @@ export default async function ProductsPage({
             <div className="flex flex-wrap gap-2">
               {activeCategory ? <Badge tone="info">{activeCategory.nameFa}</Badge> : null}
               {activeBrand ? <Badge tone="success">{activeBrand.nameFa}</Badge> : null}
+              {params.flavor ? <Badge tone="info">فیلتر طعم فعال</Badge> : null}
+              {params.color ? <Badge tone="info">فیلتر رنگ فعال</Badge> : null}
+              {params.resistance ? <Badge tone="info">فیلتر اهم فعال</Badge> : null}
               {params.stock ? <Badge tone="warning">فیلتر موجودی فعال</Badge> : null}
-              {!activeCategory && !activeBrand && !params.stock ? (
+              {!activeCategory &&
+              !activeBrand &&
+              !params.stock &&
+              !params.flavor &&
+              !params.color &&
+              !params.resistance ? (
                 <Badge tone="success">همه محصولات</Badge>
               ) : null}
             </div>
@@ -306,14 +358,38 @@ export default async function ProductsPage({
                   <option value="preorder">پیش‌سفارش</option>
                 </select>
               </label>
-              <label className="grid gap-2 text-sm text-retail-secondary">
-                رنگ
-                <CatalogColorFilter
-                  defaultValue={params.color}
-                  options={productColorPalette}
-                  tone="dark"
-                />
-              </label>
+              {flavorFilterOptions.length > 0 ? (
+                <label className="grid gap-2 text-sm text-retail-secondary">
+                  طعم
+                  <CatalogFlavorFilter
+                    defaultValue={params.flavor}
+                    options={flavorFilterOptions}
+                    tone="dark"
+                  />
+                </label>
+              ) : null}
+              {colorFilterPalette.length > 0 ? (
+                <label className="grid gap-2 text-sm text-retail-secondary">
+                  رنگ
+                  <CatalogColorFilter
+                    defaultValue={params.color}
+                    options={colorFilterPalette}
+                    tone="dark"
+                  />
+                </label>
+              ) : null}
+              {resistanceFilterOptions.length > 0 ? (
+                <label className="grid gap-2 text-sm text-retail-secondary">
+                  مقاومت
+                  <CatalogOptionFilter
+                    name="resistance"
+                    defaultValue={params.resistance}
+                    options={resistanceFilterOptions}
+                    allLabel="همه اهم‌ها"
+                    tone="dark"
+                  />
+                </label>
+              ) : null}
             </div>
 
             <CatalogPriceRangeFilter
@@ -340,13 +416,13 @@ export default async function ProductsPage({
             </label>
 
             <div className="grid grid-cols-2 gap-2">
-              <button className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-retail-accent bg-retail-accent px-4 text-sm font-bold text-retail-bg transition hover:bg-retail-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent">
+              <button className="inline-flex min-h-11 select-none items-center justify-center gap-2 rounded-md border border-retail-accent bg-retail-accent px-4 text-sm font-bold text-retail-bg transition hover:bg-retail-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent">
                 <Filter size={16} aria-hidden="true" />
                 اعمال
               </button>
               <Link
                 href="/products"
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-retail-border px-4 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
+                className="inline-flex min-h-11 select-none items-center justify-center gap-2 rounded-md border border-retail-border px-4 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
               >
                 <X size={16} aria-hidden="true" />
                 پاک کردن
@@ -372,7 +448,7 @@ export default async function ProductsPage({
 
           {pagedProducts.length === 0 ? (
             <EmptyState title="محصولی با این فیلتر پیدا نشد">
-              بازه قیمت، برند یا دسته‌بندی را تغییر دهید تا نتایج بیشتری ببینید.
+              بازه قیمت، برند، طعم، رنگ یا دسته‌بندی را تغییر دهید تا نتایج بیشتری ببینید.
             </EmptyState>
           ) : (
             <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -380,73 +456,48 @@ export default async function ProductsPage({
                 const product = row.product;
                 const variant = row.variant;
                 const available = getCatalogRowStock(row);
-                const variantOptions = getProductVariantOptions(product);
+                const variantOptions = getStorefrontVariantOptions(product, flavors);
                 return (
-                  <div
+                  <ProductCard
                     key={product.id}
-                    className="h-full rounded-retail transition-shadow hover:shadow-retail-lg"
-                  >
-                    <ProductCard
-                      title={product.nameFa}
-                      description={product.shortDescriptionFa}
-                      media={
-                        <Image
-                          key={`media-${product.id}`}
-                          src={getProductImage(product)}
-                          alt={product.nameFa}
-                          width={520}
-                          height={390}
-                          loading="lazy"
-                          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
-                        />
-                      }
-                      badge={<StockStatus key={`stock-${product.id}`} available={available} />}
-                      price={
-                        <Price key={`price-${product.id}`} valueRial={variant.retailPriceRial} />
-                      }
-                      actions={
-                        <div key={`actions-${product.id}`} className="grid w-full gap-2">
-                          {variantOptions.length > 0 ? (
-                            <div className="flex min-h-6 flex-wrap items-center gap-1 text-xs text-[#9BA7B4]">
-                              {variantOptions.slice(0, 5).map((option) => (
-                                <span
-                                  key={option.id}
-                                  className="inline-flex items-center gap-1 rounded-full border border-[#22303D] bg-white/5 px-2 py-1"
-                                >
-                                  {option.swatch ? (
-                                    <span
-                                      className="h-3 w-3 rounded-full border border-white/30"
-                                      style={
-                                        option.swatch.startsWith("linear-gradient")
-                                          ? { backgroundImage: option.swatch }
-                                          : { backgroundColor: option.swatch }
-                                      }
-                                      aria-hidden="true"
-                                    />
-                                  ) : null}
-                                  {option.labelFa}
-                                </span>
-                              ))}
-                              {variantOptions.length > 5 ? (
-                                <span>+{variantOptions.length - 5}</span>
-                              ) : null}
-                            </div>
-                          ) : null}
-                          <Link href={`/products/${product.slug}`} className="w-full">
-                            <Button size="sm" variant="ghost" className="w-full">
-                              جزئیات
-                              <ArrowLeft size={16} aria-hidden="true" />
-                            </Button>
-                          </Link>
+                    title={product.nameFa}
+                    description={product.shortDescriptionFa}
+                    mediaClassName="bg-white"
+                    media={
+                      <StorefrontProductImage
+                        key={`media-${product.id}`}
+                        src={getProductImage(product)}
+                        fallbackSrc={
+                          getCategoryImage(product.categoryId) ?? "/images/categories/lighter.png"
+                        }
+                        alt={product.nameFa}
+                        className="h-full w-full object-contain p-4 transition duration-200 group-hover:scale-[1.03] motion-reduce:transition-none"
+                      />
+                    }
+                    badge={<StockStatus key={`stock-${product.id}`} available={available} />}
+                    price={
+                      <Price key={`price-${product.id}`} valueRial={variant.retailPriceRial} />
+                    }
+                    actions={
+                      <div key={`actions-${product.id}`} className="grid w-full gap-3">
+                        <ProductVariantSummary options={variantOptions} />
+                        <Link href={`/products/${product.slug}`} className="w-full">
+                          <Button size="sm" variant="ghost" className="w-full">
+                            جزئیات
+                            <ArrowLeft size={16} aria-hidden="true" />
+                          </Button>
+                        </Link>
+                        {variantOptions.length === 0 ? (
                           <AddToCartButton
                             variantId={variant.id}
                             label="افزودن به سبد خرید"
+                            enableQuantity
                             maxQuantity={available > 0 ? available : undefined}
                           />
-                        </div>
-                      }
-                    />
-                  </div>
+                        ) : null}
+                      </div>
+                    }
+                  />
                 );
               })}
             </div>

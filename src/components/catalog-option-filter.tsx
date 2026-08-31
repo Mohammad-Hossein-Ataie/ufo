@@ -2,27 +2,23 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
-import type { ProductColorOption } from "@ufo/domain";
+import type { CatalogTechnicalOption } from "@/lib/catalog-technical-filters";
 
-interface CatalogColorFilterProps {
-  name?: string;
+interface CatalogOptionFilterProps {
+  name: string;
   defaultValue?: string | undefined;
-  options: ProductColorOption[];
+  options: CatalogTechnicalOption[];
+  allLabel: string;
   tone?: "dark" | "light";
 }
 
-function colorStyle(color: ProductColorOption) {
-  return color.hex.startsWith("linear-gradient")
-    ? { backgroundImage: color.hex }
-    : { backgroundColor: color.hex };
-}
-
-export function CatalogColorFilter({
-  name = "color",
+export function CatalogOptionFilter({
+  name,
   defaultValue,
   options,
+  allLabel,
   tone = "dark",
-}: CatalogColorFilterProps) {
+}: CatalogOptionFilterProps) {
   const [value, setValue] = useState(defaultValue ?? "");
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -51,16 +47,7 @@ export function CatalogColorFilter({
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span className="inline-flex min-w-0 items-center gap-2">
-          {selected ? (
-            <span
-              className="h-4 w-4 shrink-0 rounded-full border border-current/25"
-              style={colorStyle(selected)}
-              aria-hidden="true"
-            />
-          ) : null}
-          <span className="truncate">{selected ? selected.labelFa : "همه رنگ‌ها"}</span>
-        </span>
+        <span className="truncate">{selected ? selected.labelFa : allLabel}</span>
         <ChevronDown size={16} aria-hidden="true" />
       </button>
 
@@ -73,7 +60,7 @@ export function CatalogColorFilter({
           }`}
           role="listbox"
         >
-          {[{ id: "", labelFa: "همه رنگ‌ها", hex: "" }, ...options].map((option) => {
+          {[{ id: "", labelFa: allLabel }, ...options].map((option) => {
             const active = option.id === value;
             return (
               <button
@@ -95,18 +82,7 @@ export function CatalogColorFilter({
                 role="option"
                 aria-selected={active}
               >
-                <span className="inline-flex min-w-0 items-center gap-2">
-                  {option.id ? (
-                    <span
-                      className="h-4 w-4 shrink-0 rounded-full border border-current/25"
-                      style={colorStyle(option)}
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <span className="h-4 w-4 shrink-0 rounded-full border border-current/25 bg-transparent" />
-                  )}
-                  <span className="truncate">{option.labelFa}</span>
-                </span>
+                <span className="truncate">{option.labelFa}</span>
                 {active ? <Check size={15} aria-hidden="true" /> : null}
               </button>
             );

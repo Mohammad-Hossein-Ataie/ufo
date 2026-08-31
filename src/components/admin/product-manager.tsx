@@ -997,7 +997,11 @@ export function ProductManager() {
                       <Palette size={18} className="text-[#168BFF]" aria-hidden="true" />
                       <h3 className="font-black">نوع تنوع محصول</h3>
                     </div>
-                    <div className="grid gap-2 md:grid-cols-3" role="radiogroup" aria-label="نوع تنوع محصول">
+                    <div
+                      className="grid gap-2 md:grid-cols-3"
+                      role="radiogroup"
+                      aria-label="نوع تنوع محصول"
+                    >
                       {[
                         { value: "none" as const, label: "بدون تنوع", icon: CircleOff },
                         { value: "flavor" as const, label: "طعم", icon: Sparkles },
@@ -1066,7 +1070,12 @@ export function ProductManager() {
                               افزودن طعم جدید
                             </Button>
                           ) : null}
-                          <Button type="button" size="sm" variant="secondary" onClick={applySuggestedVariantValues}>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="secondary"
+                            onClick={applySuggestedVariantValues}
+                          >
                             پیشنهاد بر اساس نوع
                           </Button>
                           <Button
@@ -1159,11 +1168,17 @@ export function ProductManager() {
                                     aria-hidden="true"
                                   />
                                 ) : (
-                                  <Sparkles size={16} className="shrink-0 text-[#168BFF]" aria-hidden="true" />
+                                  <Sparkles
+                                    size={16}
+                                    className="shrink-0 text-[#168BFF]"
+                                    aria-hidden="true"
+                                  />
                                 )}
                                 <span className="truncate">{option.labelFa}</span>
                               </span>
-                              {active ? <Check size={16} className="shrink-0" aria-hidden="true" /> : null}
+                              {active ? (
+                                <Check size={16} className="shrink-0" aria-hidden="true" />
+                              ) : null}
                             </button>
                           );
                         })}
@@ -1605,6 +1620,91 @@ export function ProductManager() {
                   ذخیره محصول
                 </Button>
               </div>
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+
+      <DialogPrimitive.Root open={isFlavorDialogOpen} onOpenChange={setIsFlavorDialogOpen}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-[70] bg-slate-950/45 backdrop-blur-sm" />
+          <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-[80] grid w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-md border border-[#D7DDE4] bg-white p-5 text-[#17202A] shadow-2xl">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <DialogPrimitive.Title className="text-lg font-black">
+                  افزودن طعم جدید
+                </DialogPrimitive.Title>
+                <DialogPrimitive.Description className="mt-1 text-sm leading-6 text-[#5F6C79]">
+                  طعم ذخیره‌شده بلافاصله به همین محصول اضافه می‌شود.
+                </DialogPrimitive.Description>
+              </div>
+              <DialogPrimitive.Close asChild>
+                <IconButton
+                  label="بستن"
+                  className="h-9 w-9 border-[#D7DDE4] bg-white text-[#17202A]"
+                >
+                  <X size={16} aria-hidden="true" />
+                </IconButton>
+              </DialogPrimitive.Close>
+            </div>
+
+            <div className="grid gap-3">
+              <label className="grid gap-1 text-sm font-bold">
+                نام فارسی
+                <Input
+                  value={newFlavor.nameFa}
+                  onChange={(event) =>
+                    setNewFlavor((current) => ({ ...current, nameFa: event.target.value }))
+                  }
+                />
+              </label>
+              <label className="grid gap-1 text-sm font-bold">
+                نام انگلیسی
+                <Input
+                  dir="ltr"
+                  value={newFlavor.nameEn}
+                  onChange={(event) =>
+                    setNewFlavor((current) => ({ ...current, nameEn: event.target.value }))
+                  }
+                  placeholder="Watermelon Ice"
+                />
+              </label>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="grid gap-1 text-sm font-bold">
+                  slug
+                  <Input
+                    dir="ltr"
+                    value={newFlavor.slug}
+                    onChange={(event) =>
+                      setNewFlavor((current) => ({ ...current, slug: event.target.value }))
+                    }
+                    placeholder="watermelon-ice"
+                  />
+                </label>
+                <label className="grid gap-1 text-sm font-bold">
+                  کلید یا ایموجی آیکن
+                  <Input
+                    dir="auto"
+                    value={newFlavor.iconKey}
+                    onChange={(event) =>
+                      setNewFlavor((current) => ({ ...current, iconKey: event.target.value }))
+                    }
+                    placeholder="watermelon یا 🍉"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-[#D7DDE4] pt-4">
+              <DialogPrimitive.Close asChild>
+                <Button type="button" variant="secondary">
+                  انصراف
+                </Button>
+              </DialogPrimitive.Close>
+              <Button type="button" onClick={createFlavor} disabled={loading}>
+                <Plus size={17} aria-hidden="true" />
+                ذخیره طعم
+              </Button>
             </div>
           </DialogPrimitive.Content>
         </DialogPrimitive.Portal>

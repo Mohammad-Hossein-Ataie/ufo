@@ -4,16 +4,24 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeCheck, Box, Film, ListChecks, ShieldCheck } from "lucide-react";
 import { ProductDetailClient } from "@/components/product-detail-client";
+import { ProductVariantSummary } from "@/components/product-variant-visuals";
+import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { findCatalogRowBySlug, getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
-import { getProductImage, getProductImages, getProductVariantImages } from "@/lib/product-images";
+import { listAdminFlavors } from "@/lib/admin-flavors";
+import {
+  getCategoryImage,
+  getProductImage,
+  getProductImages,
+  getProductVariantImages,
+} from "@/lib/product-images";
+import { getStorefrontVariantOptions } from "@/lib/storefront-variants";
 import { rewriteLiaraPublicUrl } from "@ufo/storage";
 import {
   brands,
   categories,
-  getProductVariantOptions,
   getProductVariantType,
-  productFlavorAttributeTechnicalValue,
   productColorAttributeTechnicalValue,
+  productFlavorAttributeTechnicalValue,
 } from "@ufo/domain";
 import { breadcrumbJsonLd, jsonLdScriptProps, productJsonLd } from "@ufo/seo";
 import { Button, Price, ProductCard, StockStatus } from "@ufo/ui";
@@ -50,15 +58,13 @@ function renderRichDescription(description: string) {
     if (imageMatch?.groups?.url) {
       const imageUrl = rewriteLiaraPublicUrl(imageMatch.groups.url);
       return (
-        <figure
-          key={`${block}-${index}`}
-          className="overflow-hidden rounded-md border border-[#22303D] bg-[#0D1117]"
-        >
+        <figure key={`${block}-${index}`} className="overflow-hidden rounded-xl bg-white/[0.04]">
           <div className="relative aspect-[16/10]">
             <Image
               src={imageUrl}
               alt={imageMatch.groups.alt || "تصویر توضیحات محصول"}
               fill
+              unoptimized
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
             />
@@ -74,14 +80,14 @@ function renderRichDescription(description: string) {
       return isFileVideo ? (
         <video
           key={`${block}-${index}`}
-          className="aspect-video w-full rounded-md border border-[#22303D] bg-black"
+          className="aspect-video w-full rounded-xl bg-black"
           src={url}
           controls
         />
       ) : (
         <iframe
           key={`${block}-${index}`}
-          className="aspect-video w-full rounded-md border border-[#22303D] bg-black"
+          className="aspect-video w-full rounded-xl bg-black"
           src={youtubeEmbedUrl(url)}
           title="ویدیو محصول"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -139,7 +145,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const galleryImages = getProductImages(product);
   const variantImages = getProductVariantImages(product);
   const variantType = getProductVariantType(product);
-  const variantOptions = getProductVariantOptions(product);
+  const flavors = await listAdminFlavors();
+  const variantOptions = getStorefrontVariantOptions(product, flavors);
   const relatedRows = (await listCatalogRows())
     .filter(
       (item) =>
@@ -159,7 +166,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <main id="main-content" className="bg-retail-bg text-retail-primary">
       <script {...jsonLdScriptProps(jsonLd)} />
       <script {...jsonLdScriptProps(breadcrumb)} />
-      <div className="mx-auto max-w-7xl px-4 py-10">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:py-10">
         <nav aria-label="مسیر صفحه" className="mb-5 text-sm text-[#9BA7B4]">
           <Link href="/products" className="hover:text-cyan-200">
             محصولات
@@ -187,16 +194,16 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           variantOptions={variantOptions}
         />
 
-        <section className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_25rem]">
-          <div className="rounded-md border border-[#22303D] bg-[#0D1117] p-5">
-            <h2 className="inline-flex items-center gap-2 text-2xl font-black">
+        <section className="mt-10 grid gap-5 lg:grid-cols-[minmax(0,1fr)_24rem]">
+          <div className="rounded-xl bg-[#0D1117] p-5 ring-1 ring-white/10">
+            <h2 className="inline-flex items-center gap-2 text-xl font-black">
               <Film size={22} className="text-cyan-300" aria-hidden="true" />
-              توضیحات محصول
+              توضیحات
             </h2>
             <div className="mt-4 grid gap-4">{renderRichDescription(product.descriptionFa)}</div>
           </div>
-          <div className="rounded-md border border-[#22303D] bg-[#0D1117] p-5">
-            <h2 className="inline-flex items-center gap-2 text-2xl font-black">
+          <div className="rounded-xl bg-[#0D1117] p-5 ring-1 ring-white/10">
+            <h2 className="inline-flex items-center gap-2 text-xl font-black">
               <ListChecks size={22} className="text-cyan-300" aria-hidden="true" />
               مشخصات
             </h2>
@@ -204,7 +211,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               {(product.specs ?? []).map((spec) => (
                 <div
                   key={`${spec.labelFa}-${spec.valueFa}`}
-                  className="flex justify-between rounded-md border border-[#22303D] p-3"
+                  className="flex justify-between gap-3 border-b border-white/10 py-2 last:border-b-0"
                 >
                   <dt className="text-[#9BA7B4]">{spec.labelFa}</dt>
                   <dd>{spec.valueFa}</dd>
@@ -219,37 +226,19 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 .map((attribute) => (
                   <div
                     key={`${attribute.nameFa}-${attribute.valueFa}`}
-                    className="flex justify-between rounded-md border border-[#22303D] p-3"
+                    className="flex justify-between gap-3 border-b border-white/10 py-2 last:border-b-0"
                   >
                     <dt className="text-[#9BA7B4]">{attribute.nameFa}</dt>
                     <dd>{attribute.valueFa}</dd>
                   </div>
                 ))}
               {variantOptions.length > 0 ? (
-                <div className="rounded-md border border-[#22303D] p-3">
+                <div className="pt-2">
                   <dt className="text-[#9BA7B4]">
                     {variantType === "flavor" ? "طعم‌های قابل انتخاب" : "رنگ‌های قابل سفارش"}
                   </dt>
-                  <dd className="mt-2 flex flex-wrap gap-2">
-                    {variantOptions.map((option) => (
-                      <span
-                        key={option.id}
-                        className="inline-flex items-center gap-2 rounded-md bg-white/5 px-2 py-1 text-sm"
-                      >
-                        {option.swatch ? (
-                          <span
-                            className="h-4 w-4 rounded-full border border-white/30"
-                            style={
-                              option.swatch.startsWith("linear-gradient")
-                                ? { backgroundImage: option.swatch }
-                                : { backgroundColor: option.swatch }
-                            }
-                            aria-hidden="true"
-                          />
-                        ) : null}
-                        {option.labelFa}
-                      </span>
-                    ))}
+                  <dd className="mt-2">
+                    <ProductVariantSummary options={variantOptions} />
                   </dd>
                 </div>
               ) : null}
@@ -258,10 +247,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         </section>
 
         {product.highlightsFa?.length || product.packageItemsFa?.length ? (
-          <section className="mt-10 grid gap-6 lg:grid-cols-2">
+          <section className="mt-10 grid gap-5 lg:grid-cols-2">
             {product.highlightsFa?.length ? (
-              <div className="rounded-md border border-[#22303D] bg-[#0D1117] p-5">
-                <h2 className="inline-flex items-center gap-2 text-2xl font-black">
+              <div className="rounded-xl bg-[#0D1117] p-5 ring-1 ring-white/10">
+                <h2 className="inline-flex items-center gap-2 text-xl font-black">
                   <ShieldCheck size={22} className="text-[#20F28B]" aria-hidden="true" />
                   مزایا
                 </h2>
@@ -280,8 +269,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </div>
             ) : null}
             {product.packageItemsFa?.length ? (
-              <div className="rounded-md border border-[#22303D] bg-[#0D1117] p-5">
-                <h2 className="inline-flex items-center gap-2 text-2xl font-black">
+              <div className="rounded-xl bg-[#0D1117] p-5 ring-1 ring-white/10">
+                <h2 className="inline-flex items-center gap-2 text-xl font-black">
                   <Box size={22} className="text-cyan-300" aria-hidden="true" />
                   محتویات بسته
                 </h2>
@@ -304,7 +293,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               <h2 className="text-2xl font-black">محصولات مرتبط</h2>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-1 text-sm font-bold text-cyan-300"
+                className="inline-flex select-none items-center gap-1 text-sm font-bold text-cyan-300"
               >
                 همه محصولات
                 <ArrowLeft size={16} aria-hidden="true" />
@@ -315,28 +304,34 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 const related = relatedRow.product;
                 const relatedVariant = relatedRow.variant;
                 const relatedAvailable = getCatalogRowStock(relatedRow);
+                const relatedVariantOptions = getStorefrontVariantOptions(related, flavors);
                 return (
                   <ProductCard
                     key={related.id}
                     title={related.nameFa}
                     description={related.shortDescriptionFa}
+                    mediaClassName="bg-white"
                     media={
-                      <Image
+                      <StorefrontProductImage
                         src={getProductImage(related)}
+                        fallbackSrc={
+                          getCategoryImage(related.categoryId) ?? "/images/categories/lighter.png"
+                        }
                         alt={related.nameFa}
-                        width={520}
-                        height={390}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-contain p-3 transition duration-200 group-hover:scale-[1.03] motion-reduce:transition-none"
                       />
                     }
                     badge={<StockStatus available={relatedAvailable} />}
                     price={<Price valueRial={relatedVariant.retailPriceRial} />}
                     actions={
-                      <Link href={`/products/${related.slug}`}>
-                        <Button size="sm" variant="ghost" className="w-full">
-                          جزئیات
-                        </Button>
-                      </Link>
+                      <div className="grid gap-3">
+                        <ProductVariantSummary options={relatedVariantOptions} />
+                        <Link href={`/products/${related.slug}`}>
+                          <Button size="sm" variant="ghost" className="w-full">
+                            جزئیات
+                          </Button>
+                        </Link>
+                      </div>
                     }
                   />
                 );

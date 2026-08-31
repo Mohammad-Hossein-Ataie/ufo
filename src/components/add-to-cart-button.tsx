@@ -166,7 +166,7 @@ export function AddToCartButton({
           type="button"
           size="sm"
           onClick={() => setRetailQuantity(firstQuantity)}
-          className="min-w-40"
+          className="w-full min-w-40 select-none"
         >
           <ShoppingCart size={16} aria-hidden="true" />
           {label}
@@ -175,11 +175,11 @@ export function AddToCartButton({
     }
 
     return (
-      <div className="grid w-full gap-2 sm:w-auto" aria-label="انتخاب تعداد">
-        <div className="inline-flex min-h-10 items-center overflow-hidden rounded-md border border-current/20 bg-current/[0.04]">
+      <div className="grid w-full gap-2" aria-label="انتخاب تعداد">
+        <div className="inline-flex min-h-10 w-full items-center justify-between overflow-hidden rounded-md border border-current/20 bg-current/[0.04]">
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent disabled:cursor-not-allowed disabled:opacity-45"
+            className="inline-flex h-10 w-12 select-none items-center justify-center transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent disabled:cursor-not-allowed disabled:opacity-45"
             aria-label="کاهش تعداد"
             onClick={() => setRetailQuantity(selectedQuantity - 1)}
           >
@@ -193,7 +193,7 @@ export function AddToCartButton({
           </output>
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent disabled:cursor-not-allowed disabled:opacity-45"
+            className="inline-flex h-10 w-12 select-none items-center justify-center transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent disabled:cursor-not-allowed disabled:opacity-45"
             aria-label="افزایش تعداد"
             disabled={!canIncrease}
             onClick={() => setRetailQuantity(selectedQuantity + 1)}
@@ -205,7 +205,7 @@ export function AddToCartButton({
           type="button"
           size="sm"
           onClick={() => setRetailQuantity(selectedQuantity)}
-          className="min-w-40"
+          className="w-full min-w-40 select-none"
         >
           <ShoppingCart size={16} aria-hidden="true" />
           {added
@@ -217,7 +217,7 @@ export function AddToCartButton({
   }
 
   return (
-    <Button type="button" size="sm" onClick={() => addToCart()}>
+    <Button type="button" size="sm" onClick={() => addToCart()} className="select-none">
       <ShoppingCart size={16} aria-hidden="true" />
       {added ? "اضافه شد" : label}
     </Button>

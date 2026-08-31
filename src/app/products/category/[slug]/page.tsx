@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button, Price, ProductCard, StockStatus } from "@ufo/ui";
 import { categories } from "@ufo/domain";
+import { ProductVariantSummary } from "@/components/product-variant-visuals";
+import { StorefrontProductImage } from "@/components/storefront-product-image";
+import { listAdminFlavors } from "@/lib/admin-flavors";
 import { getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
-import { getProductImage } from "@/lib/product-images";
+import { getCategoryImage, getProductImage } from "@/lib/product-images";
+import { getStorefrontVariantOptions } from "@/lib/storefront-variants";
 import {
   breadcrumbJsonLd,
   categoryMetadata,
@@ -46,6 +49,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const categoryRows = (await listCatalogRows()).filter(
     (row) => row.product.isActive && row.product.categoryId === category.id,
   );
+  const flavors = await listAdminFlavors();
   if (categoryRows.length === 0) notFound();
 
   const breadcrumb = breadcrumbJsonLd([
@@ -98,30 +102,41 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           const product = row.product;
           const variant = row.variant;
           const available = getCatalogRowStock(row);
+          const variantOptions = getStorefrontVariantOptions(product, flavors);
           return (
             <ProductCard
               key={product.id}
               title={product.nameFa}
               description={product.shortDescriptionFa}
+              mediaClassName="bg-white"
               media={
-                <Image
+                <StorefrontProductImage
                   src={getProductImage(product)}
+                  fallbackSrc={
+                    getCategoryImage(product.categoryId) ?? "/images/categories/lighter.png"
+                  }
                   alt={product.nameFa}
-                  width={520}
-                  height={390}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain p-4 transition duration-200 group-hover:scale-[1.03] motion-reduce:transition-none"
                 />
               }
               badge={<StockStatus available={available} />}
               price={<Price valueRial={variant.retailPriceRial} />}
               actions={
-                <div className="grid w-full gap-2">
+                <div className="grid w-full gap-3">
+                  <ProductVariantSummary options={variantOptions} />
                   <Link href={`/products/${product.slug}`}>
                     <Button size="sm" variant="ghost" className="w-full">
                       جزئیات
                     </Button>
                   </Link>
-                  <AddToCartButton variantId={variant.id} label="افزودن به سبد خرید" />
+                  {variantOptions.length === 0 ? (
+                    <AddToCartButton
+                      variantId={variant.id}
+                      label="افزودن به سبد خرید"
+                      enableQuantity
+                      maxQuantity={available > 0 ? available : undefined}
+                    />
+                  ) : null}
                 </div>
               }
             />
