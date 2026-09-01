@@ -16,7 +16,13 @@ function parseImageMap(value: unknown): Record<string, string> {
 }
 
 function parseVariantType(value: unknown): ProductVariantType | undefined {
-  return value === "flavor" || value === "color" || value === "none" ? value : undefined;
+  return value === "flavor" ||
+    value === "color" ||
+    value === "resistance" ||
+    value === "capacity" ||
+    value === "none"
+    ? value
+    : undefined;
 }
 
 function parseInput(body: unknown): AdminProductInput {

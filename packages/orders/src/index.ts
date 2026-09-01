@@ -4,6 +4,7 @@ import {
   createOrderItemSnapshot,
   getProductFlavorOptions,
   getProductColorOptions,
+  getProductVariantOptions,
   products,
   quoteShipping,
   variants,
@@ -69,6 +70,13 @@ export interface ChatMessageRecord {
   readByAdminAt?: string;
   readByCustomerAt?: string;
   createdAt: string;
+}
+
+function getSelectedVariantLabel(type: Exclude<ProductVariantType, "none">) {
+  if (type === "flavor") return "طعم";
+  if (type === "color") return "رنگ";
+  if (type === "resistance") return "اهم";
+  return "ظرفیت";
 }
 
 export interface SubmittedOrder extends Order {
@@ -194,7 +202,9 @@ function createItemSnapshots(
         ? getProductFlavorOptions(product).find((item) => item.id === option.valueId)
         : option?.type === "color"
           ? getProductColorOptions(product).find((item) => item.id === option.valueId)
-          : undefined;
+          : option
+            ? getProductVariantOptions(product).find((item) => item.id === option.valueId)
+            : undefined;
     const withSelectedOption = (snapshot: OrderItemSnapshot) =>
       option && selectedValue
         ? {
@@ -202,7 +212,7 @@ function createItemSnapshots(
             selectedAttributes: [
               ...snapshot.selectedAttributes,
               {
-                nameFa: option.type === "flavor" ? "طعم" : "رنگ",
+                nameFa: getSelectedVariantLabel(option.type),
                 valueFa: "labelFa" in selectedValue ? selectedValue.labelFa : selectedValue.nameFa,
                 technicalValue: option.valueId,
               },

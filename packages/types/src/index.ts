@@ -87,7 +87,7 @@ export type ProductKind =
   | "cartridge"
   | "accessory";
 
-export type ProductVariantType = "flavor" | "color" | "none";
+export type ProductVariantType = "flavor" | "color" | "resistance" | "capacity" | "none";
 
 export interface ProductSpec {
   labelFa: string;

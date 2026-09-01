@@ -6,8 +6,10 @@ import {
   inventoryItems,
   productColorAttributeTechnicalValue,
   productColorPalette,
+  productCapacityAttributeTechnicalValue,
   productFlavorAttributeTechnicalValue,
   productFlavorCatalog,
+  productResistanceAttributeTechnicalValue,
   products,
   variants,
 } from "@ufo/domain";
@@ -123,7 +125,11 @@ function getCurrentVariantValueIds(product: Product | undefined, variantType: Pr
   const technicalValue =
     variantType === "color"
       ? productColorAttributeTechnicalValue
-      : productFlavorAttributeTechnicalValue;
+      : variantType === "flavor"
+        ? productFlavorAttributeTechnicalValue
+        : variantType === "resistance"
+          ? productResistanceAttributeTechnicalValue
+          : productCapacityAttributeTechnicalValue;
   return (
     product.attributes
       .find((attribute) => attribute.technicalValue === technicalValue)
@@ -144,6 +150,20 @@ function variantAttribute(variantType: ProductVariantType, valueIds: string[]) {
       nameFa: "Ø·Ø¹Ù…â€ŒÙ‡Ø§ÛŒ Ù‚Ø§Ø¨Ù„ Ø³ÙØ§Ø±Ø´",
       valueFa: valueIds.join(","),
       technicalValue: productFlavorAttributeTechnicalValue,
+    };
+  }
+  if (variantType === "resistance" && valueIds.length > 0) {
+    return {
+      nameFa: "اهم‌های قابل سفارش",
+      valueFa: valueIds.join(","),
+      technicalValue: productResistanceAttributeTechnicalValue,
+    };
+  }
+  if (variantType === "capacity" && valueIds.length > 0) {
+    return {
+      nameFa: "ظرفیت‌های قابل سفارش",
+      valueFa: valueIds.join(","),
+      technicalValue: productCapacityAttributeTechnicalValue,
     };
   }
   return undefined;
@@ -177,19 +197,25 @@ function buildDocuments(
       ? productColorPalette.map((color) => color.id)
       : variantType === "flavor"
         ? allowedFlavorIds
-        : [];
+        : undefined;
   const rawVariantValueIds =
     input.variantValueIds ??
     (variantType === "color" ? input.colorIds : undefined) ??
     getCurrentVariantValueIds(current?.product, variantType);
   const variantValueIds = uniqueIds(rawVariantValueIds).filter((item) =>
-    allowedVariantIds.includes(item),
+    allowedVariantIds ? allowedVariantIds.includes(item) : true,
   );
   if (variantType === "flavor" && variantValueIds.length === 0) {
     throw new Error("برای محصول طعم‌دار، حداقل یک طعم انتخاب کنید.");
   }
   if (variantType === "color" && variantValueIds.length === 0) {
     throw new Error("برای محصول رنگ‌دار، حداقل یک رنگ انتخاب کنید.");
+  }
+  if (variantType === "resistance" && variantValueIds.length === 0) {
+    throw new Error("برای محصول کویل، حداقل یک اهم انتخاب کنید.");
+  }
+  if (variantType === "capacity" && variantValueIds.length === 0) {
+    throw new Error("برای محصول کارتریج، حداقل یک ظرفیت انتخاب کنید.");
   }
   const retailPriceRial = input.retailPriceRial;
   const wholesalePriceRial =

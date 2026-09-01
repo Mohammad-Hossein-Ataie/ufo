@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { AlertTriangle, BadgeCheck, Check, PackageCheck, Palette, Sparkles } from "lucide-react";
+import { AlertTriangle, BadgeCheck, Check, Gauge, PackageCheck, Palette, Sparkles } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import {
   FlavorVisual,
@@ -35,6 +35,14 @@ function buildVariantImageMap(
   );
 }
 
+function getVariantTypeLabel(variantType: ProductVariantType) {
+  if (variantType === "flavor") return "طعم";
+  if (variantType === "color") return "رنگ";
+  if (variantType === "resistance") return "اهم";
+  if (variantType === "capacity") return "ظرفیت";
+  return "";
+}
+
 export function ProductDetailClient({
   product,
   variant,
@@ -63,8 +71,8 @@ export function ProductDetailClient({
   );
   const hasVariantOptions = variantType !== "none" && variantOptions.length > 0;
   const needsVariantSelection = hasVariantOptions && !selectedVariantValueId;
-  const variantTypeLabel = variantType === "flavor" ? "طعم" : "رنگ";
-  const selectorTitle = variantType === "flavor" ? "طعم را انتخاب کنید" : "رنگ را انتخاب کنید";
+  const variantTypeLabel = getVariantTypeLabel(variantType);
+  const selectorTitle = `${variantTypeLabel} را انتخاب کنید`;
 
   function selectVariantValue(valueId: string) {
     setSelectedVariantValueId(valueId);
@@ -181,8 +189,10 @@ export function ProductDetailClient({
                 <h2 className="inline-flex items-center gap-2 text-base font-black text-white">
                   {variantType === "flavor" ? (
                     <Sparkles size={18} className="text-cyan-300" aria-hidden="true" />
-                  ) : (
+                  ) : variantType === "color" ? (
                     <Palette size={18} className="text-cyan-300" aria-hidden="true" />
+                  ) : (
+                    <Gauge size={18} className="text-cyan-300" aria-hidden="true" />
                   )}
                   {selectorTitle}
                 </h2>

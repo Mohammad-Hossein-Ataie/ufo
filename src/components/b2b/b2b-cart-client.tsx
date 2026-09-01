@@ -4,7 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Button, EmptyState, Price } from "@ufo/ui";
-import { getProductColorById, getProductFlavorById, products, variants } from "@ufo/domain";
+import {
+  getProductColorById,
+  getProductFlavorById,
+  getProductVariantOptions,
+  products,
+  variants,
+} from "@ufo/domain";
 import type { ProductVariantType } from "@ufo/types";
 
 interface SelectedVariant {
@@ -25,7 +31,11 @@ function isSelectedVariant(value: unknown): value is SelectedVariant {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const record = value as Record<string, unknown>;
   return (
-    (record.type === "flavor" || record.type === "color") && typeof record.valueId === "string"
+    (record.type === "flavor" ||
+      record.type === "color" ||
+      record.type === "resistance" ||
+      record.type === "capacity") &&
+    typeof record.valueId === "string"
   );
 }
 
@@ -84,7 +94,9 @@ export function B2BCartClient() {
               ? getProductFlavorById(selectedVariant.valueId)
               : selectedVariant?.type === "color"
                 ? getProductColorById(selectedVariant.valueId)
-                : undefined;
+                : selectedVariant
+                  ? getProductVariantOptions(product).find((item) => item.id === selectedVariant.valueId)
+                  : undefined;
           return {
             ...line,
             variant,

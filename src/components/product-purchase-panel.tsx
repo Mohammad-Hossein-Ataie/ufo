@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Palette, Sparkles } from "lucide-react";
+import { Check, Gauge, Palette, Sparkles } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import type { ProductVariantOption } from "@ufo/domain";
 import type { ProductVariantType } from "@ufo/types";
@@ -22,6 +22,14 @@ function swatchStyle(option: ProductVariantOption) {
     : { backgroundColor: option.swatch };
 }
 
+function getVariantTypeLabel(variantType: ProductVariantType) {
+  if (variantType === "flavor") return "طعم";
+  if (variantType === "color") return "رنگ";
+  if (variantType === "resistance") return "اهم";
+  if (variantType === "capacity") return "ظرفیت";
+  return "";
+}
+
 export function ProductPurchasePanel({
   variantId,
   variantType,
@@ -33,7 +41,7 @@ export function ProductPurchasePanel({
   const hasOptions = variantType !== "none" && variantOptions.length > 0;
   const selectedOption = variantOptions.find((option) => option.id === selectedValueId);
   const needsSelection = hasOptions && !selectedValueId;
-  const labelFa = variantType === "flavor" ? "طعم" : "رنگ";
+  const labelFa = getVariantTypeLabel(variantType);
 
   return (
     <div className="grid gap-4">
@@ -43,8 +51,10 @@ export function ProductPurchasePanel({
             <h2 className="inline-flex items-center gap-2 text-sm font-black">
               {variantType === "flavor" ? (
                 <Sparkles size={17} className="text-cyan-300" aria-hidden="true" />
-              ) : (
+              ) : variantType === "color" ? (
                 <Palette size={17} className="text-cyan-300" aria-hidden="true" />
+              ) : (
+                <Gauge size={17} className="text-cyan-300" aria-hidden="true" />
               )}
               انتخاب {labelFa}
             </h2>
@@ -96,8 +106,8 @@ export function ProductPurchasePanel({
           label={label}
           enableQuantity
           selectedVariant={
-            selectedValueId
-              ? { type: variantType as "flavor" | "color", valueId: selectedValueId }
+            selectedValueId && variantType !== "none"
+              ? { type: variantType, valueId: selectedValueId }
               : undefined
           }
         />

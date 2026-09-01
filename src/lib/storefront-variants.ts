@@ -2,7 +2,9 @@ import {
   getProductColorOptions,
   getProductVariantType,
   productColorAttributeTechnicalValue,
+  productCapacityAttributeTechnicalValue,
   productFlavorAttributeTechnicalValue,
+  productResistanceAttributeTechnicalValue,
 } from "@ufo/domain";
 import type { Product, ProductFlavor, ProductVariantType } from "@ufo/types";
 
@@ -57,6 +59,22 @@ export function getStorefrontVariantOptions(
     });
   }
 
+  if (variantType === "resistance" || variantType === "capacity") {
+    const technicalValue =
+      variantType === "resistance"
+        ? productResistanceAttributeTechnicalValue
+        : productCapacityAttributeTechnicalValue;
+    const valueIds =
+      uniqueIds(product.variantValueIds).length > 0
+        ? uniqueIds(product.variantValueIds)
+        : attributeIds(product, technicalValue);
+    return valueIds.map((valueId) => ({
+      id: valueId,
+      labelFa: valueId,
+      type: variantType,
+    }));
+  }
+
   return [];
 }
 
@@ -67,7 +85,11 @@ export function getStorefrontVariantValueIds(product: Product, variantType: Prod
     product,
     variantType === "color"
       ? productColorAttributeTechnicalValue
-      : productFlavorAttributeTechnicalValue,
+      : variantType === "flavor"
+        ? productFlavorAttributeTechnicalValue
+        : variantType === "resistance"
+          ? productResistanceAttributeTechnicalValue
+          : productCapacityAttributeTechnicalValue,
   );
 }
 

@@ -621,6 +621,8 @@ export interface ProductVariantOption {
 
 export const productColorAttributeTechnicalValue = "product-colors";
 export const productFlavorAttributeTechnicalValue = "product-flavors";
+export const productResistanceAttributeTechnicalValue = "product-resistances";
+export const productCapacityAttributeTechnicalValue = "product-capacities";
 
 export const productColorPalette: ProductColorOption[] = [
   { id: "black", labelFa: "مشکی", hex: "#111827" },
@@ -672,15 +674,11 @@ export const productFlavorCatalog: ProductFlavor[] = [
 export const productColorEligibleKinds: ProductKind[] = [
   "pod-device",
   "vape-device",
-  "disposable",
-  "accessory",
 ];
 
 export const suggestedProductColorOptionsByKind: Partial<Record<ProductKind, string[]>> = {
   "pod-device": ["black", "silver", "blue", "turquoise", "green", "purple", "pink", "multicolor"],
   "vape-device": ["black", "silver", "blue", "turquoise", "red", "pink", "gold", "multicolor"],
-  disposable: ["black", "white", "blue", "turquoise", "green", "purple", "pink", "multicolor"],
-  accessory: ["black", "silver", "blue", "red", "pink", "gold", "multicolor"],
 };
 
 export const suggestedProductColorOptionsByCategoryId: Record<string, string[]> = {
@@ -705,7 +703,8 @@ export const defaultVariantTypeByKind: Partial<Record<ProductKind, ProductVarian
   "e-liquid": "flavor",
   "pod-device": "color",
   "vape-device": "color",
-  accessory: "color",
+  coil: "resistance",
+  cartridge: "capacity",
 };
 
 export const defaultVariantTypeByCategoryId: Record<string, ProductVariantType> = {
@@ -714,7 +713,8 @@ export const defaultVariantTypeByCategoryId: Record<string, ProductVariantType> 
   "cat-salt-nicotine": "flavor",
   "cat-pod": "color",
   "cat-vape": "color",
-  "cat-lighter": "color",
+  "cat-coil": "resistance",
+  "cat-cartridge": "capacity",
 };
 
 export const suggestedProductFlavorOptionsByKind: Partial<Record<ProductKind, string[]>> = {
@@ -765,6 +765,10 @@ export function getDefaultProductVariantType(
 export function getProductVariantType(product: Product): ProductVariantType {
   if (product.variantType) return product.variantType;
   if (getAttributeIds(product, productFlavorAttributeTechnicalValue).length > 0) return "flavor";
+  if (getAttributeIds(product, productResistanceAttributeTechnicalValue).length > 0)
+    return "resistance";
+  if (getAttributeIds(product, productCapacityAttributeTechnicalValue).length > 0)
+    return "capacity";
   const defaultType = getDefaultProductVariantType(product);
   if (
     defaultType === "color" &&
@@ -826,6 +830,30 @@ export function getProductVariantOptions(product: Product): ProductVariantOption
       type: "color",
       swatch: color.hex,
     }));
+  }
+  if (variantType === "resistance" || variantType === "capacity") {
+    return getGenericProductVariantValueIds(product, variantType).map((valueId) => ({
+      id: valueId,
+      labelFa: valueId,
+      type: variantType,
+    }));
+  }
+  return [];
+}
+
+export function getGenericProductVariantValueIds(
+  product: Product,
+  variantType: ProductVariantType,
+): string[] {
+  if (variantType === "resistance") {
+    return uniqueIds(product.variantValueIds).length > 0
+      ? uniqueIds(product.variantValueIds)
+      : getAttributeIds(product, productResistanceAttributeTechnicalValue);
+  }
+  if (variantType === "capacity") {
+    return uniqueIds(product.variantValueIds).length > 0
+      ? uniqueIds(product.variantValueIds)
+      : getAttributeIds(product, productCapacityAttributeTechnicalValue);
   }
   return [];
 }

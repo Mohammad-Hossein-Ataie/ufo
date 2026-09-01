@@ -18,7 +18,13 @@ function selectedVariant(
 ): { type: Exclude<ProductVariantType, "none">; valueId: string } | undefined {
   if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
   const record = value as Record<string, unknown>;
-  if ((record.type === "flavor" || record.type === "color") && typeof record.valueId === "string") {
+  if (
+    (record.type === "flavor" ||
+      record.type === "color" ||
+      record.type === "resistance" ||
+      record.type === "capacity") &&
+    typeof record.valueId === "string"
+  ) {
     return { type: record.type, valueId: record.valueId };
   }
   return undefined;

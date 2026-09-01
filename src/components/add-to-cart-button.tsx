@@ -22,7 +22,11 @@ function isSelectedVariant(value: unknown): value is SelectedVariant {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const record = value as Record<string, unknown>;
   return (
-    (record.type === "flavor" || record.type === "color") && typeof record.valueId === "string"
+    (record.type === "flavor" ||
+      record.type === "color" ||
+      record.type === "resistance" ||
+      record.type === "capacity") &&
+    typeof record.valueId === "string"
   );
 }
 

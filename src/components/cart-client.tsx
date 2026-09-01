@@ -30,8 +30,19 @@ function isSelectedVariant(value: unknown): value is SelectedVariant {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const record = value as Record<string, unknown>;
   return (
-    (record.type === "flavor" || record.type === "color") && typeof record.valueId === "string"
+    (record.type === "flavor" ||
+      record.type === "color" ||
+      record.type === "resistance" ||
+      record.type === "capacity") &&
+    typeof record.valueId === "string"
   );
+}
+
+function getSelectedVariantLabel(type: SelectedVariant["type"]) {
+  if (type === "flavor") return "طعم";
+  if (type === "color") return "رنگ";
+  if (type === "resistance") return "اهم";
+  return "ظرفیت";
 }
 
 function readCart(): CartLine[] {
@@ -92,7 +103,9 @@ export function CartClient() {
               ? getProductFlavorById(selectedVariant.valueId)
               : selectedVariant?.type === "color"
                 ? getProductColorById(selectedVariant.valueId)
-                : undefined;
+                : selectedVariant
+                  ? { nameFa: selectedVariant.valueId }
+                  : undefined;
           return {
             ...line,
             product,
@@ -175,7 +188,7 @@ export function CartClient() {
                       aria-hidden="true"
                     />
                   ) : null}
-                  {line.selectedVariant?.type === "flavor" ? "طعم" : "رنگ"}:{" "}
+                  {line.selectedVariant ? getSelectedVariantLabel(line.selectedVariant.type) : ""}:{" "}
                   {"labelFa" in line.selectedOption
                     ? line.selectedOption.labelFa
                     : line.selectedOption.nameFa}

@@ -1,7 +1,6 @@
 "use client";
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import Image from "next/image";
 import { useEffect, useMemo, useState, type DragEvent } from "react";
 import {
   Check,
@@ -9,6 +8,7 @@ import {
   Edit3,
   FileImage,
   Filter,
+  Gauge,
   GripVertical,
   ImagePlus,
   LayoutGrid,
@@ -28,7 +28,6 @@ import {
   getDefaultProductVariantType,
   getProductColorOptions,
   getProductFlavorOptions,
-  getProductVariantType,
   getProductVariantOptions,
   getSuggestedProductVariantValueIds,
   productColorPalette,
@@ -83,6 +82,13 @@ interface FormState {
   shortDescriptionFa: string;
   descriptionFa: string;
   isActive: boolean;
+}
+
+interface PendingImageUpload {
+  id: string;
+  name: string;
+  previewUrl: string;
+  failed: boolean;
 }
 
 const productKindOptions: Array<{ value: ProductKind; label: string }> = [
@@ -146,9 +152,133 @@ function textToSpecs(text: string): ProductSpec[] {
     });
 }
 
-function uniqueImages(images: string[]) {
+function summarizeFileLike(value: unknown) {
+  if (typeof File !== "undefined" && value instanceof File) {
+    return { name: value.name, size: value.size, type: value.type };
+  }
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    return {
+      name: typeof record.name === "string" ? record.name : undefined,
+      size: typeof record.size === "number" ? record.size : undefined,
+      type: typeof record.type === "string" ? record.type : undefined,
+    };
+  }
+  return value;
+}
+
+function summarizeImageField(value: unknown) {
+  if (typeof value === "string") return value;
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  if (typeof File !== "undefined" && value instanceof File) return summarizeFileLike(value);
+  if (typeof value === "object") return { type: "object", keys: Object.keys(value) };
+  return { type: typeof value, value };
+}
+
+function getImageCandidateDebug(value: unknown, index?: number) {
+  if (typeof File !== "undefined" && value instanceof File) {
+    return {
+      index,
+      type: "file",
+      file: summarizeFileLike(value),
+    };
+  }
+  const record = value && typeof value === "object" ? (value as Record<string, unknown>) : null;
+  return {
+    index,
+    type: value === null ? "null" : typeof value,
+    value: typeof value === "string" ? value : undefined,
+    url: record ? summarizeImageField(record.url) : undefined,
+    id: record ? summarizeImageField(record.id) : undefined,
+    file: record ? summarizeFileLike(record.file) : undefined,
+    previewUrl: record ? summarizeImageField(record.previewUrl) : undefined,
+  };
+}
+
+function normalizeImageUrl(value: unknown) {
+  if (typeof value === "string") return value.trim();
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    if (typeof record.url === "string") return record.url.trim();
+    if (typeof record.previewUrl === "string") return record.previewUrl.trim();
+  }
+  return "";
+}
+
+function logImageDebug(stage: string, payload: unknown) {
+  if (process.env.NODE_ENV !== "production") {
+    console.info(`[ProductManager:image] ${stage}`, payload);
+  }
+}
+
+function getModalLayoutDebug() {
+  if (typeof document === "undefined") return null;
+  const dialog = document.querySelector<HTMLElement>('[role="dialog"]');
+  const scroller = dialog?.querySelector<HTMLElement>(".min-h-0.flex-1.overflow-y-auto");
+  const footer = dialog?.lastElementChild;
+  const dialogRect = dialog?.getBoundingClientRect();
+  const scrollerRect = scroller?.getBoundingClientRect();
+  const footerRect = footer?.getBoundingClientRect();
+  return {
+    activeElement: document.activeElement
+      ? {
+          tag: document.activeElement.tagName.toLowerCase(),
+          className: document.activeElement.getAttribute("class"),
+          ariaLabel: document.activeElement.getAttribute("aria-label"),
+        }
+      : null,
+    body: {
+      scrollTop: document.documentElement.scrollTop,
+      clientHeight: document.documentElement.clientHeight,
+      scrollHeight: document.documentElement.scrollHeight,
+    },
+    dialog: dialogRect
+      ? {
+          top: dialogRect.top,
+          bottom: dialogRect.bottom,
+          height: dialogRect.height,
+          clientHeight: dialog?.clientHeight,
+          scrollHeight: dialog?.scrollHeight,
+          overflowY: dialog ? window.getComputedStyle(dialog).overflowY : undefined,
+        }
+      : null,
+    scroller: scrollerRect
+      ? {
+          top: scrollerRect.top,
+          bottom: scrollerRect.bottom,
+          height: scrollerRect.height,
+          scrollTop: scroller?.scrollTop,
+          clientHeight: scroller?.clientHeight,
+          scrollHeight: scroller?.scrollHeight,
+          overflowY: scroller ? window.getComputedStyle(scroller).overflowY : undefined,
+        }
+      : null,
+    footer: footerRect
+      ? {
+          top: footerRect.top,
+          bottom: footerRect.bottom,
+          height: footerRect.height,
+          insideDialog:
+            dialogRect ? footerRect.top >= dialogRect.top && footerRect.bottom <= dialogRect.bottom : false,
+        }
+      : null,
+  };
+}
+
+function logModalLayoutDebug(stage: string) {
+  logImageDebug(stage, getModalLayoutDebug());
+}
+
+function uniqueImages(images: unknown[]) {
   return images
-    .map((item) => item.trim())
+    .map((item, index) => {
+      const url = normalizeImageUrl(item);
+      if (!url) {
+        logImageDebug("invalid image filtered", getImageCandidateDebug(item, index));
+      }
+      return url;
+    })
     .filter((item, index, list) => item && list.indexOf(item) === index);
 }
 
@@ -164,15 +294,40 @@ function getInitialVariantImages(
   );
 }
 
+function getLockedVariantType(categoryId: string, productKind: ProductKind) {
+  return getDefaultProductVariantType({ categoryId, productKind });
+}
+
+function getVariantTypeLabel(variantType: ProductVariantType) {
+  if (variantType === "flavor") return "طعم";
+  if (variantType === "color") return "رنگ";
+  if (variantType === "resistance") return "اهم";
+  if (variantType === "capacity") return "ظرفیت";
+  return "";
+}
+
+function getVariantTypeHelp(variantType: ProductVariantType) {
+  if (variantType === "flavor") return "برای این نوع محصول فقط طعم ذخیره می‌شود.";
+  if (variantType === "color") return "برای این نوع محصول فقط رنگ ذخیره می‌شود.";
+  if (variantType === "resistance") return "برای کویل فقط اهم ذخیره می‌شود.";
+  if (variantType === "capacity") return "برای کارتریج فقط ظرفیت ذخیره می‌شود.";
+  return "برای این نوع محصول تنوع انتخابی ذخیره نمی‌شود.";
+}
+
 function rowToForm(row: AdminProductRecord): FormState {
   const images = uniqueImages([row.product.image, ...(row.product.images ?? [])]);
-  const variantType = getProductVariantType(row.product);
+  const variantType = getLockedVariantType(
+    row.product.categoryId,
+    row.product.productKind ?? "disposable",
+  );
   const variantValueIds =
-    variantType === "flavor"
-      ? getProductFlavorOptions(row.product).map((flavor) => flavor.id)
-      : variantType === "color"
-        ? getProductColorOptions(row.product).map((color) => color.id)
-        : [];
+    row.product.variantValueIds?.length
+      ? row.product.variantValueIds
+      : variantType === "flavor"
+        ? getProductFlavorOptions(row.product).map((flavor) => flavor.id)
+        : variantType === "color"
+          ? getProductColorOptions(row.product).map((color) => color.id)
+          : [];
   return {
     id: row.product.id,
     variantId: row.variant.id,
@@ -221,13 +376,51 @@ function videoMarkup(url: string) {
   return `\n\n[ویدیو محصول](${url})\n\n`;
 }
 
+function AdminImagePreview({
+  src,
+  alt,
+  className = "object-cover",
+}: {
+  src?: unknown;
+  alt: string;
+  className?: string;
+}) {
+  const safeSrc = normalizeImageUrl(src);
+  const [failed, setFailed] = useState(!safeSrc);
+
+  useEffect(() => {
+    setFailed(!safeSrc);
+  }, [safeSrc]);
+
+  if (failed) {
+    return (
+      <div className="absolute inset-0 grid place-items-center text-[#5F6C79]">
+        <FileImage size={20} aria-hidden="true" />
+      </div>
+    );
+  }
+
+  return (
+    // Admin thumbnails should render directly so slow remote storage cannot trip Next's optimizer.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={safeSrc}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      referrerPolicy="no-referrer"
+      className={`absolute inset-0 h-full w-full ${className}`}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 export function ProductManager() {
   const [rows, setRows] = useState<AdminProductRecord[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [flavors, setFlavors] = useState<ProductFlavor[]>(productFlavorCatalog);
   const [form, setForm] = useState<FormState>(emptyForm);
-  const [variantTypeTouched, setVariantTypeTouched] = useState(false);
   const [query, setQuery] = useState("");
   const [flavorQuery, setFlavorQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -235,34 +428,46 @@ export function ProductManager() {
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [status, setStatus] = useState("در حال بارگذاری...");
   const [loading, setLoading] = useState(false);
+  const [isFetchingRows, setIsFetchingRows] = useState(true);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
+  const [pendingImageUploads, setPendingImageUploads] = useState<PendingImageUpload[]>([]);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isFlavorDialogOpen, setIsFlavorDialogOpen] = useState(false);
   const [newFlavor, setNewFlavor] = useState({ nameFa: "", nameEn: "", slug: "", iconKey: "" });
   const [isDragging, setIsDragging] = useState(false);
   const [manualImageUrl, setManualImageUrl] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
+  const [customVariantValue, setCustomVariantValue] = useState("");
 
   async function fetchRows() {
-    setLoading(true);
-    const [response, flavorsResponse] = await Promise.all([
-      fetch("/api/admin/products", { cache: "no-store" }),
-      fetch("/api/admin/flavors", { cache: "no-store" }),
-    ]);
-    const data = (await response.json()) as {
-      rows?: AdminProductRecord[];
-      categories?: Category[];
-      brands?: Brand[];
-      error?: string;
-    };
-    const flavorData = (await flavorsResponse.json().catch(() => ({}))) as {
-      flavors?: ProductFlavor[];
-    };
-    setRows(data.rows ?? []);
-    setCategories(data.categories ?? []);
-    setBrands(data.brands ?? []);
-    setFlavors(flavorData.flavors ?? productFlavorCatalog);
-    setStatus(data.error ?? "محصولات به‌روز شد.");
-    setLoading(false);
+    setIsFetchingRows(true);
+    try {
+      const [response, flavorsResponse] = await Promise.all([
+        fetch("/api/admin/products", { cache: "no-store" }),
+        fetch("/api/admin/flavors", { cache: "no-store" }),
+      ]);
+      const data = (await response.json().catch(() => ({}))) as {
+        rows?: AdminProductRecord[];
+        categories?: Category[];
+        brands?: Brand[];
+        error?: string;
+      };
+      const flavorData = (await flavorsResponse.json().catch(() => ({}))) as {
+        flavors?: ProductFlavor[];
+      };
+      setRows(data.rows ?? []);
+      setCategories(data.categories ?? []);
+      setBrands(data.brands ?? []);
+      setFlavors(flavorData.flavors ?? productFlavorCatalog);
+      setStatus(data.error ?? "محصولات به‌روز شد.");
+    } catch {
+      setRows([]);
+      setCategories([]);
+      setBrands([]);
+      setStatus("بارگذاری محصولات ناموفق بود.");
+    } finally {
+      setIsFetchingRows(false);
+    }
   }
 
   useEffect(() => {
@@ -309,37 +514,31 @@ export function ProductManager() {
   }
 
   function updateProductKind(productKind: ProductKind) {
-    setForm((current) => ({
-      ...current,
-      productKind,
-      ...(current.id || variantTypeTouched
-        ? {}
-        : {
-            variantType: getDefaultProductVariantType({
-              categoryId: current.categoryId,
-              productKind,
-            }),
-            variantValueIds: [],
-            variantImages: {},
-          }),
-    }));
+    setForm((current) => {
+      const variantType = getLockedVariantType(current.categoryId, productKind);
+      return {
+        ...current,
+        productKind,
+        variantType,
+        variantValueIds: current.variantType === variantType ? current.variantValueIds : [],
+        variantImages: current.variantType === variantType ? current.variantImages : {},
+      };
+    });
+    setCustomVariantValue("");
   }
 
   function updateCategory(categoryId: string) {
-    setForm((current) => ({
-      ...current,
-      categoryId,
-      ...(current.id || variantTypeTouched
-        ? {}
-        : {
-            variantType: getDefaultProductVariantType({
-              categoryId,
-              productKind: current.productKind,
-            }),
-            variantValueIds: [],
-            variantImages: {},
-          }),
-    }));
+    setForm((current) => {
+      const variantType = getLockedVariantType(categoryId, current.productKind);
+      return {
+        ...current,
+        categoryId,
+        variantType,
+        variantValueIds: current.variantType === variantType ? current.variantValueIds : [],
+        variantImages: current.variantType === variantType ? current.variantImages : {},
+      };
+    });
+    setCustomVariantValue("");
   }
 
   function setVariantType(variantType: ProductVariantType) {
@@ -355,7 +554,6 @@ export function ProductManager() {
       ) {
         return current;
       }
-      setVariantTypeTouched(true);
       return {
         ...current,
         variantType,
@@ -370,6 +568,12 @@ export function ProductManager() {
       const exists = current.variantValueIds.includes(valueId);
       const variantImages = { ...current.variantImages };
       if (exists) delete variantImages[valueId];
+      if (!exists && current.images.length > 0) {
+        const assignedImages = new Set(Object.values(variantImages));
+        const fallbackImage =
+          current.images.find((image) => !assignedImages.has(image)) ?? current.images[0];
+        if (fallbackImage) variantImages[valueId] = fallbackImage;
+      }
       return {
         ...current,
         variantValueIds: exists
@@ -378,6 +582,27 @@ export function ProductManager() {
         variantImages,
       };
     });
+  }
+
+  function addCustomVariantValue() {
+    const valueId = customVariantValue.trim();
+    if (!valueId || (form.variantType !== "resistance" && form.variantType !== "capacity")) return;
+    setForm((current) => {
+      const fallbackImage = current.images[0];
+      return {
+        ...current,
+        variantValueIds: current.variantValueIds.includes(valueId)
+          ? current.variantValueIds
+          : [...current.variantValueIds, valueId],
+        variantImages: {
+          ...current.variantImages,
+          ...(current.variantImages[valueId] || !fallbackImage
+            ? {}
+            : { [valueId]: fallbackImage }),
+        },
+      };
+    });
+    setCustomVariantValue("");
   }
 
   function applySuggestedVariantValues() {
@@ -416,6 +641,7 @@ export function ProductManager() {
   }
 
   function openCreate() {
+    clearPendingImageUploads();
     setForm({
       ...emptyForm,
       variantType: getDefaultProductVariantType({
@@ -423,35 +649,57 @@ export function ProductManager() {
         productKind: emptyForm.productKind,
       }),
     });
-    setVariantTypeTouched(false);
     setFlavorQuery("");
     setManualImageUrl("");
     setVideoUrl("");
+    setCustomVariantValue("");
     setIsEditorOpen(true);
   }
 
   function openEdit(row: AdminProductRecord) {
+    clearPendingImageUploads();
     setForm(rowToForm(row));
-    setVariantTypeTouched(true);
     setFlavorQuery("");
     setManualImageUrl("");
     setVideoUrl("");
+    setCustomVariantValue("");
     setIsEditorOpen(true);
   }
 
-  function setImages(images: string[]) {
-    const nextImages = uniqueImages(images);
-    setForm((current) => ({
+  function clearPendingImageUploads() {
+    setPendingImageUploads((current) => {
+      current.forEach((upload) => URL.revokeObjectURL(upload.previewUrl));
+      return [];
+    });
+  }
+
+  function setImages(images: string[] | ((currentImages: string[]) => string[])) {
+    setForm((current) => {
+      const requestedImages = typeof images === "function" ? images(current.images) : images;
+      logImageDebug("before image state update", {
+        currentPrimary: getImageCandidateDebug(current.image),
+        currentImages: current.images.map((image, index) => getImageCandidateDebug(image, index)),
+        requestedImages: requestedImages.map((image, index) => getImageCandidateDebug(image, index)),
+      });
+      const nextImages = uniqueImages(
+        requestedImages,
+      );
+      logImageDebug("after image state update", {
+        nextPrimary: nextImages[0] ?? normalizeImageUrl(current.image),
+        nextImages: nextImages.map((image, index) => getImageCandidateDebug(image, index)),
+      });
+      return {
       ...current,
       images: nextImages,
-      image: nextImages[0] ?? current.image,
+      image: nextImages[0] ?? normalizeImageUrl(current.image) ?? emptyForm.image,
       variantImages: Object.fromEntries(
         Object.entries(current.variantImages).filter(
           ([valueId, imageValue]) =>
             current.variantValueIds.includes(valueId) && nextImages.includes(imageValue),
         ),
       ),
-    }));
+      };
+    });
   }
 
   function addManualImage() {
@@ -561,32 +809,92 @@ export function ProductManager() {
   }
 
   async function uploadImages(files: FileList | File[]) {
+    logModalLayoutDebug("uploadImages entry layout");
+    logImageDebug("before file selection handler", {
+      files: Array.from(files).map((file, index) => getImageCandidateDebug(file, index)),
+    });
     const accepted = Array.from(files).filter((file) => file.type.startsWith("image/"));
+    logImageDebug("after file selection handler", {
+      accepted: accepted.map((file, index) => getImageCandidateDebug(file, index)),
+    });
+    logModalLayoutDebug("uploadImages after accepted files layout");
     if (accepted.length === 0) return;
-    setLoading(true);
+    const pendingUploads = accepted.map((file, index) => ({
+      id: `${Date.now()}-${index}-${file.name}`,
+      name: file.name,
+      previewUrl: URL.createObjectURL(file),
+      failed: false,
+    }));
+    logImageDebug("before pending upload state", {
+      pendingUploads: pendingUploads.map((upload, index) => getImageCandidateDebug(upload, index)),
+    });
+    setPendingImageUploads((current) => [...pendingUploads, ...current]);
+    setIsUploadingImages(true);
+    setStatus(`${formatNumber(accepted.length)} تصویر در حال آپلود است...`);
+    requestAnimationFrame(() => logModalLayoutDebug("after pending upload render layout"));
     const uploadedUrls: string[] = [];
-    for (const file of accepted) {
-      const formData = new FormData();
-      formData.append("file", file);
-      const response = await fetch("/api/admin/storage/upload", { method: "POST", body: formData });
-      const data = (await response.json()) as {
-        file?: { key: string; url?: string };
-        error?: string;
-        message?: string;
-      };
-      if (data.file?.url) uploadedUrls.push(data.file.url);
-      if (!response.ok) setStatus(data.error ?? "آپلود یکی از تصاویر ناموفق بود.");
+    try {
+      for (const [index, file] of accepted.entries()) {
+        const pendingUpload = pendingUploads[index];
+        if (!pendingUpload) continue;
+        try {
+          const formData = new FormData();
+          formData.append("file", file);
+          const response = await fetch("/api/admin/storage/upload", {
+            method: "POST",
+            body: formData,
+          });
+          const data = (await response.json().catch(() => ({}))) as {
+            file?: Record<string, unknown>;
+            error?: string;
+            message?: string;
+          };
+          const mappedUrl = normalizeImageUrl(data.file?.url);
+          logImageDebug("upload response mapping", {
+            responseOk: response.ok,
+            status: response.status,
+            pendingUpload: getImageCandidateDebug(pendingUpload),
+            responseFile: getImageCandidateDebug(data.file),
+            mappedUrl,
+          });
+          if (mappedUrl) uploadedUrls.push(mappedUrl);
+          if (!response.ok) {
+            setStatus(data.error ?? "آپلود یکی از تصاویر ناموفق بود.");
+            setPendingImageUploads((current) =>
+              current.map((upload) =>
+                upload.id === pendingUpload.id ? { ...upload, failed: true } : upload,
+              ),
+            );
+          } else {
+            setPendingImageUploads((current) =>
+              current.filter((upload) => upload.id !== pendingUpload.id),
+            );
+            URL.revokeObjectURL(pendingUpload.previewUrl);
+          }
+        } catch {
+          setStatus("آپلود یکی از تصاویر ناموفق بود.");
+          setPendingImageUploads((current) =>
+            current.map((upload) =>
+              upload.id === pendingUpload.id ? { ...upload, failed: true } : upload,
+            ),
+          );
+        }
+      }
+      if (uploadedUrls.length > 0) {
+        setImages((currentImages) => [...currentImages, ...uploadedUrls]);
+        setStatus(`${formatNumber(uploadedUrls.length)} تصویر به گالری محصول اضافه شد.`);
+      }
+    } finally {
+      setIsUploadingImages(false);
+      requestAnimationFrame(() => logModalLayoutDebug("after upload settled render layout"));
     }
-    if (uploadedUrls.length > 0) {
-      setImages([...form.images, ...uploadedUrls]);
-      setStatus(`${formatNumber(uploadedUrls.length)} تصویر به گالری محصول اضافه شد.`);
-    }
-    setLoading(false);
   }
 
   function handleDrop(event: DragEvent<HTMLLabelElement>) {
+    logModalLayoutDebug("before drop preventDefault layout");
     event.preventDefault();
     setIsDragging(false);
+    logModalLayoutDebug("after drop state layout");
     void uploadImages(event.dataTransfer.files);
   }
 
@@ -620,7 +928,6 @@ export function ProductManager() {
           ? current.variantValueIds
           : [...current.variantValueIds, data.flavor!.id],
       }));
-      setVariantTypeTouched(true);
       setNewFlavor({ nameFa: "", nameEn: "", slug: "", iconKey: "" });
       setIsFlavorDialogOpen(false);
     }
@@ -647,7 +954,13 @@ export function ProductManager() {
             swatch: color.hex,
             iconKey: undefined,
           }))
-        : [];
+        : form.variantValueIds.map((valueId) => ({
+            id: valueId,
+            labelFa: valueId,
+            description: form.variantType === "resistance" ? "ohm" : "capacity",
+            swatch: undefined,
+            iconKey: undefined,
+          }));
   const activeVariantOptions = variantValueOptions.filter((option) =>
     form.variantValueIds.includes(option.id),
   );
@@ -662,14 +975,43 @@ export function ProductManager() {
             .includes(normalizedFlavorQuery),
         )
       : variantValueOptions;
+  const missingVariantImageIds =
+    form.variantType === "flavor"
+      ? form.variantValueIds.filter((valueId) => !form.variantImages[valueId])
+      : [];
   const variantValidationMessage =
     form.variantType === "flavor" && form.variantValueIds.length === 0
       ? "برای محصول طعم‌دار، حداقل یک طعم انتخاب کنید."
+      : missingVariantImageIds.length > 0
+        ? `برای ${formatNumber(missingVariantImageIds.length)} طعم، عکس مرتبط انتخاب نشده است.`
       : form.variantType === "color" && form.variantValueIds.length === 0
         ? "برای محصول رنگ‌دار، حداقل یک رنگ انتخاب کنید."
+        : form.variantType === "resistance" && form.variantValueIds.length === 0
+          ? "برای محصول کویل، حداقل یک اهم وارد کنید."
+          : form.variantType === "capacity" && form.variantValueIds.length === 0
+            ? "برای محصول کارتریج، حداقل یک ظرفیت وارد کنید."
         : "";
-  const variantTypeLabel =
-    form.variantType === "flavor" ? "Ø·Ø¹Ù…" : form.variantType === "color" ? "Ø±Ù†Ú¯" : "";
+  const variantTypeLabel = getVariantTypeLabel(form.variantType);
+  const galleryImages = useMemo(
+    () => uniqueImages([form.image, ...form.images]),
+    [form.image, form.images],
+  );
+  const visiblePendingImageUploads = pendingImageUploads.filter((upload, index) => {
+    const previewUrl = normalizeImageUrl(upload.previewUrl);
+    if (!previewUrl) {
+      logImageDebug("invalid pending upload filtered", getImageCandidateDebug(upload, index));
+    }
+    return Boolean(previewUrl);
+  });
+
+  useEffect(() => {
+    logImageDebug("gallery render", {
+      primary: getImageCandidateDebug(form.image),
+      rawImages: form.images.map((image, index) => getImageCandidateDebug(image, index)),
+      galleryImages: galleryImages.map((image, index) => getImageCandidateDebug(image, index)),
+      pending: pendingImageUploads.map((upload, index) => getImageCandidateDebug(upload, index)),
+    });
+  }, [form.image, form.images, galleryImages, pendingImageUploads]);
 
   return (
     <div className="grid gap-6">
@@ -753,7 +1095,9 @@ export function ProductManager() {
         </div>
         <div className="flex items-center gap-2 text-sm text-[#5F6C79]" role="status">
           <Filter size={16} aria-hidden="true" />
-          {formatNumber(filtered.length)} نتیجه از {formatNumber(rows.length)} محصول
+          {isFetchingRows
+            ? "در حال بارگذاری محصولات..."
+            : `${formatNumber(filtered.length)} نتیجه از ${formatNumber(rows.length)} محصول`}
         </div>
       </section>
 
@@ -782,12 +1126,9 @@ export function ProductManager() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md border border-[#D7DDE4] bg-[#EEF3F8]">
-                          <Image
+                          <AdminImagePreview
                             src={row.product.image}
                             alt={row.product.nameFa}
-                            fill
-                            sizes="56px"
-                            className="object-cover"
                           />
                         </div>
                         <div className="min-w-0">
@@ -876,22 +1217,35 @@ export function ProductManager() {
             </tbody>
           </table>
         </div>
-        {filtered.length === 0 ? (
+        {isFetchingRows ? (
+          <div className="p-8 text-center text-sm font-bold text-[#5F6C79]">
+            در حال بارگذاری محصولات...
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="p-8 text-center text-sm text-[#5F6C79]">
             محصولی با این فیلتر پیدا نشد.
           </div>
         ) : null}
       </section>
 
-      <p className="text-sm text-[#5F6C79]" role="status">
-        {status}
+      <p
+        className="rounded-md border border-[#D7DDE4] bg-white px-4 py-3 text-sm text-[#5F6C79] shadow-sm"
+        role="status"
+      >
+        {isFetchingRows ? "در حال بارگذاری محصولات..." : status}
       </p>
 
-      <DialogPrimitive.Root open={isEditorOpen} onOpenChange={setIsEditorOpen}>
+      <DialogPrimitive.Root
+        open={isEditorOpen}
+        onOpenChange={(open) => {
+          if (!open) clearPendingImageUploads();
+          setIsEditorOpen(open);
+        }}
+      >
         <DialogPrimitive.Portal>
           <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-slate-950/55 backdrop-blur-sm" />
-          <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 max-h-[92vh] w-[min(96vw,76rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-md bg-white text-[#17202A] shadow-2xl focus:outline-none">
-            <div className="flex items-start justify-between gap-3 border-b border-[#D7DDE4] px-5 py-4">
+          <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 flex max-h-[90vh] w-[min(96vw,76rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-md bg-white text-[#17202A] shadow-2xl focus:outline-none">
+            <div className="flex flex-shrink-0 items-start justify-between gap-3 border-b border-[#D7DDE4] px-5 py-4">
               <div>
                 <DialogPrimitive.Title className="text-xl font-black">
                   {form.id ? "ویرایش محصول" : "ایجاد محصول"}
@@ -907,7 +1261,7 @@ export function ProductManager() {
               </DialogPrimitive.Close>
             </div>
 
-            <div className="max-h-[calc(92vh-9rem)] overflow-y-auto px-5 py-5">
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
               <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
                 <div className="grid gap-5">
                   <section className="rounded-md border border-[#D7DDE4] p-4">
@@ -998,7 +1352,7 @@ export function ProductManager() {
                       <h3 className="font-black">نوع تنوع محصول</h3>
                     </div>
                     <div
-                      className="grid gap-2 md:grid-cols-3"
+                      className="grid gap-2 md:grid-cols-5"
                       role="radiogroup"
                       aria-label="نوع تنوع محصول"
                     >
@@ -1006,6 +1360,8 @@ export function ProductManager() {
                         { value: "none" as const, label: "بدون تنوع", icon: CircleOff },
                         { value: "flavor" as const, label: "طعم", icon: Sparkles },
                         { value: "color" as const, label: "رنگ", icon: Palette },
+                        { value: "resistance" as const, label: "اهم", icon: Gauge },
+                        { value: "capacity" as const, label: "ظرفیت", icon: Gauge },
                       ].map((option) => {
                         const Icon = option.icon;
                         const active = form.variantType === option.value;
@@ -1013,11 +1369,14 @@ export function ProductManager() {
                           <button
                             key={option.value}
                             type="button"
-                            onClick={() => setVariantType(option.value)}
+                            disabled={!active}
+                            onClick={() => {
+                              if (active) setVariantType(option.value);
+                            }}
                             className={`flex min-h-14 items-center justify-between gap-3 rounded-md border px-3 text-sm font-black transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
                               active
                                 ? "border-[#168BFF] bg-white text-[#0B5CAD] shadow-sm ring-2 ring-[#168BFF]/15"
-                                : "border-[#D7DDE4] bg-white text-[#17202A] hover:bg-[#EEF3F8]"
+                                : "border-[#D7DDE4] bg-white text-[#5F6C79] opacity-60"
                             }`}
                             role="radio"
                             aria-checked={active}
@@ -1031,6 +1390,9 @@ export function ProductManager() {
                         );
                       })}
                     </div>
+                    <p className="mt-3 text-xs font-bold text-[#5F6C79]">
+                      {getVariantTypeHelp(form.variantType)}
+                    </p>
                     {variantValidationMessage ? (
                       <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900">
                         {variantValidationMessage}
@@ -1044,17 +1406,21 @@ export function ProductManager() {
                         <div className="flex items-center gap-2">
                           {form.variantType === "flavor" ? (
                             <Sparkles size={18} className="text-[#168BFF]" aria-hidden="true" />
-                          ) : (
+                          ) : form.variantType === "color" ? (
                             <Palette size={18} className="text-[#168BFF]" aria-hidden="true" />
+                          ) : (
+                            <Gauge size={18} className="text-[#168BFF]" aria-hidden="true" />
                           )}
                           <div>
                             <h3 className="font-black">
-                              {form.variantType === "flavor" ? "طعم‌های محصول" : "رنگ‌های محصول"}
+                              {variantTypeLabel ? `${variantTypeLabel}‌های محصول` : "تنوع محصول"}
                             </h3>
                             <p className="mt-1 text-xs text-[#5F6C79]">
                               {form.variantType === "flavor"
                                 ? "طعم‌های قابل انتخاب را از رکوردهای طعم ذخیره‌شده انتخاب کنید."
-                                : "رنگ‌های واقعی محصول را با سواچ رنگ انتخاب کنید."}
+                                : form.variantType === "color"
+                                  ? "رنگ‌های واقعی محصول را با سواچ رنگ انتخاب کنید."
+                                  : "مقدارهای قابل سفارش را وارد کنید و در گالری به عکس مرتبط وصل کنید."}
                             </p>
                           </div>
                         </div>
@@ -1070,20 +1436,28 @@ export function ProductManager() {
                               افزودن طعم جدید
                             </Button>
                           ) : null}
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="secondary"
-                            onClick={applySuggestedVariantValues}
-                          >
-                            پیشنهاد بر اساس نوع
-                          </Button>
+                          {form.variantType === "flavor" || form.variantType === "color" ? (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="secondary"
+                              onClick={applySuggestedVariantValues}
+                            >
+                              پیشنهاد بر اساس نوع
+                            </Button>
+                          ) : null}
                           <Button
                             type="button"
                             size="sm"
                             variant="ghost"
                             className="border border-[#D7DDE4] text-[#17202A] hover:bg-[#EEF3F8]"
-                            onClick={() => update("variantValueIds", [])}
+                            onClick={() =>
+                              setForm((current) => ({
+                                ...current,
+                                variantValueIds: [],
+                                variantImages: {},
+                              }))
+                            }
                           >
                             پاک کردن انتخاب‌ها
                           </Button>
@@ -1105,6 +1479,31 @@ export function ProductManager() {
                             placeholder="جستجوی طعم..."
                           />
                         </label>
+                      ) : null}
+
+                      {form.variantType === "resistance" || form.variantType === "capacity" ? (
+                        <div className="mb-3 grid gap-2 sm:grid-cols-[1fr_auto]">
+                          <Input
+                            dir="ltr"
+                            value={customVariantValue}
+                            onChange={(event) => setCustomVariantValue(event.target.value)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                event.preventDefault();
+                                addCustomVariantValue();
+                              }
+                            }}
+                            placeholder={form.variantType === "resistance" ? "0.8ohm" : "3ml"}
+                          />
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={addCustomVariantValue}
+                          >
+                            <Plus size={16} aria-hidden="true" />
+                            افزودن {variantTypeLabel}
+                          </Button>
+                        </div>
                       ) : null}
 
                       {activeVariantOptions.length > 0 ? (
@@ -1141,7 +1540,7 @@ export function ProductManager() {
                         </div>
                       ) : null}
 
-                      <div className="grid max-h-64 gap-2 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-3">
+                      <div className="grid gap-2 pr-1 sm:grid-cols-2 lg:grid-cols-3">
                         {filteredVariantOptions.map((option) => {
                           const active = form.variantValueIds.includes(option.id);
                           return (
@@ -1307,22 +1706,38 @@ export function ProductManager() {
                       }}
                       onDragLeave={() => setIsDragging(false)}
                       onDrop={handleDrop}
-                      className={`grid min-h-36 cursor-pointer place-items-center rounded-md border border-dashed p-5 text-center transition ${
+                      className={`relative grid min-h-36 cursor-pointer place-items-center rounded-md border border-dashed p-5 text-center transition ${
                         isDragging
                           ? "border-[#168BFF] bg-[#E8F3FF]"
                           : "border-[#B8C4D2] bg-[#F8FAFC] hover:bg-[#F4F6F8]"
                       }`}
                     >
                       <input
-                        className="sr-only"
+                        className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
                         type="file"
                         accept="image/*"
                         multiple
-                        onChange={(event) => void uploadImages(event.target.files ?? [])}
+                        onChange={(event) => {
+                          logModalLayoutDebug("before file input onChange layout");
+                          logImageDebug("before file input onChange", {
+                            filesLength: event.currentTarget.files?.length ?? 0,
+                          });
+                          const files = Array.from(event.currentTarget.files ?? []);
+                          event.currentTarget.value = "";
+                          logImageDebug("after file input onChange", {
+                            files: files.map((file, index) => getImageCandidateDebug(file, index)),
+                          });
+                          logModalLayoutDebug("after file input value reset layout");
+                          void uploadImages(files);
+                        }}
                       />
-                      <span className="grid place-items-center gap-2">
+                      <span className="pointer-events-none grid place-items-center gap-2">
                         <UploadCloud size={28} className="text-[#168BFF]" aria-hidden="true" />
-                        <span className="font-bold">تصاویر را اینجا رها کنید یا انتخاب کنید</span>
+                        <span className="font-bold">
+                          {isUploadingImages
+                            ? "تصاویر در حال آپلود هستند..."
+                            : "تصاویر را اینجا رها کنید یا انتخاب کنید"}
+                        </span>
                         <span className="text-xs text-[#5F6C79]">
                           امکان انتخاب چند تصویر برای محصول تکی و عمده
                         </span>
@@ -1341,7 +1756,31 @@ export function ProductManager() {
                       </Button>
                     </div>
                     <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                      {form.images.map((url) => (
+                      {visiblePendingImageUploads.map((upload) => (
+                        <div
+                          key={upload.id}
+                          className={`overflow-hidden rounded-md border bg-white shadow-sm ${
+                            upload.failed ? "border-rose-200" : "border-cyan-200"
+                          }`}
+                        >
+                          <div className="relative aspect-[4/3] bg-[#EEF3F8]">
+                            <AdminImagePreview src={upload.previewUrl} alt={upload.name} />
+                            <div
+                              className={`absolute bottom-2 right-2 rounded-md px-2 py-1 text-xs font-black shadow-sm ${
+                                upload.failed
+                                  ? "bg-rose-50 text-rose-700"
+                                  : "bg-cyan-50 text-cyan-800"
+                              }`}
+                            >
+                              {upload.failed ? "آپلود ناموفق" : "در حال آپلود"}
+                            </div>
+                          </div>
+                          <div className="min-h-12 truncate p-2 text-xs font-bold text-[#5F6C79]">
+                            {upload.name}
+                          </div>
+                        </div>
+                      ))}
+                      {galleryImages.map((url) => (
                         <div
                           key={url}
                           className={`overflow-hidden rounded-md border bg-white shadow-sm ${
@@ -1351,12 +1790,9 @@ export function ProductManager() {
                           }`}
                         >
                           <div className="relative aspect-[4/3] bg-[#EEF3F8]">
-                            <Image
+                            <AdminImagePreview
                               src={url}
                               alt="تصویر محصول"
-                              fill
-                              sizes="220px"
-                              className="object-cover"
                             />
                             <div className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/70 bg-white/90 text-[#5F6C79] shadow-sm">
                               <GripVertical size={16} aria-hidden="true" />
@@ -1392,9 +1828,7 @@ export function ProductManager() {
                           </div>
                           {activeVariantOptions.length > 0 ? (
                             <label className="grid gap-1 border-t border-[#D7DDE4] p-2 text-xs font-bold text-[#5F6C79]">
-                              {form.variantType === "flavor"
-                                ? "طعم مرتبط با این تصویر"
-                                : "رنگ مرتبط با این تصویر"}
+                              {variantTypeLabel} مرتبط با این تصویر
                               <select
                                 className="min-h-9 rounded-md border border-[#D7DDE4] bg-white px-2 text-sm text-[#17202A] focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-100"
                                 value={getImageVariantValueId(url)}
@@ -1403,9 +1837,7 @@ export function ProductManager() {
                                 }
                               >
                                 <option value="">
-                                  {form.variantType === "flavor"
-                                    ? "بدون طعم اختصاصی"
-                                    : "بدون رنگ اختصاصی"}
+                                  بدون {variantTypeLabel} اختصاصی
                                 </option>
                                 {activeVariantOptions.map((option) => (
                                   <option key={option.id} value={option.id}>
@@ -1605,9 +2037,9 @@ export function ProductManager() {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#D7DDE4] bg-[#F8FAFC] px-5 py-4">
+            <div className="flex flex-shrink-0 flex-wrap items-center justify-between gap-3 border-t border-[#D7DDE4] bg-[#F8FAFC] px-5 py-4">
               <p className="text-sm text-[#5F6C79]" role="status">
-                {loading ? "در حال ذخیره..." : status}
+                {loading ? "در حال ذخیره..." : isUploadingImages ? "در حال آپلود تصویر..." : status}
               </p>
               <div className="flex gap-2">
                 <DialogPrimitive.Close asChild>
@@ -1615,7 +2047,7 @@ export function ProductManager() {
                     انصراف
                   </Button>
                 </DialogPrimitive.Close>
-                <Button type="button" onClick={saveProduct} disabled={loading}>
+                <Button type="button" onClick={saveProduct} disabled={loading || isUploadingImages}>
                   <Save size={17} aria-hidden="true" />
                   ذخیره محصول
                 </Button>
