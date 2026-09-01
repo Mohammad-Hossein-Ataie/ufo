@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { ensureIndexes, getDb, hasUsableMongoUri } from "@ufo/database";
 import { productFlavorCatalog } from "@ufo/domain";
 import type { ProductFlavor } from "@ufo/types";
@@ -16,7 +17,10 @@ function normalizeSlug(value: string): string {
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
   const latin = normalized.match(/[a-z0-9]+/g)?.join("-") ?? "";
-  const fallback = Buffer.from(normalized || "flavor").toString("hex").slice(0, 18);
+  const fallback = createHash("sha1")
+    .update(normalized || "flavor")
+    .digest("hex")
+    .slice(0, 12);
   return (latin || `flavor-${fallback}`).replace(/-+/g, "-").replace(/^-|-$/g, "");
 }
 
