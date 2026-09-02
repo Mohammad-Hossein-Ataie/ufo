@@ -6,6 +6,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-export default function SearchPage() {
-  redirect("/products");
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ q?: string }>;
+}) {
+  const params = (await searchParams) ?? {};
+  const query = params.q?.trim();
+  redirect(query ? `/products?q=${encodeURIComponent(query)}` : "/products");
 }

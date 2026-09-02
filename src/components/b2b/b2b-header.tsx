@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { Button, IconButton } from "@ufo/ui";
+import { SmartSearch } from "@/components/smart-search";
 
 interface CartLine {
   variantId: string;
@@ -124,6 +125,8 @@ export function B2BHeader() {
           })}
         </nav>
 
+        <SmartSearch channel="wholesale" className="hidden flex-1 md:block lg:max-w-lg xl:max-w-2xl" />
+
         <div className="flex items-center gap-2">
           <Link href="/b2b/quick-order" className="hidden sm:inline-flex">
             <IconButton label="سفارش سریع" className="border-[#D5D9C9] bg-white text-[#14201B]">
@@ -169,6 +172,9 @@ export function B2BHeader() {
 
       {menuOpen ? (
         <div className="border-t border-[#D5D9C9] bg-white lg:hidden">
+          <div className="mx-auto max-w-7xl px-4 pt-4 md:hidden">
+            <SmartSearch channel="wholesale" />
+          </div>
           <nav aria-label="منوی موبایل عمده" className="mx-auto grid max-w-7xl gap-2 px-4 py-4">
             {navItems.map((item) => (
               <Link

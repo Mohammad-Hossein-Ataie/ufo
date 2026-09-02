@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Home, Info, Menu, PackageSearch, Search, ShoppingCart, UserRound, X } from "lucide-react";
 import { Button, IconButton } from "@ufo/ui";
+import { SmartSearch } from "@/components/smart-search";
 
 interface CartLine {
   variantId: string;
@@ -115,6 +116,8 @@ export function SiteHeader() {
           })}
         </nav>
 
+        <SmartSearch channel="retail" className="hidden flex-1 md:block lg:max-w-lg xl:max-w-2xl" />
+
         <div className="flex items-center gap-2">
           <Link href="/search" aria-label="جستجو" className="hidden sm:inline-flex">
             <IconButton label="جستجو">
@@ -154,6 +157,9 @@ export function SiteHeader() {
 
       {menuOpen ? (
         <div className="border-t border-retail-border bg-retail-surface lg:hidden">
+          <div className="mx-auto max-w-7xl px-4 pt-4 md:hidden">
+            <SmartSearch channel="retail" />
+          </div>
           <nav aria-label="منوی موبایل" className="mx-auto grid max-w-7xl gap-2 px-4 py-4">
             {navItems.map((item) => (
               <Link
