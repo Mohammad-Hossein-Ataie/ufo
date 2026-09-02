@@ -24,6 +24,12 @@ export function CatalogFlavorFilter({
   const selected = options.find((option) => option.id === value);
   const isDark = tone === "dark";
 
+  function submitForm() {
+    requestAnimationFrame(() => {
+      wrapperRef.current?.closest("form")?.requestSubmit();
+    });
+  }
+
   useEffect(() => {
     function closeOnOutsideClick(event: MouseEvent) {
       if (!wrapperRef.current?.contains(event.target as Node)) setOpen(false);
@@ -72,6 +78,7 @@ export function CatalogFlavorFilter({
                 onClick={() => {
                   setValue(optionId);
                   setOpen(false);
+                  submitForm();
                 }}
                 className={`flex min-h-10 w-full select-none items-center justify-between gap-3 rounded-md px-3 text-right text-sm font-bold transition motion-reduce:transition-none ${
                   active

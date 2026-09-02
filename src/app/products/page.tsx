@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowLeft,
-  Filter,
   Search,
   ShieldCheck,
   SlidersHorizontal,
@@ -10,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { CatalogAutoSubmitForm } from "@/components/catalog-auto-submit-form";
 import { CatalogColorFilter } from "@/components/catalog-color-filter";
 import { CatalogFlavorFilter } from "@/components/catalog-flavor-filter";
 import { CatalogOptionFilter } from "@/components/catalog-option-filter";
@@ -286,7 +286,7 @@ export default async function ProductsPage({
             <SlidersHorizontal size={18} className="text-retail-accent" aria-hidden="true" />
             <h2 className="font-black text-white">فیلتر محصولات</h2>
           </div>
-          <form action="/products" className="mt-4 grid gap-3 pb-2">
+          <CatalogAutoSubmitForm action="/products" className="mt-4 grid gap-3 pb-2">
             <label className="grid gap-2 text-sm text-retail-secondary">
               جستجو
               <span className="relative">
@@ -420,11 +420,7 @@ export default async function ProductsPage({
               </select>
             </label>
 
-            <div className="grid grid-cols-2 gap-2">
-              <button className="inline-flex min-h-11 select-none items-center justify-center gap-2 rounded-md border border-retail-accent bg-retail-accent px-4 text-sm font-bold text-retail-bg transition hover:bg-retail-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent">
-                <Filter size={16} aria-hidden="true" />
-                اعمال
-              </button>
+            <div className="grid gap-2">
               <Link
                 href="/products"
                 className="inline-flex min-h-11 select-none items-center justify-center gap-2 rounded-md border border-retail-border px-4 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
@@ -433,7 +429,7 @@ export default async function ProductsPage({
                 پاک کردن
               </Link>
             </div>
-          </form>
+          </CatalogAutoSubmitForm>
         </aside>
 
         <section>

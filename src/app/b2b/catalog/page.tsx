@@ -4,13 +4,13 @@ import {
   ArrowLeft,
   BadgeCheck,
   Boxes,
-  Filter,
   PackagePlus,
   Search,
   SlidersHorizontal,
   Truck,
   X,
 } from "lucide-react";
+import { CatalogAutoSubmitForm } from "@/components/catalog-auto-submit-form";
 import { CatalogColorFilter } from "@/components/catalog-color-filter";
 import { CatalogFlavorFilter } from "@/components/catalog-flavor-filter";
 import { CatalogOptionFilter } from "@/components/catalog-option-filter";
@@ -321,7 +321,7 @@ export default async function B2BCatalogPage({
             <SlidersHorizontal size={18} className="text-[#1F8A5B]" aria-hidden="true" />
             <h2 className="font-black">فیلتر کاتالوگ عمده</h2>
           </div>
-          <form action="/b2b/catalog" className="mt-4 grid gap-3 pb-2">
+          <CatalogAutoSubmitForm action="/b2b/catalog" className="mt-4 grid gap-3 pb-2">
             <label className="grid gap-2 text-sm font-bold text-[#405148]">
               جستجو
               <span className="relative">
@@ -455,11 +455,7 @@ export default async function B2BCatalogPage({
               </select>
             </label>
 
-            <div className="grid grid-cols-2 gap-2">
-              <button className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-[#1F8A5B] bg-[#1F8A5B] px-4 text-sm font-bold text-white transition hover:bg-[#176D48] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1F8A5B]">
-                <Filter size={16} aria-hidden="true" />
-                اعمال
-              </button>
+            <div className="grid gap-2">
               <Link
                 href="/b2b/catalog"
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-[#C8D6C7] bg-white px-4 text-sm font-bold transition hover:bg-[#F7F7F2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1F8A5B]"
@@ -468,7 +464,7 @@ export default async function B2BCatalogPage({
                 پاک کردن
               </Link>
             </div>
-          </form>
+          </CatalogAutoSubmitForm>
         </aside>
 
         <section>
