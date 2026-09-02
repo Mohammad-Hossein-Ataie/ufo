@@ -1,10 +1,11 @@
 import {
-  getProductColorOptions,
   getProductVariantType,
   productColorAttributeTechnicalValue,
   productCapacityAttributeTechnicalValue,
+  productColorPalette,
   productFlavorAttributeTechnicalValue,
   productResistanceAttributeTechnicalValue,
+  type ProductColorOption,
 } from "@ufo/domain";
 import type { Product, ProductFlavor, ProductVariantType } from "@ufo/types";
 
@@ -31,16 +32,24 @@ function attributeIds(product: Product, technicalValue: string) {
 export function getStorefrontVariantOptions(
   product: Product,
   flavors: ProductFlavor[] = [],
+  colors: ProductColorOption[] = productColorPalette,
 ): StorefrontVariantOption[] {
   const variantType = getProductVariantType(product);
 
   if (variantType === "color") {
-    return getProductColorOptions(product).map((color) => ({
-      id: color.id,
-      labelFa: color.labelFa,
-      type: "color",
-      swatch: color.hex,
-    }));
+    const colorIds =
+      uniqueIds(product.variantValueIds).length > 0
+        ? uniqueIds(product.variantValueIds)
+        : attributeIds(product, productColorAttributeTechnicalValue);
+    return colorIds.map((colorId) => {
+      const color = colors.find((item) => item.id === colorId);
+      return {
+        id: colorId,
+        labelFa: color?.labelFa ?? colorId,
+        type: "color",
+        ...(color?.hex ? { swatch: color.hex } : {}),
+      };
+    });
   }
 
   if (variantType === "flavor") {
@@ -97,11 +106,12 @@ export function aggregateStorefrontVariantOptions(
   rows: Array<{ product: Product }>,
   flavors: ProductFlavor[] = [],
   variantType: Exclude<ProductVariantType, "none">,
+  colors: ProductColorOption[] = productColorPalette,
 ) {
   const byId = new Map<string, StorefrontVariantOption>();
   for (const row of rows) {
     if (getProductVariantType(row.product) !== variantType) continue;
-    for (const option of getStorefrontVariantOptions(row.product, flavors)) {
+    for (const option of getStorefrontVariantOptions(row.product, flavors, colors)) {
       byId.set(option.id, option);
     }
   }

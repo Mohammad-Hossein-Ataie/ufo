@@ -6,6 +6,7 @@ import { Button, Price, ProductCard, StockStatus } from "@ufo/ui";
 import { categories } from "@ufo/domain";
 import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
+import { listAdminColors } from "@/lib/admin-colors";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import { getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
 import { getCategoryImage, getProductImage } from "@/lib/product-images";
@@ -50,6 +51,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     (row) => row.product.isActive && row.product.categoryId === category.id,
   );
   const flavors = await listAdminFlavors();
+  const colors = await listAdminColors();
   if (categoryRows.length === 0) notFound();
 
   const breadcrumb = breadcrumbJsonLd([
@@ -102,7 +104,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           const product = row.product;
           const variant = row.variant;
           const available = getCatalogRowStock(row);
-          const variantOptions = getStorefrontVariantOptions(product, flavors);
+          const variantOptions = getStorefrontVariantOptions(product, flavors, colors);
           return (
             <ProductCard
               key={product.id}

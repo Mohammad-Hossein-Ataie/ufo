@@ -13,6 +13,7 @@ import {
   products,
   variants,
 } from "@ufo/domain";
+import { listAdminColors } from "@/lib/admin-colors";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import type {
   InventoryItem,
@@ -173,6 +174,7 @@ function buildDocuments(
   input: AdminProductInput,
   current?: AdminProductRecord,
   allowedFlavorIds = productFlavorCatalog.map((flavor) => flavor.id),
+  allowedColorIds = productColorPalette.map((color) => color.id),
 ): AdminProductRecord {
   assertInput(input);
   const date = nowIso();
@@ -194,7 +196,7 @@ function buildDocuments(
     getDefaultProductVariantType({ categoryId: input.categoryId, productKind: input.productKind });
   const allowedVariantIds =
     variantType === "color"
-      ? productColorPalette.map((color) => color.id)
+      ? allowedColorIds
       : variantType === "flavor"
         ? allowedFlavorIds
         : undefined;
@@ -409,7 +411,8 @@ export async function saveAdminProduct(input: AdminProductInput): Promise<AdminP
     ? (await listAdminProducts()).find((row) => row.product.id === input.id)
     : undefined;
   const allowedFlavorIds = (await listAdminFlavors()).map((flavor) => flavor.id);
-  const row = buildDocuments(input, current, allowedFlavorIds);
+  const allowedColorIds = (await listAdminColors()).map((color) => color.id);
+  const row = buildDocuments(input, current, allowedFlavorIds, allowedColorIds);
 
   if (!hasUsableMongoUri()) {
     memoryState.products = upsertMemory(memoryState.products, row.product);

@@ -7,6 +7,7 @@ import { ProductDetailClient } from "@/components/product-detail-client";
 import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { findCatalogRowBySlug, getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
+import { listAdminColors } from "@/lib/admin-colors";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import {
   getCategoryImage,
@@ -146,7 +147,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const variantImages = getProductVariantImages(product);
   const variantType = getProductVariantType(product);
   const flavors = await listAdminFlavors();
-  const variantOptions = getStorefrontVariantOptions(product, flavors);
+  const colors = await listAdminColors();
+  const variantOptions = getStorefrontVariantOptions(product, flavors, colors);
   const relatedRows = (await listCatalogRows())
     .filter(
       (item) =>
@@ -304,7 +306,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 const related = relatedRow.product;
                 const relatedVariant = relatedRow.variant;
                 const relatedAvailable = getCatalogRowStock(relatedRow);
-                const relatedVariantOptions = getStorefrontVariantOptions(related, flavors);
+                const relatedVariantOptions = getStorefrontVariantOptions(related, flavors, colors);
                 return (
                   <ProductCard
                     key={related.id}

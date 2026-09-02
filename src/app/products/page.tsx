@@ -18,6 +18,7 @@ import { CatalogPriceRangeFilter } from "@/components/catalog-price-range-filter
 import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { getCatalogRowStock, listCatalogRows, searchCatalogRows } from "@/lib/catalog-data";
+import { listAdminColors } from "@/lib/admin-colors";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import {
   aggregateProductResistanceOptions,
@@ -31,7 +32,7 @@ import {
 import type { AdminProductRecord } from "@/lib/admin-products";
 import { canonical, itemListJsonLd, jsonLdScriptProps } from "@ufo/seo";
 import { Badge, Button, EmptyState, Price, ProductCard, StockStatus } from "@ufo/ui";
-import { brands, categories, getProductColorOptions } from "@ufo/domain";
+import { brands, categories } from "@ufo/domain";
 import type { ProductFlavor, ProductKind } from "@ufo/types";
 
 export const dynamic = "force-dynamic";
@@ -125,6 +126,7 @@ function filterProducts(
   rows: AdminProductRecord[],
   params: ProductSearchParams,
   flavors: ProductFlavor[],
+  colors: Awaited<ReturnType<typeof listAdminColors>>,
   includePriceFilter = true,
 ) {
   const minPrice = parseToman(params.minPrice);
@@ -143,7 +145,9 @@ function filterProducts(
     .filter(
       (row) =>
         !params.color ||
-        getProductColorOptions(row.product).some((color) => color.id === params.color),
+        getStorefrontVariantOptions(row.product, flavors, colors).some(
+          (option) => option.type === "color" && option.id === params.color,
+        ),
     )
     .filter(
       (row) =>
@@ -187,12 +191,13 @@ export default async function ProductsPage({
   const rawParams = (await searchParams) ?? {};
   const rows = await listCatalogRows();
   const flavors = await listAdminFlavors();
+  const colors = await listAdminColors();
   const activeCategory = categories.find((item) => item.slug === rawParams.category);
   const specialFilterScope = activeCategory
     ? rows.filter((row) => row.product.isActive && row.product.categoryId === activeCategory.id)
     : [];
   const colorFilterOptions = activeCategory
-    ? aggregateStorefrontVariantOptions(specialFilterScope, flavors, "color")
+    ? aggregateStorefrontVariantOptions(specialFilterScope, flavors, "color", colors)
     : [];
   const flavorFilterOptions = activeCategory
     ? aggregateStorefrontVariantOptions(specialFilterScope, flavors, "flavor")
@@ -211,9 +216,9 @@ export default async function ProductsPage({
   if (!resistanceFilterOptions.some((option) => option.id === rawParams.resistance)) {
     delete params.resistance;
   }
-  const priceScope = filterProducts(rows, params, flavors, false);
+  const priceScope = filterProducts(rows, params, flavors, colors, false);
   const priceBounds = getPriceBoundsToman(priceScope);
-  const filtered = filterProducts(rows, params, flavors);
+  const filtered = filterProducts(rows, params, flavors, colors);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(Math.max(Number(params.page ?? 1) || 1, 1), totalPages);
   const pagedProducts = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -456,7 +461,7 @@ export default async function ProductsPage({
                 const product = row.product;
                 const variant = row.variant;
                 const available = getCatalogRowStock(row);
-                const variantOptions = getStorefrontVariantOptions(product, flavors);
+                const variantOptions = getStorefrontVariantOptions(product, flavors, colors);
                 return (
                   <ProductCard
                     key={product.id}

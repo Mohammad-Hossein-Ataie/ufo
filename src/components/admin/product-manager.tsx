@@ -32,6 +32,7 @@ import {
   getSuggestedProductVariantValueIds,
   productColorPalette,
   productFlavorCatalog,
+  type ProductColorOption,
 } from "@ufo/domain";
 import type {
   Brand,
@@ -420,6 +421,7 @@ export function ProductManager() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [flavors, setFlavors] = useState<ProductFlavor[]>(productFlavorCatalog);
+  const [colors, setColors] = useState<ProductColorOption[]>(productColorPalette);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [query, setQuery] = useState("");
   const [flavorQuery, setFlavorQuery] = useState("");
@@ -433,7 +435,9 @@ export function ProductManager() {
   const [pendingImageUploads, setPendingImageUploads] = useState<PendingImageUpload[]>([]);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isFlavorDialogOpen, setIsFlavorDialogOpen] = useState(false);
+  const [isColorDialogOpen, setIsColorDialogOpen] = useState(false);
   const [newFlavor, setNewFlavor] = useState({ nameFa: "", nameEn: "", slug: "", iconKey: "" });
+  const [newColor, setNewColor] = useState({ labelFa: "", id: "", hex: "#168BFF" });
   const [isDragging, setIsDragging] = useState(false);
   const [manualImageUrl, setManualImageUrl] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
@@ -442,9 +446,10 @@ export function ProductManager() {
   async function fetchRows() {
     setIsFetchingRows(true);
     try {
-      const [response, flavorsResponse] = await Promise.all([
+      const [response, flavorsResponse, colorsResponse] = await Promise.all([
         fetch("/api/admin/products", { cache: "no-store" }),
         fetch("/api/admin/flavors", { cache: "no-store" }),
+        fetch("/api/admin/colors", { cache: "no-store" }),
       ]);
       const data = (await response.json().catch(() => ({}))) as {
         rows?: AdminProductRecord[];
@@ -455,10 +460,14 @@ export function ProductManager() {
       const flavorData = (await flavorsResponse.json().catch(() => ({}))) as {
         flavors?: ProductFlavor[];
       };
+      const colorData = (await colorsResponse.json().catch(() => ({}))) as {
+        colors?: ProductColorOption[];
+      };
       setRows(data.rows ?? []);
       setCategories(data.categories ?? []);
       setBrands(data.brands ?? []);
       setFlavors(flavorData.flavors ?? productFlavorCatalog);
+      setColors(colorData.colors ?? productColorPalette);
       setStatus(data.error ?? "محصولات به‌روز شد.");
     } catch {
       setRows([]);
@@ -653,6 +662,7 @@ export function ProductManager() {
     setManualImageUrl("");
     setVideoUrl("");
     setCustomVariantValue("");
+    setNewColor({ labelFa: "", id: "", hex: "#168BFF" });
     setIsEditorOpen(true);
   }
 
@@ -663,6 +673,7 @@ export function ProductManager() {
     setManualImageUrl("");
     setVideoUrl("");
     setCustomVariantValue("");
+    setNewColor({ labelFa: "", id: "", hex: "#168BFF" });
     setIsEditorOpen(true);
   }
 
@@ -935,6 +946,43 @@ export function ProductManager() {
     setLoading(false);
   }
 
+  async function createColor() {
+    if (!newColor.labelFa.trim()) {
+      setStatus("نام فارسی رنگ الزامی است.");
+      return;
+    }
+    setLoading(true);
+    const response = await fetch("/api/admin/colors", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newColor),
+    });
+    const data = (await response.json().catch(() => ({}))) as {
+      color?: ProductColorOption;
+      message?: string;
+      error?: string;
+    };
+    if (response.ok && data.color) {
+      setColors((current) => {
+        const exists = current.some((color) => color.id === data.color!.id);
+        return exists
+          ? current.map((color) => (color.id === data.color!.id ? data.color! : color))
+          : [...current, data.color!];
+      });
+      setForm((current) => ({
+        ...current,
+        variantType: "color",
+        variantValueIds: current.variantValueIds.includes(data.color!.id)
+          ? current.variantValueIds
+          : [...current.variantValueIds, data.color!.id],
+      }));
+      setNewColor({ labelFa: "", id: "", hex: "#168BFF" });
+      setIsColorDialogOpen(false);
+    }
+    setStatus(data.message ?? data.error ?? "پاسخ نامشخص");
+    setLoading(false);
+  }
+
   const wholesaleCartonToman = form.wholesalePriceToman * Math.max(1, form.cartonSize);
   const minimumWholesaleToman = wholesaleCartonToman * Math.max(1, form.minWholesaleCartonCount);
   const variantValueOptions =
@@ -947,7 +995,7 @@ export function ProductManager() {
           iconKey: flavor.iconKey,
         }))
       : form.variantType === "color"
-        ? productColorPalette.map((color) => ({
+        ? colors.map((color) => ({
             id: color.id,
             labelFa: color.labelFa,
             description: color.id,
@@ -1434,6 +1482,17 @@ export function ProductManager() {
                             >
                               <Plus size={16} aria-hidden="true" />
                               افزودن طعم جدید
+                            </Button>
+                          ) : null}
+                          {form.variantType === "color" ? (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => setIsColorDialogOpen(true)}
+                            >
+                              <Plus size={16} aria-hidden="true" />
+                              افزودن رنگ جدید
                             </Button>
                           ) : null}
                           {form.variantType === "flavor" || form.variantType === "color" ? (
@@ -2136,6 +2195,100 @@ export function ProductManager() {
               <Button type="button" onClick={createFlavor} disabled={loading}>
                 <Plus size={17} aria-hidden="true" />
                 ذخیره طعم
+              </Button>
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+
+      <DialogPrimitive.Root open={isColorDialogOpen} onOpenChange={setIsColorDialogOpen}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-[70] bg-slate-950/45 backdrop-blur-sm" />
+          <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-[80] grid w-[min(92vw,32rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-md border border-[#D7DDE4] bg-white p-5 text-[#17202A] shadow-2xl">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <DialogPrimitive.Title className="text-lg font-black">
+                  افزودن رنگ جدید
+                </DialogPrimitive.Title>
+                <DialogPrimitive.Description className="mt-1 text-sm leading-6 text-[#5F6C79]">
+                  رنگ ذخیره‌شده بلافاصله به همین محصول اضافه می‌شود.
+                </DialogPrimitive.Description>
+              </div>
+              <DialogPrimitive.Close asChild>
+                <IconButton
+                  label="بستن"
+                  className="h-9 w-9 border-[#D7DDE4] bg-white text-[#17202A]"
+                >
+                  <X size={16} aria-hidden="true" />
+                </IconButton>
+              </DialogPrimitive.Close>
+            </div>
+
+            <div className="grid gap-3">
+              <label className="grid gap-1 text-sm font-bold">
+                نام فارسی رنگ
+                <Input
+                  value={newColor.labelFa}
+                  onChange={(event) =>
+                    setNewColor((current) => ({ ...current, labelFa: event.target.value }))
+                  }
+                  placeholder="آبی یخی"
+                />
+              </label>
+              <div className="grid gap-3 sm:grid-cols-[auto_1fr] sm:items-end">
+                <label className="grid gap-1 text-sm font-bold">
+                  انتخاب رنگ
+                  <input
+                    type="color"
+                    value={newColor.hex}
+                    onChange={(event) =>
+                      setNewColor((current) => ({ ...current, hex: event.target.value }))
+                    }
+                    className="h-11 w-16 cursor-pointer rounded-md border border-[#D7DDE4] bg-white p-1"
+                  />
+                </label>
+                <label className="grid gap-1 text-sm font-bold">
+                  کد hex
+                  <Input
+                    dir="ltr"
+                    value={newColor.hex}
+                    onChange={(event) =>
+                      setNewColor((current) => ({ ...current, hex: event.target.value }))
+                    }
+                    placeholder="#168BFF"
+                  />
+                </label>
+              </div>
+              <label className="grid gap-1 text-sm font-bold">
+                slug اختیاری
+                <Input
+                  dir="ltr"
+                  value={newColor.id}
+                  onChange={(event) =>
+                    setNewColor((current) => ({ ...current, id: event.target.value }))
+                  }
+                  placeholder="ice-blue"
+                />
+              </label>
+              <div className="flex min-h-12 items-center gap-3 rounded-md border border-[#D7DDE4] bg-[#F8FAFC] px-3">
+                <span
+                  className="h-7 w-7 rounded-full border border-slate-300"
+                  style={{ backgroundColor: newColor.hex }}
+                  aria-hidden="true"
+                />
+                <span className="text-sm font-bold">{newColor.labelFa || "رنگ جدید"}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-[#D7DDE4] pt-4">
+              <DialogPrimitive.Close asChild>
+                <Button type="button" variant="secondary">
+                  انصراف
+                </Button>
+              </DialogPrimitive.Close>
+              <Button type="button" onClick={createColor} disabled={loading}>
+                <Plus size={17} aria-hidden="true" />
+                ذخیره رنگ
               </Button>
             </div>
           </DialogPrimitive.Content>

@@ -19,6 +19,7 @@ import { CatalogPriceRangeFilter } from "@/components/catalog-price-range-filter
 import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { getCatalogRowStock, listCatalogRows, searchCatalogRows } from "@/lib/catalog-data";
+import { listAdminColors } from "@/lib/admin-colors";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import {
   aggregateProductResistanceOptions,
@@ -32,11 +33,7 @@ import {
 import type { AdminProductRecord } from "@/lib/admin-products";
 import { canonical } from "@ufo/seo";
 import { Button, EmptyState, Price, ProductCard } from "@ufo/ui";
-import {
-  brands,
-  categories,
-  getProductColorOptions,
-} from "@ufo/domain";
+import { brands, categories } from "@ufo/domain";
 import type { ProductKind, ProductVariant } from "@ufo/types";
 
 export const dynamic = "force-dynamic";
@@ -125,6 +122,7 @@ function filterWholesaleProducts(
   rows: AdminProductRecord[],
   params: B2BCatalogSearchParams,
   flavors: Awaited<ReturnType<typeof listAdminFlavors>>,
+  colors: Awaited<ReturnType<typeof listAdminColors>>,
   includePriceFilter = true,
 ) {
   const minPrice = parseToman(params.minPrice);
@@ -144,7 +142,9 @@ function filterWholesaleProducts(
     .filter(
       (row) =>
         !params.color ||
-        getProductColorOptions(row.product).some((color) => color.id === params.color),
+        getStorefrontVariantOptions(row.product, flavors, colors).some(
+          (option) => option.type === "color" && option.id === params.color,
+        ),
     )
     .filter(
       (row) =>
@@ -190,6 +190,7 @@ export default async function B2BCatalogPage({
   const rawParams = (await searchParams) ?? {};
   const rows = await listCatalogRows();
   const flavors = await listAdminFlavors();
+  const colors = await listAdminColors();
   const activeCategory = categories.find((item) => item.slug === rawParams.category);
   const specialFilterScope = activeCategory
     ? rows.filter(
@@ -201,7 +202,7 @@ export default async function B2BCatalogPage({
       )
     : [];
   const colorFilterOptions = activeCategory
-    ? aggregateStorefrontVariantOptions(specialFilterScope, flavors, "color")
+    ? aggregateStorefrontVariantOptions(specialFilterScope, flavors, "color", colors)
     : [];
   const flavorFilterOptions = activeCategory
     ? aggregateStorefrontVariantOptions(specialFilterScope, flavors, "flavor")
@@ -220,9 +221,9 @@ export default async function B2BCatalogPage({
   if (!resistanceFilterOptions.some((option) => option.id === rawParams.resistance)) {
     delete params.resistance;
   }
-  const priceScope = filterWholesaleProducts(rows, params, flavors, false);
+  const priceScope = filterWholesaleProducts(rows, params, flavors, colors, false);
   const priceBounds = getWholesalePriceBoundsToman(priceScope);
-  const filtered = filterWholesaleProducts(rows, params, flavors);
+  const filtered = filterWholesaleProducts(rows, params, flavors, colors);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(Math.max(Number(params.page ?? 1) || 1, 1), totalPages);
   const pagedProducts = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -501,7 +502,7 @@ export default async function B2BCatalogPage({
                 if (!variant) return null;
                 const available = getWholesaleStock(row);
                 const unitToman = Math.round(variant.wholesalePriceRial / variant.cartonSize / 10);
-                const variantOptions = getStorefrontVariantOptions(product, flavors);
+                const variantOptions = getStorefrontVariantOptions(product, flavors, colors);
                 return (
                   <div
                     key={product.id}
