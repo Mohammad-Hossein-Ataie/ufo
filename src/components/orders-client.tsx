@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { RotateCcw } from "lucide-react";
 import { Button, EmptyState, Price, StatusPill } from "@ufo/ui";
 import type { SubmittedOrder } from "@ufo/orders";
 import type { OrderStatus } from "@ufo/types";
+import { authHeaders, readCustomerSession } from "@/lib/customer-client";
 
 const orderStatusLabelsFa: Record<OrderStatus, string> = {
   draft: "پیش‌نویس",
@@ -20,35 +22,32 @@ const orderStatusLabelsFa: Record<OrderStatus, string> = {
   returned: "مرجوع شده",
 };
 
-function readPhone(): string {
-  const raw = window.localStorage.getItem("ufo-retail-session");
-  if (!raw) return "";
-  try {
-    const parsed = JSON.parse(raw) as { phone?: string };
-    return parsed.phone ?? "";
-  } catch {
-    return "";
-  }
-}
-
 export function OrdersClient() {
   const [orders, setOrders] = useState<SubmittedOrder[]>([]);
-  const [phone, setPhone] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const currentPhone = readPhone();
-    setPhone(currentPhone);
-    if (!currentPhone) return;
-    fetch(`/api/orders?phone=${encodeURIComponent(currentPhone)}`, { cache: "no-store" })
+    const session = readCustomerSession("retail");
+    setIsLoggedIn(Boolean(session));
+    if (!session) return;
+    fetch("/api/orders", { cache: "no-store", headers: authHeaders("retail") })
       .then((response) => response.json())
       .then((payload: { orders?: SubmittedOrder[] }) => setOrders(payload.orders ?? []))
       .catch(() => setOrders([]));
   }, []);
 
-  if (!phone) {
+  async function reorder(orderId: string) {
+    const response = await fetch(`/api/orders/${orderId}/reorder`, {
+      method: "POST",
+      headers: authHeaders("retail"),
+    });
+    if (response.ok) window.location.href = "/cart";
+  }
+
+  if (!isLoggedIn) {
     return (
       <EmptyState title="ورود انجام نشده است">
-        ابتدا با شماره همراه وارد شوید تا سفارش‌های همان شماره نمایش داده شود.
+        ابتدا با شماره همراه وارد شوید تا سفارش‌های حساب شما نمایش داده شود.
       </EmptyState>
     );
   }
@@ -63,14 +62,15 @@ export function OrdersClient() {
 
   return (
     <div className="overflow-x-auto rounded-md border border-[#22303D] bg-[#0D1117]">
-      <table className="min-w-[760px] w-full text-sm">
+      <table className="min-w-[860px] w-full text-sm">
         <thead className="bg-[#141A22] text-[#D9E2EC]">
           <tr>
             <th className="px-4 py-3 text-right">شماره</th>
+            <th className="px-4 py-3 text-right">تاریخ</th>
             <th className="px-4 py-3 text-right">وضعیت</th>
-            <th className="px-4 py-3 text-right">ارسال</th>
+            <th className="px-4 py-3 text-right">تعداد کالا</th>
             <th className="px-4 py-3 text-right">مبلغ</th>
-            <th className="px-4 py-3 text-right">جزئیات</th>
+            <th className="px-4 py-3 text-right">عملیات</th>
           </tr>
         </thead>
         <tbody>
@@ -79,17 +79,24 @@ export function OrdersClient() {
               <td className="px-4 py-3" dir="ltr">
                 {order.orderNumber}
               </td>
+              <td className="px-4 py-3">{new Date(order.createdAt).toLocaleDateString("fa-IR")}</td>
               <td className="px-4 py-3">
                 <StatusPill tone="info">{orderStatusLabelsFa[order.status]}</StatusPill>
               </td>
-              <td className="px-4 py-3">{order.etaFa}</td>
+              <td className="px-4 py-3">{order.items.length.toLocaleString("fa-IR")}</td>
               <td className="px-4 py-3 font-bold">
                 <Price valueRial={order.totalRial} />
               </td>
               <td className="px-4 py-3">
-                <Link href={`/orders/${order.id}`}>
-                  <Button size="sm">مشاهده</Button>
-                </Link>
+                <div className="flex flex-wrap gap-2">
+                  <Link href={`/orders/${order.id}`}>
+                    <Button size="sm">مشاهده</Button>
+                  </Link>
+                  <Button size="sm" variant="ghost" onClick={() => reorder(order.id)}>
+                    <RotateCcw size={16} />
+                    خرید مجدد
+                  </Button>
+                </div>
               </td>
             </tr>
           ))}

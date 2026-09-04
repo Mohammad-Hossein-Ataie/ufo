@@ -41,6 +41,7 @@ Do not commit real credentials. Use `.env.local` locally and Liara environment s
 - `SEARCH_PROVIDER`
 - `ANALYTICS_PROVIDER`
 - `UFO_MOCK_DATA_DIR`: local directory for file-backed mock orders/chat. Default: `./mock-data`.
+  - Also stores file-backed OTP challenges, customer accounts and active carts in local development.
 
 ## Store Settings Seed
 

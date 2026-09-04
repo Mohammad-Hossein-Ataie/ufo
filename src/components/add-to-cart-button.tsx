@@ -4,64 +4,17 @@ import { useState } from "react";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { Button } from "@ufo/ui";
 import type { ProductVariantType, SalesChannel } from "@ufo/types";
+import {
+  authHeaders,
+  readCustomerSession,
+  readGuestCart,
+  saveGuestCart,
+  type GuestCartLine,
+} from "@/lib/customer-client";
 
 interface SelectedVariant {
   type: Exclude<ProductVariantType, "none">;
   valueId: string;
-}
-
-interface CartLine {
-  variantId: string;
-  quantity: number;
-  channel: SalesChannel;
-  selectedVariant?: SelectedVariant;
-  colorId?: string;
-}
-
-function isSelectedVariant(value: unknown): value is SelectedVariant {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    (record.type === "flavor" ||
-      record.type === "color" ||
-      record.type === "resistance" ||
-      record.type === "capacity") &&
-    typeof record.valueId === "string"
-  );
-}
-
-const cartKeys: Record<SalesChannel, string> = {
-  retail: "ufo-retail-cart",
-  wholesale: "ufo-b2b-cart",
-};
-
-function isCartLine(value: unknown): value is CartLine {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "variantId" in value &&
-    "quantity" in value &&
-    "channel" in value &&
-    typeof value.variantId === "string" &&
-    typeof value.quantity === "number" &&
-    (value.channel === "retail" || value.channel === "wholesale") &&
-    (!("selectedVariant" in value) || isSelectedVariant(value.selectedVariant)) &&
-    (!("colorId" in value) || typeof value.colorId === "string")
-  );
-}
-
-function readCart(channel: SalesChannel): CartLine[] {
-  const raw =
-    window.localStorage.getItem(cartKeys[channel]) ?? window.localStorage.getItem("ufo-cart");
-  if (!raw) return [];
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed)
-      ? parsed.filter(isCartLine).filter((line) => line.channel === channel)
-      : [];
-  } catch {
-    return [];
-  }
 }
 
 export function AddToCartButton({
@@ -95,7 +48,7 @@ export function AddToCartButton({
         ? selectedColorIds.map((colorId) => ({ type: "color", valueId: colorId }))
         : [undefined];
 
-  function variantMatches(line: CartLine, option: SelectedVariant | undefined) {
+  function variantMatches(line: GuestCartLine, option: SelectedVariant | undefined) {
     const lineOption =
       line.selectedVariant ??
       (line.colorId ? ({ type: "color", valueId: line.colorId } as const) : undefined);
@@ -107,7 +60,7 @@ export function AddToCartButton({
     );
   }
 
-  function linePayload(option: SelectedVariant | undefined, lineQuantity: number): CartLine {
+  function linePayload(option: SelectedVariant | undefined, lineQuantity: number): GuestCartLine {
     return {
       variantId,
       quantity: lineQuantity,
@@ -117,9 +70,34 @@ export function AddToCartButton({
     };
   }
 
-  function addToCart(addQuantity = quantity) {
-    const cart = readCart(channel);
+  async function syncServerCart(line: GuestCartLine) {
+    const session = readCustomerSession(channel);
+    if (!session) return false;
+    const response = await fetch("/api/cart/items", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authHeaders(channel) },
+      body: JSON.stringify(line),
+    });
+    if (!response.ok) return false;
+    window.dispatchEvent(
+      new CustomEvent(`${channel === "retail" ? "ufo-retail-cart" : "ufo-b2b-cart"}-updated`),
+    );
+    window.dispatchEvent(new CustomEvent("ufo-cart-updated"));
+    return true;
+  }
+
+  async function addToCart(addQuantity = quantity) {
+    const cart = readGuestCart(channel);
     const quantityToAdd = Math.max(1, Math.floor(addQuantity));
+    const session = readCustomerSession(channel);
+    if (session) {
+      await Promise.all(
+        selectedVariants.map((option) => syncServerCart(linePayload(option, quantityToAdd))),
+      );
+      setAdded(true);
+      window.setTimeout(() => setAdded(false), 1800);
+      return;
+    }
     let nextCart = [...cart];
     for (const option of selectedVariants) {
       const existing = nextCart.find((line) => variantMatches(line, option));
@@ -131,16 +109,29 @@ export function AddToCartButton({
           )
         : [...nextCart, linePayload(option, quantityToAdd)];
     }
-    window.localStorage.setItem(cartKeys[channel], JSON.stringify(nextCart));
-    window.dispatchEvent(new CustomEvent(`${cartKeys[channel]}-updated`));
-    window.dispatchEvent(new CustomEvent("ufo-cart-updated"));
+    saveGuestCart(channel, nextCart);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1800);
   }
 
-  function setRetailQuantity(nextQuantity: number) {
+  async function setRetailQuantity(nextQuantity: number) {
     const safeQuantity = Math.max(0, Math.floor(nextQuantity));
-    const cart = readCart(channel);
+    const session = readCustomerSession(channel);
+    if (session && safeQuantity > 0) {
+      const delta = safeQuantity - selectedQuantity;
+      if (delta <= 0) {
+        setSelectedQuantity(safeQuantity);
+        return;
+      }
+      await Promise.all(
+        selectedVariants.map((option) => syncServerCart(linePayload(option, delta))),
+      );
+      setSelectedQuantity(safeQuantity);
+      setAdded(true);
+      window.setTimeout(() => setAdded(false), 1800);
+      return;
+    }
+    const cart = readGuestCart(channel);
     let nextCart = cart.filter(
       (line) =>
         !(
@@ -155,9 +146,7 @@ export function AddToCartButton({
         ...selectedVariants.map((option) => linePayload(option, safeQuantity)),
       ];
     }
-    window.localStorage.setItem(cartKeys[channel], JSON.stringify(nextCart));
-    window.dispatchEvent(new CustomEvent(`${cartKeys[channel]}-updated`));
-    window.dispatchEvent(new CustomEvent("ufo-cart-updated"));
+    saveGuestCart(channel, nextCart);
     setSelectedQuantity(safeQuantity);
     setAdded(safeQuantity > 0);
     window.setTimeout(() => setAdded(false), 1800);

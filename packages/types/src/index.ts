@@ -1,4 +1,7 @@
 export type SalesChannel = "retail" | "wholesale";
+export type CustomerType = SalesChannel;
+export type CustomerStatus = "active" | "suspended";
+export type CartStatus = "ACTIVE" | "CHECKED_OUT" | "ABANDONED";
 
 export type UserRole =
   | "retail_customer"
@@ -256,6 +259,49 @@ export interface User {
   fullName?: string;
   roles: UserRole[];
   createdAt: string;
+}
+
+export interface Customer {
+  id: string;
+  mobileNumber: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  customerType: CustomerType;
+  status: CustomerStatus;
+  companyName?: string;
+  businessType?: string;
+  taxId?: string;
+  customerLevel?: string;
+  pricingGroup?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CartItem {
+  id: string;
+  cartId: string;
+  productId: string;
+  variantId?: string;
+  quantity: number;
+  unitPriceSnapshot: number;
+  discountAmount: number;
+  cartonCount?: number;
+  selectedVariant?: {
+    type: Exclude<ProductVariantType, "none">;
+    valueId: string;
+  };
+  createdAt: string;
+}
+
+export interface Cart {
+  id: string;
+  customerId: string;
+  platformType: SalesChannel;
+  status: CartStatus;
+  items: CartItem[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface BusinessProfile {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { createSubmittedOrder, listSubmittedOrders, type CartSubmissionLine } from "@ufo/orders";
-import type { ProductVariantType, ShippingMethodCode } from "@ufo/types";
+import { checkoutCustomerCart, listSubmittedOrders } from "@ufo/orders";
+import type { ShippingMethodCode } from "@ufo/types";
+import { requireCustomerSession } from "@/lib/customer-session";
 
 export const runtime = "nodejs";
 
@@ -13,63 +14,22 @@ function shippingMethod(value: unknown): ShippingMethodCode {
   return "tipax";
 }
 
-function selectedVariant(
-  value: unknown,
-): { type: Exclude<ProductVariantType, "none">; valueId: string } | undefined {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
-  const record = value as Record<string, unknown>;
-  if (
-    (record.type === "flavor" ||
-      record.type === "color" ||
-      record.type === "resistance" ||
-      record.type === "capacity") &&
-    typeof record.valueId === "string"
-  ) {
-    return { type: record.type, valueId: record.valueId };
-  }
-  return undefined;
-}
-
-function cartLines(value: unknown): CartSubmissionLine[] {
-  if (!Array.isArray(value)) return [];
-  const lines: CartSubmissionLine[] = [];
-  value.forEach((line) => {
-    if (typeof line !== "object" || line === null) return;
-    const record = line as Record<string, unknown>;
-    const quantity =
-      typeof record.quantity === "number" ? record.quantity : Number(record.quantity);
-    const cartonCount =
-      typeof record.cartonCount === "number" ? record.cartonCount : Number(record.cartonCount);
-    if (
-      typeof record.variantId !== "string" ||
-      !Number.isInteger(quantity) ||
-      quantity <= 0 ||
-      !Number.isInteger(cartonCount) ||
-      cartonCount <= 0
-    ) {
-      return;
-    }
-    const option = selectedVariant(record.selectedVariant);
-    lines.push({
-      variantId: record.variantId,
-      quantity,
-      cartonCount,
-      ...(option ? { selectedVariant: option } : {}),
-      ...(typeof record.colorId === "string" ? { colorId: record.colorId } : {}),
-    });
-  });
-  return lines;
-}
-
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const phone = url.searchParams.get("phone") ?? undefined;
-  const orders = listSubmittedOrders({ channel: "wholesale", ...(phone ? { phone } : {}) });
-  return NextResponse.json({ orders });
+  try {
+    const session = requireCustomerSession(request, "wholesale");
+    const orders = listSubmittedOrders({ channel: "wholesale", customerId: session.customerId });
+    return NextResponse.json({ orders });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "دریافت سفارش‌های عمده انجام نشد." },
+      { status: 401 },
+    );
+  }
 }
 
 export async function POST(request: Request) {
   try {
+    const session = requireCustomerSession(request, "wholesale");
     const payload = (await request.json()) as Record<string, unknown>;
     const businessName = stringValue(payload.businessName).trim();
     const customerName = stringValue(
@@ -80,19 +40,19 @@ export async function POST(request: Request) {
     const city = stringValue(payload.city, "تهران");
     const addressLine = stringValue(payload.address || payload.line1).trim();
     const province = stringValue(payload.province, city === "تهران" ? "تهران" : "");
-    const order = createSubmittedOrder({
+    const order = checkoutCustomerCart({
       channel: "wholesale",
+      customerId: session.customerId,
       businessName,
       customerName,
-      phone,
+      phone: phone || session.phone,
       address: {
         province,
         city,
         line1: addressLine,
         receiverName: customerName,
-        receiverPhone: phone,
+        receiverPhone: phone || session.phone,
       },
-      lines: cartLines(payload.lines),
       shippingMethod: shippingMethod(payload.shippingMethod),
       paymentMethod: "card_to_card",
       receiptNote: stringValue(payload.receiptNote),

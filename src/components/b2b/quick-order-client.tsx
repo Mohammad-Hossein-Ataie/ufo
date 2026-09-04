@@ -9,6 +9,7 @@ import {
   validateWholesaleCartonCount,
   variants,
 } from "@ufo/domain";
+import { authHeaders, readCustomerSession, saveGuestCart } from "@/lib/customer-client";
 
 type CartonState = Record<string, number>;
 
@@ -60,7 +61,7 @@ export function QuickOrderClient() {
     });
   }
 
-  function saveWholesaleCart() {
+  async function saveWholesaleCart() {
     if (selectedLines.length === 0 || hasInvalidSelection) return;
     const payload = selectedLines.map((line) => {
       validateWholesaleCartonCount(line.variant, line.cartonCount);
@@ -68,11 +69,22 @@ export function QuickOrderClient() {
         variantId: line.variant.id,
         quantity: line.quantity,
         cartonCount: line.cartonCount,
-        channel: "wholesale",
+        channel: "wholesale" as const,
       };
     });
-    window.localStorage.setItem("ufo-b2b-cart", JSON.stringify(payload));
-    window.dispatchEvent(new CustomEvent("ufo-b2b-cart-updated"));
+    if (readCustomerSession("wholesale")) {
+      await Promise.all(
+        payload.map((line) =>
+          fetch("/api/cart/items", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", ...authHeaders("wholesale") },
+            body: JSON.stringify(line),
+          }),
+        ),
+      );
+    } else {
+      saveGuestCart("wholesale", payload);
+    }
     window.location.href = "/b2b/cart";
   }
 

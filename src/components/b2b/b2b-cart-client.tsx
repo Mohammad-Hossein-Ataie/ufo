@@ -3,72 +3,86 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Button, EmptyState, Price } from "@ufo/ui";
+import { Minus, Plus, Trash2 } from "lucide-react";
+import { calculateCartonQuantity, products, variants } from "@ufo/domain";
+import { Button, EmptyState, IconButton, Price } from "@ufo/ui";
+import type { CustomerCartView, EnrichedCartItem } from "@ufo/orders";
 import {
-  getProductColorById,
-  getProductFlavorById,
-  getProductVariantOptions,
-  products,
-  variants,
-} from "@ufo/domain";
-import type { ProductVariantType } from "@ufo/types";
+  authHeaders,
+  fetchCustomerCart,
+  readCustomerSession,
+  readGuestCart,
+  saveGuestCart,
+  type GuestCartLine,
+} from "@/lib/customer-client";
 
-interface SelectedVariant {
-  type: Exclude<ProductVariantType, "none">;
-  valueId: string;
-}
-
-interface CartLine {
+interface WholesaleLine {
+  id?: string;
   variantId: string;
-  quantity: number;
   cartonCount: number;
-  channel: "wholesale";
-  selectedVariant?: SelectedVariant;
-  colorId?: string;
+  quantity: number;
+  productName: string;
+  variantName: string;
+  sku: string;
+  image: string;
+  unitPriceSnapshot: number;
+  discountAmount: number;
+  totalPrice: number;
 }
 
-function isSelectedVariant(value: unknown): value is SelectedVariant {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    (record.type === "flavor" ||
-      record.type === "color" ||
-      record.type === "resistance" ||
-      record.type === "capacity") &&
-    typeof record.valueId === "string"
-  );
+function guestToLine(line: GuestCartLine): WholesaleLine | null {
+  const variant = variants.find((item) => item.id === line.variantId);
+  const product = variant ? products.find((item) => item.id === variant.productId) : undefined;
+  if (!variant || !product || line.channel !== "wholesale") return null;
+  const cartonCount = line.cartonCount ?? Math.ceil(line.quantity / variant.cartonSize);
+  const quantity = calculateCartonQuantity(variant, cartonCount);
+  return {
+    variantId: line.variantId,
+    cartonCount,
+    quantity,
+    productName: product.nameFa,
+    variantName: variant.nameFa,
+    sku: variant.sku,
+    image: product.image,
+    unitPriceSnapshot: variant.wholesalePriceRial,
+    discountAmount: 0,
+    totalPrice: variant.wholesalePriceRial * quantity,
+  };
 }
 
-function readCart(): CartLine[] {
-  const raw =
-    window.localStorage.getItem("ufo-b2b-cart") ?? window.localStorage.getItem("ufo-cart");
-  if (!raw) return [];
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((line): line is CartLine => {
-      if (typeof line !== "object" || line === null) return false;
-      const record = line as Record<string, unknown>;
-      return (
-        typeof record.variantId === "string" &&
-        typeof record.quantity === "number" &&
-        typeof record.cartonCount === "number" &&
-        record.channel === "wholesale" &&
-        (!("selectedVariant" in record) || isSelectedVariant(record.selectedVariant)) &&
-        (!("colorId" in record) || typeof record.colorId === "string")
-      );
-    });
-  } catch {
-    return [];
-  }
+function serverToLine(item: EnrichedCartItem): WholesaleLine {
+  return {
+    id: item.id,
+    variantId: item.variantId ?? "",
+    cartonCount: item.cartonCount ?? 1,
+    quantity: item.quantity,
+    productName: item.productName,
+    variantName: item.variantName,
+    sku: item.sku,
+    image: item.image,
+    unitPriceSnapshot: item.unitPriceSnapshot,
+    discountAmount: item.discountAmount,
+    totalPrice: item.totalPrice,
+  };
 }
 
 export function B2BCartClient() {
-  const [cart, setCart] = useState<CartLine[]>([]);
+  const [cartView, setCartView] = useState<CustomerCartView | null>(null);
+  const [guestCart, setGuestCart] = useState<GuestCartLine[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  async function sync() {
+    const session = readCustomerSession("wholesale");
+    setIsLoggedIn(Boolean(session));
+    if (session) {
+      setCartView(await fetchCustomerCart("wholesale"));
+      return;
+    }
+    setGuestCart(readGuestCart("wholesale"));
+  }
 
   useEffect(() => {
-    const sync = () => setCart(readCart());
-    sync();
+    void sync();
     window.addEventListener("ufo-b2b-cart-updated", sync);
     window.addEventListener("storage", sync);
     return () => {
@@ -79,43 +93,72 @@ export function B2BCartClient() {
 
   const lines = useMemo(
     () =>
-      cart
-        .map((line) => {
-          const variant = variants.find((item) => item.id === line.variantId);
-          const product = variant
-            ? products.find((item) => item.id === variant.productId)
-            : undefined;
-          if (!variant || !product) return null;
-          const selectedVariant =
-            line.selectedVariant ??
-            (line.colorId ? ({ type: "color", valueId: line.colorId } as const) : undefined);
-          const selectedOption =
-            selectedVariant?.type === "flavor"
-              ? getProductFlavorById(selectedVariant.valueId)
-              : selectedVariant?.type === "color"
-                ? getProductColorById(selectedVariant.valueId)
-                : selectedVariant
-                  ? getProductVariantOptions(product).find((item) => item.id === selectedVariant.valueId)
-                  : undefined;
-          return {
-            ...line,
-            variant,
-            product,
-            selectedVariant,
-            selectedOption,
-            totalRial: variant.wholesalePriceRial * line.quantity,
-          };
-        })
-        .filter((line): line is NonNullable<typeof line> => line !== null),
-    [cart],
+      isLoggedIn
+        ? (cartView?.items.map(serverToLine) ?? [])
+        : guestCart.map(guestToLine).filter((line): line is WholesaleLine => line !== null),
+    [cartView, guestCart, isLoggedIn],
   );
 
-  const totalRial = lines.reduce((sum, line) => sum + line.totalRial, 0);
+  const subtotalRial = isLoggedIn
+    ? (cartView?.summary.subtotalRial ?? 0)
+    : lines.reduce((sum, line) => sum + line.unitPriceSnapshot * line.quantity, 0);
+  const discountRial = isLoggedIn
+    ? (cartView?.summary.discountRial ?? 0)
+    : lines.reduce((sum, line) => sum + line.discountAmount, 0);
+  const totalRial = isLoggedIn
+    ? (cartView?.summary.totalRial ?? 0)
+    : lines.reduce((sum, line) => sum + line.totalPrice, 0);
 
-  function clearCart() {
-    window.localStorage.removeItem("ufo-b2b-cart");
-    window.dispatchEvent(new CustomEvent("ufo-b2b-cart-updated"));
-    setCart([]);
+  async function updateCarton(line: WholesaleLine, cartonCount: number) {
+    const safeCartons = Math.max(0, Math.floor(cartonCount));
+    const variant = variants.find((item) => item.id === line.variantId);
+    if (!variant) return;
+    if (isLoggedIn && line.id) {
+      const requestInit: RequestInit =
+        safeCartons === 0
+          ? { method: "DELETE", headers: authHeaders("wholesale") }
+          : {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json", ...authHeaders("wholesale") },
+              body: JSON.stringify({
+                cartonCount: safeCartons,
+                quantity: calculateCartonQuantity(variant, safeCartons),
+              }),
+            };
+      const response = await fetch(`/api/cart/items/${line.id}`, requestInit);
+      if (response.ok) setCartView((await response.json()) as CustomerCartView);
+      return;
+    }
+    const next = guestCart
+      .map((item) =>
+        item.variantId === line.variantId
+          ? {
+              ...item,
+              cartonCount: safeCartons,
+              quantity: safeCartons > 0 ? calculateCartonQuantity(variant, safeCartons) : 0,
+            }
+          : item,
+      )
+      .filter((item) => item.quantity > 0);
+    saveGuestCart("wholesale", next);
+    setGuestCart(next);
+  }
+
+  async function clearCart() {
+    if (isLoggedIn && cartView) {
+      await Promise.all(
+        cartView.items.map((item) =>
+          fetch(`/api/cart/items/${item.id}`, {
+            method: "DELETE",
+            headers: authHeaders("wholesale"),
+          }),
+        ),
+      );
+      setCartView(await fetchCustomerCart("wholesale"));
+      return;
+    }
+    saveGuestCart("wholesale", []);
+    setGuestCart([]);
   }
 
   if (lines.length === 0) {
@@ -131,42 +174,78 @@ export function B2BCartClient() {
       <div className="grid gap-3">
         {lines.map((line) => (
           <article
-            key={`${line.variantId}-${line.selectedVariant?.type ?? "none"}-${line.selectedVariant?.valueId ?? line.colorId ?? "default"}`}
+            key={line.id ?? line.variantId}
             className="grid gap-4 rounded-md border border-[#D5D9C9] bg-white p-4 sm:grid-cols-[7rem_1fr_auto]"
           >
             <div className="relative aspect-square overflow-hidden rounded-md border border-[#D5D9C9] bg-[#EEF0E5]">
               <Image
-                src={line.product.image}
-                alt={line.product.nameFa}
+                src={line.image}
+                alt={line.productName}
                 fill
                 sizes="(min-width: 640px) 7rem, 100vw"
                 className="object-cover"
               />
             </div>
             <div className="min-w-0">
-              <h2 className="font-bold">{line.product.nameFa}</h2>
+              <h2 className="font-bold">{line.productName}</h2>
               <p className="mt-1 text-sm text-[#596B61]">
-                {line.variant.nameFa} · {line.variant.sku}
+                {line.variantName} · {line.sku}
               </p>
               <p className="mt-2 text-sm text-[#596B61]">
                 {line.cartonCount.toLocaleString("fa-IR")} کارتن ·{" "}
                 {line.quantity.toLocaleString("fa-IR")} عدد
               </p>
+              <div className="mt-3 inline-flex h-10 items-center overflow-hidden rounded-md border border-[#D5D9C9]">
+                <IconButton
+                  label="کاهش کارتن"
+                  className="h-10 w-10 border-0 text-[#12201A]"
+                  onClick={() => updateCarton(line, line.cartonCount - 1)}
+                >
+                  <Minus size={16} />
+                </IconButton>
+                <output className="min-w-12 px-3 text-center text-sm font-bold text-[#12201A]">
+                  {line.cartonCount.toLocaleString("fa-IR")}
+                </output>
+                <IconButton
+                  label="افزایش کارتن"
+                  className="h-10 w-10 border-0 text-[#12201A]"
+                  onClick={() => updateCarton(line, line.cartonCount + 1)}
+                >
+                  <Plus size={16} />
+                </IconButton>
+              </div>
             </div>
-            <div className="font-bold">
-              <Price valueRial={line.totalRial} />
+            <div className="grid content-between gap-3 justify-items-end font-bold">
+              <Price valueRial={line.totalPrice} />
+              <IconButton
+                label="حذف از سبد"
+                className="text-[#12201A]"
+                onClick={() => updateCarton(line, 0)}
+              >
+                <Trash2 size={16} />
+              </IconButton>
             </div>
           </article>
         ))}
       </div>
       <aside className="h-fit rounded-md border border-[#D5D9C9] bg-[#14201B] p-5 text-white">
         <h2 className="text-lg font-bold">خلاصه عمده</h2>
-        <div className="mt-4 flex items-center justify-between">
-          <span className="text-white/65">جمع کالاها</span>
-          <Price valueRial={totalRial} />
+        <div className="mt-4 grid gap-2">
+          <div className="flex items-center justify-between">
+            <span className="text-white/65">جمع کالاها</span>
+            <Price valueRial={subtotalRial} />
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-white/65">تخفیف</span>
+            <Price valueRial={discountRial} />
+          </div>
+          <div className="border-t border-white/15 pt-3 flex items-center justify-between font-black">
+            <span>قابل پرداخت</span>
+            <Price valueRial={totalRial} />
+          </div>
         </div>
         <div className="mt-5 grid gap-2">
-          <Link href="/b2b/checkout">
+          <Link href={isLoggedIn ? "/b2b/checkout" : "/b2b/login?next=/b2b/checkout"}>
             <Button className="w-full border-[#E8C547] bg-[#E8C547] text-[#14201B] hover:bg-[#F0D86D]">
               ادامه ثبت سفارش
             </Button>

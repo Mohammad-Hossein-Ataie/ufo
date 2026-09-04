@@ -69,7 +69,7 @@ export function SiteHeader() {
   }, [pathname]);
 
   const cartHref = loggedIn ? "/cart" : "/login?next=/cart";
-  const accountHref = loggedIn ? "/cart" : "/login";
+  const accountHref = loggedIn ? "/account" : "/login";
   const accountLabel = loggedIn ? "حساب و سبد خرید" : "ورود";
   const formattedCount = useMemo(
     () => new Intl.NumberFormat("fa-IR").format(cartCount),

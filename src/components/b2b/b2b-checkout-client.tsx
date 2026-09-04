@@ -1,43 +1,12 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
 import { CreditCard, Send, Truck } from "lucide-react";
 import { Alert, Button, EmptyState, Input, Price, Textarea } from "@ufo/ui";
-import { products, variants } from "@ufo/domain";
-import type { ProductVariantType, SalesChannel, ShippingMethodCode } from "@ufo/types";
-
-interface SelectedVariant {
-  type: Exclude<ProductVariantType, "none">;
-  valueId: string;
-}
-
-interface CartLine {
-  variantId: string;
-  quantity: number;
-  cartonCount: number;
-  channel: SalesChannel;
-  selectedVariant?: SelectedVariant;
-  colorId?: string;
-}
-
-function isSelectedVariant(value: unknown): value is SelectedVariant {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    (record.type === "flavor" ||
-      record.type === "color" ||
-      record.type === "resistance" ||
-      record.type === "capacity") &&
-    typeof record.valueId === "string"
-  );
-}
-
-interface B2BSession {
-  channel: "wholesale";
-  businessName: string;
-  managerName: string;
-  phone: string;
-}
+import type { ShippingMethodCode } from "@ufo/types";
+import type { CustomerCartView } from "@ufo/orders";
+import { authHeaders, fetchCustomerCart, readCustomerSession } from "@/lib/customer-client";
 
 const shippingOptions: Array<{
   code: ShippingMethodCode;
@@ -55,50 +24,8 @@ const shippingOptions: Array<{
   { code: "pickup", title: "تحویل حضوری", costRial: 0, eta: "هماهنگی همان روز" },
 ];
 
-function readCart(): CartLine[] {
-  const raw =
-    window.localStorage.getItem("ufo-b2b-cart") ?? window.localStorage.getItem("ufo-cart");
-  if (!raw) return [];
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((line): line is CartLine => {
-      if (typeof line !== "object" || line === null) return false;
-      const record = line as Record<string, unknown>;
-      return (
-        typeof record.variantId === "string" &&
-        typeof record.quantity === "number" &&
-        typeof record.cartonCount === "number" &&
-        record.channel === "wholesale" &&
-        (!("selectedVariant" in record) || isSelectedVariant(record.selectedVariant)) &&
-        (!("colorId" in record) || typeof record.colorId === "string")
-      );
-    });
-  } catch {
-    return [];
-  }
-}
-
-function readSession(): B2BSession | null {
-  const raw = window.localStorage.getItem("ufo-b2b-session");
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(raw) as Partial<B2BSession>;
-    return parsed.channel === "wholesale" && typeof parsed.phone === "string"
-      ? {
-          channel: "wholesale",
-          phone: parsed.phone,
-          businessName: parsed.businessName ?? "",
-          managerName: parsed.managerName ?? "",
-        }
-      : null;
-  } catch {
-    return null;
-  }
-}
-
 export function B2BCheckoutClient() {
-  const [cart, setCart] = useState<CartLine[]>([]);
+  const [cartView, setCartView] = useState<CustomerCartView | null>(null);
   const [businessName, setBusinessName] = useState("");
   const [managerName, setManagerName] = useState("");
   const [phone, setPhone] = useState("");
@@ -108,41 +35,28 @@ export function B2BCheckoutClient() {
   const [receiptNote, setReceiptNote] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    setCart(readCart());
-    const session = readSession();
-    if (session) {
-      setBusinessName(session.businessName);
-      setManagerName(session.managerName);
-      setPhone(session.phone);
-    }
+    const session = readCustomerSession("wholesale");
+    setIsLoggedIn(Boolean(session));
+    if (!session) return;
+    setBusinessName(session.customer.companyName ?? session.businessName ?? "");
+    setManagerName(
+      `${session.customer.firstName} ${session.customer.lastName}`.trim() ||
+        session.managerName ||
+        "",
+    );
+    setPhone(session.customer.mobileNumber);
+    void fetchCustomerCart("wholesale").then(setCartView);
   }, []);
-
-  const lines = useMemo(
-    () =>
-      cart
-        .map((line) => {
-          const variant = variants.find((item) => item.id === line.variantId);
-          const product = variant
-            ? products.find((item) => item.id === variant.productId)
-            : undefined;
-          if (!variant || !product) return null;
-          return {
-            ...line,
-            product,
-            variant,
-            totalRial: variant.wholesalePriceRial * line.quantity,
-          };
-        })
-        .filter((line): line is NonNullable<typeof line> => line !== null),
-    [cart],
-  );
 
   const shipping =
     shippingOptions.find((item) => item.code === shippingMethod) ?? shippingOptions[0]!;
-  const subtotalRial = lines.reduce((sum, line) => sum + line.totalRial, 0);
-  const totalRial = subtotalRial + shipping.costRial;
+  const subtotalRial = cartView?.summary.subtotalRial ?? 0;
+  const discountRial = cartView?.summary.discountRial ?? 0;
+  const totalRial = subtotalRial - discountRial + shipping.costRial;
+  const lines = cartView?.items ?? [];
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -150,7 +64,7 @@ export function B2BCheckoutClient() {
     setError("");
     const response = await fetch("/api/b2b/orders", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders("wholesale") },
       body: JSON.stringify({
         businessName,
         customerName: managerName,
@@ -159,13 +73,6 @@ export function B2BCheckoutClient() {
         address,
         shippingMethod,
         receiptNote,
-        lines: cart.map((line) => ({
-          variantId: line.variantId,
-          quantity: line.quantity,
-          cartonCount: line.cartonCount,
-          ...(line.selectedVariant ? { selectedVariant: line.selectedVariant } : {}),
-          ...(line.colorId ? { colorId: line.colorId } : {}),
-        })),
       }),
     });
     const payload = (await response.json().catch(() => ({}))) as {
@@ -177,9 +84,20 @@ export function B2BCheckoutClient() {
       setError(payload.error ?? "ثبت سفارش عمده انجام نشد.");
       return;
     }
-    window.localStorage.removeItem("ufo-b2b-cart");
     window.dispatchEvent(new CustomEvent("ufo-b2b-cart-updated"));
     window.location.href = `/b2b/orders/${payload.order.id}`;
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <EmptyState title="برای ثبت سفارش عمده وارد شوید">
+        <Link href="/b2b/login?next=/b2b/checkout" className="mt-3 inline-flex">
+          <Button className="border-[#1F8A5B] bg-[#1F8A5B] text-white hover:bg-[#176D48]">
+            ورود همکاری
+          </Button>
+        </Link>
+      </EmptyState>
+    );
   }
 
   if (lines.length === 0) {
@@ -259,11 +177,7 @@ export function B2BCheckoutClient() {
         </fieldset>
         <label className="grid gap-2">
           توضیح/شماره پیگیری پرداخت
-          <Textarea
-            value={receiptNote}
-            onChange={(event) => setReceiptNote(event.target.value)}
-            placeholder="شماره پیگیری یا توضیح پرداخت عمده"
-          />
+          <Textarea value={receiptNote} onChange={(event) => setReceiptNote(event.target.value)} />
         </label>
       </section>
       <aside className="h-fit rounded-md border border-[#D5D9C9] bg-[#14201B] p-5 text-white">
@@ -273,15 +187,15 @@ export function B2BCheckoutClient() {
         </h2>
         <div className="mt-4 grid gap-3 text-sm">
           {lines.map((line) => (
-            <div key={line.variant.id} className="flex items-start justify-between gap-3">
+            <div key={line.id} className="flex items-start justify-between gap-3">
               <span>
-                {line.product.nameFa}
+                {line.productName}
                 <br />
                 <small className="text-white/65">
-                  {line.cartonCount.toLocaleString("fa-IR")} کارتن
+                  {line.cartonCount?.toLocaleString("fa-IR")} کارتن
                 </small>
               </span>
-              <Price valueRial={line.totalRial} />
+              <Price valueRial={line.totalPrice} />
             </div>
           ))}
         </div>
@@ -289,6 +203,10 @@ export function B2BCheckoutClient() {
           <div className="flex justify-between gap-3">
             <span>جمع کالاها</span>
             <Price valueRial={subtotalRial} />
+          </div>
+          <div className="mt-2 flex justify-between gap-3">
+            <span>تخفیف</span>
+            <Price valueRial={discountRial} />
           </div>
           <div className="mt-2 flex justify-between gap-3">
             <span>ارسال</span>

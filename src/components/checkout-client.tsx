@@ -1,41 +1,12 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
 import { CreditCard, Send, Truck } from "lucide-react";
 import { Alert, Button, EmptyState, Input, Price, Textarea } from "@ufo/ui";
-import { products, variants } from "@ufo/domain";
-import type { ProductVariantType, SalesChannel, ShippingMethodCode } from "@ufo/types";
-
-interface SelectedVariant {
-  type: Exclude<ProductVariantType, "none">;
-  valueId: string;
-}
-
-interface CartLine {
-  variantId: string;
-  quantity: number;
-  channel: SalesChannel;
-  selectedVariant?: SelectedVariant;
-  colorId?: string;
-}
-
-function isSelectedVariant(value: unknown): value is SelectedVariant {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    (record.type === "flavor" ||
-      record.type === "color" ||
-      record.type === "resistance" ||
-      record.type === "capacity") &&
-    typeof record.valueId === "string"
-  );
-}
-
-interface RetailSession {
-  channel: "retail";
-  fullName: string;
-  phone: string;
-}
+import type { ShippingMethodCode } from "@ufo/types";
+import type { CustomerCartView } from "@ufo/orders";
+import { authHeaders, fetchCustomerCart, readCustomerSession } from "@/lib/customer-client";
 
 const shippingOptions: Array<{
   code: ShippingMethodCode;
@@ -53,44 +24,8 @@ const shippingOptions: Array<{
   { code: "pickup", title: "تحویل حضوری", costRial: 0, eta: "هماهنگی همان روز" },
 ];
 
-function readCart(): CartLine[] {
-  const raw =
-    window.localStorage.getItem("ufo-retail-cart") ?? window.localStorage.getItem("ufo-cart");
-  if (!raw) return [];
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((line): line is CartLine => {
-      if (typeof line !== "object" || line === null) return false;
-      const record = line as Record<string, unknown>;
-      return (
-        typeof record.variantId === "string" &&
-        typeof record.quantity === "number" &&
-        record.channel === "retail" &&
-        (!("selectedVariant" in record) || isSelectedVariant(record.selectedVariant)) &&
-        (!("colorId" in record) || typeof record.colorId === "string")
-      );
-    });
-  } catch {
-    return [];
-  }
-}
-
-function readSession(): RetailSession | null {
-  const raw = window.localStorage.getItem("ufo-retail-session");
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(raw) as Partial<RetailSession>;
-    return parsed.channel === "retail" && typeof parsed.phone === "string"
-      ? { channel: "retail", phone: parsed.phone, fullName: parsed.fullName ?? "" }
-      : null;
-  } catch {
-    return null;
-  }
-}
-
 export function CheckoutClient() {
-  const [cart, setCart] = useState<CartLine[]>([]);
+  const [cartView, setCartView] = useState<CustomerCartView | null>(null);
   const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("تهران");
@@ -99,40 +34,25 @@ export function CheckoutClient() {
   const [receiptNote, setReceiptNote] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    setCart(readCart());
-    const session = readSession();
-    if (session) {
-      setCustomerName(session.fullName);
-      setPhone(session.phone);
-    }
+    const session = readCustomerSession("retail");
+    setIsLoggedIn(Boolean(session));
+    if (!session) return;
+    setCustomerName(
+      `${session.customer.firstName} ${session.customer.lastName}`.trim() || session.fullName || "",
+    );
+    setPhone(session.customer.mobileNumber);
+    void fetchCustomerCart("retail").then(setCartView);
   }, []);
-
-  const lines = useMemo(
-    () =>
-      cart
-        .map((line) => {
-          const variant = variants.find((item) => item.id === line.variantId);
-          const product = variant
-            ? products.find((item) => item.id === variant.productId)
-            : undefined;
-          if (!variant || !product) return null;
-          return {
-            ...line,
-            product,
-            variant,
-            totalRial: variant.retailPriceRial * line.quantity,
-          };
-        })
-        .filter((line): line is NonNullable<typeof line> => line !== null),
-    [cart],
-  );
 
   const shipping =
     shippingOptions.find((item) => item.code === shippingMethod) ?? shippingOptions[0]!;
-  const subtotalRial = lines.reduce((sum, line) => sum + line.totalRial, 0);
-  const totalRial = subtotalRial + shipping.costRial;
+  const subtotalRial = cartView?.summary.subtotalRial ?? 0;
+  const discountRial = cartView?.summary.discountRial ?? 0;
+  const totalRial = subtotalRial - discountRial + shipping.costRial;
+  const lines = cartView?.items ?? [];
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -141,7 +61,7 @@ export function CheckoutClient() {
 
     const response = await fetch("/api/orders", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders("retail") },
       body: JSON.stringify({
         customerName,
         phone,
@@ -149,12 +69,6 @@ export function CheckoutClient() {
         address,
         shippingMethod,
         receiptNote,
-        lines: cart.map((line) => ({
-          variantId: line.variantId,
-          quantity: line.quantity,
-          ...(line.selectedVariant ? { selectedVariant: line.selectedVariant } : {}),
-          ...(line.colorId ? { colorId: line.colorId } : {}),
-        })),
       }),
     });
     const payload = (await response.json().catch(() => ({}))) as {
@@ -166,10 +80,18 @@ export function CheckoutClient() {
       setError(payload.error ?? "ثبت سفارش انجام نشد.");
       return;
     }
-
-    window.localStorage.removeItem("ufo-retail-cart");
     window.dispatchEvent(new CustomEvent("ufo-retail-cart-updated"));
     window.location.href = `/orders/${payload.order.id}`;
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <EmptyState title="برای پرداخت وارد شوید">
+        <Link href="/login?next=/checkout" className="mt-3 inline-flex">
+          <Button>ورود با کد پیامکی</Button>
+        </Link>
+      </EmptyState>
+    );
   }
 
   if (lines.length === 0) {
@@ -241,11 +163,7 @@ export function CheckoutClient() {
         </fieldset>
         <label className="grid gap-2">
           توضیح/شماره پیگیری پرداخت
-          <Textarea
-            value={receiptNote}
-            onChange={(event) => setReceiptNote(event.target.value)}
-            placeholder="مثلاً شماره کارت مبدا، ساعت پرداخت یا کد پیگیری"
-          />
+          <Textarea value={receiptNote} onChange={(event) => setReceiptNote(event.target.value)} />
         </label>
       </section>
       <aside className="h-fit rounded-md border border-[#22303D] bg-[#141A22] p-5">
@@ -255,9 +173,9 @@ export function CheckoutClient() {
         </h2>
         <div className="mt-4 grid gap-3 text-sm">
           {lines.map((line) => (
-            <div key={line.variant.id} className="flex items-start justify-between gap-3">
-              <span>{line.product.nameFa}</span>
-              <Price valueRial={line.totalRial} />
+            <div key={line.id} className="flex items-start justify-between gap-3">
+              <span>{line.productName}</span>
+              <Price valueRial={line.totalPrice} />
             </div>
           ))}
         </div>
@@ -265,6 +183,10 @@ export function CheckoutClient() {
           <div className="flex justify-between gap-3">
             <span>جمع کالاها</span>
             <Price valueRial={subtotalRial} />
+          </div>
+          <div className="mt-2 flex justify-between gap-3">
+            <span>تخفیف</span>
+            <Price valueRial={discountRial} />
           </div>
           <div className="mt-2 flex justify-between gap-3">
             <span>ارسال</span>

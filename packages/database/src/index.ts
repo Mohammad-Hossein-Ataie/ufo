@@ -10,6 +10,7 @@ import type {
 
 export const collectionNames = [
   "users",
+  "customers",
   "userAddresses",
   "businessProfiles",
   "roles",
@@ -27,6 +28,7 @@ export const collectionNames = [
   "inventoryReservations",
   "restockEvents",
   "carts",
+  "cartItems",
   "orders",
   "orderEvents",
   "payments",
@@ -43,6 +45,7 @@ export const collectionNames = [
   "notificationDeliveries",
   "coupons",
   "reviews",
+  "wishlists",
   "chatConversations",
   "chatMessages",
   "blogPosts",
@@ -57,6 +60,10 @@ export type CollectionName = (typeof collectionNames)[number];
 
 export const databaseIndexes: Record<CollectionName, IndexDescription[]> = {
   users: [{ key: { phone: 1 }, unique: true }],
+  customers: [
+    { key: { mobileNumber: 1, customerType: 1 }, unique: true },
+    { key: { status: 1, customerType: 1 } },
+  ],
   userAddresses: [{ key: { userId: 1 } }],
   businessProfiles: [{ key: { userId: 1 }, unique: true }, { key: { status: 1, city: 1 } }],
   roles: [{ key: { name: 1 }, unique: true }],
@@ -87,7 +94,12 @@ export const databaseIndexes: Record<CollectionName, IndexDescription[]> = {
     { key: { expiresAt: 1 }, expireAfterSeconds: 0 },
   ],
   restockEvents: [{ key: { variantId: 1, createdAt: -1 } }],
-  carts: [{ key: { userId: 1, channel: 1 } }, { key: { updatedAt: -1 } }],
+  carts: [
+    { key: { customerId: 1, platformType: 1, status: 1 } },
+    { key: { userId: 1, channel: 1 } },
+    { key: { updatedAt: -1 } },
+  ],
+  cartItems: [{ key: { cartId: 1 } }, { key: { productId: 1, variantId: 1 } }],
   orders: [
     { key: { orderNumber: 1 }, unique: true },
     { key: { userId: 1, createdAt: -1 } },
@@ -114,6 +126,10 @@ export const databaseIndexes: Record<CollectionName, IndexDescription[]> = {
   reviews: [
     { key: { productId: 1, status: 1, createdAt: -1 } },
     { key: { orderId: 1, userId: 1 } },
+  ],
+  wishlists: [
+    { key: { customerId: 1, productId: 1 }, unique: true },
+    { key: { customerId: 1, createdAt: -1 } },
   ],
   chatConversations: [{ key: { userId: 1, updatedAt: -1 } }],
   chatMessages: [{ key: { conversationId: 1, createdAt: 1 } }],
