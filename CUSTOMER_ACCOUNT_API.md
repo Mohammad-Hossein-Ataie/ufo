@@ -28,6 +28,19 @@ Authorization: Bearer <token>
   - Updates retail profile fields and wholesale fields such as `companyName`, `businessType`, and `taxId`. Pricing groups and customer levels are not customer-editable.
   - Returns `customer` and `needsProfileCompletion`. Completion requires first/last name and, for wholesale, company name.
 
+### Address book
+
+- `GET /api/customer/addresses`: lists addresses owned by the signed-in retail customer.
+- `POST /api/customer/addresses`: creates an address; the first address becomes the default.
+- `PATCH /api/customer/addresses/:addressId`: edits an owned address or makes it default.
+- `DELETE /api/customer/addresses/:addressId`: deletes an owned address and promotes a replacement default when needed.
+
+### Shipping
+
+- `GET /api/shipping/methods?province=...&city=...`: returns active server-priced shipping quotes for a valid location.
+- Admin-only `/api/admin/shipping-methods` endpoints create, edit, enable, disable, and delete methods.
+- Checkout submits only a method code; the order service reloads its active configuration and recalculates shipping cost server-side.
+
 ## Cart
 
 - `GET /api/cart`

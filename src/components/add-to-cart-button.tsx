@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { Check, LoaderCircle, Minus, Plus, ShoppingCart } from "lucide-react";
 import { Button } from "@ufo/ui";
 import type { ProductVariantType, SalesChannel } from "@ufo/types";
 import {
@@ -37,6 +37,7 @@ export function AddToCartButton({
   selectedColorIds?: string[];
 }) {
   const [added, setAdded] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState(0);
   const formatter = new Intl.NumberFormat("fa-IR");
   const firstQuantity = Math.max(1, Math.floor(quantity));
@@ -87,15 +88,21 @@ export function AddToCartButton({
   }
 
   async function addToCart(addQuantity = quantity) {
+    if (busy) return;
+    setBusy(true);
     const cart = readGuestCart(channel);
     const quantityToAdd = Math.max(1, Math.floor(addQuantity));
     const session = readCustomerSession(channel);
     if (session) {
-      await Promise.all(
-        selectedVariants.map((option) => syncServerCart(linePayload(option, quantityToAdd))),
-      );
-      setAdded(true);
-      window.setTimeout(() => setAdded(false), 1800);
+      try {
+        await Promise.all(
+          selectedVariants.map((option) => syncServerCart(linePayload(option, quantityToAdd))),
+        );
+        setAdded(true);
+        window.setTimeout(() => setAdded(false), 1800);
+      } finally {
+        setBusy(false);
+      }
       return;
     }
     let nextCart = [...cart];
@@ -112,44 +119,51 @@ export function AddToCartButton({
     saveGuestCart(channel, nextCart);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1800);
+    setBusy(false);
   }
 
   async function setRetailQuantity(nextQuantity: number) {
-    const safeQuantity = Math.max(0, Math.floor(nextQuantity));
-    const session = readCustomerSession(channel);
-    if (session && safeQuantity > 0) {
-      const delta = safeQuantity - selectedQuantity;
-      if (delta <= 0) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const safeQuantity = Math.max(0, Math.floor(nextQuantity));
+      const session = readCustomerSession(channel);
+      if (session && safeQuantity > 0) {
+        const delta = safeQuantity - selectedQuantity;
+        if (delta <= 0) {
+          setSelectedQuantity(safeQuantity);
+          return;
+        }
+        await Promise.all(
+          selectedVariants.map((option) => syncServerCart(linePayload(option, delta))),
+        );
         setSelectedQuantity(safeQuantity);
+        setAdded(true);
+        window.setTimeout(() => setAdded(false), 1800);
         return;
       }
-      await Promise.all(
-        selectedVariants.map((option) => syncServerCart(linePayload(option, delta))),
+      const cart = readGuestCart(channel);
+      let nextCart = cart.filter(
+        (line) =>
+          !(
+            line.variantId === variantId &&
+            line.channel === channel &&
+            selectedVariants.some((option) => variantMatches(line, option))
+          ),
       );
+      if (safeQuantity > 0) {
+        nextCart = [
+          ...nextCart,
+          ...selectedVariants.map((option) => linePayload(option, safeQuantity)),
+        ];
+      }
+      saveGuestCart(channel, nextCart);
       setSelectedQuantity(safeQuantity);
-      setAdded(true);
+      setAdded(safeQuantity > 0);
       window.setTimeout(() => setAdded(false), 1800);
-      return;
+    } finally {
+      setBusy(false);
     }
-    const cart = readGuestCart(channel);
-    let nextCart = cart.filter(
-      (line) =>
-        !(
-          line.variantId === variantId &&
-          line.channel === channel &&
-          selectedVariants.some((option) => variantMatches(line, option))
-        ),
-    );
-    if (safeQuantity > 0) {
-      nextCart = [
-        ...nextCart,
-        ...selectedVariants.map((option) => linePayload(option, safeQuantity)),
-      ];
-    }
-    saveGuestCart(channel, nextCart);
-    setSelectedQuantity(safeQuantity);
-    setAdded(safeQuantity > 0);
-    window.setTimeout(() => setAdded(false), 1800);
   }
 
   if (enableQuantity) {
@@ -158,11 +172,16 @@ export function AddToCartButton({
         <Button
           type="button"
           size="sm"
+          disabled={busy}
           onClick={() => setRetailQuantity(firstQuantity)}
-          className="w-full min-w-40 select-none"
+          className="add-cart-button w-full min-w-0 select-none"
         >
-          <ShoppingCart size={16} aria-hidden="true" />
-          {label}
+          {busy ? (
+            <LoaderCircle className="animate-spin" size={16} aria-hidden="true" />
+          ) : (
+            <ShoppingCart size={16} aria-hidden="true" />
+          )}
+          {busy ? "در حال افزودن" : label}
         </Button>
       );
     }
@@ -174,6 +193,7 @@ export function AddToCartButton({
             type="button"
             className="inline-flex h-10 w-12 select-none items-center justify-center transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent disabled:cursor-not-allowed disabled:opacity-45"
             aria-label="کاهش تعداد"
+            disabled={busy}
             onClick={() => setRetailQuantity(selectedQuantity - 1)}
           >
             <Minus size={16} aria-hidden="true" />
@@ -197,10 +217,17 @@ export function AddToCartButton({
         <Button
           type="button"
           size="sm"
+          disabled={busy}
           onClick={() => setRetailQuantity(selectedQuantity)}
-          className="w-full min-w-40 select-none"
+          className={`add-cart-button w-full min-w-0 select-none ${added ? "is-success" : ""}`}
         >
-          <ShoppingCart size={16} aria-hidden="true" />
+          {busy ? (
+            <LoaderCircle className="animate-spin" size={16} aria-hidden="true" />
+          ) : added ? (
+            <Check size={16} aria-hidden="true" />
+          ) : (
+            <ShoppingCart size={16} aria-hidden="true" />
+          )}
           {added
             ? `${formatter.format(selectedQuantity)} انتخاب شد`
             : `${formatter.format(selectedQuantity)} انتخاب شده`}
@@ -210,9 +237,21 @@ export function AddToCartButton({
   }
 
   return (
-    <Button type="button" size="sm" onClick={() => addToCart()} className="select-none">
-      <ShoppingCart size={16} aria-hidden="true" />
-      {added ? "اضافه شد" : label}
+    <Button
+      type="button"
+      size="sm"
+      disabled={busy}
+      onClick={() => addToCart()}
+      className={`add-cart-button select-none ${added ? "is-success" : ""}`}
+    >
+      {busy ? (
+        <LoaderCircle className="animate-spin" size={16} aria-hidden="true" />
+      ) : added ? (
+        <Check size={16} aria-hidden="true" />
+      ) : (
+        <ShoppingCart size={16} aria-hidden="true" />
+      )}
+      {busy ? "در حال افزودن" : added ? "به سبد اضافه شد" : label}
     </Button>
   );
 }

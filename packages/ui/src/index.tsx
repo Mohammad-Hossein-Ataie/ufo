@@ -172,6 +172,7 @@ export function ProductCard({
   badge,
   actions,
   mediaClassName,
+  compactOnMobile = false,
 }: {
   title: string;
   description: string;
@@ -180,20 +181,63 @@ export function ProductCard({
   badge?: ReactNode;
   actions?: ReactNode;
   mediaClassName?: string;
+  compactOnMobile?: boolean;
 }) {
   return (
-    <article className="group grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-current/10 bg-current/[0.028] shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-current/20 hover:bg-current/[0.045] hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-      <div className={cn("aspect-[4/3] overflow-hidden bg-black/10", mediaClassName)}>
+    <article
+      className={cn(
+        "group grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-current/10 bg-current/[0.028] shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-current/20 hover:bg-current/[0.045] hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+        compactOnMobile && "mobile-product-card",
+      )}
+    >
+      <div
+        className={cn(
+          "aspect-[4/3] overflow-hidden bg-black/10",
+          compactOnMobile && "mobile-product-media",
+          mediaClassName,
+        )}
+      >
         {media}
       </div>
-      <div className="grid h-full grid-rows-[auto_auto_1fr] gap-3 p-4 sm:p-5">
-        <div className="flex min-h-14 items-start justify-between gap-3">
-          <h3 className="line-clamp-2 text-base font-black leading-7">{title}</h3>
+      <div
+        className={cn(
+          "grid h-full grid-rows-[auto_auto_1fr] gap-3 p-4 sm:p-5",
+          compactOnMobile && "mobile-product-body",
+        )}
+      >
+        <div
+          className={cn(
+            "flex min-h-14 items-start justify-between gap-3",
+            compactOnMobile && "mobile-product-title-row",
+          )}
+        >
+          <h3
+            className={cn(
+              "line-clamp-2 text-base font-black leading-7",
+              compactOnMobile && "mobile-product-title",
+            )}
+          >
+            {title}
+          </h3>
           {badge}
         </div>
-        <p className="line-clamp-2 min-h-12 text-sm leading-6 text-current/65">{description}</p>
-        <div className="mt-auto grid gap-3 border-t border-current/10 pt-4">
-          <div className="text-lg font-black">{price}</div>
+        <p
+          className={cn(
+            "line-clamp-2 min-h-12 text-sm leading-6 text-current/65",
+            compactOnMobile && "mobile-product-description",
+          )}
+        >
+          {description}
+        </p>
+        <div
+          className={cn(
+            "mt-auto grid gap-3 border-t border-current/10 pt-4",
+            compactOnMobile && "mobile-product-footer",
+          )}
+        >
+          <div className={cn("text-lg font-black", compactOnMobile && "mobile-product-price")}>
+            {price}
+          </div>
           {actions}
         </div>
       </div>

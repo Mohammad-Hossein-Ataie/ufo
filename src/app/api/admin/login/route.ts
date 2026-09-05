@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { ADMIN_SESSION_COOKIE, verifyAdminCredentials } from "@/lib/admin-auth";
+import { createAdminSessionToken } from "@/lib/admin-session";
+import { checkRateLimit } from "@/lib/customer-session";
 
 export const runtime = "nodejs";
 
@@ -7,6 +9,14 @@ export async function POST(request: Request) {
   const payload = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   const username = typeof payload.username === "string" ? payload.username : "";
   const password = typeof payload.password === "string" ? payload.password : "";
+
+  const limit = checkRateLimit(`admin-login:${username.trim().toLowerCase()}`, 5, 15 * 60_000);
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { error: "تلاش‌های ورود بیش از حد مجاز است. کمی بعد دوباره تلاش کنید." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } },
+    );
+  }
 
   try {
     if (!verifyAdminCredentials(username, password)) {
@@ -24,7 +34,7 @@ export async function POST(request: Request) {
   }
 
   const response = NextResponse.json({ ok: true });
-  response.cookies.set(ADMIN_SESSION_COOKIE, "authenticated", {
+  response.cookies.set(ADMIN_SESSION_COOKIE, await createAdminSessionToken(username), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",

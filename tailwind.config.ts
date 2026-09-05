@@ -28,6 +28,9 @@ const config: Config = {
       boxShadow: {
         "retail-lg": "0 18px 44px rgba(0, 0, 0, 0.55)",
       },
+      transitionTimingFunction: {
+        mobile: "cubic-bezier(0.4, 0, 0.2, 1)",
+      },
     },
   },
   plugins: [],

@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { timingSafeEqual } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 
 export const ADMIN_SESSION_COOKIE = "ufo_admin_session";
@@ -48,8 +49,11 @@ export function getAdminCredentials(): AdminCredentials {
 
 export function verifyAdminCredentials(username: string, password: string): boolean {
   const credentials = getAdminCredentials();
+  const providedPassword = Buffer.from(password);
+  const expectedPassword = Buffer.from(credentials.password);
   return (
     username.trim().toLowerCase() === credentials.username.toLowerCase() &&
-    password === credentials.password
+    providedPassword.length === expectedPassword.length &&
+    timingSafeEqual(providedPassword, expectedPassword)
   );
 }

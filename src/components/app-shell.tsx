@@ -46,7 +46,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </a>
       <SiteHeader />
       {children}
-      <footer className="border-t border-[#22303D] bg-[#0D1117] text-[#D9E2EC]">
+      <footer className="border-t border-[#22303D] bg-[#0D1117] pb-20 text-[#D9E2EC] lg:pb-0">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[1.2fr_1fr_1fr]">
           <section aria-label="UFO Puff">
             <Link href="/" className="inline-flex items-center gap-3">

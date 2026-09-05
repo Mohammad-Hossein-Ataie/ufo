@@ -41,7 +41,21 @@ export type OrderStatus =
 export type InvoiceStatus = "draft" | "issued" | "sent" | "paid" | "void";
 export type ShipmentStatus = "draft" | "ready" | "in_transit" | "delivered" | "failed";
 export type PaymentMethod = "card_to_card" | "manual_receipt";
-export type ShippingMethodCode = "tipax" | "tehran_courier" | "pickup";
+export type ShippingMethodCode = string;
+
+export interface ShippingMethodConfig {
+  id: string;
+  code: ShippingMethodCode;
+  titleFa: string;
+  descriptionFa: string;
+  costRial: number;
+  etaFa: string;
+  scope: "nationwide" | "tehran" | "pickup";
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Money {
   amountRial: number;
@@ -242,6 +256,15 @@ export interface ShippingAddress {
   postalCode?: string;
   receiverName: string;
   receiverPhone: string;
+}
+
+export interface CustomerAddress extends ShippingAddress {
+  id: string;
+  customerId: string;
+  label: string;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ShippingQuote {

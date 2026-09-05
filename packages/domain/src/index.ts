@@ -14,6 +14,7 @@ import type {
   ProductVariant,
   SalesChannel,
   ShippingAddress,
+  ShippingMethodCode,
   ShippingQuote,
   StoreSettings,
 } from "@ufo/types";
@@ -506,7 +507,7 @@ export function createOrder(args: {
   userId?: string;
   shippingRial?: number;
   paymentMethod?: "card_to_card" | "manual_receipt";
-  shippingMethod?: "tipax" | "tehran_courier" | "pickup";
+  shippingMethod?: ShippingMethodCode;
   now?: Date;
 }): Order {
   const nowDate = args.now ?? new Date();
@@ -531,10 +532,7 @@ export function createOrder(args: {
   };
 }
 
-export function quoteShipping(
-  address: ShippingAddress,
-  method: "tipax" | "tehran_courier" | "pickup",
-): ShippingQuote {
+export function quoteShipping(address: ShippingAddress, method: ShippingMethodCode): ShippingQuote {
   const phone = normalizeIranPhone(address.receiverPhone);
   const receiverName = address.receiverName.trim();
   if (!receiverName || !phone) throw new Error("اطلاعات گیرنده کامل نیست.");
@@ -671,10 +669,7 @@ export const productFlavorCatalog: ProductFlavor[] = [
   { id: "tobacco", slug: "tobacco", nameFa: "تنباکو", nameEn: "Tobacco", iconKey: "leaf" },
 ];
 
-export const productColorEligibleKinds: ProductKind[] = [
-  "pod-device",
-  "vape-device",
-];
+export const productColorEligibleKinds: ProductKind[] = ["pod-device", "vape-device"];
 
 export const suggestedProductColorOptionsByKind: Partial<Record<ProductKind, string[]>> = {
   "pod-device": ["black", "silver", "blue", "turquoise", "green", "purple", "pink", "multicolor"],

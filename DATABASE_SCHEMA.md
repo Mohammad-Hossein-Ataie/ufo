@@ -69,6 +69,23 @@ Collections تعریف‌شده:
 
 Cart price is never trusted from frontend payloads. API handlers send only product/variant IDs and quantities; the backend looks up active variants and recalculates unit price, discount, subtotal and final total.
 
+### UserAddress
+
+- `id`, `customerId`
+- `label` such as home or work
+- `province`, `city`, `line1`, optional `postalCode`
+- `receiverName`, `receiverPhone`
+- `isDefault`: only one default address per customer
+- `createdAt`, `updatedAt` as ISO UTC
+
+### ShippingMethod
+
+- `id`, unique machine-safe `code`
+- `titleFa`, `descriptionFa`, `etaFa`
+- `costRial`: server-owned shipping price; never accepted from checkout clients
+- `scope`: `nationwide`, `tehran`, or `pickup`
+- `isActive`, `sortOrder`, `createdAt`, `updatedAt`
+
 ### Order
 
 - `orderNumber` human-readable and unique

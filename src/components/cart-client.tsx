@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Minus, Plus, Trash2 } from "lucide-react";
-import { Button, EmptyState, IconButton, Price } from "@ufo/ui";
+import { LockKeyhole, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
+import { Button, IconButton, Price } from "@ufo/ui";
 import {
   getProductColorById,
   getProductFlavorById,
@@ -22,6 +22,7 @@ import {
   saveGuestCart,
   type GuestCartLine,
 } from "@/lib/customer-client";
+import { CustomerOtpLogin } from "@/components/customer-otp-login";
 
 interface SelectedVariant {
   type: Exclude<ProductVariantType, "none">;
@@ -90,6 +91,19 @@ export function CartClient() {
   const [cartView, setCartView] = useState<CustomerCartView | null>(null);
   const [guestCart, setGuestCart] = useState<GuestCartLine[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+
+  useEffect(() => {
+    if (!loginOpen) return;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const close = (event: KeyboardEvent) => event.key === "Escape" && setLoginOpen(false);
+    window.addEventListener("keydown", close);
+    return () => {
+      document.body.style.overflow = overflow;
+      window.removeEventListener("keydown", close);
+    };
+  }, [loginOpen]);
 
   async function sync() {
     const session = readCustomerSession("retail");
@@ -174,10 +188,18 @@ export function CartClient() {
 
   if (lines.length === 0) {
     return (
-      <EmptyState title="سبد خرید خالی است">
-        محصول موردنظر را از کاتالوگ انتخاب کنید. موجودی و قیمت قبل از پرداخت دوباره در backend کنترل
-        می‌شود.
-      </EmptyState>
+      <div className="rounded-[24px] border border-dashed border-retail-border bg-white/[0.025] px-5 py-10 text-center">
+        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-retail-accent/10 text-retail-accent">
+          <ShoppingBag size={29} />
+        </span>
+        <h2 className="mt-5 text-xl font-black text-white">سبد خرید شما خالی است</h2>
+        <p className="mt-2 text-sm leading-7 text-retail-secondary">
+          محصول موردنظرتان را پیدا کنید و با یک لمس به سبد اضافه کنید.
+        </p>
+        <Link href="/products">
+          <Button className="mt-6 min-h-12 w-full max-w-xs rounded-xl">مشاهده محصولات</Button>
+        </Link>
+      </div>
     );
   }
 
@@ -282,14 +304,61 @@ export function CartClient() {
           </div>
         </div>
         <div className="mt-5 grid gap-2">
-          <Link href={isLoggedIn ? "/checkout" : "/login?next=/checkout"}>
-            <Button className="w-full">ادامه خرید</Button>
-          </Link>
+          {isLoggedIn ? (
+            <Link href="/checkout">
+              <Button className="w-full">ادامه خرید</Button>
+            </Link>
+          ) : (
+            <Button type="button" className="w-full" onClick={() => setLoginOpen(true)}>
+              <LockKeyhole size={17} />
+              ورود و ادامه پرداخت
+            </Button>
+          )}
           <Button type="button" variant="ghost" className="w-full" onClick={clearCart}>
             خالی کردن سبد
           </Button>
         </div>
       </aside>
+      <div
+        className={`fixed inset-0 z-[70] ${loginOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+        aria-hidden={!loginOpen}
+      >
+        <button
+          type="button"
+          aria-label="بستن ورود"
+          onClick={() => setLoginOpen(false)}
+          className={`absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ease-mobile ${loginOpen ? "opacity-100" : "opacity-0"}`}
+        />
+        <section
+          role="dialog"
+          aria-modal="true"
+          aria-label="ورود برای ادامه پرداخت"
+          className={`absolute inset-x-0 bottom-0 mx-auto max-h-[92svh] max-w-xl overflow-y-auto rounded-t-[28px] border border-retail-border bg-[#090e14] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-24px_80px_rgba(0,0,0,.7)] transition-transform duration-300 ease-mobile sm:bottom-1/2 sm:rounded-[28px] sm:p-6 sm:translate-y-1/2 ${loginOpen ? "translate-y-0 sm:translate-y-1/2" : "translate-y-full sm:translate-y-[calc(50%+100vh)]"}`}
+        >
+          <div className="mb-4 flex items-center justify-between px-1">
+            <div>
+              <h2 className="font-black text-white">ورود امن برای پرداخت</h2>
+              <p className="mt-1 text-xs text-retail-secondary">سبد شما بعد از ورود حفظ می‌شود</p>
+            </div>
+            <button
+              type="button"
+              aria-label="بستن"
+              onClick={() => setLoginOpen(false)}
+              className="flex h-11 w-11 items-center justify-center rounded-full text-retail-secondary hover:bg-white/10 hover:text-white"
+            >
+              <X size={20} />
+            </button>
+          </div>
+          <CustomerOtpLogin channel="retail" nextPath="/checkout" />
+          <button
+            type="button"
+            onClick={() => setLoginOpen(false)}
+            className="mt-3 min-h-11 w-full text-sm font-bold text-retail-secondary hover:text-white"
+          >
+            فعلاً به خرید ادامه می‌دهم
+          </button>
+        </section>
+      </div>
     </div>
   );
 }

@@ -7,7 +7,6 @@ import {
   getProductVariantOptions,
   getUnitPriceRial,
   products,
-  quoteShipping,
   validateWholesaleCartonCount,
   variants,
 } from "@ufo/domain";
@@ -19,6 +18,7 @@ import type {
   Cart,
   CartItem,
   Customer,
+  CustomerAddress,
   CustomerType,
   ProductVariantType,
   SalesChannel,
@@ -28,6 +28,9 @@ import type {
 import { normalizeIranPhone } from "@ufo/validation";
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { isValidIranLocation, quoteConfiguredShipping } from "./shipping-settings";
+
+export * from "./shipping-settings";
 
 export { createOrder, createOrderItemSnapshot, createOrderNumber } from "@ufo/domain";
 
@@ -118,9 +121,10 @@ const emptyStore: OrderStoreFile = { orders: [] };
 interface CustomerStoreFile {
   customers: Customer[];
   carts: Cart[];
+  addresses: CustomerAddress[];
 }
 
-const emptyCustomerStore: CustomerStoreFile = { customers: [], carts: [] };
+const emptyCustomerStore: CustomerStoreFile = { customers: [], carts: [], addresses: [] };
 
 export const orderStatusLabelsFa: Record<OrderStatus, string> = {
   draft: "پیش‌نویس",
@@ -194,6 +198,7 @@ function readCustomerStore(): CustomerStoreFile {
     return {
       customers: Array.isArray(parsed.customers) ? parsed.customers : [],
       carts: Array.isArray(parsed.carts) ? parsed.carts : [],
+      addresses: Array.isArray(parsed.addresses) ? parsed.addresses : [],
     };
   } catch {
     return emptyCustomerStore;
@@ -456,6 +461,129 @@ export function updateCustomerAccountProfile(
   return next;
 }
 
+export interface CustomerAddressInput {
+  label: string;
+  province: string;
+  city: string;
+  line1: string;
+  postalCode?: string;
+  receiverName: string;
+  receiverPhone: string;
+  isDefault?: boolean;
+}
+
+function normalizeAddressInput(
+  input: CustomerAddressInput,
+): Omit<CustomerAddressInput, "isDefault"> {
+  const label = input.label.trim();
+  const province = input.province.trim();
+  const city = input.city.trim();
+  const line1 = input.line1.trim();
+  const receiverName = input.receiverName.trim();
+  if (!label || label.length > 40) throw new Error("عنوان آدرس باید بین ۱ تا ۴۰ کاراکتر باشد.");
+  if (!province || !city || !line1 || !receiverName) throw new Error("اطلاعات آدرس کامل نیست.");
+  if (!isValidIranLocation(province, city)) throw new Error("استان یا شهر انتخاب‌شده معتبر نیست.");
+  if (province.length > 80 || city.length > 80 || line1.length > 500 || receiverName.length > 100)
+    throw new Error("یکی از فیلدهای آدرس بیش از حد طولانی است.");
+  const postalCode = input.postalCode?.replace(/\D/g, "");
+  if (postalCode && postalCode.length !== 10) throw new Error("کد پستی باید ۱۰ رقم باشد.");
+  return {
+    label,
+    province,
+    city,
+    line1,
+    ...(postalCode ? { postalCode } : {}),
+    receiverName,
+    receiverPhone: normalizeIranPhone(input.receiverPhone),
+  };
+}
+
+export function listCustomerAddresses(customerId: string): CustomerAddress[] {
+  return readCustomerStore()
+    .addresses.filter((address) => address.customerId === customerId)
+    .sort(
+      (a, b) => Number(b.isDefault) - Number(a.isDefault) || b.updatedAt.localeCompare(a.updatedAt),
+    );
+}
+
+export function createCustomerAddress(
+  customerId: string,
+  input: CustomerAddressInput,
+): CustomerAddress {
+  const store = readCustomerStore();
+  if (
+    !store.customers.some((customer) => customer.id === customerId && customer.status === "active")
+  )
+    throw new Error("حساب مشتری فعال نیست.");
+  const normalized = normalizeAddressInput(input);
+  const existing = store.addresses.filter((address) => address.customerId === customerId);
+  if (existing.length >= 10) throw new Error("حداکثر ۱۰ آدرس قابل ذخیره است.");
+  const isDefault = input.isDefault === true || existing.length === 0;
+  const now = new Date().toISOString();
+  const address: CustomerAddress = {
+    id: `addr_${crypto.randomUUID()}`,
+    customerId,
+    ...normalized,
+    isDefault,
+    createdAt: now,
+    updatedAt: now,
+  };
+  const addresses = store.addresses
+    .map((item) =>
+      isDefault && item.customerId === customerId
+        ? { ...item, isDefault: false, updatedAt: now }
+        : item,
+    )
+    .concat(address);
+  writeCustomerStore({ ...store, addresses });
+  return address;
+}
+
+export function updateCustomerAddress(
+  customerId: string,
+  addressId: string,
+  input: Partial<CustomerAddressInput>,
+): CustomerAddress {
+  const store = readCustomerStore();
+  const index = store.addresses.findIndex(
+    (address) => address.id === addressId && address.customerId === customerId,
+  );
+  if (index < 0) throw new Error("آدرس پیدا نشد.");
+  const current = store.addresses[index]!;
+  const normalized = normalizeAddressInput({ ...current, ...input });
+  const now = new Date().toISOString();
+  const isDefault = input.isDefault ?? current.isDefault;
+  const next: CustomerAddress = { ...current, ...normalized, isDefault, updatedAt: now };
+  const addresses = store.addresses.map((address, itemIndex) => {
+    if (itemIndex === index) return next;
+    return isDefault && address.customerId === customerId
+      ? { ...address, isDefault: false, updatedAt: now }
+      : address;
+  });
+  writeCustomerStore({ ...store, addresses });
+  return next;
+}
+
+export function deleteCustomerAddress(customerId: string, addressId: string): void {
+  const store = readCustomerStore();
+  const target = store.addresses.find(
+    (address) => address.id === addressId && address.customerId === customerId,
+  );
+  if (!target) throw new Error("آدرس پیدا نشد.");
+  let addresses = store.addresses.filter((address) => address.id !== addressId);
+  if (target.isDefault) {
+    const replacement = addresses.find((address) => address.customerId === customerId);
+    if (replacement) {
+      addresses = addresses.map((address) =>
+        address.id === replacement.id
+          ? { ...address, isDefault: true, updatedAt: new Date().toISOString() }
+          : address,
+      );
+    }
+  }
+  writeCustomerStore({ ...store, addresses });
+}
+
 export function getOrCreateActiveCart(customerId: string, platformType: SalesChannel): Cart {
   const store = readCustomerStore();
   const customer = store.customers.find((item) => item.id === customerId);
@@ -698,7 +826,7 @@ export function createSubmittedOrder(input: CreateSubmittedOrderInput): Submitte
   const customerName = input.customerName.trim();
   if (!customerName) throw new Error("نام مشتری الزامی است.");
 
-  const quote = quoteShipping(
+  const quote = quoteConfiguredShipping(
     {
       ...input.address,
       receiverName: input.address.receiverName || customerName,

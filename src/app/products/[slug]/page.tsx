@@ -168,8 +168,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <main id="main-content" className="bg-retail-bg text-retail-primary">
       <script {...jsonLdScriptProps(jsonLd)} />
       <script {...jsonLdScriptProps(breadcrumb)} />
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:py-10">
-        <nav aria-label="مسیر صفحه" className="mb-5 text-sm text-[#9BA7B4]">
+      <div className="mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-10">
+        <nav
+          aria-label="مسیر صفحه"
+          className="mb-4 overflow-hidden whitespace-nowrap text-xs text-[#9BA7B4] sm:mb-5 sm:text-sm"
+        >
           <Link href="/products" className="hover:text-cyan-200">
             محصولات
           </Link>
@@ -290,7 +293,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         ) : null}
 
         {relatedRows.length > 0 ? (
-          <section className="mt-10">
+          <section className="mt-8 sm:mt-10">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-2xl font-black">محصولات مرتبط</h2>
               <Link
@@ -301,7 +304,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 <ArrowLeft size={16} aria-hidden="true" />
               </Link>
             </div>
-            <div className="mt-5 grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-5 grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
               {relatedRows.map((relatedRow) => {
                 const related = relatedRow.product;
                 const relatedVariant = relatedRow.variant;
@@ -312,6 +315,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     key={related.id}
                     title={related.nameFa}
                     description={related.shortDescriptionFa}
+                    compactOnMobile
                     mediaClassName="bg-white"
                     media={
                       <StorefrontProductImage
@@ -326,11 +330,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     badge={<StockStatus available={relatedAvailable} />}
                     price={<Price valueRial={relatedVariant.retailPriceRial} />}
                     actions={
-                      <div className="grid gap-3">
-                        <ProductVariantSummary options={relatedVariantOptions} />
+                      <div className="grid gap-2 sm:gap-3">
+                        <div className="hidden sm:block">
+                          <ProductVariantSummary options={relatedVariantOptions} />
+                        </div>
                         <Link href={`/products/${related.slug}`}>
-                          <Button size="sm" variant="ghost" className="w-full">
-                            جزئیات
+                          <Button size="sm" className="w-full px-2">
+                            مشاهده محصول
                           </Button>
                         </Link>
                       </div>

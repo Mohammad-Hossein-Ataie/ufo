@@ -1,13 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  Search,
-  ShieldCheck,
-  SlidersHorizontal,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { ArrowLeft, Search, ShieldCheck, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { CatalogAutoSubmitForm } from "@/components/catalog-auto-submit-form";
 import { CatalogColorFilter } from "@/components/catalog-color-filter";
@@ -235,20 +228,20 @@ export default async function ProductsPage({
       <script {...jsonLdScriptProps(jsonLd)} />
 
       <section className="showcase-grid border-b border-retail-border bg-retail-surface">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 lg:grid-cols-[1fr_22rem] lg:py-14">
+        <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:gap-8 sm:py-10 lg:grid-cols-[1fr_22rem] lg:py-14">
           <div className="reveal-up">
             <span className="inline-flex select-none items-center gap-2 rounded-full border border-retail-border bg-white/5 px-3 py-1 text-xs font-medium text-retail-secondary">
               <Sparkles size={14} className="text-retail-accent-2" aria-hidden="true" />
               کاتالوگ خرده‌فروشی یوفوپاف
             </span>
-            <h1 className="mt-4 text-3xl font-black leading-[1.3] text-white sm:text-4xl">
+            <h1 className="mt-3 text-2xl font-black leading-[1.45] text-white sm:mt-4 sm:text-4xl sm:leading-[1.3]">
               انتخاب سریع پاد، ویپ و لوازم مصرفی با فیلتر دقیق
             </h1>
             <p className="mt-3 max-w-3xl leading-8 text-retail-secondary">
               محصول را بر اساس برند، دسته، طعم، رنگ، موجودی و بازه قیمت محدود کنید.
             </p>
           </div>
-          <div className="reveal-up-delay-1 grid gap-3 rounded-retail border border-retail-border bg-retail-bg/70 p-5">
+          <div className="reveal-up-delay-1 grid gap-3 rounded-retail border border-retail-border bg-retail-bg/70 p-4 sm:p-5">
             <div className="flex items-center gap-3">
               <span className="inline-flex h-11 w-11 select-none items-center justify-center rounded-full bg-retail-accent/10 text-retail-accent">
                 <ShieldCheck size={22} aria-hidden="true" />
@@ -281,7 +274,38 @@ export default async function ProductsPage({
       </section>
 
       <div className="mx-auto grid max-w-7xl gap-5 px-4 py-8 lg:grid-cols-[20rem_1fr] lg:py-10">
-        <aside className="h-fit rounded-retail border border-retail-border bg-retail-surface p-4 shadow-retail-lg lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:overscroll-contain">
+        <nav
+          aria-label="دسته‌بندی سریع"
+          className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 lg:hidden"
+        >
+          <Link
+            href="/products"
+            className={`min-h-11 shrink-0 snap-start rounded-full border px-4 py-3 text-xs font-bold ${!params.category ? "border-retail-accent bg-retail-accent/10 text-retail-accent" : "border-retail-border bg-retail-surface text-retail-secondary"}`}
+          >
+            همه محصولات
+          </Link>
+          {categories.map((item) => (
+            <Link
+              key={item.id}
+              href={`/products?category=${encodeURIComponent(item.slug)}`}
+              className={`min-h-11 shrink-0 snap-start rounded-full border px-4 py-3 text-xs font-bold ${params.category === item.slug ? "border-retail-accent bg-retail-accent/10 text-retail-accent" : "border-retail-border bg-retail-surface text-retail-secondary"}`}
+            >
+              {item.nameFa}
+            </Link>
+          ))}
+        </nav>
+        <input id="mobile-filter-toggle" type="checkbox" className="peer sr-only lg:hidden" />
+        <label
+          htmlFor="mobile-filter-toggle"
+          className="flex min-h-12 cursor-pointer items-center justify-between rounded-xl border border-retail-border bg-retail-surface px-4 font-black text-white peer-checked:border-retail-accent/40 lg:hidden"
+        >
+          <span className="flex items-center gap-2">
+            <SlidersHorizontal size={19} className="text-retail-accent" />
+            فیلتر و مرتب‌سازی
+          </span>
+          <span className="text-xs font-medium text-retail-secondary">نمایش گزینه‌ها</span>
+        </label>
+        <aside className="catalog-filter-aside hidden h-fit rounded-retail border border-retail-border bg-retail-surface p-4 shadow-retail-lg peer-checked:block lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:overscroll-contain">
           <div className="flex items-center gap-2 border-b border-retail-border pb-4">
             <SlidersHorizontal size={18} className="text-retail-accent" aria-hidden="true" />
             <h2 className="font-black text-white">فیلتر محصولات</h2>
@@ -452,17 +476,23 @@ export default async function ProductsPage({
               بازه قیمت، برند، طعم، رنگ یا دسته‌بندی را تغییر دهید تا نتایج بیشتری ببینید.
             </EmptyState>
           ) : (
-            <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
               {pagedProducts.map((row) => {
                 const product = row.product;
                 const variant = row.variant;
                 const available = getCatalogRowStock(row);
                 const variantOptions = getStorefrontVariantOptions(product, flavors, colors);
+                const compareAt = variant.compareAtPriceRial;
+                const discountPercent =
+                  compareAt && compareAt > variant.retailPriceRial
+                    ? Math.round(((compareAt - variant.retailPriceRial) / compareAt) * 100)
+                    : 0;
                 return (
                   <ProductCard
                     key={product.id}
                     title={product.nameFa}
                     description={product.shortDescriptionFa}
+                    compactOnMobile
                     mediaClassName="bg-white"
                     media={
                       <StorefrontProductImage
@@ -472,19 +502,42 @@ export default async function ProductsPage({
                           getCategoryImage(product.categoryId) ?? "/images/categories/lighter.png"
                         }
                         alt={product.nameFa}
-                        className="h-full w-full object-contain p-4 transition duration-200 group-hover:scale-[1.03] motion-reduce:transition-none"
+                        className="h-full w-full object-contain p-2.5 transition duration-200 group-hover:scale-[1.03] sm:p-4 motion-reduce:transition-none"
                       />
                     }
-                    badge={<StockStatus key={`stock-${product.id}`} available={available} />}
+                    badge={
+                      <div className="flex shrink-0 flex-col items-end gap-1">
+                        {discountPercent > 0 ? (
+                          <span className="rounded-full bg-rose-500 px-2 py-1 text-[10px] font-black text-white">
+                            ٪{new Intl.NumberFormat("fa-IR").format(discountPercent)}
+                          </span>
+                        ) : null}
+                        <StockStatus key={`stock-${product.id}`} available={available} />
+                      </div>
+                    }
                     price={
-                      <Price key={`price-${product.id}`} valueRial={variant.retailPriceRial} />
+                      <div key={`price-${product.id}`} className="grid gap-0.5">
+                        {compareAt && compareAt > variant.retailPriceRial ? (
+                          <Price
+                            valueRial={compareAt}
+                            className="text-xs font-medium text-retail-muted line-through"
+                          />
+                        ) : null}
+                        <Price valueRial={variant.retailPriceRial} />
+                      </div>
                     }
                     actions={
                       <div key={`actions-${product.id}`} className="grid w-full gap-3">
-                        <ProductVariantSummary options={variantOptions} />
+                        <div className="hidden sm:block">
+                          <ProductVariantSummary options={variantOptions} />
+                        </div>
                         <Link href={`/products/${product.slug}`} className="w-full">
-                          <Button size="sm" variant="ghost" className="w-full">
-                            جزئیات
+                          <Button
+                            size="sm"
+                            variant={variantOptions.length > 0 ? "primary" : "ghost"}
+                            className="w-full px-2"
+                          >
+                            {variantOptions.length > 0 ? "انتخاب و خرید" : "جزئیات"}
                             <ArrowLeft size={16} aria-hidden="true" />
                           </Button>
                         </Link>

@@ -2,7 +2,15 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { AlertTriangle, BadgeCheck, Check, Gauge, PackageCheck, Palette, Sparkles } from "lucide-react";
+import {
+  AlertTriangle,
+  BadgeCheck,
+  Check,
+  Gauge,
+  PackageCheck,
+  Palette,
+  Sparkles,
+} from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import {
   FlavorVisual,
@@ -73,6 +81,11 @@ export function ProductDetailClient({
   const needsVariantSelection = hasVariantOptions && !selectedVariantValueId;
   const variantTypeLabel = getVariantTypeLabel(variantType);
   const selectorTitle = `${variantTypeLabel} را انتخاب کنید`;
+  const compareAt = variant.compareAtPriceRial;
+  const discountPercent =
+    compareAt && compareAt > variant.retailPriceRial
+      ? Math.round(((compareAt - variant.retailPriceRial) / compareAt) * 100)
+      : 0;
 
   function selectVariantValue(valueId: string) {
     setSelectedVariantValueId(valueId);
@@ -85,7 +98,7 @@ export function ProductDetailClient({
   }
 
   return (
-    <section className="grid gap-7 rounded-[1.25rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(0,217,255,0.10),transparent_34%),#0D1117] p-3 shadow-retail-lg sm:p-5 lg:grid-cols-[minmax(0,1.03fr)_minmax(24rem,0.97fr)] lg:p-6">
+    <section className="grid gap-6 rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(0,217,255,0.10),transparent_34%),#0D1117] p-3 shadow-retail-lg sm:p-5 lg:grid-cols-[minmax(0,1.03fr)_minmax(24rem,0.97fr)] lg:gap-7 lg:p-6">
       <div className="grid gap-3 lg:order-2">
         <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#F5F7FA] p-3 sm:p-4">
           <div className="relative mx-auto aspect-square max-h-[34rem] max-w-[34rem] overflow-hidden rounded-lg bg-white">
@@ -112,7 +125,7 @@ export function ProductDetailClient({
           ) : null}
         </div>
 
-        <div className="grid grid-cols-5 gap-2 sm:grid-cols-6 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="flex snap-x gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-6 sm:overflow-visible lg:grid-cols-5 xl:grid-cols-6">
           {galleryImages.map((image, index) => {
             const active = selectedImage === image;
             const thumbnailOption = variantOptions.find(
@@ -123,7 +136,7 @@ export function ProductDetailClient({
                 key={`${image}-${index}`}
                 type="button"
                 onClick={() => selectImage(image)}
-                className={`relative aspect-square select-none overflow-hidden rounded-md border bg-white transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 motion-reduce:transition-none ${
+                className={`relative aspect-square w-[4.25rem] shrink-0 snap-start select-none overflow-hidden rounded-xl border bg-white transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 sm:w-auto motion-reduce:transition-none ${
                   active
                     ? "border-cyan-300 ring-2 ring-cyan-300/30"
                     : "border-white/10 hover:border-cyan-300/70"
@@ -158,7 +171,7 @@ export function ProductDetailClient({
         </div>
 
         <div className="mt-5">
-          <h1 className="text-3xl font-black leading-[1.35] text-white sm:text-4xl">
+          <h1 className="text-2xl font-black leading-[1.5] text-white sm:text-4xl sm:leading-[1.35]">
             {product.nameFa}
           </h1>
           {product.nameEn ? (
@@ -172,7 +185,18 @@ export function ProductDetailClient({
         <div className="mt-6 flex flex-wrap items-end justify-between gap-3 border-y border-white/10 py-4">
           <div>
             <p className="text-xs font-bold text-retail-secondary">قیمت فروش</p>
-            <div className="mt-1 text-3xl font-black text-retail-accent">
+            {compareAt && compareAt > variant.retailPriceRial ? (
+              <div className="mt-1 flex items-center gap-2">
+                <Price
+                  valueRial={compareAt}
+                  className="text-sm font-medium text-retail-muted line-through"
+                />
+                <span className="rounded-full bg-rose-500 px-2 py-1 text-[11px] font-black text-white">
+                  ٪{new Intl.NumberFormat("fa-IR").format(discountPercent)} تخفیف
+                </span>
+              </div>
+            ) : null}
+            <div className="mt-1 text-2xl font-black text-retail-accent sm:text-3xl">
               <Price valueRial={variant.retailPriceRial} />
             </div>
           </div>
@@ -182,7 +206,7 @@ export function ProductDetailClient({
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4">
+        <div className="product-purchase-zone mt-6 grid gap-4">
           {hasVariantOptions ? (
             <section>
               <div className="mb-3 flex items-center justify-between gap-3">

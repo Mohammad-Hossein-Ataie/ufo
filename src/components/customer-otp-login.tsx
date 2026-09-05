@@ -2,14 +2,20 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { LogIn, Pencil, RotateCw } from "lucide-react";
+import { Check, LoaderCircle, LogIn, Pencil, RotateCw, Smartphone } from "lucide-react";
 import { Alert, Button, Input } from "@ufo/ui";
 import type { Customer, SalesChannel } from "@ufo/types";
 import { normalizeIranPhone, toEnglishDigits } from "@ufo/validation";
 import { clearGuestCart, readGuestCart, saveCustomerSession } from "@/lib/customer-client";
 import { customerLoginDestination, needsProfileCompletion } from "@/lib/customer-onboarding";
 
-export function CustomerOtpLogin({ channel }: { channel: SalesChannel }) {
+export function CustomerOtpLogin({
+  channel,
+  nextPath,
+}: {
+  channel: SalesChannel;
+  nextPath?: string;
+}) {
   const searchParams = useSearchParams();
   const [step, setStep] = useState<"phone" | "code" | "profile">("phone");
   const [phone, setPhone] = useState("");
@@ -116,7 +122,9 @@ export function CustomerOtpLogin({ channel }: { channel: SalesChannel }) {
         setStep("profile");
         return;
       }
-      window.location.assign(customerLoginDestination(searchParams.get("next"), channel));
+      window.location.assign(
+        customerLoginDestination(nextPath ?? searchParams.get("next"), channel),
+      );
     } catch (err) {
       setError(
         err instanceof Error && err.name !== "TypeError" && err.name !== "TimeoutError"
@@ -137,23 +145,43 @@ export function CustomerOtpLogin({ channel }: { channel: SalesChannel }) {
   return (
     <form
       onSubmit={submit}
-      className={`mt-6 grid min-w-0 gap-4 rounded-md border p-5 ${wholesale ? "border-[#D5D9C9] bg-white" : "border-[#22303D] bg-[#0D1117]"}`}
+      className={`grid min-w-0 gap-5 border p-5 sm:p-7 ${wholesale ? "mt-6 rounded-md border-[#D5D9C9] bg-white" : "rounded-[24px] border-white/10 bg-white/[0.055] shadow-[0_24px_80px_rgba(0,0,0,.45)] backdrop-blur-xl"}`}
       aria-busy={busy}
     >
-      <h2 className="text-lg font-semibold">
-        {step === "phone"
-          ? "ورود یا ثبت‌نام"
-          : step === "code"
-            ? "تأیید شماره موبایل"
-            : "تکمیل حساب کاربری"}
-      </h2>
+      <div className="flex items-center gap-3">
+        {!wholesale ? (
+          <span
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${step === "code" ? "otp-icon-pulse bg-retail-accent/15 text-retail-accent" : step === "profile" ? "bg-retail-accent-2/15 text-retail-accent-2" : "bg-white/8 text-white"}`}
+          >
+            {step === "profile" ? <Check size={21} /> : <Smartphone size={21} />}
+          </span>
+        ) : null}
+        <div>
+          <h2 className="text-lg font-black">
+            {step === "phone"
+              ? "ورود یا ثبت‌نام"
+              : step === "code"
+                ? "کد تأیید را وارد کنید"
+                : "فقط یک قدم دیگر"}
+          </h2>
+          {!wholesale ? (
+            <p className="mt-1 text-xs leading-5 text-retail-secondary">
+              {step === "phone"
+                ? "بدون رمز عبور، با شماره موبایل"
+                : step === "code"
+                  ? "کد ۶ رقمی برای شما پیامک شد"
+                  : "اطلاعات لازم برای ارسال سفارش"}
+            </p>
+          ) : null}
+        </div>
+      </div>
       {error ? (
         <Alert title="خطا" tone="danger">
           {error}
         </Alert>
       ) : null}
       {step === "phone" ? (
-        <label className="grid gap-2">
+        <label className="grid gap-2 text-sm font-bold">
           شماره موبایل
           <Input
             autoFocus
@@ -165,6 +193,11 @@ export function CustomerOtpLogin({ channel }: { channel: SalesChannel }) {
             placeholder="09xxxxxxxxx"
             required
             disabled={busy}
+            className={
+              !wholesale
+                ? "min-h-14 rounded-xl !border-white/10 !bg-[#090d13] px-4 text-center text-lg font-bold tracking-wider !text-white caret-retail-accent !shadow-none placeholder:!text-retail-muted focus:!border-retail-accent focus:!ring-retail-accent/20"
+                : ""
+            }
           />
         </label>
       ) : step === "code" ? (
@@ -187,7 +220,7 @@ export function CustomerOtpLogin({ channel }: { channel: SalesChannel }) {
               <Pencil size={18} />
             </button>
           </div>
-          <label className="grid gap-2">
+          <label className="grid gap-2 text-sm font-bold">
             کد پیامکی
             <Input
               key={challengeId}
@@ -204,6 +237,11 @@ export function CustomerOtpLogin({ channel }: { channel: SalesChannel }) {
               dir="ltr"
               required
               disabled={busy}
+              className={
+                !wholesale
+                  ? "min-h-14 rounded-xl !border-retail-accent/25 !bg-[#07141a] px-4 text-center text-xl font-black tracking-[0.4em] !text-white caret-retail-accent !shadow-none focus:!border-retail-accent focus:!ring-retail-accent/20"
+                  : ""
+              }
             />
           </label>
           {mockCode ? <span className="text-xs">کد تست: {mockCode}</span> : null}
@@ -219,7 +257,7 @@ export function CustomerOtpLogin({ channel }: { channel: SalesChannel }) {
         </>
       ) : (
         <>
-          <label className="grid gap-2">
+          <label className="grid gap-2 text-sm font-bold">
             نام
             <Input
               autoFocus
@@ -229,9 +267,14 @@ export function CustomerOtpLogin({ channel }: { channel: SalesChannel }) {
               required
               maxLength={100}
               disabled={busy}
+              className={
+                !wholesale
+                  ? "min-h-[52px] rounded-xl !border-white/10 !bg-[#090d13] !text-white caret-retail-accent !shadow-none focus:!border-retail-accent focus:!ring-retail-accent/20"
+                  : ""
+              }
             />
           </label>
-          <label className="grid gap-2">
+          <label className="grid gap-2 text-sm font-bold">
             نام خانوادگی
             <Input
               autoComplete="family-name"
@@ -240,6 +283,11 @@ export function CustomerOtpLogin({ channel }: { channel: SalesChannel }) {
               required
               maxLength={100}
               disabled={busy}
+              className={
+                !wholesale
+                  ? "min-h-[52px] rounded-xl !border-white/10 !bg-[#090d13] !text-white caret-retail-accent !shadow-none focus:!border-retail-accent focus:!ring-retail-accent/20"
+                  : ""
+              }
             />
           </label>
           {wholesale ? (
@@ -263,10 +311,18 @@ export function CustomerOtpLogin({ channel }: { channel: SalesChannel }) {
           busy || (step === "phone" && remaining > 0) || (step === "code" && code.length !== 6)
         }
         className={
-          wholesale ? "!border-[#1F8A5B] !bg-[#1F8A5B] !text-white hover:!bg-[#176D48]" : ""
+          wholesale
+            ? "!border-[#1F8A5B] !bg-[#1F8A5B] !text-white hover:!bg-[#176D48]"
+            : "min-h-14 rounded-xl text-base font-black shadow-[0_14px_38px_rgba(0,217,255,.2)]"
         }
       >
-        <LogIn size={18} />
+        {busy ? (
+          <LoaderCircle className="animate-spin" size={19} />
+        ) : step === "profile" ? (
+          <Check size={19} />
+        ) : (
+          <LogIn size={19} />
+        )}
         {busy
           ? "در حال بررسی..."
           : step === "phone"
@@ -277,6 +333,11 @@ export function CustomerOtpLogin({ channel }: { channel: SalesChannel }) {
               ? "تأیید و ورود"
               : "ثبت اطلاعات و ادامه"}
       </Button>
+      {!wholesale ? (
+        <p className="text-center text-xs leading-6 text-retail-muted">
+          با ادامه، قوانین و حریم خصوصی یوفوپاف را می‌پذیرید.
+        </p>
+      ) : null}
     </form>
   );
 }
