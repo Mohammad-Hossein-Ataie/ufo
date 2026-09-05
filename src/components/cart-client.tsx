@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { LockKeyhole, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
@@ -23,6 +22,7 @@ import {
   type GuestCartLine,
 } from "@/lib/customer-client";
 import { CustomerOtpLogin } from "@/components/customer-otp-login";
+import { ProtectedProductImage } from "@/components/protected-product-image";
 
 interface SelectedVariant {
   type: Exclude<ProductVariantType, "none">;
@@ -64,7 +64,7 @@ function guestToLine(line: GuestCartLine): RetailLine | null {
     productName: product.nameFa,
     variantName: variant.nameFa,
     sku: variant.sku,
-    image: product.image,
+    image: `/api/product-images/variant/${encodeURIComponent(line.variantId)}/card`,
     unitPriceSnapshot: variant.retailPriceRial,
     discountAmount: 0,
     totalPrice: variant.retailPriceRial * line.quantity,
@@ -80,7 +80,7 @@ function serverToLine(item: EnrichedCartItem): RetailLine {
     productName: item.productName,
     variantName: item.variantName,
     sku: item.sku,
-    image: item.image,
+    image: `/api/product-images/variant/${encodeURIComponent(item.variantId ?? "")}/card`,
     unitPriceSnapshot: item.unitPriceSnapshot,
     discountAmount: item.discountAmount,
     totalPrice: item.totalPrice,
@@ -227,10 +227,11 @@ export function CartClient() {
               className="grid gap-4 rounded-md border border-[#22303D] bg-[#0D1117] p-4 sm:grid-cols-[7rem_1fr_auto]"
             >
               <div className="relative aspect-square overflow-hidden rounded-md border border-[#22303D] bg-[#141A22]">
-                <Image
+                <ProtectedProductImage
                   src={line.image}
                   alt={line.productName}
                   fill
+                  loading="lazy"
                   sizes="(min-width: 640px) 7rem, 100vw"
                   className="object-cover"
                 />

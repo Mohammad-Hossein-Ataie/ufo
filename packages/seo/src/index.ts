@@ -43,6 +43,7 @@ export function productJsonLd(
   variant: ProductVariant,
   available: boolean,
   brandName = "UFO Puff",
+  imageUrls: string[] = product.images,
 ) {
   return {
     "@context": "https://schema.org",
@@ -50,7 +51,7 @@ export function productJsonLd(
     "@id": canonical(`/products/${product.slug}`),
     name: product.nameFa,
     ...(product.nameEn ? { alternateName: product.nameEn } : {}),
-    image: product.images.map((image) => absoluteUrl(image)),
+    image: imageUrls.map((image) => absoluteUrl(image)),
     description: product.shortDescriptionFa,
     sku: variant.sku,
     brand: {

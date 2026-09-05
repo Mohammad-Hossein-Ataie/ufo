@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Minus, Plus, Trash2 } from "lucide-react";
@@ -15,6 +14,7 @@ import {
   saveGuestCart,
   type GuestCartLine,
 } from "@/lib/customer-client";
+import { ProtectedProductImage } from "@/components/protected-product-image";
 
 interface WholesaleLine {
   id?: string;
@@ -43,7 +43,7 @@ function guestToLine(line: GuestCartLine): WholesaleLine | null {
     productName: product.nameFa,
     variantName: variant.nameFa,
     sku: variant.sku,
-    image: product.image,
+    image: `/api/product-images/variant/${encodeURIComponent(line.variantId)}/card`,
     unitPriceSnapshot: variant.wholesalePriceRial,
     discountAmount: 0,
     totalPrice: variant.wholesalePriceRial * quantity,
@@ -59,7 +59,7 @@ function serverToLine(item: EnrichedCartItem): WholesaleLine {
     productName: item.productName,
     variantName: item.variantName,
     sku: item.sku,
-    image: item.image,
+    image: `/api/product-images/variant/${encodeURIComponent(item.variantId ?? "")}/card`,
     unitPriceSnapshot: item.unitPriceSnapshot,
     discountAmount: item.discountAmount,
     totalPrice: item.totalPrice,
@@ -178,10 +178,11 @@ export function B2BCartClient() {
             className="grid gap-4 rounded-md border border-[#D5D9C9] bg-white p-4 sm:grid-cols-[7rem_1fr_auto]"
           >
             <div className="relative aspect-square overflow-hidden rounded-md border border-[#D5D9C9] bg-[#EEF0E5]">
-              <Image
+              <ProtectedProductImage
                 src={line.image}
                 alt={line.productName}
                 fill
+                loading="lazy"
                 sizes="(min-width: 640px) 7rem, 100vw"
                 className="object-cover"
               />

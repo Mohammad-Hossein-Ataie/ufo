@@ -3,7 +3,7 @@ import { brands, categories } from "@ufo/domain";
 import type { SalesChannel } from "@ufo/types";
 import { listAdminProducts, type AdminProductRecord } from "@/lib/admin-products";
 import { getCatalogRowStock } from "@/lib/catalog-data";
-import { getCategoryImage } from "@/lib/product-images";
+import { getCategoryImage, getProductImage } from "@/lib/product-images";
 
 type SearchChannel = Extract<SalesChannel, "retail" | "wholesale">;
 
@@ -41,7 +41,9 @@ function expandTokens(query: string): string[] {
   const tokens = tokenize(query);
   return [
     ...new Set(
-      tokens.flatMap((token) => [token, ...(commonAliases[token] ?? [])]).filter((token) => token.length > 0),
+      tokens
+        .flatMap((token) => [token, ...(commonAliases[token] ?? [])])
+        .filter((token) => token.length > 0),
     ),
   ];
 }
@@ -113,7 +115,9 @@ export async function GET(request: Request) {
     .map((category) => {
       const matches = channelRows.filter((row) => row.product.categoryId === category.id);
       const score =
-        tokens.length > 0 ? fieldScore(category.nameFa + " " + category.slug, tokens, 45, 18) : matches.length;
+        tokens.length > 0
+          ? fieldScore(category.nameFa + " " + category.slug, tokens, 45, 18)
+          : matches.length;
       return { category, count: matches.length, score };
     })
     .filter((item) => item.count > 0 && item.score > 0)
@@ -124,7 +128,9 @@ export async function GET(request: Request) {
     .map((brand) => {
       const matches = channelRows.filter((row) => row.product.brandId === brand.id);
       const score =
-        tokens.length > 0 ? fieldScore(brand.nameFa + " " + brand.slug, tokens, 45, 18) : matches.length;
+        tokens.length > 0
+          ? fieldScore(brand.nameFa + " " + brand.slug, tokens, 45, 18)
+          : matches.length;
       return { brand, count: matches.length, score };
     })
     .filter((item) => item.count > 0 && item.score > 0)
@@ -140,7 +146,8 @@ export async function GET(request: Request) {
       const available = getCatalogRowStock(row);
       const priceRial =
         channel === "wholesale" ? row.variant.wholesalePriceRial : row.variant.retailPriceRial;
-      const fallbackImage = getCategoryImage(row.product.categoryId) ?? "/images/categories/lighter.png";
+      const fallbackImage =
+        getCategoryImage(row.product.categoryId) ?? "/images/categories/lighter.png";
       return {
         id: row.product.id,
         title: row.product.nameFa,
@@ -152,7 +159,7 @@ export async function GET(request: Request) {
           channel === "wholesale"
             ? `/b2b/catalog?q=${encodeURIComponent(row.product.nameFa)}`
             : `/products/${row.product.slug}`,
-        image: fallbackImage,
+        image: getProductImage(row.product),
         fallbackImage,
         priceRial,
         compareAtPriceRial:

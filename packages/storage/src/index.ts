@@ -15,14 +15,20 @@ export interface StoredFile {
   lastModified?: string;
 }
 
+export interface StoredObject extends StoredFile {
+  body: Uint8Array;
+}
+
 export interface UploadObjectInput {
   key: string;
   body: Uint8Array;
   contentType: string;
+  visibility?: "private" | "public";
 }
 
 export interface StorageProvider {
   upload(input: UploadObjectInput): Promise<StoredFile>;
+  read(key: string): Promise<StoredObject>;
   list(prefix?: string): Promise<StoredFile[]>;
   presignGet(key: string, expiresInSeconds?: number): Promise<string>;
   delete(key: string): Promise<void>;
@@ -112,9 +118,25 @@ export class LiaraStorageProvider implements StorageProvider {
         Key: input.key,
         Body: input.body,
         ContentType: input.contentType,
+        ...(input.visibility === "private" ? { ACL: "private" as const } : {}),
       }),
     );
     return { key: input.key, size: input.body.byteLength, contentType: input.contentType };
+  }
+
+  async read(key: string): Promise<StoredObject> {
+    const response = await this.client.send(
+      new GetObjectCommand({ Bucket: this.config.bucketName, Key: key }),
+    );
+    if (!response.Body) throw new Error("فایل پیدا نشد.");
+    const body = await response.Body.transformToByteArray();
+    return {
+      key,
+      body,
+      ...(typeof response.ContentLength === "number" ? { size: response.ContentLength } : {}),
+      ...(response.ContentType ? { contentType: response.ContentType } : {}),
+      ...(response.LastModified ? { lastModified: response.LastModified.toISOString() } : {}),
+    };
   }
 
   async list(prefix?: string): Promise<StoredFile[]> {
@@ -164,6 +186,12 @@ export class MemoryStorageProvider implements StorageProvider {
     return file;
   }
 
+  async read(key: string): Promise<StoredObject> {
+    const file = this.files.get(key);
+    if (!file) throw new Error("فایل پیدا نشد.");
+    return { ...file, body: new Uint8Array(file.body) };
+  }
+
   async list(prefix = ""): Promise<StoredFile[]> {
     return Array.from(this.files.values())
       .filter((file) => file.key.startsWith(prefix))
@@ -190,8 +218,9 @@ export function createStorageProvider(env: NodeJS.ProcessEnv = process.env): Sto
   const accessKey = env.LIARA_ACCESS_KEY;
   const secretKey = env.LIARA_SECRET_KEY;
   const explicitLiara = env.STORAGE_PROVIDER === "liara";
+  const explicitMemory = env.STORAGE_PROVIDER === "mock" || env.STORAGE_PROVIDER === "memory";
 
-  if (explicitLiara || (endpoint && bucketName && accessKey && secretKey)) {
+  if (!explicitMemory && (explicitLiara || (endpoint && bucketName && accessKey && secretKey))) {
     if (!endpoint || !bucketName || !accessKey || !secretKey) {
       throw new Error("متغیرهای Liara Object Storage کامل نیستند.");
     }

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BadgeCheck, Box, Film, ListChecks, ShieldCheck } from "lucide-react";
 import { ProductDetailClient } from "@/components/product-detail-client";
+import { ProtectedProductImage } from "@/components/protected-product-image";
 import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { findCatalogRowBySlug, getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
@@ -16,7 +16,7 @@ import {
   getProductVariantImages,
 } from "@/lib/product-images";
 import { getStorefrontVariantOptions } from "@/lib/storefront-variants";
-import { rewriteLiaraPublicUrl } from "@ufo/storage";
+import { productCatalogImageUrl } from "@/lib/product-image-protection";
 import {
   brands,
   categories,
@@ -48,8 +48,8 @@ function youtubeEmbedUrl(url: string) {
   return url;
 }
 
-function renderRichDescription(description: string) {
-  const blocks = description
+function renderRichDescription(product: { id: string; descriptionFa: string }) {
+  const blocks = product.descriptionFa
     .split(/\n{2,}/)
     .map((block) => block.trim())
     .filter(Boolean);
@@ -57,14 +57,15 @@ function renderRichDescription(description: string) {
   return blocks.map((block, index) => {
     const imageMatch = block.match(imageBlockPattern);
     if (imageMatch?.groups?.url) {
-      const imageUrl = rewriteLiaraPublicUrl(imageMatch.groups.url);
+      const imageUrl = productCatalogImageUrl(product.id, `description-${index}`, "detail");
       return (
         <figure key={`${block}-${index}`} className="overflow-hidden rounded-xl bg-white/[0.04]">
           <div className="relative aspect-[16/10]">
-            <Image
+            <ProtectedProductImage
               src={imageUrl}
               alt={imageMatch.groups.alt || "تصویر توضیحات محصول"}
               fill
+              loading="lazy"
               unoptimized
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
@@ -157,7 +158,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         item.product.categoryId === product.categoryId,
     )
     .slice(0, 4);
-  const jsonLd = productJsonLd(product, variant, available > 0, brand?.nameFa);
+  const jsonLd = productJsonLd(product, variant, available > 0, brand?.nameFa, galleryImages);
   const breadcrumb = breadcrumbJsonLd([
     { name: "خانه", path: "/" },
     { name: "محصولات", path: "/products" },
@@ -189,7 +190,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         </nav>
 
         <ProductDetailClient
-          product={product}
+          product={{
+            id: product.id,
+            nameFa: product.nameFa,
+            ...(product.nameEn ? { nameEn: product.nameEn } : {}),
+            shortDescriptionFa: product.shortDescriptionFa,
+          }}
           variant={variant}
           available={available}
           brandName={brand?.nameFa}
@@ -205,7 +211,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               <Film size={22} className="text-cyan-300" aria-hidden="true" />
               توضیحات
             </h2>
-            <div className="mt-4 grid gap-4">{renderRichDescription(product.descriptionFa)}</div>
+            <div className="mt-4 grid gap-4">{renderRichDescription(product)}</div>
           </div>
           <div className="rounded-xl bg-[#0D1117] p-5 ring-1 ring-white/10">
             <h2 className="inline-flex items-center gap-2 text-xl font-black">

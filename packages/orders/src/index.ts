@@ -337,7 +337,7 @@ function enrichCart(cart: Cart): CustomerCartView {
         productName: product.nameFa,
         variantName: variant.nameFa,
         sku: variant.sku,
-        image: product.image,
+        image: `/api/product-images/variant/${encodeURIComponent(variant.id)}/card`,
         totalPrice: unitPriceSnapshot * item.quantity - item.discountAmount,
       };
       return refreshed;

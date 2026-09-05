@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import { ProtectedProductImage } from "@/components/protected-product-image";
 
 interface StorefrontProductImageProps {
   src: string;
@@ -25,7 +25,7 @@ export function StorefrontProductImage({
 
   return (
     <span className="relative block h-full w-full">
-      <Image
+      <ProtectedProductImage
         src={currentSrc || fallbackSrc}
         alt={alt}
         fill

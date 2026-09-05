@@ -506,7 +506,10 @@ export default async function ProductsPage({
                       />
                     }
                     badge={
-                      <div className="flex shrink-0 flex-col items-end gap-1">
+                      <div
+                        key={`badge-${product.id}`}
+                        className="flex shrink-0 flex-col items-end gap-1"
+                      >
                         {discountPercent > 0 ? (
                           <span className="rounded-full bg-rose-500 px-2 py-1 text-[10px] font-black text-white">
                             ٪{new Intl.NumberFormat("fa-IR").format(discountPercent)}

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useState } from "react";
 import {
   AlertTriangle,
@@ -12,6 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { ProtectedProductImage } from "@/components/protected-product-image";
 import {
   FlavorVisual,
   SelectedCheck,
@@ -22,7 +22,7 @@ import type { Product, ProductVariant, ProductVariantType } from "@ufo/types";
 import { Alert, Badge, Button, Price, StockStatus } from "@ufo/ui";
 
 interface ProductDetailClientProps {
-  product: Product;
+  product: Pick<Product, "id" | "nameFa" | "nameEn" | "shortDescriptionFa">;
   variant: ProductVariant;
   available: number;
   brandName?: string | undefined;
@@ -61,7 +61,7 @@ export function ProductDetailClient({
   variantImages,
   variantOptions,
 }: ProductDetailClientProps) {
-  const firstImage = galleryImages[0] ?? product.image;
+  const firstImage = galleryImages[0] ?? "/images/categories/lighter.png";
   const variantImageMap = useMemo(
     () => buildVariantImageMap(variantOptions, variantImages),
     [variantImages, variantOptions],
@@ -102,7 +102,7 @@ export function ProductDetailClient({
       <div className="grid gap-3 lg:order-2">
         <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#F5F7FA] p-3 sm:p-4">
           <div className="relative mx-auto aspect-square max-h-[34rem] max-w-[34rem] overflow-hidden rounded-lg bg-white">
-            <Image
+            <ProtectedProductImage
               key={selectedImage}
               src={selectedImage}
               alt={
@@ -111,7 +111,7 @@ export function ProductDetailClient({
                   : product.nameFa
               }
               fill
-              priority
+              loading="lazy"
               unoptimized
               className="object-contain p-3 transition-opacity duration-200 motion-reduce:transition-none"
               sizes="(min-width: 1024px) 47vw, 100vw"
@@ -144,10 +144,11 @@ export function ProductDetailClient({
                 aria-label={`${product.nameFa} ${thumbnailOption?.labelFa ?? index + 1}`}
                 aria-pressed={active}
               >
-                <Image
+                <ProtectedProductImage
                   src={image}
                   alt={`${product.nameFa} ${thumbnailOption?.labelFa ?? index + 1}`}
                   fill
+                  loading="lazy"
                   unoptimized
                   sizes="112px"
                   className="object-contain p-1.5"

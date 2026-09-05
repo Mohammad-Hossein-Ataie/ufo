@@ -23,6 +23,7 @@ import { brands, categories } from "@ufo/domain";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
 import { categoryImageBySlug, getProductImage } from "@/lib/product-images";
+import { ProtectedProductImage } from "@/components/protected-product-image";
 import { faqPageJsonLd, jsonLdScriptProps, organizationJsonLd, websiteJsonLd } from "@ufo/seo";
 
 export const dynamic = "force-dynamic";
@@ -214,7 +215,7 @@ export default async function HomePage() {
                     aria-label={`مشاهده جزئیات ${product.nameFa}`}
                   />
                   <div className="relative aspect-[4/3] overflow-hidden bg-retail-surface-alt">
-                    <Image
+                    <ProtectedProductImage
                       src={imageSrc}
                       alt={product.nameFa}
                       fill
