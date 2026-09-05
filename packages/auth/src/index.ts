@@ -43,12 +43,13 @@ export function requirePermission(roleList: UserRole[], permission: string): voi
   }
 }
 
-export function createOtpCode(seed: string, now = new Date()): string {
-  const numeric = Array.from(`${seed}:${now.toISOString().slice(0, 16)}`).reduce(
-    (sum, char) => sum + char.charCodeAt(0),
-    0,
-  );
-  return String(100000 + (numeric % 900000));
+export function createOtpCode(_seed: string, _now = new Date()): string {
+  const sample = new Uint32Array(1);
+  const ceiling = Math.floor(0x100000000 / 900000) * 900000;
+  do {
+    crypto.getRandomValues(sample);
+  } while (sample[0]! >= ceiling);
+  return String(100000 + (sample[0]! % 900000));
 }
 
 export async function hashToken(value: string): Promise<string> {
@@ -71,7 +72,7 @@ export async function createOtpChallenge(args: {
   return {
     code,
     challenge: {
-      id: `otp_${phone}_${nowDate.getTime()}`,
+      id: `otp_${crypto.randomUUID()}`,
       phone,
       codeHash: await hashToken(`${code}:${args.secret}`),
       attempts: 0,
@@ -89,7 +90,7 @@ export async function verifyOtpChallenge(args: {
   now?: Date;
 }): Promise<OtpChallenge> {
   const nowDate = args.now ?? new Date();
-  if (nowDate.toISOString() > args.challenge.expiresAt) {
+  if (nowDate.toISOString() >= args.challenge.expiresAt) {
     throw new Error("کد ورود منقضی شده است.");
   }
   if (args.challenge.attempts >= args.challenge.maxAttempts) {

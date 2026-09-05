@@ -6,10 +6,11 @@ Customer account APIs support both B2C retail and B2B wholesale sessions after O
 
 - `POST /api/auth/send-otp`
   - Body: `phone`, `customerType` (`retail` or `wholesale`)
-  - Creates an OTP challenge. In `SMS_PROVIDER=mock` or non-production it returns the test `code`.
+  - Sends via Melipayamak and then stores the OTP challenge. Returns a test `code` only when `SMS_PROVIDER=mock` AND outside production. See `MELIPAYAMAK.md`.
 - `POST /api/auth/verify-otp`
-  - Body: `challengeId`, `code`, `customerType`, profile fields, `guestCart`
-  - Creates or updates the customer account, merges guest cart lines into the active customer cart, and returns a signed customer session token.
+  - Body: `challengeId`, `code`, `customerType`, `guestCart`. Profile fields are ignored.
+  - Finds or creates the customer using the verified phone, merges guest cart lines into the active customer cart, and returns a signed customer session token plus `needsProfileCompletion`.
+  - Only incomplete profiles need a follow-up authenticated profile update. Complete returning customers go directly to their destination.
 
 Clients store the returned token in platform-specific local storage and send it as:
 
@@ -24,7 +25,8 @@ Authorization: Bearer <token>
   - Returns the current customer profile.
 - `PATCH /api/customer/profile`
   - Requires a valid customer session token.
-  - Updates retail profile fields and wholesale fields such as `companyName`, `businessType`, `taxId`, `customerLevel`, and `pricingGroup`.
+  - Updates retail profile fields and wholesale fields such as `companyName`, `businessType`, and `taxId`. Pricing groups and customer levels are not customer-editable.
+  - Returns `customer` and `needsProfileCompletion`. Completion requires first/last name and, for wholesale, company name.
 
 ## Cart
 

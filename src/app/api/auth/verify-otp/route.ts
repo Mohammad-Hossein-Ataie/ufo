@@ -1,14 +1,9 @@
 import { NextResponse } from "next/server";
-import { verifyOtpChallenge } from "@ufo/auth";
-import {
-  mergeGuestCart,
-  upsertCustomerAccount,
-  type CartLineInput,
-  type CustomerProfilePatch,
-} from "@ufo/orders";
+import { mergeGuestCart, upsertCustomerAccount, type CartLineInput } from "@ufo/orders";
 import type { CustomerType, ProductVariantType, UserRole } from "@ufo/types";
 import { checkRateLimit, createCustomerSessionToken } from "@/lib/customer-session";
-import { getOtpChallenge, removeOtpChallenge, updateOtpChallenge } from "@/lib/otp-store";
+import { verifyStoredOtp } from "@/lib/verify-stored-otp";
+import { needsProfileCompletion } from "@/lib/customer-onboarding";
 
 export const runtime = "nodejs";
 
@@ -56,21 +51,6 @@ function guestCartLines(value: unknown): CartLineInput[] {
     .filter((line): line is CartLineInput => line !== null);
 }
 
-function profilePatch(payload: Record<string, unknown>, type: CustomerType): CustomerProfilePatch {
-  return {
-    ...(typeof payload.firstName === "string" ? { firstName: payload.firstName } : {}),
-    ...(typeof payload.lastName === "string" ? { lastName: payload.lastName } : {}),
-    ...(typeof payload.email === "string" ? { email: payload.email } : {}),
-    ...(type === "wholesale" && typeof payload.companyName === "string"
-      ? { companyName: payload.companyName }
-      : {}),
-    ...(type === "wholesale" && typeof payload.businessType === "string"
-      ? { businessType: payload.businessType }
-      : {}),
-    ...(type === "wholesale" && typeof payload.taxId === "string" ? { taxId: payload.taxId } : {}),
-  };
-}
-
 export async function POST(request: Request) {
   try {
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
@@ -86,31 +66,15 @@ export async function POST(request: Request) {
     const challengeId = String(payload.challengeId ?? "");
     const code = String(payload.code ?? "");
     const type = customerType(payload.customerType ?? payload.platformType);
-    const challenge = getOtpChallenge(challengeId);
-    if (!challenge) throw new Error("کد ورود پیدا نشد یا منقضی شده است.");
-
-    const verified = await verifyOtpChallenge({
-      challenge,
-      code,
-      secret: process.env.OTP_SECRET ?? "development-otp-secret",
-    });
-    if (verified.attempts !== challenge.attempts) {
-      updateOtpChallenge(verified);
-      throw new Error("کد ورود صحیح نیست.");
-    }
-    removeOtpChallenge(challengeId);
+    const challenge = await verifyStoredOtp(challengeId, code);
 
     const customer = upsertCustomerAccount({
       mobileNumber: challenge.phone,
       customerType: type,
-      fullName:
-        typeof payload.fullName === "string"
-          ? payload.fullName
-          : typeof payload.businessName === "string"
-            ? payload.businessName
-            : "",
-      profile: profilePatch(payload, type),
     });
+    if (customer.status !== "active") {
+      return NextResponse.json({ error: "حساب کاربری غیرفعال است." }, { status: 403 });
+    }
     const roles: UserRole[] = [type === "wholesale" ? "wholesale_customer" : "retail_customer"];
     const token = createCustomerSessionToken({
       customerId: customer.id,
@@ -120,7 +84,12 @@ export async function POST(request: Request) {
     });
     const cart = mergeGuestCart(customer.id, type, guestCartLines(payload.guestCart));
 
-    return NextResponse.json({ customer, token, cart });
+    return NextResponse.json({
+      customer,
+      token,
+      cart,
+      needsProfileCompletion: needsProfileCompletion(customer),
+    });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "ورود انجام نشد." },

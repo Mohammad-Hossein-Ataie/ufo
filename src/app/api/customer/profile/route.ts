@@ -5,10 +5,21 @@ import {
   type CustomerProfilePatch,
 } from "@ufo/orders";
 import { checkRateLimit, requireCustomerSession } from "@/lib/customer-session";
+import { needsProfileCompletion } from "@/lib/customer-onboarding";
 
 export const runtime = "nodejs";
 
 function profilePatch(payload: Record<string, unknown>): CustomerProfilePatch {
+  for (const field of ["firstName", "lastName", "companyName"] as const) {
+    if (
+      field in payload &&
+      (typeof payload[field] !== "string" ||
+        !payload[field].trim() ||
+        payload[field].trim().length > 100)
+    ) {
+      throw new Error("نام و نام خانوادگی یا نام فروشگاه باید بین ۱ تا ۱۰۰ کاراکتر باشد.");
+    }
+  }
   return {
     ...(typeof payload.firstName === "string" ? { firstName: payload.firstName } : {}),
     ...(typeof payload.lastName === "string" ? { lastName: payload.lastName } : {}),
@@ -16,8 +27,6 @@ function profilePatch(payload: Record<string, unknown>): CustomerProfilePatch {
     ...(typeof payload.companyName === "string" ? { companyName: payload.companyName } : {}),
     ...(typeof payload.businessType === "string" ? { businessType: payload.businessType } : {}),
     ...(typeof payload.taxId === "string" ? { taxId: payload.taxId } : {}),
-    ...(typeof payload.customerLevel === "string" ? { customerLevel: payload.customerLevel } : {}),
-    ...(typeof payload.pricingGroup === "string" ? { pricingGroup: payload.pricingGroup } : {}),
   };
 }
 
@@ -26,7 +35,10 @@ export async function GET(request: Request) {
     const session = requireCustomerSession(request);
     const customer = getCustomerAccount(session.customerId);
     if (!customer) throw new Error("حساب مشتری پیدا نشد.");
-    return NextResponse.json({ customer });
+    return NextResponse.json({
+      customer,
+      needsProfileCompletion: needsProfileCompletion(customer),
+    });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "دریافت پروفایل انجام نشد." },
@@ -46,8 +58,13 @@ export async function PATCH(request: Request) {
       );
     }
     const payload = (await request.json()) as Record<string, unknown>;
+    const current = getCustomerAccount(session.customerId);
+    if (!current || current.status !== "active") throw new Error("حساب کاربری فعال نیست.");
     const customer = updateCustomerAccountProfile(session.customerId, profilePatch(payload));
-    return NextResponse.json({ customer });
+    return NextResponse.json({
+      customer,
+      needsProfileCompletion: needsProfileCompletion(customer),
+    });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "بروزرسانی پروفایل انجام نشد." },

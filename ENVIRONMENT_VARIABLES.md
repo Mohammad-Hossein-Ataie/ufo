@@ -25,6 +25,10 @@ Do not commit real credentials. Use `.env.local` locally and Liara environment s
 
 ## Auth
 
+Melipayamak setup and server-only variables are documented in `MELIPAYAMAK.md`.
+Local SMS credentials are stored in `.env`; remove overriding SMS values from
+`.env.local`. Production uses the hosting provider's environment settings.
+
 - `SESSION_SECRET`
 - `OTP_SECRET`
 - `SUPER_ADMIN_PHONE`

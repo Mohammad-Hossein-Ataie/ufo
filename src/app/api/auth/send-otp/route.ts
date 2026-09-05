@@ -4,6 +4,7 @@ import { normalizeIranPhone } from "@ufo/validation";
 import type { CustomerType } from "@ufo/types";
 import { checkRateLimit } from "@/lib/customer-session";
 import { saveOtpChallenge } from "@/lib/otp-store";
+import { OtpSmsError, otpSecret, sendOtpSms } from "@/lib/otp-sms";
 
 export const runtime = "nodejs";
 
@@ -25,24 +26,33 @@ export async function POST(request: Request) {
     const payload = (await request.json()) as Record<string, unknown>;
     const phone = normalizeIranPhone(String(payload.phone ?? ""));
     const type = customerType(payload.customerType ?? payload.platformType);
+    const phoneLimit = checkRateLimit(`otp-phone:${phone}`, 1, 60_000);
+    if (!phoneLimit.allowed) {
+      return NextResponse.json(
+        { error: "برای ارسال مجدد یک دقیقه صبر کنید." },
+        {
+          status: 429,
+          headers: { "Retry-After": String(phoneLimit.retryAfterSeconds) },
+        },
+      );
+    }
     const { challenge, code } = await createOtpChallenge({
       phone,
-      secret: process.env.OTP_SECRET ?? "development-otp-secret",
+      secret: otpSecret(),
     });
+    const delivery = await sendOtpSms(phone, code);
     saveOtpChallenge(challenge);
     return NextResponse.json({
       challengeId: challenge.id,
       phone,
       customerType: type,
       expiresAt: challenge.expiresAt,
-      ...(process.env.SMS_PROVIDER === "mock" || process.env.NODE_ENV !== "production"
-        ? { code }
-        : {}),
+      ...(delivery.mock ? { code } : {}),
     });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "ارسال کد ورود انجام نشد." },
-      { status: 400 },
+      { status: error instanceof OtpSmsError ? 503 : 400 },
     );
   }
 }
