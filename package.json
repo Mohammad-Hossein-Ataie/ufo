@@ -7,9 +7,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "next dev -p 3000",
-    "start": "next start -p 3000",
-    "build": "next build",
+    "dev": "node scripts/next-command.mjs dev -p 3000",
+    "start": "node scripts/next-command.mjs start -p 3000",
+    "build": "node scripts/next-command.mjs build",
     "build:all": "turbo build",
     "lint": "eslint src next.config.mjs tailwind.config.ts postcss.config.mjs",
     "lint:all": "turbo lint",

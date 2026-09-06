@@ -8,15 +8,13 @@ import {
 } from "@/lib/product-image-protection";
 import { getStorageProvider } from "@ufo/storage";
 import { checkRateLimit } from "@/lib/customer-session";
+import { requireAdminMutation, adminRequestErrorStatus } from "@/lib/admin-request";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
-    const origin = req.headers.get("origin");
-    if (origin && origin !== new URL(req.url).origin) {
-      return NextResponse.json({ error: "مبدأ درخواست معتبر نیست." }, { status: 403 });
-    }
+    await requireAdminMutation(req);
     const contentLength = Number(req.headers.get("content-length") ?? 0);
     if (contentLength > maxProductImageBytes + 1024 * 1024) {
       return NextResponse.json({ error: "حجم درخواست بیش از حد مجاز است." }, { status: 413 });
@@ -54,7 +52,7 @@ export async function POST(req: Request) {
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "آپلود تصویر ناموفق بود." },
-      { status: 400 },
+      { status: adminRequestErrorStatus(error) },
     );
   }
 }

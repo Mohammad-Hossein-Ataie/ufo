@@ -8,6 +8,7 @@ The existing server-rendered card contents remain intact. `HomepageProductSlot` 
 - Each mounted slot owns its state and timer. The first rotation is staggered by `slotIndex * 400ms`; manual interaction and resume reset the timer. A committed manual selection receives a fresh 4500ms interval, and a slow pending manual selection cannot be superseded by autoplay.
 - Complete outgoing content fades and moves 6px horizontally for 200ms; the decoded incoming card enters from the opposite side for 200ms. Both stages use `cubic-bezier(0.4, 0, 0.2, 1)`. RTL reverses movement.
 - Mouse hover, focus anywhere in the card, and touch independently pause playback. Leaving one interaction does not clear another pause reason. A small pause/resume control also allows persistent user control.
+- Initial hover and focus are also read when the hook mounts, so interaction that starts before hydration still pauses the first rotation.
 - Hidden documents and cards outside the viewport plus a 100px margin have no autoplay timer. Visible cards resume from the same product with a fresh timer.
 - Reduced motion disables autoplay and makes manual changes immediate.
 - Indicators are 44px semantic buttons with item position/name and `aria-pressed`. Keyboard arrows respect computed direction; Home/End select the endpoints. Focus remains on the selected control.
@@ -21,6 +22,7 @@ The prepared source and active index commit in one state update. `StorefrontProd
 
 ## Validation
 
+- Final hover-hydration fix: 30 focused unit tests passed, along with the real-browser long-hover/focus/RTL keyboard test. TypeScript, ESLint, production build and `git diff --check` passed. Browser verification was run separately from the build after a concurrent run exhausted its overall timeout.
 - Unit tests cover 1/2/3 items, exact timing, loop, deterministic stagger, reset, combined pauses, hidden tabs, offscreen cards, reduced motion, slow/error images, stale requests, rapid selection, cancellation and cleanup.
 - Image preparation tests cover derivative decode, fallback decode, timeout, abort and cleanup.
 - Browser tests use the real catalog: autoplay and manual cart/price/link/image consistency in an isolated guest session; long hover, focus and RTL keyboard controls; small/vertical/horizontal touch gestures and rapid indicator changes. Existing discovery checks verify stable heights across all available slot items, mobile/desktop layouts, filters and protected detail images.

@@ -54,7 +54,15 @@ export function useProductCardCarousel(images: CarouselImage[], slotIndex: numbe
     onMotion();
     onVisibility();
     const element = containerRef.current;
-    if (element) setRtl(getComputedStyle(element).direction === "rtl");
+    if (element) {
+      setRtl(getComputedStyle(element).direction === "rtl");
+      // Hover/focus can predate hydration without a React enter event.
+      if (window.matchMedia("(hover: hover)").matches && element.matches(":hover")) {
+        pauseReasons.current.add("hover");
+      }
+      if (element.contains(document.activeElement)) pauseReasons.current.add("focus");
+      setPaused(pauseReasons.current.size > 0);
+    }
     const observer = new IntersectionObserver(
       ([entry]) => setNearViewport(Boolean(entry?.isIntersecting)),
       { rootMargin: "100px" },

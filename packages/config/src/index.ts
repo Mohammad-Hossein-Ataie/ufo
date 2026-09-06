@@ -1,44 +1,61 @@
 import { z } from "zod";
 import type { StoreSettings } from "@ufo/types";
+import { isProductionSessionSecret } from "./session-security";
+export { getSessionSecret } from "./session-security";
 
 const optionalUrl = z.string().url().optional().or(z.literal(""));
 
-export const envSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  APP_BASE_URL: z.string().url().default("http://localhost:3000"),
-  B2B_BASE_URL: z.string().url().default("http://localhost:3000/b2b"),
-  ADMIN_BASE_URL: z.string().url().default("http://localhost:3000/admin"),
-  MONGODB_URI: z.string().min(1).optional(),
-  MONGODB_DB_NAME: z.string().min(1).default("my-app"),
-  LIARA_ENDPOINT: optionalUrl.default(""),
-  LIARA_BUCKET_NAME: z.string().optional(),
-  LIARA_ACCESS_KEY: z.string().optional(),
-  LIARA_SECRET_KEY: z.string().optional(),
-  LIARA_PUBLIC_BASE_URL: optionalUrl.default(""),
-  SESSION_SECRET: z.string().min(16).optional(),
-  OTP_SECRET: z.string().min(16).optional(),
-  SUPER_ADMIN_PHONE: z.string().optional(),
-  ADMIN_USERNAME: z.string().optional(),
-  ADMIN_PASSWORD: z.string().optional(),
-  ADMIN_PHONE: z.string().optional(),
-  SMS_PROVIDER: z.enum(["mock", "liara", "manual", "melipayamak"]).default("mock"),
-  MELIPAYAMAK_USERNAME: z.string().optional(),
-  MELIPAYAMAK_PASSWORD: z.string().optional(),
-  MELIPAYAMAK_API_KEY: z.string().optional(),
-  MELIPAYAMAK_OTP_MODE: z.enum(["otp", "pattern"]).default("otp"),
-  MELIPAYAMAK_FROM: z.string().optional(),
-  MELIPAYAMAK_BODY_ID: z.string().optional(),
-  PAYMENT_PROVIDER: z.enum(["manual", "mock"]).default("manual"),
-  SHIPPING_PROVIDER: z.enum(["mock", "tipax"]).default("mock"),
-  CHAT_PROVIDER: z.enum(["mock"]).default("mock"),
-  STORAGE_PROVIDER: z.enum(["mock", "liara"]).default("mock"),
-  SEARCH_PROVIDER: z.enum(["memory", "database"]).default("memory"),
-  ANALYTICS_PROVIDER: z.enum(["mock"]).default("mock"),
-  STORE_OWNER_NAME: z.string().default("امیر محمودی"),
-  STORE_PHONE: z.string().default("09362157181"),
-  STORE_ADDRESS: z.string().default("تهران، بازار مولوی، پاساژ صفویه"),
-  STORE_TELEGRAM: z.string().url().default("https://t.me/vapeufostoree"),
-});
+export const envSchema = z
+  .object({
+    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+    APP_BASE_URL: z.string().url().default("http://localhost:3000"),
+    B2B_BASE_URL: z.string().url().default("http://localhost:3000/b2b"),
+    ADMIN_BASE_URL: z.string().url().default("http://localhost:3000/admin"),
+    TRUST_PROXY_HEADERS: z.enum(["true", "false"]).default("false"),
+    ORIGIN_DEBUG: z.enum(["true", "false"]).default("false"),
+    MONGODB_URI: z.string().min(1).optional(),
+    MONGODB_DB_NAME: z.string().min(1).default("my-app"),
+    LIARA_ENDPOINT: optionalUrl.default(""),
+    LIARA_BUCKET_NAME: z.string().optional(),
+    LIARA_ACCESS_KEY: z.string().optional(),
+    LIARA_SECRET_KEY: z.string().optional(),
+    LIARA_PUBLIC_BASE_URL: optionalUrl.default(""),
+    SESSION_SECRET: z.preprocess(
+      (value) => (value === "" ? undefined : value),
+      z.string().min(16).optional(),
+    ),
+    OTP_SECRET: z.string().min(16).optional(),
+    SUPER_ADMIN_PHONE: z.string().optional(),
+    ADMIN_USERNAME: z.string().optional(),
+    ADMIN_PASSWORD: z.string().optional(),
+    ADMIN_PHONE: z.string().optional(),
+    SMS_PROVIDER: z.enum(["mock", "liara", "manual", "melipayamak"]).default("mock"),
+    MELIPAYAMAK_USERNAME: z.string().optional(),
+    MELIPAYAMAK_PASSWORD: z.string().optional(),
+    MELIPAYAMAK_API_KEY: z.string().optional(),
+    MELIPAYAMAK_OTP_MODE: z.enum(["otp", "pattern"]).default("otp"),
+    MELIPAYAMAK_FROM: z.string().optional(),
+    MELIPAYAMAK_BODY_ID: z.string().optional(),
+    PAYMENT_PROVIDER: z.enum(["manual", "mock"]).default("manual"),
+    SHIPPING_PROVIDER: z.enum(["mock", "tipax"]).default("mock"),
+    CHAT_PROVIDER: z.enum(["mock"]).default("mock"),
+    STORAGE_PROVIDER: z.enum(["mock", "liara"]).default("mock"),
+    SEARCH_PROVIDER: z.enum(["memory", "database"]).default("memory"),
+    ANALYTICS_PROVIDER: z.enum(["mock"]).default("mock"),
+    STORE_OWNER_NAME: z.string().default("امیر محمودی"),
+    STORE_PHONE: z.string().default("09362157181"),
+    STORE_ADDRESS: z.string().default("تهران، بازار مولوی، پاساژ صفویه"),
+    STORE_TELEGRAM: z.string().url().default("https://t.me/vapeufostoree"),
+  })
+  .superRefine((env, context) => {
+    if (env.NODE_ENV === "production" && !isProductionSessionSecret(env.SESSION_SECRET)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["SESSION_SECRET"],
+        message: "Production requires a non-placeholder SESSION_SECRET of at least 32 characters.",
+      });
+    }
+  });
 
 export type RuntimeEnv = z.infer<typeof envSchema>;
 

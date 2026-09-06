@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { CustomerType, SalesChannel, UserRole } from "@ufo/types";
+import { getSessionSecret } from "@ufo/config";
 
 export interface CustomerSessionPayload {
   customerId: string;
@@ -19,18 +20,12 @@ const globalState = globalThis as typeof globalThis & {
   __ufoCustomerRateLimits?: Map<string, number[]>;
 };
 
-function getSecret(): string {
-  const secret = process.env.SESSION_SECRET ?? "development-session-secret-change-me";
-  if (secret.length < 16) throw new Error("SESSION_SECRET باید حداقل ۱۶ کاراکتر باشد.");
-  return secret;
-}
-
 function base64Url(value: string): string {
   return Buffer.from(value, "utf8").toString("base64url");
 }
 
 function sign(payload: string): string {
-  return createHmac("sha256", getSecret()).update(payload).digest("base64url");
+  return createHmac("sha256", getSessionSecret("customer")).update(payload).digest("base64url");
 }
 
 export function createCustomerSessionToken(

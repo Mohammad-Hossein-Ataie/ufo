@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { deleteShippingMethod, saveShippingMethod, type ShippingMethodInput } from "@ufo/orders";
 import { checkRateLimit } from "@/lib/customer-session";
+import { requireAdminMutation, adminRequestErrorStatus } from "@/lib/admin-request";
 
 export const runtime = "nodejs";
 type Context = { params: Promise<{ methodId: string }> };
 
-function assertSameOrigin(request: Request) {
-  const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) throw new Error("مبدأ درخواست معتبر نیست.");
+async function assertMutation(request: Request) {
+  await requireAdminMutation(request);
   const contentLength = Number(request.headers.get("content-length") ?? 0);
   if (contentLength > 20_000) throw new Error("حجم درخواست بیش از حد مجاز است.");
   if (!checkRateLimit("admin-shipping-mutation", 120, 60_000).allowed)
@@ -30,28 +30,28 @@ function parseInput(payload: Record<string, unknown>): ShippingMethodInput {
 
 export async function PATCH(request: Request, context: Context) {
   try {
-    assertSameOrigin(request);
+    await assertMutation(request);
     const { methodId } = await context.params;
     const payload = (await request.json()) as Record<string, unknown>;
     return NextResponse.json({ method: saveShippingMethod(parseInput(payload), methodId) });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "ویرایش روش ارسال انجام نشد." },
-      { status: 400 },
+      { status: adminRequestErrorStatus(error) },
     );
   }
 }
 
 export async function DELETE(request: Request, context: Context) {
   try {
-    assertSameOrigin(request);
+    await assertMutation(request);
     const { methodId } = await context.params;
     deleteShippingMethod(methodId);
     return NextResponse.json({ ok: true });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "حذف روش ارسال انجام نشد." },
-      { status: 400 },
+      { status: adminRequestErrorStatus(error) },
     );
   }
 }

@@ -1,12 +1,6 @@
-const encoder = new TextEncoder();
+import { getSessionSecret } from "@ufo/config";
 
-function sessionSecret(): string {
-  const value = process.env.SESSION_SECRET ?? "development-admin-session-secret-change-me";
-  if (process.env.NODE_ENV === "production" && value.length < 32) {
-    throw new Error("SESSION_SECRET امن برای نشست ادمین تنظیم نشده است.");
-  }
-  return value;
-}
+const encoder = new TextEncoder();
 
 function base64Url(bytes: Uint8Array): string {
   let binary = "";
@@ -17,7 +11,7 @@ function base64Url(bytes: Uint8Array): string {
 async function signature(value: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
-    encoder.encode(sessionSecret()),
+    encoder.encode(getSessionSecret("admin")),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"],

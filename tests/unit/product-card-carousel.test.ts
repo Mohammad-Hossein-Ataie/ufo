@@ -87,6 +87,23 @@ afterEach(async () => {
 });
 
 describe("product card carousel", () => {
+  it("honors hover that starts before hydration", async () => {
+    vi.stubGlobal("matchMedia", (query: string) =>
+      query === "(hover: hover)" ? { matches: true } : media,
+    );
+    const matches = vi.spyOn(Element.prototype, "matches").mockReturnValue(true);
+    try {
+      await mount();
+      await advance(10000);
+      expect(api.activeIndex).toBe(0);
+      expect(vi.getTimerCount()).toBe(0);
+      await act(async () => api.resume("hover"));
+      await advance(4700);
+      expect(api.activeIndex).toBe(1);
+    } finally {
+      matches.mockRestore();
+    }
+  });
   it("does not schedule or preload for one item", async () => {
     await mount(1);
     await advance(20000);
