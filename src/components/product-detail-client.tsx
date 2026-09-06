@@ -98,7 +98,7 @@ export function ProductDetailClient({
   }
 
   return (
-    <section className="grid gap-6 rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(0,217,255,0.10),transparent_34%),#0D1117] p-3 shadow-retail-lg sm:p-5 lg:grid-cols-[minmax(0,1.03fr)_minmax(24rem,0.97fr)] lg:gap-7 lg:p-6">
+    <section className="retail-glass grid gap-6 rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(0,217,255,0.10),transparent_34%),#0D1117] p-3 shadow-retail-lg sm:p-5 lg:grid-cols-[minmax(0,1.03fr)_minmax(24rem,0.97fr)] lg:gap-7 lg:p-6">
       <div className="grid gap-3 lg:order-2">
         <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#F5F7FA] p-3 sm:p-4">
           <div className="relative mx-auto aspect-square max-h-[34rem] max-w-[34rem] overflow-hidden rounded-lg bg-white">

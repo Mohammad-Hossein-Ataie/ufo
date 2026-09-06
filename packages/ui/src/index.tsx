@@ -186,13 +186,13 @@ export function ProductCard({
   return (
     <article
       className={cn(
-        "group grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-current/10 bg-current/[0.028] shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-current/20 hover:bg-current/[0.045] hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+        "storefront-product-card group grid min-w-0 h-full grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-current/10 bg-current/[0.028] shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-current/20 hover:bg-current/[0.045] hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0",
         compactOnMobile && "mobile-product-card",
       )}
     >
       <div
         className={cn(
-          "aspect-[4/3] overflow-hidden bg-black/10",
+          "aspect-square overflow-hidden bg-black/10",
           compactOnMobile && "mobile-product-media",
           mediaClassName,
         )}
@@ -207,13 +207,13 @@ export function ProductCard({
       >
         <div
           className={cn(
-            "flex min-h-14 items-start justify-between gap-3",
+            "flex min-h-14 flex-wrap items-start justify-between gap-2",
             compactOnMobile && "mobile-product-title-row",
           )}
         >
           <h3
             className={cn(
-              "line-clamp-2 text-base font-black leading-7",
+              "min-w-0 flex-1 basis-28 line-clamp-2 text-base font-black leading-7",
               compactOnMobile && "mobile-product-title",
             )}
           >

@@ -7,9 +7,46 @@ import {
   productCatalogImageUrl,
   productImageAssetId,
   validateProductImage,
+  generatedProductKey,
 } from "@/lib/product-image-protection";
 
 describe("product image protection", () => {
+  it.each([
+    [100, 300],
+    [300, 100],
+  ])(
+    "fills a %s × %s card without white letterboxing or cropping foreground edges",
+    async (width, height) => {
+      const original = await sharp({
+        create: { width, height, channels: 3, background: "#e02030" },
+      })
+        .png()
+        .toBuffer();
+      const card = await generateProtectedProductImage(original, "card");
+      const { data, info } = await sharp(card).raw().toBuffer({ resolveWithObject: true });
+      const pixel = (x: number, y: number) =>
+        Array.from(
+          data.subarray(
+            (y * info.width + x) * info.channels,
+            (y * info.width + x) * info.channels + 3,
+          ),
+        );
+      expect(pixel(10, 10).every((channel) => channel < 240)).toBe(true);
+      for (const [x, y] of width < height
+        ? [
+            [300, 2],
+            [300, 597],
+          ]
+        : [
+            [2, 300],
+            [597, 300],
+          ]) {
+        expect(pixel(x!, y!)[0]).toBeGreaterThan(200);
+      }
+      expect(generatedProductKey("asset", "card")).toContain("card-v2.webp");
+      expect(generatedProductKey("asset", "detail")).toContain("asset-detail.webp");
+    },
+  );
   it("creates exact WebP card and detail derivatives with a visible low-opacity watermark", async () => {
     const original = await sharp({
       create: { width: 160, height: 100, channels: 3, background: "#ffffff" },

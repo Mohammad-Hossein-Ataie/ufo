@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
+import type { PreparedCarouselImage } from "@/lib/product-carousel-image";
+export const StorefrontProductImageSource = createContext<PreparedCarouselImage | null>(null);
 import { ProtectedProductImage } from "@/components/protected-product-image";
 
 interface StorefrontProductImageProps {
@@ -18,10 +20,11 @@ export function StorefrontProductImage({
   className,
   sizes = "(min-width: 1024px) 28vw, 50vw",
 }: StorefrontProductImageProps) {
-  const [currentSrc, setCurrentSrc] = useState(src || fallbackSrc);
-  const imageClassName =
-    className ??
-    "h-full w-full object-contain p-4 transition duration-200 group-hover:scale-[1.03] motion-reduce:transition-none";
+  const [failedSrc, setFailedSrc] = useState<string>();
+  const prepared = useContext(StorefrontProductImageSource);
+  const currentSrc =
+    prepared?.src === src ? prepared.resolvedSrc : !src || failedSrc === src ? fallbackSrc : src;
+  const imageClassName = className ?? "h-full w-full object-cover";
 
   return (
     <span className="relative block h-full w-full">
@@ -33,7 +36,7 @@ export function StorefrontProductImage({
         loading="lazy"
         unoptimized
         className={imageClassName}
-        onError={() => setCurrentSrc(fallbackSrc)}
+        onError={() => setFailedSrc(src)}
       />
     </span>
   );

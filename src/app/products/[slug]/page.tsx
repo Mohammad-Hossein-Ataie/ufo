@@ -166,7 +166,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   ]);
 
   return (
-    <main id="main-content" className="bg-retail-bg text-retail-primary">
+    <main id="main-content" className="retail-storefront bg-retail-bg text-retail-primary">
       <script {...jsonLdScriptProps(jsonLd)} />
       <script {...jsonLdScriptProps(breadcrumb)} />
       <div className="mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-10">
@@ -322,7 +322,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     title={related.nameFa}
                     description={related.shortDescriptionFa}
                     compactOnMobile
-                    mediaClassName="bg-white"
                     media={
                       <StorefrontProductImage
                         src={getProductImage(related)}
@@ -330,7 +329,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                           getCategoryImage(related.categoryId) ?? "/images/categories/lighter.png"
                         }
                         alt={related.nameFa}
-                        className="h-full w-full object-contain p-3 transition duration-200 group-hover:scale-[1.03] motion-reduce:transition-none"
                       />
                     }
                     badge={<StockStatus available={relatedAvailable} />}

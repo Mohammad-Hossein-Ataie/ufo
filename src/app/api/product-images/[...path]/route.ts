@@ -137,7 +137,7 @@ async function serveAsset(assetId: string, preset: ProductImagePreset): Promise<
   const cacheId = assetId.toLowerCase();
   const generatedKey = generatedProductKey(cacheId, preset);
   const cached = await readGenerated(generatedKey);
-  if (cached) return responseImage(cached, `${cacheId}-${preset}`);
+  if (cached) return responseImage(cached, generatedKey);
   if (!checkRateLimit(`product-image-generation:${cacheId}`, 5, 60_000).allowed) {
     return new NextResponse(null, { status: 429, headers: { "Retry-After": "60" } });
   }
@@ -150,7 +150,7 @@ async function serveAsset(assetId: string, preset: ProductImagePreset): Promise<
     contentType: "image/webp",
     visibility: "private",
   });
-  return responseImage(generated, `${cacheId}-${preset}`);
+  return responseImage(generated, generatedKey);
 }
 
 async function serveCatalog(
@@ -174,7 +174,7 @@ async function serveCatalog(
     .slice(0, 32);
   const generatedKey = generatedProductKey(cacheId, preset);
   const cached = await readGenerated(generatedKey);
-  if (cached) return responseImage(cached, `${cacheId}-${preset}`);
+  if (cached) return responseImage(cached, generatedKey);
   if (!checkRateLimit(`product-image-generation:${cacheId}`, 5, 60_000).allowed) {
     return new NextResponse(null, { status: 429, headers: { "Retry-After": "60" } });
   }
@@ -187,7 +187,7 @@ async function serveCatalog(
     contentType: "image/webp",
     visibility: "private",
   });
-  return responseImage(generated, `${cacheId}-${preset}`);
+  return responseImage(generated, generatedKey);
 }
 
 async function serveVariant(variantId: string, preset: ProductImagePreset): Promise<Response> {

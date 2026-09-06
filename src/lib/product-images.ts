@@ -2,6 +2,7 @@ import { categories } from "@ufo/domain";
 import {
   productCatalogImageUrl,
   protectedAssetUrl,
+  productCardImageVersion,
   type ProductImagePreset,
 } from "@/lib/product-image-protection";
 import type { Product } from "@ufo/types";
@@ -36,7 +37,7 @@ function protectedProductSource(
 
 export function getProductImage(product: Pick<Product, "id" | "categoryId" | "image">) {
   if (!genericProductImages.has(product.image)) {
-    return protectedProductSource(product.id, product.image, "primary", "card");
+    return `${protectedProductSource(product.id, product.image, "primary", "card")}?v=${productCardImageVersion}`;
   }
   return getCategoryImage(product.categoryId) ?? "/images/categories/lighter.png";
 }

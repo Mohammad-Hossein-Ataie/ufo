@@ -18,12 +18,12 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { Button, Price, StockStatus } from "@ufo/ui";
+import { Button } from "@ufo/ui";
 import { brands, categories } from "@ufo/domain";
-import { AddToCartButton } from "@/components/add-to-cart-button";
-import { getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
-import { categoryImageBySlug, getProductImage } from "@/lib/product-images";
-import { ProtectedProductImage } from "@/components/protected-product-image";
+import { HomepageProducts } from "@/components/homepage-products";
+import { getLatestHomepageProducts } from "@/lib/homepage-products";
+import { listCatalogRows } from "@/lib/catalog-data";
+import { categoryImageBySlug } from "@/lib/product-images";
 import { faqPageJsonLd, jsonLdScriptProps, organizationJsonLd, websiteJsonLd } from "@ufo/seo";
 
 export const dynamic = "force-dynamic";
@@ -98,14 +98,10 @@ const categoryAccent: Record<string, string> = {
 };
 
 export default async function HomePage() {
-  const featured = (await listCatalogRows())
-    .filter(
-      (row) => row.product.isActive && (row.product.salesChannels?.includes("retail") ?? true),
-    )
-    .slice(0, 4);
+  const homepageSlots = getLatestHomepageProducts(await listCatalogRows());
 
   return (
-    <main id="main-content">
+    <main id="main-content" className="retail-storefront">
       <script {...jsonLdScriptProps(organizationJsonLd())} />
       <script {...jsonLdScriptProps(websiteJsonLd())} />
       <script {...jsonLdScriptProps(faqPageJsonLd(homeFaq))} />
@@ -180,13 +176,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="section-surface-alt border-y border-retail-border">
+      <section className="new-products-section section-surface-alt border-y border-retail-border">
         <div className="mx-auto max-w-7xl px-4 py-16">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-black text-white sm:text-3xl">محصولات منتخب یوفوپاف</h2>
+              <h2 className="text-2xl font-black text-white sm:text-3xl">محصولات جدید یوفوپاف</h2>
               <p className="mt-2 text-retail-secondary">
-                قیمت‌ها در دیتابیس ریالی ذخیره و در UI به تومان نمایش داده می‌شوند.
+                تازه‌ترین محصولات پاد، ویپ، پاد یک‌بارمصرف و جویس را کشف کنید.
               </p>
             </div>
             <Link
@@ -197,81 +193,7 @@ export default async function HomePage() {
               <ArrowLeft size={16} aria-hidden="true" />
             </Link>
           </div>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((row) => {
-              const product = row.product;
-              const variant = row.variant;
-              const available = getCatalogRowStock(row);
-              const category = categories.find((item) => item.id === product.categoryId);
-              const imageSrc = getProductImage(product);
-              return (
-                <article
-                  key={product.id}
-                  className="group relative isolate grid h-full overflow-hidden rounded-retail bg-[#0C1218] shadow-[inset_0_0_0_1px_rgba(34,211,238,0.16),0_18px_44px_rgba(0,0,0,0.24)] transition duration-300 hover:-translate-y-1 hover:shadow-[inset_0_0_0_1px_rgba(34,211,238,0.42),0_24px_60px_rgba(0,0,0,0.32)]"
-                >
-                  <Link
-                    href={`/products/${product.slug}`}
-                    className="absolute inset-0 z-10 rounded-retail focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
-                    aria-label={`مشاهده جزئیات ${product.nameFa}`}
-                  />
-                  <div className="relative aspect-[4/3] overflow-hidden bg-retail-surface-alt">
-                    <ProtectedProductImage
-                      src={imageSrc}
-                      alt={product.nameFa}
-                      fill
-                      loading="lazy"
-                      className="object-cover transition duration-500 group-hover:scale-[1.05]"
-                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                    />
-                    <div
-                      className="absolute inset-0 bg-gradient-to-t from-[#0C1218] via-transparent to-black/10"
-                      aria-hidden="true"
-                    />
-                    <div className="absolute right-3 top-3 z-20">
-                      <StockStatus available={available} />
-                    </div>
-                    {category ? (
-                      <span className="absolute bottom-3 left-3 z-20 rounded-full bg-black/45 px-3 py-1 text-xs font-bold text-[#D9E2EC] backdrop-blur">
-                        {category.nameFa}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div className="grid min-h-[19rem] grid-rows-[auto_auto_1fr_auto] gap-3 p-4">
-                    <div>
-                      <h3 className="line-clamp-2 text-lg font-black leading-8 text-white">
-                        {product.nameFa}
-                      </h3>
-                      {product.nameEn ? (
-                        <p className="mt-1 line-clamp-1 text-xs font-medium text-retail-muted">
-                          {product.nameEn}
-                        </p>
-                      ) : null}
-                    </div>
-                    <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-retail-secondary">
-                      {product.shortDescriptionFa}
-                    </p>
-                    <div className="mt-auto flex items-end justify-between gap-3 border-t border-white/10 pt-3">
-                      <span className="text-xs text-retail-muted">قیمت خرید تکی</span>
-                      <Price
-                        valueRial={variant.retailPriceRial}
-                        className="text-lg font-black text-white"
-                      />
-                    </div>
-                    <div className="relative z-20 grid gap-2">
-                      <AddToCartButton variantId={variant.id} />
-                      <Link
-                        href={`/products/${product.slug}`}
-                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md text-sm font-bold text-retail-accent transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
-                      >
-                        جزئیات
-                        <ArrowLeft size={16} aria-hidden="true" />
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <HomepageProducts slots={homepageSlots} />
         </div>
       </section>
 

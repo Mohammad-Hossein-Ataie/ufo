@@ -11,3 +11,7 @@
   to clients. Keep HTTPS verification enabled and provider URLs fixed.
 - See `MELIPAYAMAK.md` for setup, provider errors and existing storage limitations.
 - Run focused OTP transport/auth tests and typecheck when changing authentication.
+
+- Product-card rotation uses `useProductCardCarousel`. Keep each product's content/CTA
+  atomic and preload protected derivatives only; preserve interaction, visibility and
+  reduced-motion pauses. Run carousel unit/browser tests when changing this behavior.

@@ -6,6 +6,7 @@ export const productImagePresets = {
 } as const;
 
 export type ProductImagePreset = keyof typeof productImagePresets;
+export const productCardImageVersion = "2";
 
 export const productOriginalPrefix = "storage/products/original/";
 export const productGeneratedPrefix = "storage/products/generated/";
@@ -44,7 +45,8 @@ export function originalProductKey(assetId: string): string {
 }
 
 export function generatedProductKey(cacheId: string, preset: ProductImagePreset): string {
-  return `${productGeneratedPrefix}${cacheId}-${preset}.webp`;
+  const version = preset === "card" ? `-v${productCardImageVersion}` : "";
+  return `${productGeneratedPrefix}${cacheId}-${preset}${version}.webp`;
 }
 
 function watermarkSvg(width: number, height: number): Buffer {
@@ -91,6 +93,32 @@ export async function generateProtectedProductImage(
 ): Promise<Uint8Array> {
   await validateProductImage(input);
   const config = productImagePresets[preset];
+  if (preset === "card") {
+    // Preserve portrait packaging and landscape artwork in full. A defocused copy
+    // fills the square without white letterboxing or stretching the foreground.
+    const source = sharp(input, {
+      failOn: "error",
+      limitInputPixels: maxProductImagePixels,
+    }).rotate();
+    const foreground = await source
+      .clone()
+      .resize(config.width, config.height, { fit: "contain", background: "#00000000" })
+      .png()
+      .toBuffer();
+    const card = await source
+      .clone()
+      .resize(config.width, config.height, { fit: "cover" })
+      .flatten({ background: "#141a22" })
+      .blur(24)
+      .modulate({ brightness: 0.7, saturation: 0.65 })
+      .composite([
+        { input: foreground },
+        { input: watermarkSvg(config.width, config.height), gravity: "southeast" },
+      ])
+      .webp({ quality: config.quality, effort: 5, smartSubsample: true })
+      .toBuffer();
+    return new Uint8Array(card);
+  }
   const output = await sharp(input, {
     failOn: "error",
     limitInputPixels: maxProductImagePixels,

@@ -68,7 +68,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   );
 
   return (
-    <main id="main-content" className="mx-auto max-w-7xl px-4 py-10">
+    <main id="main-content" className="retail-storefront mx-auto max-w-7xl px-4 py-10">
       <script {...jsonLdScriptProps(breadcrumb)} />
       <script {...jsonLdScriptProps(collectionPageJsonLd(category, categoryProducts.length))} />
       <script {...jsonLdScriptProps(itemList)} />
@@ -91,7 +91,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           </Button>
         </Link>
       </header>
-      <section className="mt-8 rounded-md border border-[#22303D] bg-[#0D1117] p-5">
+      <section className="retail-glass mt-8 rounded-md border border-[#22303D] bg-[#0D1117] p-5">
         <h2 className="text-xl font-bold">چطور انتخاب کنیم؟</h2>
         <p className="mt-3 leading-8 text-[#D9E2EC]">
           برای انتخاب مطمئن، ابتدا نوع مصرف، سازگاری دستگاه یا کارتریج، موجودی قابل فروش و قیمت
@@ -110,7 +110,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               key={product.id}
               title={product.nameFa}
               description={product.shortDescriptionFa}
-              mediaClassName="bg-white"
               media={
                 <StorefrontProductImage
                   src={getProductImage(product)}
@@ -118,7 +117,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                     getCategoryImage(product.categoryId) ?? "/images/categories/lighter.png"
                   }
                   alt={product.nameFa}
-                  className="h-full w-full object-contain p-4 transition duration-200 group-hover:scale-[1.03] motion-reduce:transition-none"
                 />
               }
               badge={<StockStatus available={available} />}

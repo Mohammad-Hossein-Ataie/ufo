@@ -42,6 +42,88 @@
   background: linear-gradient(180deg, var(--retail-surface) 0%, var(--retail-surface-alt) 100%);
 }
 
+/* Shared retail surfaces; keep the wholesale palette and mobile panels intact. */
+@media (min-width: 1024px) {
+  .retail-storefront {
+    background-image: radial-gradient(
+      ellipse at 85% 20%,
+      rgba(0, 217, 255, 0.035),
+      transparent 55%
+    );
+  }
+
+  .retail-storefront .storefront-product-card,
+  .retail-storefront .retail-glass,
+  .retail-header {
+    background: linear-gradient(145deg, rgba(28, 37, 48, 0.82), rgba(12, 18, 26, 0.92));
+    border-color: rgba(255, 255, 255, 0.12);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.055),
+      0 12px 32px rgba(0, 0, 0, 0.18);
+  }
+
+  .retail-storefront .storefront-product-card:hover {
+    border-color: rgba(0, 217, 255, 0.3);
+  }
+
+  .retail-storefront .new-products-section {
+    background: radial-gradient(ellipse at 75% 0%, rgba(0, 217, 255, 0.055), transparent 60%),
+      rgba(15, 22, 31, 0.72);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.homepage-product-slot .mobile-product-body {
+  grid-template-rows: 4rem 3rem 1fr;
+}
+
+.homepage-product-slot .mobile-product-title-row {
+  align-content: start;
+}
+
+.homepage-product-slide[data-phase="out"] {
+  animation: homepage-product-exit 200ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.homepage-product-slide[data-phase="in"] {
+  animation: homepage-product-enter 200ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes homepage-product-exit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(var(--carousel-out-x));
+  }
+}
+
+@keyframes homepage-product-enter {
+  from {
+    opacity: 0;
+    transform: translateX(var(--carousel-in-x));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (max-width: 639px) {
+  .homepage-product-slot .mobile-product-body {
+    grid-template-rows: 4.5rem 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .homepage-product-slide[data-phase] {
+    animation: none;
+  }
+}
+
 /* Hairline divider/border using the shared border token. */
 .hairline {
   border-color: var(--retail-border);

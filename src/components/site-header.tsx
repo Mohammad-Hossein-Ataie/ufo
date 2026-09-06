@@ -182,7 +182,7 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-retail-border bg-[#05070B]/88 backdrop-blur-xl">
+      <header className="retail-header sticky top-0 z-40 border-b border-retail-border bg-[#05070B]/88 backdrop-blur-xl">
         <div className="relative mx-auto flex h-[60px] max-w-7xl items-center justify-between px-3 sm:h-16 sm:px-4">
           <div className="flex items-center gap-1 lg:hidden">
             <IconButton
