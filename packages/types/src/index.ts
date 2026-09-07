@@ -122,6 +122,8 @@ export interface ProductFlavor {
 }
 
 export interface Product {
+  deletedAt?: string;
+  seoKeywords?: string[];
   id: string;
   slug: string;
   nameFa: string;

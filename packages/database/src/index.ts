@@ -76,6 +76,10 @@ export const databaseIndexes: Record<CollectionName, IndexDescription[]> = {
     { key: { expiresAt: 1 }, expireAfterSeconds: 0 },
   ],
   products: [
+    { key: { id: 1 } },
+    { key: { deletedAt: 1, updatedAt: -1, id: 1 } },
+    { key: { brandId: 1, isActive: 1 } },
+    { key: { productKind: 1, salesChannels: 1 } },
     { key: { slug: 1 }, unique: true },
     { key: { categoryId: 1, isActive: 1 } },
     { key: { variantType: 1 } },

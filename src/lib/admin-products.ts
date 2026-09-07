@@ -34,6 +34,9 @@ export interface AdminProductRecord {
 }
 
 export interface AdminProductInput {
+  seoTitle?: string | undefined;
+  seoDescription?: string | undefined;
+  seoKeywords?: string[] | undefined;
   id?: string | undefined;
   variantId?: string | undefined;
   inventoryId?: string | undefined;
@@ -98,6 +101,31 @@ function getCategoryName(categoryId: string): string {
 }
 
 function assertInput(input: AdminProductInput) {
+  for (const field of [input.onHand, input.reserved, input.restockThreshold]) {
+    if (field !== undefined && (!Number.isSafeInteger(field) || field < 0))
+      throw new Error("موجودی معتبر نیست.");
+  }
+  for (const field of [input.cartonSize, input.minWholesaleCartonCount]) {
+    if (field !== undefined && (!Number.isSafeInteger(field) || field < 1))
+      throw new Error("تعداد بسته‌بندی معتبر نیست.");
+  }
+  if (
+    input.seoTitle !== undefined &&
+    (typeof input.seoTitle !== "string" || input.seoTitle.length > 160)
+  )
+    throw new Error("عنوان سئو معتبر نیست.");
+  if (
+    input.seoDescription !== undefined &&
+    (typeof input.seoDescription !== "string" || input.seoDescription.length > 500)
+  )
+    throw new Error("توضیحات سئو معتبر نیست.");
+  if (
+    input.seoKeywords !== undefined &&
+    (!Array.isArray(input.seoKeywords) ||
+      input.seoKeywords.length > 50 ||
+      input.seoKeywords.some((v) => typeof v !== "string" || v.length > 100))
+  )
+    throw new Error("کلمات کلیدی معتبر نیست.");
   if (!input.nameFa?.trim()) throw new Error("نام فارسی محصول الزامی است.");
   if (!categories.some((category) => category.id === input.categoryId))
     throw new Error("دسته‌بندی معتبر نیست.");
@@ -184,7 +212,10 @@ function buildDocuments(
   const inventoryId =
     input.inventoryId || current?.inventory.id || `inv-admin-${slug}-${Date.now()}`;
   const brandId = input.brandId || current?.product.brandId || "brand-ufo";
-  const image = input.image?.trim() || current?.product.image || "/images/ufo-hero.png";
+  const image =
+    input.image === undefined
+      ? current?.product.image || "/images/ufo-hero.png"
+      : input.image.trim() || "/images/ufo-hero.png";
   const images = [
     image,
     ...(input.images ?? current?.product.images ?? []).map((item) => item.trim()).filter(Boolean),
@@ -282,9 +313,16 @@ function buildDocuments(
     sourceNoteFa: current?.product.sourceNoteFa ?? "ثبت‌شده از پنل ادمین",
     isActive: input.isActive ?? true,
     isAgeRestricted: true,
-    seoTitle: `${input.nameFa.trim()} | UFO Puff`,
+    seoTitle:
+      (input.seoTitle === undefined ? current?.product.seoTitle : input.seoTitle.trim()) ||
+      `${input.nameFa.trim()} | UFO Puff`,
+    seoKeywords: input.seoKeywords ?? current?.product.seoKeywords ?? [],
     seoDescription:
-      input.shortDescriptionFa?.trim() || `${input.nameFa.trim()} با قیمت و موجودی قابل ویرایش.`,
+      (input.seoDescription === undefined
+        ? current?.product.seoDescription
+        : input.seoDescription.trim()) ||
+      input.shortDescriptionFa?.trim() ||
+      `${input.nameFa.trim()} با قیمت و موجودی قابل ویرایش.`,
     createdAt: current?.product.createdAt ?? date,
     updatedAt: date,
   };
@@ -329,6 +367,7 @@ function combineRows(
   inventoryList: InventoryItem[],
 ): AdminProductRecord[] {
   return productList
+    .filter((product) => !product.deletedAt)
     .map((product) => {
       const variant = variantList.find((item) => item.productId === product.id);
       if (!variant) return undefined;
@@ -407,9 +446,8 @@ export async function listAdminProducts(): Promise<AdminProductRecord[]> {
 }
 
 export async function saveAdminProduct(input: AdminProductInput): Promise<AdminProductRecord> {
-  const current = input.id
-    ? (await listAdminProducts()).find((row) => row.product.id === input.id)
-    : undefined;
+  const current = input.id ? await getAdminProduct(input.id) : undefined;
+  if (input.id && !current) throw new Error("محصول پیدا نشد.");
   const allowedFlavorIds = (await listAdminFlavors()).map((flavor) => flavor.id);
   const allowedColorIds = (await listAdminColors()).map((color) => color.id);
   const row = buildDocuments(input, current, allowedFlavorIds, allowedColorIds);
@@ -435,4 +473,42 @@ export async function saveAdminProduct(input: AdminProductInput): Promise<AdminP
       .updateOne({ id: row.inventory.id }, { $set: row.inventory }, { upsert: true }),
   ]);
   return row;
+}
+
+export function getMemoryAdminProducts() {
+  return combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems);
+}
+
+export async function getAdminProduct(id: string): Promise<AdminProductRecord | undefined> {
+  if (!hasUsableMongoUri()) return getMemoryAdminProducts().find((row) => row.product.id === id);
+  const db = await getDb();
+  const product = await db
+    .collection<Product>("products")
+    .findOne({ id, deletedAt: { $exists: false } });
+  if (!product) return undefined;
+  const variant = await db
+    .collection<ProductVariant>("productVariants")
+    .findOne({ productId: id }, { sort: { id: 1 } });
+  if (!variant) return undefined;
+  const inventory = await db
+    .collection<InventoryItem>("inventoryItems")
+    .findOne({ variantId: variant.id });
+  return combineRows(
+    [withoutMongoId(product)],
+    [withoutMongoId(variant)],
+    inventory ? [withoutMongoId(inventory)] : [],
+  )[0];
+}
+
+export function mutateMemoryAdminProduct(
+  id: string,
+  productPatch: Partial<Product>,
+  variantPatch: Partial<ProductVariant>,
+) {
+  memoryState.products = memoryState.products.map((item) =>
+    item.id === id ? { ...item, ...productPatch } : item,
+  );
+  memoryState.variants = memoryState.variants.map((item) =>
+    item.productId === id ? { ...item, ...variantPatch } : item,
+  );
 }

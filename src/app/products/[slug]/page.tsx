@@ -125,6 +125,7 @@ export async function generateMetadata({
   return {
     title: product.seoTitle,
     description: product.seoDescription,
+    keywords: product.seoKeywords,
     alternates: { canonical: `/products/${product.slug}` },
     openGraph: {
       title: product.seoTitle,

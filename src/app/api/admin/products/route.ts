@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { categories, brands } from "@ufo/domain";
-import { listAdminProducts, saveAdminProduct, type AdminProductInput } from "@/lib/admin-products";
+import { saveAdminProduct, type AdminProductInput } from "@/lib/admin-products";
+import { productQuerySchema, queryAdminProducts } from "@/lib/admin-product-query";
 import type { ProductVariantType } from "@ufo/types";
 
 export const runtime = "nodejs";
@@ -28,6 +29,9 @@ function parseVariantType(value: unknown): ProductVariantType | undefined {
 function parseInput(body: unknown): AdminProductInput {
   const value = body as Partial<AdminProductInput>;
   return {
+    seoTitle: value.seoTitle,
+    seoDescription: value.seoDescription,
+    seoKeywords: value.seoKeywords,
     id: value.id,
     variantId: value.variantId,
     inventoryId: value.inventoryId,
@@ -69,9 +73,18 @@ function parseInput(body: unknown): AdminProductInput {
   };
 }
 
-export async function GET() {
-  const rows = await listAdminProducts();
-  return NextResponse.json({ rows, categories, brands });
+export async function GET(request: Request) {
+  const query = productQuerySchema.safeParse(Object.fromEntries(new URL(request.url).searchParams));
+  if (!query.success)
+    return NextResponse.json({ error: "پارامترهای جست‌وجو معتبر نیست." }, { status: 400 });
+  try {
+    return NextResponse.json({ ...(await queryAdminProducts(query.data)), categories, brands });
+  } catch {
+    return NextResponse.json(
+      { error: "دریافت محصولات ناموفق بود؛ دوباره تلاش کنید." },
+      { status: 503 },
+    );
+  }
 }
 
 export async function POST(req: Request) {

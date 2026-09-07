@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { saveAdminProduct, type AdminProductInput } from "@/lib/admin-products";
+import { getAdminProduct, saveAdminProduct, type AdminProductInput } from "@/lib/admin-products";
 import type { ProductVariantType } from "@ufo/types";
 
 export const runtime = "nodejs";
@@ -27,6 +27,9 @@ function parseVariantType(value: unknown): ProductVariantType | undefined {
 function parseInput(productId: string, body: unknown): AdminProductInput {
   const value = body as Partial<AdminProductInput>;
   return {
+    seoTitle: value.seoTitle,
+    seoDescription: value.seoDescription,
+    seoKeywords: value.seoKeywords,
     id: productId,
     variantId: value.variantId,
     inventoryId: value.inventoryId,
@@ -78,5 +81,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ produc
       { error: error instanceof Error ? error.message : "به‌روزرسانی محصول ناموفق بود." },
       { status: 400 },
     );
+  }
+}
+
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ productId: string }> },
+) {
+  try {
+    const row = await getAdminProduct((await params).productId);
+    return row
+      ? NextResponse.json({ row })
+      : NextResponse.json({ error: "محصول پیدا نشد." }, { status: 404 });
+  } catch {
+    return NextResponse.json({ error: "دریافت محصول ناموفق بود." }, { status: 503 });
   }
 }

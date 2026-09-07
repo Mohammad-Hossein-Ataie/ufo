@@ -1,34 +1,27 @@
 "use client";
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { useEffect, useMemo, useState, type DragEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Check,
   CircleOff,
-  Edit3,
   FileImage,
-  Filter,
   Gauge,
-  GripVertical,
   ImagePlus,
   LayoutGrid,
-  Link2,
   Palette,
   Plus,
   Save,
   Search,
   Sparkles,
-  Trash2,
-  UploadCloud,
   Video,
   X,
 } from "lucide-react";
-import { Badge, Button, IconButton, Input, Price, Textarea } from "@ufo/ui";
+import { Button, IconButton, Input, Textarea } from "@ufo/ui";
 import {
   getDefaultProductVariantType,
   getProductColorOptions,
   getProductFlavorOptions,
-  getProductVariantOptions,
   getSuggestedProductVariantValueIds,
   productColorPalette,
   productFlavorCatalog,
@@ -47,6 +40,18 @@ import type {
   SalesChannel,
 } from "@ufo/types";
 
+import dynamic from "next/dynamic";
+import { ProductFilters, emptyFilters, type FilterState } from "./products/product-filters";
+import { ProductTable } from "./products/product-table";
+import { Pagination } from "./products/pagination";
+import { BulkActions, ConfirmationDialog } from "./products/bulk-actions";
+import { ProductTabs, type ProductTab } from "./products/product-tabs";
+import type { ProductListRow, ProductQuery } from "@/lib/admin-product-query";
+import type { BulkProductInput } from "@/lib/admin-product-bulk";
+const ImageManager = dynamic(() => import("./products/image-manager"), {
+  loading: () => <p role="status">در حال آماده‌سازی تصاویر…</p>,
+});
+
 interface AdminProductRecord {
   product: Product;
   variant: ProductVariant;
@@ -56,6 +61,9 @@ interface AdminProductRecord {
 }
 
 interface FormState {
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string;
   id?: string;
   variantId?: string;
   inventoryId?: string;
@@ -104,6 +112,9 @@ const productKindOptions: Array<{ value: ProductKind; label: string }> = [
 ];
 
 const emptyForm: FormState = {
+  seoTitle: "",
+  seoDescription: "",
+  seoKeywords: "",
   nameFa: "",
   nameEn: "",
   slug: "",
@@ -260,8 +271,9 @@ function getModalLayoutDebug() {
           top: footerRect.top,
           bottom: footerRect.bottom,
           height: footerRect.height,
-          insideDialog:
-            dialogRect ? footerRect.top >= dialogRect.top && footerRect.bottom <= dialogRect.bottom : false,
+          insideDialog: dialogRect
+            ? footerRect.top >= dialogRect.top && footerRect.bottom <= dialogRect.bottom
+            : false,
         }
       : null,
   };
@@ -321,15 +333,17 @@ function rowToForm(row: AdminProductRecord): FormState {
     row.product.categoryId,
     row.product.productKind ?? "disposable",
   );
-  const variantValueIds =
-    row.product.variantValueIds?.length
-      ? row.product.variantValueIds
-      : variantType === "flavor"
-        ? getProductFlavorOptions(row.product).map((flavor) => flavor.id)
-        : variantType === "color"
-          ? getProductColorOptions(row.product).map((color) => color.id)
-          : [];
+  const variantValueIds = row.product.variantValueIds?.length
+    ? row.product.variantValueIds
+    : variantType === "flavor"
+      ? getProductFlavorOptions(row.product).map((flavor) => flavor.id)
+      : variantType === "color"
+        ? getProductColorOptions(row.product).map((color) => color.id)
+        : [];
   return {
+    seoTitle: row.product.seoTitle,
+    seoDescription: row.product.seoDescription,
+    seoKeywords: (row.product.seoKeywords ?? []).join("، "),
     id: row.product.id,
     variantId: row.variant.id,
     inventoryId: row.inventory.id,
@@ -365,10 +379,6 @@ function rowToForm(row: AdminProductRecord): FormState {
   };
 }
 
-function channelLabel(channel: SalesChannel) {
-  return channel === "wholesale" ? "عمده" : "تکی";
-}
-
 function imageMarkup(url: string) {
   return `\n\n![تصویر محصول](${url})\n\n`;
 }
@@ -377,58 +387,17 @@ function videoMarkup(url: string) {
   return `\n\n[ویدیو محصول](${url})\n\n`;
 }
 
-function AdminImagePreview({
-  src,
-  alt,
-  className = "object-cover",
-}: {
-  src?: unknown;
-  alt: string;
-  className?: string;
-}) {
-  const safeSrc = normalizeImageUrl(src);
-  const [failed, setFailed] = useState(!safeSrc);
-
-  useEffect(() => {
-    setFailed(!safeSrc);
-  }, [safeSrc]);
-
-  if (failed) {
-    return (
-      <div className="absolute inset-0 grid place-items-center text-[#5F6C79]">
-        <FileImage size={20} aria-hidden="true" />
-      </div>
-    );
-  }
-
-  return (
-    // Admin thumbnails should render directly so slow remote storage cannot trip Next's optimizer.
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={safeSrc}
-      alt={alt}
-      loading="lazy"
-      decoding="async"
-      referrerPolicy="no-referrer"
-      className={`absolute inset-0 h-full w-full ${className}`}
-      onError={() => setFailed(true)}
-    />
-  );
-}
-
 export function ProductManager() {
-  const [rows, setRows] = useState<AdminProductRecord[]>([]);
+  const [rows, setRows] = useState<ProductListRow[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [flavors, setFlavors] = useState<ProductFlavor[]>(productFlavorCatalog);
   const [colors, setColors] = useState<ProductColorOption[]>(productColorPalette);
   const [form, setForm] = useState<FormState>(emptyForm);
-  const [query, setQuery] = useState("");
+
   const [flavorQuery, setFlavorQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const [channelFilter, setChannelFilter] = useState<"all" | SalesChannel>("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
-  const [status, setStatus] = useState("در حال بارگذاری...");
+
+  const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const [isFetchingRows, setIsFetchingRows] = useState(true);
   const [isUploadingImages, setIsUploadingImages] = useState(false);
@@ -438,85 +407,143 @@ export function ProductManager() {
   const [isColorDialogOpen, setIsColorDialogOpen] = useState(false);
   const [newFlavor, setNewFlavor] = useState({ nameFa: "", nameEn: "", slug: "", iconKey: "" });
   const [newColor, setNewColor] = useState({ labelFa: "", id: "", hex: "#168BFF" });
-  const [isDragging, setIsDragging] = useState(false);
-  const [manualImageUrl, setManualImageUrl] = useState("");
+
   const [videoUrl, setVideoUrl] = useState("");
   const [customVariantValue, setCustomVariantValue] = useState("");
 
-  async function fetchRows() {
+  const [filters, setFilters] = useState<FilterState>(emptyFilters);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
+  const [total, setTotal] = useState(0);
+  const [sort, setSort] = useState<ProductQuery["sort"]>("updatedAt");
+  const [direction, setDirection] = useState<"asc" | "desc">("desc");
+  const [selected, setSelected] = useState<string[]>([]);
+  const [fetchError, setFetchError] = useState("");
+  const [reload, setReload] = useState(0);
+  const [activeTab, setActiveTab] = useState<ProductTab>("basic");
+  const [baseline, setBaseline] = useState(JSON.stringify(emptyForm));
+  const [discardOpen, setDiscardOpen] = useState(false);
+  const [bulkFailures, setBulkFailures] = useState<Array<{ id: string; error: string }>>([]);
+  const [editorFetching, setEditorFetching] = useState(false);
+  const fetchSequence = useRef(0);
+  const dirty = isEditorOpen && JSON.stringify(form) !== baseline;
+
+  function changeFilters(next: FilterState) {
+    setFilters(next);
+    setPage(1);
+    setSelected([]);
+  }
+  const fetchRows = useCallback(() => {
+    setReload((value) => value + 1);
+  }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    const sequence = ++fetchSequence.current;
     setIsFetchingRows(true);
+    setFetchError("");
+    setSelected([]);
+    const timer = setTimeout(async () => {
+      try {
+        const params = new URLSearchParams({
+          ...filters,
+          page: String(page),
+          pageSize: String(pageSize),
+          sort,
+          direction,
+        });
+        const response = await fetch(`/api/admin/products?${params}`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "دریافت محصولات ناموفق بود.");
+        if (sequence !== fetchSequence.current || controller.signal.aborted) return;
+        setRows(data.rows);
+        setTotal(data.total);
+        setPage(data.page);
+        setCategories(data.categories);
+        setBrands(data.brands);
+      } catch (error) {
+        if (!controller.signal.aborted && sequence === fetchSequence.current) {
+          setRows([]);
+          setTotal(0);
+          setFetchError(error instanceof Error ? error.message : "دریافت محصولات ناموفق بود.");
+        }
+      } finally {
+        if (!controller.signal.aborted && sequence === fetchSequence.current)
+          setIsFetchingRows(false);
+      }
+    }, 300);
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [filters, page, pageSize, sort, direction, reload]);
+  useEffect(() => {
+    if (!isEditorOpen) return;
+    const controller = new AbortController();
+    Promise.all([
+      fetch("/api/admin/flavors", { signal: controller.signal }),
+      fetch("/api/admin/colors", { signal: controller.signal }),
+    ])
+      .then(async ([a, b]) => {
+        if (!a.ok || !b.ok) throw new Error();
+        const [fa, co] = await Promise.all([a.json(), b.json()]);
+        if (!controller.signal.aborted) {
+          setFlavors(fa.flavors);
+          setColors(co.colors);
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted)
+          setStatus("دریافت فهرست تنوع‌ها ناموفق بود؛ پیش از ذخیره دوباره تلاش کنید.");
+      });
+    return () => controller.abort();
+  }, [isEditorOpen]);
+  useEffect(() => {
+    if (!dirty && !isUploadingImages) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty, isUploadingImages]);
+  function closeEditor() {
+    if (loading || isUploadingImages) {
+      setStatus("تا پایان عملیات صبر کنید.");
+      return;
+    }
+    if (dirty) {
+      setDiscardOpen(true);
+      return;
+    }
+    clearPendingImageUploads();
+    setIsEditorOpen(false);
+  }
+  async function applyBulk(input: BulkProductInput) {
+    setLoading(true);
+    setBulkFailures([]);
     try {
-      const [response, flavorsResponse, colorsResponse] = await Promise.all([
-        fetch("/api/admin/products", { cache: "no-store" }),
-        fetch("/api/admin/flavors", { cache: "no-store" }),
-        fetch("/api/admin/colors", { cache: "no-store" }),
-      ]);
-      const data = (await response.json().catch(() => ({}))) as {
-        rows?: AdminProductRecord[];
-        categories?: Category[];
-        brands?: Brand[];
-        error?: string;
-      };
-      const flavorData = (await flavorsResponse.json().catch(() => ({}))) as {
-        flavors?: ProductFlavor[];
-      };
-      const colorData = (await colorsResponse.json().catch(() => ({}))) as {
-        colors?: ProductColorOption[];
-      };
-      setRows(data.rows ?? []);
-      setCategories(data.categories ?? []);
-      setBrands(data.brands ?? []);
-      setFlavors(flavorData.flavors ?? productFlavorCatalog);
-      setColors(colorData.colors ?? productColorPalette);
-      setStatus(data.error ?? "محصولات به‌روز شد.");
-    } catch {
-      setRows([]);
-      setCategories([]);
-      setBrands([]);
-      setStatus("بارگذاری محصولات ناموفق بود.");
+      const response = await fetch("/api/admin/products/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "عملیات ناموفق بود.");
+      setStatus(
+        `${data.succeeded.length.toLocaleString("fa-IR")} محصول تغییر کرد؛ ${data.failed.length.toLocaleString("fa-IR")} مورد ناموفق.`,
+      );
+      setBulkFailures(data.failed);
+      setSelected([]);
+      fetchRows();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "عملیات ناموفق بود.");
     } finally {
-      setIsFetchingRows(false);
+      setLoading(false);
     }
   }
-
-  useEffect(() => {
-    void fetchRows();
-  }, []);
-
-  const summary = useMemo(() => {
-    const active = rows.filter((row) => row.product.isActive).length;
-    const retail = rows.filter((row) => row.product.salesChannels?.includes("retail")).length;
-    const wholesale = rows.filter((row) => row.product.salesChannels?.includes("wholesale")).length;
-    const lowStock = rows.filter(
-      (row) => row.inventory.onHand - row.inventory.reserved <= row.inventory.restockThreshold,
-    ).length;
-    return { active, retail, wholesale, lowStock };
-  }, [rows]);
-
-  const filtered = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return rows.filter((row) => {
-      const haystack = [
-        row.product.nameFa,
-        row.product.nameEn,
-        row.product.slug,
-        row.variant.sku,
-        row.brandNameFa,
-        row.categoryNameFa,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      const matchesQuery = !normalized || haystack.includes(normalized);
-      const matchesCategory = categoryFilter === "all" || row.product.categoryId === categoryFilter;
-      const channels = row.product.salesChannels ?? ["retail", "wholesale"];
-      const matchesChannel = channelFilter === "all" || channels.includes(channelFilter);
-      const matchesStatus =
-        statusFilter === "all" ||
-        (statusFilter === "active" ? row.product.isActive : !row.product.isActive);
-      return matchesQuery && matchesCategory && matchesChannel && matchesStatus;
-    });
-  }, [categoryFilter, channelFilter, query, rows, statusFilter]);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -605,9 +632,7 @@ export function ProductManager() {
           : [...current.variantValueIds, valueId],
         variantImages: {
           ...current.variantImages,
-          ...(current.variantImages[valueId] || !fallbackImage
-            ? {}
-            : { [valueId]: fallbackImage }),
+          ...(current.variantImages[valueId] || !fallbackImage ? {} : { [valueId]: fallbackImage }),
         },
       };
     });
@@ -659,22 +684,41 @@ export function ProductManager() {
       }),
     });
     setFlavorQuery("");
-    setManualImageUrl("");
+
     setVideoUrl("");
     setCustomVariantValue("");
     setNewColor({ labelFa: "", id: "", hex: "#168BFF" });
+    setBaseline(JSON.stringify(emptyForm));
+    setActiveTab("basic");
+    setStatus("");
     setIsEditorOpen(true);
   }
 
-  function openEdit(row: AdminProductRecord) {
-    clearPendingImageUploads();
-    setForm(rowToForm(row));
-    setFlavorQuery("");
-    setManualImageUrl("");
-    setVideoUrl("");
-    setCustomVariantValue("");
-    setNewColor({ labelFa: "", id: "", hex: "#168BFF" });
-    setIsEditorOpen(true);
+  async function openEdit(row: ProductListRow) {
+    if (editorFetching || loading) return;
+    setEditorFetching(true);
+    setStatus("در حال دریافت محصول…");
+    try {
+      const response = await fetch(`/api/admin/products/${encodeURIComponent(row.product.id)}`, {
+        cache: "no-store",
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "دریافت محصول ناموفق بود.");
+      const next = rowToForm(data.row);
+      clearPendingImageUploads();
+      setForm(next);
+      setBaseline(JSON.stringify(next));
+      setFlavorQuery("");
+      setVideoUrl("");
+      setCustomVariantValue("");
+      setActiveTab("basic");
+      setStatus("");
+      setIsEditorOpen(true);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "دریافت محصول ناموفق بود.");
+    } finally {
+      setEditorFetching(false);
+    }
   }
 
   function clearPendingImageUploads() {
@@ -690,41 +734,27 @@ export function ProductManager() {
       logImageDebug("before image state update", {
         currentPrimary: getImageCandidateDebug(current.image),
         currentImages: current.images.map((image, index) => getImageCandidateDebug(image, index)),
-        requestedImages: requestedImages.map((image, index) => getImageCandidateDebug(image, index)),
+        requestedImages: requestedImages.map((image, index) =>
+          getImageCandidateDebug(image, index),
+        ),
       });
-      const nextImages = uniqueImages(
-        requestedImages,
-      );
+      const nextImages = uniqueImages(requestedImages);
       logImageDebug("after image state update", {
         nextPrimary: nextImages[0] ?? normalizeImageUrl(current.image),
         nextImages: nextImages.map((image, index) => getImageCandidateDebug(image, index)),
       });
       return {
-      ...current,
-      images: nextImages,
-      image: nextImages[0] ?? normalizeImageUrl(current.image) ?? emptyForm.image,
-      variantImages: Object.fromEntries(
-        Object.entries(current.variantImages).filter(
-          ([valueId, imageValue]) =>
-            current.variantValueIds.includes(valueId) && nextImages.includes(imageValue),
+        ...current,
+        images: nextImages,
+        image: nextImages[0] ?? "",
+        variantImages: Object.fromEntries(
+          Object.entries(current.variantImages).filter(
+            ([valueId, imageValue]) =>
+              current.variantValueIds.includes(valueId) && nextImages.includes(imageValue),
+          ),
         ),
-      ),
       };
     });
-  }
-
-  function addManualImage() {
-    if (!manualImageUrl.trim()) return;
-    setImages([...form.images, manualImageUrl]);
-    setManualImageUrl("");
-  }
-
-  function removeImage(url: string) {
-    setImages(form.images.filter((item) => item !== url));
-  }
-
-  function makePrimaryImage(url: string) {
-    setImages([url, ...form.images.filter((item) => item !== url)]);
   }
 
   function assignImageToVariantValue(image: string, valueId: string) {
@@ -755,6 +785,7 @@ export function ProductManager() {
   async function saveProduct() {
     if (variantValidationMessage) {
       setStatus(variantValidationMessage);
+      setActiveTab("variants");
       return;
     }
     setLoading(true);
@@ -770,6 +801,12 @@ export function ProductManager() {
       ),
     );
     const payload = {
+      seoTitle: form.seoTitle,
+      seoDescription: form.seoDescription,
+      seoKeywords: form.seoKeywords
+        .split(/[،,]/)
+        .map((v) => v.trim())
+        .filter(Boolean),
       id: form.id,
       variantId: form.variantId,
       inventoryId: form.inventoryId,
@@ -801,22 +838,27 @@ export function ProductManager() {
       restockThreshold: form.restockThreshold,
       isActive: form.isActive,
     };
-    const response = await fetch(
-      form.id ? `/api/admin/products/${encodeURIComponent(form.id)}` : "/api/admin/products",
-      {
-        method: form.id ? "PATCH" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      },
-    );
-    const data = (await response.json()) as { message?: string; error?: string };
-    setStatus(data.message ?? data.error ?? "پاسخ نامشخص");
-    if (response.ok) {
-      setForm(emptyForm);
-      setIsEditorOpen(false);
-      await fetchRows();
+    try {
+      const response = await fetch(
+        form.id ? `/api/admin/products/${encodeURIComponent(form.id)}` : "/api/admin/products",
+        {
+          method: form.id ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
+      const data = (await response.json()) as { message?: string; error?: string };
+      setStatus(data.message ?? data.error ?? "پاسخ نامشخص");
+      if (response.ok) {
+        setForm(emptyForm);
+        setIsEditorOpen(false);
+        await fetchRows();
+      }
+    } catch {
+      setStatus("ذخیره ناموفق بود؛ اتصال را بررسی و دوباره تلاش کنید.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   async function uploadImages(files: FileList | File[]) {
@@ -899,14 +941,6 @@ export function ProductManager() {
       setIsUploadingImages(false);
       requestAnimationFrame(() => logModalLayoutDebug("after upload settled render layout"));
     }
-  }
-
-  function handleDrop(event: DragEvent<HTMLLabelElement>) {
-    logModalLayoutDebug("before drop preventDefault layout");
-    event.preventDefault();
-    setIsDragging(false);
-    logModalLayoutDebug("after drop state layout");
-    void uploadImages(event.dataTransfer.files);
   }
 
   async function createFlavor() {
@@ -1032,13 +1066,13 @@ export function ProductManager() {
       ? "برای محصول طعم‌دار، حداقل یک طعم انتخاب کنید."
       : missingVariantImageIds.length > 0
         ? `برای ${formatNumber(missingVariantImageIds.length)} طعم، عکس مرتبط انتخاب نشده است.`
-      : form.variantType === "color" && form.variantValueIds.length === 0
-        ? "برای محصول رنگ‌دار، حداقل یک رنگ انتخاب کنید."
-        : form.variantType === "resistance" && form.variantValueIds.length === 0
-          ? "برای محصول کویل، حداقل یک اهم وارد کنید."
-          : form.variantType === "capacity" && form.variantValueIds.length === 0
-            ? "برای محصول کارتریج، حداقل یک ظرفیت وارد کنید."
-        : "";
+        : form.variantType === "color" && form.variantValueIds.length === 0
+          ? "برای محصول رنگ‌دار، حداقل یک رنگ انتخاب کنید."
+          : form.variantType === "resistance" && form.variantValueIds.length === 0
+            ? "برای محصول کویل، حداقل یک اهم وارد کنید."
+            : form.variantType === "capacity" && form.variantValueIds.length === 0
+              ? "برای محصول کارتریج، حداقل یک ظرفیت وارد کنید."
+              : "";
   const variantTypeLabel = getVariantTypeLabel(form.variantType);
   const galleryImages = useMemo(
     () => uniqueImages([form.image, ...form.images]),
@@ -1063,231 +1097,114 @@ export function ProductManager() {
 
   return (
     <div className="grid gap-6">
-      <section className="grid gap-4 rounded-md border border-[#D7DDE4] bg-white p-4 shadow-sm">
-        <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
-          <div className="grid gap-3 md:grid-cols-4">
-            {[
-              { label: "کل محصولات", value: rows.length },
-              { label: "فعال", value: summary.active },
-              { label: "کانال عمده", value: summary.wholesale },
-              { label: "نیازمند شارژ", value: summary.lowStock },
-            ].map((item) => (
-              <div key={item.label} className="rounded-md bg-[#F4F6F8] p-3">
-                <p className="text-xs text-[#5F6C79]">{item.label}</p>
-                <p className="mt-1 text-xl font-black tabular-nums">{formatNumber(item.value)}</p>
-              </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-black">
+            کاتالوگ محصولات{" "}
+            <span className="mr-2 rounded-md bg-blue-50 px-2 py-1 text-sm text-blue-700">
+              {formatNumber(total)}
+            </span>
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">جست‌وجو، ویرایش و مدیریت گروهی محصولات</p>
+        </div>
+        <Button onClick={openCreate} disabled={loading || editorFetching}>
+          <Plus size={18} />
+          افزودن محصول
+        </Button>
+      </div>
+      <ProductFilters
+        value={filters}
+        onChange={changeFilters}
+        brands={brands}
+        categories={categories}
+      />
+      <BulkActions
+        ids={selected}
+        brands={brands}
+        categories={categories}
+        disabled={loading || isFetchingRows}
+        onApply={applyBulk}
+        onClear={() => setSelected([])}
+      />
+      {bulkFailures.length > 0 && (
+        <div role="alert" className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm">
+          <p className="font-bold">موارد انجام‌نشده</p>
+          <ul className="mt-2 list-inside list-disc">
+            {bulkFailures.map((failure) => (
+              <li key={failure.id}>
+                {rows.find((row) => row.product.id === failure.id)?.product.nameFa ?? failure.id}:{" "}
+                {failure.error}
+              </li>
             ))}
-          </div>
-          <Button type="button" onClick={openCreate}>
-            <Plus size={17} aria-hidden="true" />
-            محصول جدید
-          </Button>
+          </ul>
         </div>
-
-        <div className="grid gap-3 lg:grid-cols-[minmax(16rem,1fr)_repeat(3,minmax(10rem,12rem))]">
-          <label className="relative">
-            <span className="sr-only">جستجو در محصولات</span>
-            <Search
-              className="pointer-events-none absolute right-3 top-3 text-[#5F6C79]"
-              size={18}
-              aria-hidden="true"
-            />
-            <Input
-              className="pr-10"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="جستجو در نام، برند، SKU"
-            />
-          </label>
-          <label className="relative">
-            <span className="sr-only">فیلتر دسته</span>
-            <select
-              className="min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-200"
-              value={categoryFilter}
-              onChange={(event) => setCategoryFilter(event.target.value)}
-            >
-              <option value="all">همه دسته‌ها</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.nameFa}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="relative">
-            <span className="sr-only">فیلتر کانال فروش</span>
-            <select
-              className="min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-200"
-              value={channelFilter}
-              onChange={(event) => setChannelFilter(event.target.value as "all" | SalesChannel)}
-            >
-              <option value="all">همه کانال‌ها</option>
-              <option value="retail">فروش تکی</option>
-              <option value="wholesale">فروش عمده</option>
-            </select>
-          </label>
-          <label className="relative">
-            <span className="sr-only">فیلتر وضعیت</span>
-            <select
-              className="min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-200"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as "all" | "active" | "inactive")
-              }
-            >
-              <option value="all">همه وضعیت‌ها</option>
-              <option value="active">فقط فعال</option>
-              <option value="inactive">فقط غیرفعال</option>
-            </select>
-          </label>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-[#5F6C79]" role="status">
-          <Filter size={16} aria-hidden="true" />
-          {isFetchingRows
-            ? "در حال بارگذاری محصولات..."
-            : `${formatNumber(filtered.length)} نتیجه از ${formatNumber(rows.length)} محصول`}
-        </div>
-      </section>
-
+      )}
       <section className="overflow-hidden rounded-md border border-[#D7DDE4] bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[1040px] text-sm">
-            <thead className="bg-[#EEF3F8] text-[#4C5A67]">
-              <tr>
-                <th className="px-4 py-3 text-right">محصول</th>
-                <th className="px-4 py-3 text-right">دسته</th>
-                <th className="px-4 py-3 text-right">قیمت تکی</th>
-                <th className="px-4 py-3 text-right">قیمت عمده</th>
-                <th className="px-4 py-3 text-right">موجودی</th>
-                <th className="px-4 py-3 text-right">کانال</th>
-                <th className="px-4 py-3 text-right">وضعیت</th>
-                <th className="px-4 py-3 text-right">ویرایش</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.slice(0, 140).map((row) => {
-                const channels = row.product.salesChannels ?? ["retail", "wholesale"];
-                const available = row.inventory.onHand - row.inventory.reserved;
-                const variantOptions = getProductVariantOptions(row.product);
-                return (
-                  <tr key={row.product.id} className="border-t border-[#E2E7ED] align-middle">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md border border-[#D7DDE4] bg-[#EEF3F8]">
-                          <AdminImagePreview
-                            src={row.product.image}
-                            alt={row.product.nameFa}
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="truncate font-bold">{row.product.nameFa}</p>
-                          <p className="truncate text-xs text-[#5F6C79]" dir="ltr">
-                            {row.variant.sku}
-                          </p>
-                          {variantOptions.length > 0 ? (
-                            <div className="mt-2 flex flex-wrap items-center gap-1">
-                              {variantOptions.slice(0, 5).map((option) => (
-                                <span
-                                  key={option.id}
-                                  className="inline-flex items-center gap-1 rounded-full border border-[#D7DDE4] bg-white px-2 py-1 text-[11px] text-[#4C5A67]"
-                                  title={option.labelFa}
-                                >
-                                  {option.swatch ? (
-                                    <span
-                                      className="h-3 w-3 rounded-full border border-slate-300"
-                                      style={
-                                        option.swatch.startsWith("linear-gradient")
-                                          ? { backgroundImage: option.swatch }
-                                          : { backgroundColor: option.swatch }
-                                      }
-                                      aria-hidden="true"
-                                    />
-                                  ) : null}
-                                  {option.labelFa}
-                                </span>
-                              ))}
-                              {variantOptions.length > 5 ? (
-                                <span className="text-[11px] text-[#5F6C79]">
-                                  +{formatNumber(variantOptions.length - 5)}
-                                </span>
-                              ) : null}
-                            </div>
-                          ) : null}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">{row.categoryNameFa}</td>
-                    <td className="px-4 py-3">
-                      <Price valueRial={row.variant.retailPriceRial} />
-                    </td>
-                    <td className="px-4 py-3">
-                      {row.variant.wholesaleEnabled === false ? (
-                        <Badge tone="warning">غیرفعال</Badge>
-                      ) : (
-                        <div>
-                          <Price valueRial={row.variant.wholesalePriceRial} />
-                          <p className="mt-1 text-xs text-[#5F6C79]">
-                            هر عدد در عمده، کارتن {formatNumber(row.variant.cartonSize)} عددی
-                          </p>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="font-bold tabular-nums">{formatNumber(available)}</span>
-                      <span className="text-xs text-[#5F6C79]"> قابل فروش</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {channels.map((channel) => (
-                          <Badge key={channel} tone={channel === "wholesale" ? "info" : "success"}>
-                            {channelLabel(channel)}
-                          </Badge>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge tone={row.product.isActive ? "success" : "warning"}>
-                        {row.product.isActive ? "فعال" : "غیرفعال"}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3">
-                      <IconButton
-                        label="ویرایش محصول"
-                        className="border-[#D7DDE4] bg-[#EEF3F8] text-[#17202A]"
-                        onClick={() => openEdit(row)}
-                      >
-                        <Edit3 size={17} aria-hidden="true" />
-                      </IconButton>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        {isFetchingRows ? (
-          <div className="p-8 text-center text-sm font-bold text-[#5F6C79]">
-            در حال بارگذاری محصولات...
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="p-8 text-center text-sm text-[#5F6C79]">
-            محصولی با این فیلتر پیدا نشد.
-          </div>
-        ) : null}
+        <ProductTable
+          rows={rows}
+          busy={isFetchingRows}
+          selected={selected}
+          onSelect={(id) =>
+            setSelected((current) =>
+              current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
+            )
+          }
+          onSelectAll={() =>
+            setSelected(selected.length === rows.length ? [] : rows.map((row) => row.product.id))
+          }
+          onEdit={openEdit}
+          sort={sort}
+          direction={direction}
+          onSort={(next) => {
+            setSort(next);
+            setDirection(next === sort && direction === "asc" ? "desc" : "asc");
+            setPage(1);
+          }}
+          error={fetchError}
+          onRetry={fetchRows}
+        />
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          busy={isFetchingRows || loading}
+          onPage={setPage}
+          onPageSize={(size) => {
+            setPageSize(size);
+            setPage(1);
+          }}
+        />
       </section>
-
-      <p
-        className="rounded-md border border-[#D7DDE4] bg-white px-4 py-3 text-sm text-[#5F6C79] shadow-sm"
-        role="status"
-      >
-        {isFetchingRows ? "در حال بارگذاری محصولات..." : status}
-      </p>
-
+      {status && !isEditorOpen && (
+        <div
+          role="status"
+          className="pointer-events-none fixed top-20 left-5 z-40 flex max-w-[90vw] items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 text-sm shadow-xl"
+        >
+          <span>{status}</span>
+          <button
+            className="pointer-events-auto"
+            aria-label="بستن اعلان"
+            onClick={() => setStatus("")}
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+      <ConfirmationDialog
+        open={discardOpen}
+        title="تغییرات ذخیره نشده‌اند"
+        description="با بستن فرم، تغییرات این محصول کنار گذاشته می‌شوند."
+        onCancel={() => setDiscardOpen(false)}
+        onConfirm={() => {
+          setDiscardOpen(false);
+          clearPendingImageUploads();
+          setIsEditorOpen(false);
+        }}
+      />
       <DialogPrimitive.Root
         open={isEditorOpen}
         onOpenChange={(open) => {
-          if (!open) clearPendingImageUploads();
-          setIsEditorOpen(open);
+          if (!open) closeEditor();
         }}
       >
         <DialogPrimitive.Portal>
@@ -1309,8 +1226,15 @@ export function ProductManager() {
               </DialogPrimitive.Close>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
-              <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
+            <ProductTabs active={activeTab} onChange={setActiveTab} />
+            <div
+              id="product-tab-panel"
+              role="tabpanel"
+              aria-labelledby={`product-tab-${activeTab}`}
+              className="min-h-0 flex-1 overflow-y-auto px-5 py-5"
+              key={activeTab}
+            >
+              {activeTab === "basic" && (
                 <div className="grid gap-5">
                   <section className="rounded-md border border-[#D7DDE4] p-4">
                     <div className="mb-4 flex items-center gap-2">
@@ -1345,6 +1269,7 @@ export function ProductManager() {
                         نوع محصول
                         <select
                           className="min-h-11 rounded-md border border-slate-300 bg-white px-3"
+                          aria-label="نوع محصول"
                           value={form.productKind}
                           onChange={(event) => updateProductKind(event.target.value as ProductKind)}
                         >
@@ -1393,7 +1318,84 @@ export function ProductManager() {
                       />
                     </label>
                   </section>
-
+                  <section className="rounded-md border border-[#D7DDE4] bg-[#F8FAFC] p-4">
+                    <h3 className="font-black">کانال فروش</h3>
+                    <div className="mt-3 grid gap-2 text-sm">
+                      <label className="flex min-h-11 items-center justify-between rounded-md border border-[#D7DDE4] bg-white px-3">
+                        فروش تکی
+                        <input
+                          type="checkbox"
+                          checked={form.retailEnabled}
+                          onChange={(event) => update("retailEnabled", event.target.checked)}
+                        />
+                      </label>
+                      <label className="flex min-h-11 items-center justify-between rounded-md border border-[#D7DDE4] bg-white px-3">
+                        فروش عمده
+                        <input
+                          type="checkbox"
+                          checked={form.wholesaleEnabled}
+                          onChange={(event) => update("wholesaleEnabled", event.target.checked)}
+                        />
+                      </label>
+                      <label className="flex min-h-11 items-center justify-between rounded-md border border-[#D7DDE4] bg-white px-3">
+                        فعال در سایت
+                        <input
+                          type="checkbox"
+                          checked={form.isActive}
+                          onChange={(event) => update("isActive", event.target.checked)}
+                        />
+                      </label>
+                    </div>
+                  </section>
+                  <section className="rounded-md border border-[#D7DDE4] p-4">
+                    <div className="mb-4 flex items-center gap-2">
+                      <FileImage size={18} className="text-[#168BFF]" aria-hidden="true" />
+                      <h3 className="font-black">توضیحات ترکیبی</h3>
+                    </div>
+                    <div className="grid gap-3">
+                      <Textarea
+                        className="min-h-48"
+                        value={form.descriptionFa}
+                        onChange={(event) => update("descriptionFa", event.target.value)}
+                        placeholder="متن توضیح، تصویر یا لینک ویدیو را به ترتیب محتوای صفحه محصول وارد کنید."
+                      />
+                      <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto]">
+                        <Input
+                          dir="ltr"
+                          value={videoUrl}
+                          onChange={(event) => setVideoUrl(event.target.value)}
+                          placeholder="لینک ویدیو یا تصویر برای درج در توضیحات"
+                        />
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={() => {
+                            appendToDescription(imageMarkup(videoUrl || form.image));
+                            setVideoUrl("");
+                          }}
+                        >
+                          <ImagePlus size={17} aria-hidden="true" />
+                          بلوک عکس
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={() => {
+                            if (!videoUrl.trim()) return;
+                            appendToDescription(videoMarkup(videoUrl));
+                            setVideoUrl("");
+                          }}
+                        >
+                          <Video size={17} aria-hidden="true" />
+                          بلوک ویدیو
+                        </Button>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              )}
+              {activeTab === "variants" && (
+                <div className="grid gap-5">
                   <section className="rounded-md border border-[#D7DDE4] bg-[#F8FAFC] p-4">
                     <div className="mb-4 flex items-center gap-2">
                       <Palette size={18} className="text-[#168BFF]" aria-hidden="true" />
@@ -1447,134 +1449,171 @@ export function ProductManager() {
                       </p>
                     ) : null}
                   </section>
-
-                  {form.variantType !== "none" ? (
-                    <section className="rounded-md border border-[#D7DDE4] p-4">
-                      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          {form.variantType === "flavor" ? (
-                            <Sparkles size={18} className="text-[#168BFF]" aria-hidden="true" />
-                          ) : form.variantType === "color" ? (
-                            <Palette size={18} className="text-[#168BFF]" aria-hidden="true" />
-                          ) : (
-                            <Gauge size={18} className="text-[#168BFF]" aria-hidden="true" />
-                          )}
-                          <div>
-                            <h3 className="font-black">
-                              {variantTypeLabel ? `${variantTypeLabel}‌های محصول` : "تنوع محصول"}
-                            </h3>
-                            <p className="mt-1 text-xs text-[#5F6C79]">
-                              {form.variantType === "flavor"
-                                ? "طعم‌های قابل انتخاب را از رکوردهای طعم ذخیره‌شده انتخاب کنید."
-                                : form.variantType === "color"
-                                  ? "رنگ‌های واقعی محصول را با سواچ رنگ انتخاب کنید."
-                                  : "مقدارهای قابل سفارش را وارد کنید و در گالری به عکس مرتبط وصل کنید."}
-                            </p>
-                          </div>
+                  <section className="rounded-md border border-[#D7DDE4] p-4">
+                    <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        {form.variantType === "flavor" ? (
+                          <Sparkles size={18} className="text-[#168BFF]" aria-hidden="true" />
+                        ) : form.variantType === "color" ? (
+                          <Palette size={18} className="text-[#168BFF]" aria-hidden="true" />
+                        ) : (
+                          <Gauge size={18} className="text-[#168BFF]" aria-hidden="true" />
+                        )}
+                        <div>
+                          <h3 className="font-black">
+                            {variantTypeLabel ? `${variantTypeLabel}‌های محصول` : "تنوع محصول"}
+                          </h3>
+                          <p className="mt-1 text-xs text-[#5F6C79]">
+                            {form.variantType === "flavor"
+                              ? "طعم‌های قابل انتخاب را از رکوردهای طعم ذخیره‌شده انتخاب کنید."
+                              : form.variantType === "color"
+                                ? "رنگ‌های واقعی محصول را با سواچ رنگ انتخاب کنید."
+                                : "مقدارهای قابل سفارش را وارد کنید و در گالری به عکس مرتبط وصل کنید."}
+                          </p>
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                          {form.variantType === "flavor" ? (
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="secondary"
-                              onClick={() => setIsFlavorDialogOpen(true)}
-                            >
-                              <Plus size={16} aria-hidden="true" />
-                              افزودن طعم جدید
-                            </Button>
-                          ) : null}
-                          {form.variantType === "color" ? (
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="secondary"
-                              onClick={() => setIsColorDialogOpen(true)}
-                            >
-                              <Plus size={16} aria-hidden="true" />
-                              افزودن رنگ جدید
-                            </Button>
-                          ) : null}
-                          {form.variantType === "flavor" || form.variantType === "color" ? (
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="secondary"
-                              onClick={applySuggestedVariantValues}
-                            >
-                              پیشنهاد بر اساس نوع
-                            </Button>
-                          ) : null}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {form.variantType === "flavor" ? (
                           <Button
                             type="button"
                             size="sm"
-                            variant="ghost"
-                            className="border border-[#D7DDE4] text-[#17202A] hover:bg-[#EEF3F8]"
-                            onClick={() =>
-                              setForm((current) => ({
-                                ...current,
-                                variantValueIds: [],
-                                variantImages: {},
-                              }))
-                            }
-                          >
-                            پاک کردن انتخاب‌ها
-                          </Button>
-                        </div>
-                      </div>
-
-                      {form.variantType === "flavor" ? (
-                        <label className="relative mb-3 block">
-                          <span className="sr-only">جستجوی طعم</span>
-                          <Search
-                            className="pointer-events-none absolute right-3 top-3 text-[#5F6C79]"
-                            size={18}
-                            aria-hidden="true"
-                          />
-                          <Input
-                            className="pr-10"
-                            value={flavorQuery}
-                            onChange={(event) => setFlavorQuery(event.target.value)}
-                            placeholder="جستجوی طعم..."
-                          />
-                        </label>
-                      ) : null}
-
-                      {form.variantType === "resistance" || form.variantType === "capacity" ? (
-                        <div className="mb-3 grid gap-2 sm:grid-cols-[1fr_auto]">
-                          <Input
-                            dir="ltr"
-                            value={customVariantValue}
-                            onChange={(event) => setCustomVariantValue(event.target.value)}
-                            onKeyDown={(event) => {
-                              if (event.key === "Enter") {
-                                event.preventDefault();
-                                addCustomVariantValue();
-                              }
-                            }}
-                            placeholder={form.variantType === "resistance" ? "0.8ohm" : "3ml"}
-                          />
-                          <Button
-                            type="button"
                             variant="secondary"
-                            onClick={addCustomVariantValue}
+                            onClick={() => setIsFlavorDialogOpen(true)}
                           >
                             <Plus size={16} aria-hidden="true" />
-                            افزودن {variantTypeLabel}
+                            افزودن طعم جدید
                           </Button>
-                        </div>
-                      ) : null}
+                        ) : null}
+                        {form.variantType === "color" ? (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => setIsColorDialogOpen(true)}
+                          >
+                            <Plus size={16} aria-hidden="true" />
+                            افزودن رنگ جدید
+                          </Button>
+                        ) : null}
+                        {form.variantType === "flavor" || form.variantType === "color" ? (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="secondary"
+                            onClick={applySuggestedVariantValues}
+                          >
+                            پیشنهاد بر اساس نوع
+                          </Button>
+                        ) : null}
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          className="border border-[#D7DDE4] text-[#17202A] hover:bg-[#EEF3F8]"
+                          onClick={() =>
+                            setForm((current) => ({
+                              ...current,
+                              variantValueIds: [],
+                              variantImages: {},
+                            }))
+                          }
+                        >
+                          پاک کردن انتخاب‌ها
+                        </Button>
+                      </div>
+                    </div>
 
-                      {activeVariantOptions.length > 0 ? (
-                        <div className="mb-3 flex flex-wrap gap-2">
-                          {activeVariantOptions.map((option) => (
-                            <span
-                              key={option.id}
-                              className="inline-flex min-h-9 items-center gap-2 rounded-md border border-[#B8C4D2] bg-white px-2 text-xs font-bold text-[#17202A]"
+                    {form.variantType === "flavor" ? (
+                      <label className="relative mb-3 block">
+                        <span className="sr-only">جستجوی طعم</span>
+                        <Search
+                          className="pointer-events-none absolute right-3 top-3 text-[#5F6C79]"
+                          size={18}
+                          aria-hidden="true"
+                        />
+                        <Input
+                          className="pr-10"
+                          value={flavorQuery}
+                          onChange={(event) => setFlavorQuery(event.target.value)}
+                          placeholder="جستجوی طعم..."
+                        />
+                      </label>
+                    ) : null}
+
+                    {form.variantType === "resistance" || form.variantType === "capacity" ? (
+                      <div className="mb-3 grid gap-2 sm:grid-cols-[1fr_auto]">
+                        <Input
+                          dir="ltr"
+                          value={customVariantValue}
+                          onChange={(event) => setCustomVariantValue(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              addCustomVariantValue();
+                            }
+                          }}
+                          placeholder={form.variantType === "resistance" ? "0.8ohm" : "3ml"}
+                        />
+                        <Button type="button" variant="secondary" onClick={addCustomVariantValue}>
+                          <Plus size={16} aria-hidden="true" />
+                          افزودن {variantTypeLabel}
+                        </Button>
+                      </div>
+                    ) : null}
+
+                    {activeVariantOptions.length > 0 ? (
+                      <div className="mb-3 flex flex-wrap gap-2">
+                        {activeVariantOptions.map((option) => (
+                          <span
+                            key={option.id}
+                            className="inline-flex min-h-9 items-center gap-2 rounded-md border border-[#B8C4D2] bg-white px-2 text-xs font-bold text-[#17202A]"
+                          >
+                            {option.swatch ? (
+                              <span
+                                className="h-4 w-4 rounded-full border border-slate-300"
+                                style={
+                                  option.swatch.startsWith("linear-gradient")
+                                    ? { backgroundImage: option.swatch }
+                                    : { backgroundColor: option.swatch }
+                                }
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <Sparkles size={14} className="text-[#168BFF]" aria-hidden="true" />
+                            )}
+                            {option.labelFa}
+                            <button
+                              type="button"
+                              className="rounded p-1 text-[#5F6C79] hover:bg-[#EEF3F8] hover:text-[#17202A]"
+                              onClick={() => toggleVariantValue(option.id)}
+                              aria-label={`حذف ${option.labelFa}`}
                             >
+                              <X size={13} aria-hidden="true" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+
+                    <div className="grid gap-2 pr-1 sm:grid-cols-2 lg:grid-cols-3">
+                      {filteredVariantOptions.map((option) => {
+                        const active = form.variantValueIds.includes(option.id);
+                        return (
+                          <button
+                            key={option.id}
+                            type="button"
+                            onClick={() => toggleVariantValue(option.id)}
+                            className={`flex min-h-12 items-center justify-between gap-2 rounded-md border px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
+                              active
+                                ? "border-cyan-500 bg-cyan-50 text-cyan-950"
+                                : "border-[#D7DDE4] bg-white text-[#17202A] hover:bg-[#F4F6F8]"
+                            }`}
+                            aria-pressed={active}
+                          >
+                            <span className="min-w-0 inline-flex items-center gap-2">
                               {option.swatch ? (
                                 <span
-                                  className="h-4 w-4 rounded-full border border-slate-300"
+                                  className="h-5 w-5 shrink-0 rounded-full border border-slate-300"
                                   style={
                                     option.swatch.startsWith("linear-gradient")
                                       ? { backgroundImage: option.swatch }
@@ -1583,412 +1622,26 @@ export function ProductManager() {
                                   aria-hidden="true"
                                 />
                               ) : (
-                                <Sparkles size={14} className="text-[#168BFF]" aria-hidden="true" />
+                                <Sparkles
+                                  size={16}
+                                  className="shrink-0 text-[#168BFF]"
+                                  aria-hidden="true"
+                                />
                               )}
-                              {option.labelFa}
-                              <button
-                                type="button"
-                                className="rounded p-1 text-[#5F6C79] hover:bg-[#EEF3F8] hover:text-[#17202A]"
-                                onClick={() => toggleVariantValue(option.id)}
-                                aria-label={`حذف ${option.labelFa}`}
-                              >
-                                <X size={13} aria-hidden="true" />
-                              </button>
+                              <span className="truncate">{option.labelFa}</span>
                             </span>
-                          ))}
-                        </div>
-                      ) : null}
-
-                      <div className="grid gap-2 pr-1 sm:grid-cols-2 lg:grid-cols-3">
-                        {filteredVariantOptions.map((option) => {
-                          const active = form.variantValueIds.includes(option.id);
-                          return (
-                            <button
-                              key={option.id}
-                              type="button"
-                              onClick={() => toggleVariantValue(option.id)}
-                              className={`flex min-h-12 items-center justify-between gap-2 rounded-md border px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
-                                active
-                                  ? "border-cyan-500 bg-cyan-50 text-cyan-950"
-                                  : "border-[#D7DDE4] bg-white text-[#17202A] hover:bg-[#F4F6F8]"
-                              }`}
-                              aria-pressed={active}
-                            >
-                              <span className="min-w-0 inline-flex items-center gap-2">
-                                {option.swatch ? (
-                                  <span
-                                    className="h-5 w-5 shrink-0 rounded-full border border-slate-300"
-                                    style={
-                                      option.swatch.startsWith("linear-gradient")
-                                        ? { backgroundImage: option.swatch }
-                                        : { backgroundColor: option.swatch }
-                                    }
-                                    aria-hidden="true"
-                                  />
-                                ) : (
-                                  <Sparkles
-                                    size={16}
-                                    className="shrink-0 text-[#168BFF]"
-                                    aria-hidden="true"
-                                  />
-                                )}
-                                <span className="truncate">{option.labelFa}</span>
-                              </span>
-                              {active ? (
-                                <Check size={16} className="shrink-0" aria-hidden="true" />
-                              ) : null}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </section>
-                  ) : null}
-
-                  <section className="hidden">
-                    <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        <Palette size={18} className="text-[#168BFF]" aria-hidden="true" />
-                        <div>
-                          <h3 className="font-black">نوع انتخاب محصول</h3>
-                          <p className="mt-1 text-xs leading-5 text-[#5F6C79]">
-                            فقط وقتی رنگی انتخاب شود، بخش رنگ در صفحه محصول و کارت‌های لیست نمایش
-                            داده می‌شود. برای کویل و کارتریج می‌توانید این بخش را خالی بگذارید.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="secondary"
-                          onClick={applySuggestedVariantValues}
-                        >
-                          پیشنهاد بر اساس نوع
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          className="border border-[#D7DDE4] text-[#17202A] hover:bg-[#EEF3F8]"
-                          onClick={() => update("variantValueIds", [])}
-                        >
-                          بدون رنگ
-                        </Button>
-                      </div>
-                    </div>
-                    <div
-                      className="mb-4 grid gap-2 sm:grid-cols-3"
-                      role="radiogroup"
-                      aria-label="نوع تنوع محصول"
-                    >
-                      {[
-                        { value: "none" as const, label: "بدون تنوع" },
-                        { value: "flavor" as const, label: "طعم" },
-                        { value: "color" as const, label: "رنگ" },
-                      ].map((option) => (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => setVariantType(option.value)}
-                          className={`min-h-11 rounded-md border px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
-                            form.variantType === option.value
-                              ? "border-cyan-500 bg-cyan-50 text-cyan-950"
-                              : "border-[#D7DDE4] bg-white text-[#17202A] hover:bg-[#F4F6F8]"
-                          }`}
-                          role="radio"
-                          aria-checked={form.variantType === option.value}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </div>
-                    {form.variantType !== "none" ? (
-                      <div
-                        className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
-                        role="group"
-                        aria-label={
-                          form.variantType === "flavor" ? "طعم‌های محصول" : "رنگ‌های محصول"
-                        }
-                      >
-                        {variantValueOptions.map((option) => {
-                          const active = form.variantValueIds.includes(option.id);
-                          return (
-                            <button
-                              key={option.id}
-                              type="button"
-                              onClick={() => toggleVariantValue(option.id)}
-                              className={`flex min-h-11 items-center justify-between gap-2 rounded-md border px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
-                                active
-                                  ? "border-cyan-500 bg-cyan-50 text-cyan-950"
-                                  : "border-[#D7DDE4] bg-white text-[#17202A] hover:bg-[#F4F6F8]"
-                              }`}
-                              aria-pressed={active}
-                            >
-                              <span className="inline-flex items-center gap-2">
-                                {option.swatch ? (
-                                  <span
-                                    className="h-5 w-5 rounded-full border border-slate-300"
-                                    style={
-                                      option.swatch.startsWith("linear-gradient")
-                                        ? { backgroundImage: option.swatch }
-                                        : { backgroundColor: option.swatch }
-                                    }
-                                    aria-hidden="true"
-                                  />
-                                ) : null}
-                                {option.labelFa}
-                              </span>
-                              {active ? <Check size={16} aria-hidden="true" /> : null}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ) : null}
-                    <p className="mt-3 text-xs text-[#5F6C79]" role="status">
-                      {form.variantType === "none"
-                        ? "برای این محصول تنوع انتخابی تعریف نشده است."
-                        : form.variantValueIds.length > 0
-                          ? `${formatNumber(form.variantValueIds.length)} ${variantTypeLabel} برای این محصول فعال است.`
-                          : `برای این محصول ${variantTypeLabel} تعریف نشده است.`}
-                    </p>
-                  </section>
-
-                  <section className="rounded-md border border-[#D7DDE4] p-4">
-                    <div className="mb-4 flex items-center gap-2">
-                      <ImagePlus size={18} className="text-[#168BFF]" aria-hidden="true" />
-                      <h3 className="font-black">گالری تصاویر محصول</h3>
-                    </div>
-                    <label
-                      onDragOver={(event) => {
-                        event.preventDefault();
-                        setIsDragging(true);
-                      }}
-                      onDragLeave={() => setIsDragging(false)}
-                      onDrop={handleDrop}
-                      className={`relative grid min-h-36 cursor-pointer place-items-center rounded-md border border-dashed p-5 text-center transition ${
-                        isDragging
-                          ? "border-[#168BFF] bg-[#E8F3FF]"
-                          : "border-[#B8C4D2] bg-[#F8FAFC] hover:bg-[#F4F6F8]"
-                      }`}
-                    >
-                      <input
-                        className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={(event) => {
-                          logModalLayoutDebug("before file input onChange layout");
-                          logImageDebug("before file input onChange", {
-                            filesLength: event.currentTarget.files?.length ?? 0,
-                          });
-                          const files = Array.from(event.currentTarget.files ?? []);
-                          event.currentTarget.value = "";
-                          logImageDebug("after file input onChange", {
-                            files: files.map((file, index) => getImageCandidateDebug(file, index)),
-                          });
-                          logModalLayoutDebug("after file input value reset layout");
-                          void uploadImages(files);
-                        }}
-                      />
-                      <span className="pointer-events-none grid place-items-center gap-2">
-                        <UploadCloud size={28} className="text-[#168BFF]" aria-hidden="true" />
-                        <span className="font-bold">
-                          {isUploadingImages
-                            ? "تصاویر در حال آپلود هستند..."
-                            : "تصاویر را اینجا رها کنید یا انتخاب کنید"}
-                        </span>
-                        <span className="text-xs text-[#5F6C79]">
-                          امکان انتخاب چند تصویر برای محصول تکی و عمده
-                        </span>
-                      </span>
-                    </label>
-                    <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
-                      <Input
-                        dir="ltr"
-                        value={manualImageUrl}
-                        onChange={(event) => setManualImageUrl(event.target.value)}
-                        placeholder="https://... یا /images/product.png"
-                      />
-                      <Button type="button" variant="secondary" onClick={addManualImage}>
-                        <Link2 size={17} aria-hidden="true" />
-                        افزودن URL
-                      </Button>
-                    </div>
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                      {visiblePendingImageUploads.map((upload) => (
-                        <div
-                          key={upload.id}
-                          className={`overflow-hidden rounded-md border bg-white shadow-sm ${
-                            upload.failed ? "border-rose-200" : "border-cyan-200"
-                          }`}
-                        >
-                          <div className="relative aspect-[4/3] bg-[#EEF3F8]">
-                            <AdminImagePreview src={upload.previewUrl} alt={upload.name} />
-                            <div
-                              className={`absolute bottom-2 right-2 rounded-md px-2 py-1 text-xs font-black shadow-sm ${
-                                upload.failed
-                                  ? "bg-rose-50 text-rose-700"
-                                  : "bg-cyan-50 text-cyan-800"
-                              }`}
-                            >
-                              {upload.failed ? "آپلود ناموفق" : "در حال آپلود"}
-                            </div>
-                          </div>
-                          <div className="min-h-12 truncate p-2 text-xs font-bold text-[#5F6C79]">
-                            {upload.name}
-                          </div>
-                        </div>
-                      ))}
-                      {galleryImages.map((url) => (
-                        <div
-                          key={url}
-                          className={`overflow-hidden rounded-md border bg-white shadow-sm ${
-                            url === form.image
-                              ? "border-[#168BFF] ring-2 ring-[#168BFF]/15"
-                              : "border-[#D7DDE4]"
-                          }`}
-                        >
-                          <div className="relative aspect-[4/3] bg-[#EEF3F8]">
-                            <AdminImagePreview
-                              src={url}
-                              alt="تصویر محصول"
-                            />
-                            <div className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/70 bg-white/90 text-[#5F6C79] shadow-sm">
-                              <GripVertical size={16} aria-hidden="true" />
-                            </div>
-                            {url === form.image ? (
-                              <div className="absolute bottom-2 right-2 rounded-md bg-[#168BFF] px-2 py-1 text-xs font-black text-white shadow-sm">
-                                تصویر اصلی
-                              </div>
+                            {active ? (
+                              <Check size={16} className="shrink-0" aria-hidden="true" />
                             ) : null}
-                          </div>
-                          <div className="flex items-center justify-between gap-2 p-2">
-                            {url === form.image ? (
-                              <Badge tone="success">تصویر اصلی</Badge>
-                            ) : (
-                              <span />
-                            )}
-                            <div className="flex gap-1">
-                              <IconButton
-                                label="انتخاب تصویر اصلی"
-                                className="h-9 w-9 border-[#D7DDE4] bg-white text-[#17202A]"
-                                onClick={() => makePrimaryImage(url)}
-                              >
-                                <Check size={15} aria-hidden="true" />
-                              </IconButton>
-                              <IconButton
-                                label="حذف تصویر"
-                                className="h-9 w-9 border-rose-200 bg-rose-50 text-rose-700"
-                                onClick={() => removeImage(url)}
-                              >
-                                <Trash2 size={15} aria-hidden="true" />
-                              </IconButton>
-                            </div>
-                          </div>
-                          {activeVariantOptions.length > 0 ? (
-                            <label className="grid gap-1 border-t border-[#D7DDE4] p-2 text-xs font-bold text-[#5F6C79]">
-                              {variantTypeLabel} مرتبط با این تصویر
-                              <select
-                                className="min-h-9 rounded-md border border-[#D7DDE4] bg-white px-2 text-sm text-[#17202A] focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-100"
-                                value={getImageVariantValueId(url)}
-                                onChange={(event) =>
-                                  assignImageToVariantValue(url, event.target.value)
-                                }
-                              >
-                                <option value="">
-                                  بدون {variantTypeLabel} اختصاصی
-                                </option>
-                                {activeVariantOptions.map((option) => (
-                                  <option key={option.id} value={option.id}>
-                                    {option.labelFa}
-                                  </option>
-                                ))}
-                              </select>
-                            </label>
-                          ) : null}
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-
-                  <section className="rounded-md border border-[#D7DDE4] p-4">
-                    <div className="mb-4 flex items-center gap-2">
-                      <FileImage size={18} className="text-[#168BFF]" aria-hidden="true" />
-                      <h3 className="font-black">توضیحات ترکیبی</h3>
-                    </div>
-                    <div className="grid gap-3">
-                      <Textarea
-                        className="min-h-48"
-                        value={form.descriptionFa}
-                        onChange={(event) => update("descriptionFa", event.target.value)}
-                        placeholder="متن توضیح، تصویر یا لینک ویدیو را به ترتیب محتوای صفحه محصول وارد کنید."
-                      />
-                      <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto]">
-                        <Input
-                          dir="ltr"
-                          value={videoUrl}
-                          onChange={(event) => setVideoUrl(event.target.value)}
-                          placeholder="لینک ویدیو یا تصویر برای درج در توضیحات"
-                        />
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() => {
-                            appendToDescription(imageMarkup(videoUrl || form.image));
-                            setVideoUrl("");
-                          }}
-                        >
-                          <ImagePlus size={17} aria-hidden="true" />
-                          بلوک عکس
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() => {
-                            if (!videoUrl.trim()) return;
-                            appendToDescription(videoMarkup(videoUrl));
-                            setVideoUrl("");
-                          }}
-                        >
-                          <Video size={17} aria-hidden="true" />
-                          بلوک ویدیو
-                        </Button>
-                      </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   </section>
                 </div>
-
-                <aside className="grid h-fit gap-5">
-                  <section className="rounded-md border border-[#D7DDE4] bg-[#F8FAFC] p-4">
-                    <h3 className="font-black">کانال فروش</h3>
-                    <div className="mt-3 grid gap-2 text-sm">
-                      <label className="flex min-h-11 items-center justify-between rounded-md border border-[#D7DDE4] bg-white px-3">
-                        فروش تکی
-                        <input
-                          type="checkbox"
-                          checked={form.retailEnabled}
-                          onChange={(event) => update("retailEnabled", event.target.checked)}
-                        />
-                      </label>
-                      <label className="flex min-h-11 items-center justify-between rounded-md border border-[#D7DDE4] bg-white px-3">
-                        فروش عمده
-                        <input
-                          type="checkbox"
-                          checked={form.wholesaleEnabled}
-                          onChange={(event) => update("wholesaleEnabled", event.target.checked)}
-                        />
-                      </label>
-                      <label className="flex min-h-11 items-center justify-between rounded-md border border-[#D7DDE4] bg-white px-3">
-                        فعال در سایت
-                        <input
-                          type="checkbox"
-                          checked={form.isActive}
-                          onChange={(event) => update("isActive", event.target.checked)}
-                        />
-                      </label>
-                    </div>
-                  </section>
-
+              )}
+              {activeTab === "pricing" && (
+                <div className="grid gap-5 lg:grid-cols-2">
                   <section className="rounded-md border border-[#D7DDE4] p-4">
                     <h3 className="font-black">قیمت و بسته‌بندی</h3>
                     <div className="mt-3 grid gap-3">
@@ -2046,59 +1699,133 @@ export function ProductManager() {
                       </div>
                     </div>
                   </section>
-
-                  <section className="rounded-md border border-[#D7DDE4] p-4">
-                    <h3 className="font-black">موجودی و SEO</h3>
-                    <div className="mt-3 grid gap-3">
-                      <div className="grid grid-cols-2 gap-3">
-                        <label className="grid gap-1 text-sm">
-                          موجودی کل
-                          <Input
-                            type="number"
-                            min={0}
-                            value={form.onHand}
-                            onChange={(event) => update("onHand", Number(event.target.value))}
-                          />
-                        </label>
-                        <label className="grid gap-1 text-sm">
-                          هشدار شارژ
-                          <Input
-                            type="number"
-                            min={0}
-                            value={form.restockThreshold}
-                            onChange={(event) =>
-                              update("restockThreshold", Number(event.target.value))
-                            }
-                          />
-                        </label>
-                      </div>
-                      <label className="grid gap-1 text-sm">
-                        تگ‌ها
-                        <Textarea
-                          className="min-h-20"
-                          value={form.tagsText}
-                          onChange={(event) => update("tagsText", event.target.value)}
-                          placeholder="پاد، عمده، یوفوپاف"
+                  <section className="rounded-md border p-4">
+                    <h3 className="font-black">موجودی انبار</h3>
+                    <div className="mt-4 grid gap-4">
+                      <label className="grid gap-2 text-sm">
+                        موجودی کل
+                        <Input
+                          type="number"
+                          min={0}
+                          value={form.onHand}
+                          onChange={(e) => update("onHand", Number(e.target.value))}
                         />
                       </label>
-                      <label className="grid gap-1 text-sm">
-                        مشخصات فنی
-                        <Textarea
-                          className="min-h-28"
-                          value={form.specsText}
-                          onChange={(event) => update("specsText", event.target.value)}
-                          placeholder="باتری: ۸۰۰mAh"
+                      <label className="grid gap-2 text-sm">
+                        هشدار شارژ
+                        <Input
+                          type="number"
+                          min={0}
+                          value={form.restockThreshold}
+                          onChange={(e) => update("restockThreshold", Number(e.target.value))}
                         />
                       </label>
+                      <p className="text-xs leading-6 text-slate-500">
+                        موجودی قابل فروش پس از کسر رزرو سفارش‌ها محاسبه می‌شود. قیمت و موجودی این
+                        فرم مربوط به مدل اصلی است.
+                      </p>
                     </div>
                   </section>
-                </aside>
-              </div>
+                </div>
+              )}
+              {activeTab === "images" && (
+                <ImageManager
+                  images={galleryImages}
+                  busy={isUploadingImages || loading}
+                  onUpload={uploadImages}
+                  onChange={setImages}
+                  pending={visiblePendingImageUploads}
+                  renderAssignment={(url) =>
+                    activeVariantOptions.length > 0 ? (
+                      <label className="grid gap-2 border-t p-3 text-xs">
+                        {variantTypeLabel} مرتبط
+                        <select
+                          className="h-10 rounded-md border px-2 text-sm"
+                          value={getImageVariantValueId(url)}
+                          onChange={(e) => assignImageToVariantValue(url, e.target.value)}
+                        >
+                          <option value="">بدون تنوع اختصاصی</option>
+                          {activeVariantOptions.map((option) => (
+                            <option key={option.id} value={option.id}>
+                              {option.labelFa}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    ) : null
+                  }
+                />
+              )}
+              {activeTab === "seo" && (
+                <div className="grid gap-5 lg:grid-cols-2">
+                  <section className="grid gap-4 rounded-md border p-4">
+                    <h3 className="font-black">بهینه‌سازی برای جست‌وجو</h3>
+                    <label className="grid gap-2 text-sm">
+                      عنوان متا
+                      <Input
+                        value={form.seoTitle}
+                        maxLength={160}
+                        onChange={(e) => update("seoTitle", e.target.value)}
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm">
+                      توضیحات متا
+                      <Textarea
+                        value={form.seoDescription}
+                        maxLength={500}
+                        onChange={(e) => update("seoDescription", e.target.value)}
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm">
+                      کلمات کلیدی
+                      <Input
+                        value={form.seoKeywords}
+                        onChange={(e) => update("seoKeywords", e.target.value)}
+                        placeholder="با ویرگول جدا کنید"
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm">
+                      برچسب‌های محصول
+                      <Input
+                        value={form.tagsText}
+                        onChange={(e) => update("tagsText", e.target.value)}
+                      />
+                    </label>
+                  </section>
+                  <aside className="h-fit rounded-md border bg-slate-50 p-5">
+                    <p className="mb-4 text-xs text-slate-500">پیش‌نمایش نتیجهٔ جست‌وجو</p>
+                    <p className="text-lg text-blue-700">{form.seoTitle || form.nameFa}</p>
+                    <p dir="ltr" className="my-2 break-all text-xs text-green-700">
+                      ufopuff.com/products/{form.slug}
+                    </p>
+                    <p className="text-sm leading-7 text-slate-600">
+                      {form.seoDescription || form.shortDescriptionFa}
+                    </p>
+                  </aside>
+                </div>
+              )}
+              {activeTab === "specs" && (
+                <details open className="rounded-md border p-4">
+                  <summary className="cursor-pointer font-black">مشخصات فنی محصول</summary>
+                  <label className="mt-4 grid gap-2 text-sm">
+                    هر مشخصه در یک خط، به شکل عنوان: مقدار
+                    <Textarea
+                      className="min-h-64"
+                      value={form.specsText}
+                      onChange={(e) => update("specsText", e.target.value)}
+                      placeholder="باتری: ۸۰۰mAh"
+                    />
+                  </label>
+                </details>
+              )}
             </div>
-
             <div className="flex flex-shrink-0 flex-wrap items-center justify-between gap-3 border-t border-[#D7DDE4] bg-[#F8FAFC] px-5 py-4">
               <p className="text-sm text-[#5F6C79]" role="status">
-                {loading ? "در حال ذخیره..." : isUploadingImages ? "در حال آپلود تصویر..." : status}
+                {loading
+                  ? "در حال ذخیره..."
+                  : isUploadingImages
+                    ? "در حال آپلود تصویر..."
+                    : status || (dirty ? "تغییرات ذخیره نشده" : "همهٔ تغییرات ذخیره شده‌اند")}
               </p>
               <div className="flex gap-2">
                 <DialogPrimitive.Close asChild>

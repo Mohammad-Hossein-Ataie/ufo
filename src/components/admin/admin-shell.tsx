@@ -72,10 +72,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </span>
         </div>
 
-        <nav className="grid gap-5 p-3" aria-label="ناوبری مدیریت">
+        <nav className="flex gap-2 overflow-x-auto p-3 lg:grid lg:gap-5" aria-label="ناوبری مدیریت">
           {groups.map((group) => (
-            <div key={group.title} className="grid gap-1">
-              <p className="px-3 py-1 text-[11px] font-black uppercase tracking-normal text-slate-400">
+            <div key={group.title} className="flex shrink-0 gap-1 lg:grid">
+              <p className="hidden px-3 py-1 text-[11px] font-black uppercase tracking-normal text-slate-400 lg:block">
                 {group.title}
               </p>
               {group.items.map((item) => {
@@ -85,7 +85,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex min-h-10 items-center justify-between gap-2 rounded-md px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-500",
+                      "flex min-h-10 items-center justify-between gap-2 whitespace-nowrap rounded-md px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-500",
                       active
                         ? "bg-cyan-50 text-cyan-800"
                         : "text-slate-700 hover:bg-slate-50 hover:text-slate-950",

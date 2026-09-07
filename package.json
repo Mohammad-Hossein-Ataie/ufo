@@ -7,6 +7,8 @@
     "packages/*"
   ],
   "scripts": {
+    "test:admin-products": "playwright test --config playwright.admin-products.config.ts",
+    "migrate:admin-catalog": "tsx scripts/migrate-admin-catalog.ts",
     "dev": "node scripts/next-command.mjs dev -p 3000",
     "start": "node scripts/next-command.mjs start -p 3000",
     "build": "node scripts/next-command.mjs build",
