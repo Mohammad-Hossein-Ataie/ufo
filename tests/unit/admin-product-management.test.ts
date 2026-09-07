@@ -154,8 +154,8 @@ describe("catalog mutations", () => {
       variantType: "none",
       retailPriceRial: 1000,
       onHand: 10,
-      image: "/images/ufo-hero.png",
-      images: ["/images/ufo-hero.png", "/images/second.png"],
+      image: "/images/ufo-hero.webp",
+      images: ["/images/ufo-hero.webp", "/images/second.png"],
       seoTitle: "عنوان سفارشی",
       seoDescription: "توضیح سفارشی",
       seoKeywords: ["تست"],
@@ -181,7 +181,7 @@ describe("catalog mutations", () => {
       variantType: "none",
       retailPriceRial: 9000,
       image: "/images/second.png",
-      images: ["/images/second.png", "/images/ufo-hero.png"],
+      images: ["/images/second.png", "/images/ufo-hero.webp"],
     });
     expect((await getAdminProduct(row.product.id))?.product.images[0]).toBe("/images/second.png");
     expect((await getAdminProduct(row.product.id))?.product.seoTitle).toBe(

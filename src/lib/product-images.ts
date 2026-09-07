@@ -7,7 +7,7 @@ import {
 } from "@/lib/product-image-protection";
 import type { Product } from "@ufo/types";
 
-const genericProductImages = new Set(["", "/images/ufo-hero.png"]);
+const genericProductImages = new Set(["", "/images/ufo-hero.webp"]);
 
 export const categoryImageBySlug: Record<string, string> = {
   pod: "/images/categories/pod.png",

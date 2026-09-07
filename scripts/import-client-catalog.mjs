@@ -8,7 +8,7 @@ const workspaceRoot = resolve(scriptDir, "..");
 const dataRoot = resolve(workspaceRoot, "..", "..", "ufo-data");
 const outputPath = resolve(workspaceRoot, "packages/domain/src/imported-products.ts");
 const importedAt = "2026-08-05T00:00:00.000Z";
-const defaultImage = "/images/ufo-hero.png";
+const defaultImage = "/images/ufo-hero.webp";
 
 const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
 const arabicDigits = "٠١٢٣٤٥٦٧٨٩";

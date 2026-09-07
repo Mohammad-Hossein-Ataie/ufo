@@ -113,8 +113,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "وزول ۱۲ هزار با ظرفیت ۱۲۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "وزول ۱۲ هزار (Vozol 12K) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Vozol", "vozol", "12k", "۱۲۰۰۰ پاف", "12000"],
     attributes: [
       {
@@ -154,8 +154,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "وزول ۱۵ هزار پلاگ با ظرفیت ۱۵۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "وزول ۱۵ هزار پلاگ (Vozol Vista Plug 15K) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Vozol", "vozol", "vista", "plug", "15k", "۱۵۰۰۰ پاف", "15000"],
     attributes: [
       {
@@ -195,8 +195,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "وزول ۲۰ هزار استار با ظرفیت ۲۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "وزول ۲۰ هزار استار (Vozol Star 20K) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Vozol", "vozol", "star", "20k", "۲۰۰۰۰ پاف", "20000"],
     attributes: [
       {
@@ -236,8 +236,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "وزول ۴۰ هزار ریوو با ظرفیت ۴۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "وزول ۴۰ هزار ریوو (Vozol Rave 40K) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Vozol", "vozol", "rave", "40k", "۴۰۰۰۰ پاف", "40000"],
     attributes: [
       {
@@ -277,8 +277,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "وزول ۴۰ هزار استار با ظرفیت ۴۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "وزول ۴۰ هزار استار (Vozol Star 40K) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Vozol", "vozol", "star", "40k", "۴۰۰۰۰ پاف", "40000"],
     attributes: [
       {
@@ -318,8 +318,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "وزول ۵۰ هزار گییر پاور با ظرفیت ۵۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "وزول ۵۰ هزار گییر پاور (Vozol Gear Power 50K) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Vozol", "vozol", "gear", "power", "50k", "۵۰۰۰۰ پاف", "50000"],
     attributes: [
       {
@@ -359,8 +359,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "اسموک ۴۰ هزار اسپیس من با ظرفیت ۴۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "اسموک ۴۰ هزار اسپیس من (Smok Spaceman 40K) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "SMOK", "smok", "spaceman", "40k", "۴۰۰۰۰ پاف", "40000"],
     attributes: [
       {
@@ -400,8 +400,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "واکا ۶۰۰ پاف با ظرفیت ۶۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "واکا ۶۰۰ پاف (Waka 600) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Waka", "waka", "600", "۶۰۰ پاف", "600"],
     attributes: [
       {
@@ -441,8 +441,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "نستی ۵۰ هزار با ظرفیت ۵۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نستی ۵۰ هزار (Nasty 50K) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Nasty", "nasty", "50k", "۵۰۰۰۰ پاف", "50000"],
     attributes: [
       {
@@ -482,8 +482,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "نستی ۱۲۰۰ پاف با ظرفیت ۱۲۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نستی ۱۲۰۰ پاف (Nasty 1200) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Nasty", "nasty", "1200", "۱۲۰۰ پاف", "1200"],
     attributes: [
       {
@@ -523,8 +523,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "آی وی جی ۳ هزار با ظرفیت ۳۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "آی وی جی ۳ هزار (IVG 3000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "IVG", "ivg", "3000", "۳۰۰۰ پاف", "3000"],
     attributes: [
       {
@@ -564,8 +564,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "پریموبار ۳۵۰۰ پاف با ظرفیت ۳۵۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "پریموبار ۳۵۰۰ پاف (Primobar 3500) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Primobar", "primobar", "3500", "۳۵۰۰ پاف", "3500"],
     attributes: [
       {
@@ -605,8 +605,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "واکا ۶ هزار با ظرفیت ۶۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "واکا ۶ هزار (Waka 6000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Waka", "waka", "6000", "۶۰۰۰ پاف", "6000"],
     attributes: [
       {
@@ -646,8 +646,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "گیک‌بار ۱۰ هزار با ظرفیت ۱۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "گیک‌بار ۱۰ هزار (Geek Bar 10000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Geek Bar", "geek", "bar", "10000", "۱۰۰۰۰ پاف", "10000"],
     attributes: [
       {
@@ -687,8 +687,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "کریس براون ۱۵ هزار با ظرفیت ۱۵۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "کریس براون ۱۵ هزار (Chris Brown 15000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "chris", "brown", "15000", "۱۵۰۰۰ پاف", "15000"],
     attributes: [
       {
@@ -728,8 +728,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "پرایوبار ۱۵ هزار با ظرفیت ۱۵۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "پرایوبار ۱۵ هزار (Priobar 15000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "priobar", "15000", "۱۵۰۰۰ پاف", "15000"],
     attributes: [
       {
@@ -769,8 +769,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "بوگاتی ۱۷ هزار با ظرفیت ۱۷۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "بوگاتی ۱۷ هزار (Bugatti 17000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Bugatti", "bugatti", "17000", "۱۷۰۰۰ پاف", "17000"],
     attributes: [
       {
@@ -810,8 +810,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "ویشبار ویکلی ۲۰ هزار با ظرفیت ۲۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "ویشبار ویکلی ۲۰ هزار (Vishbar Weekly 20000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "vishbar", "weekly", "20000", "۲۰۰۰۰ پاف", "20000"],
     attributes: [
       {
@@ -851,8 +851,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "نمو مجیک ۳۰ هزار با ظرفیت ۳۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نمو مجیک ۳۰ هزار (Nemo Magic 30000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "nemo", "magic", "30000", "۳۰۰۰۰ پاف", "30000"],
     attributes: [
       {
@@ -892,8 +892,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "مکس گو ۲۲ هزار با ظرفیت ۲۲۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "مکس گو ۲۲ هزار (Max Go 22000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "max", "go", "22000", "۲۲۰۰۰ پاف", "22000"],
     attributes: [
       {
@@ -933,8 +933,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "هیتلی ۱۱ هزار با ظرفیت ۱۱۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "هیتلی ۱۱ هزار (Hitli 11000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "hitli", "11000", "۱۱۰۰۰ پاف", "11000"],
     attributes: [
       {
@@ -974,8 +974,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یلا ۲۴ هزار طعم سوییچ با ظرفیت ۲۴۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "یلا ۲۴ هزار طعم سوییچ (Yalla 24000 Switch Flavor) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: [
       "یکبارمصرف",
       "UFO Selection",
@@ -1024,8 +1024,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "آووک ۱۰۰ هزار قلیونی با ظرفیت ۱۰۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "آووک ۱۰۰ هزار قلیونی (Aook 100000 Shisha) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "aook", "100000", "shisha", "۱۰۰۰۰۰ پاف", "100000"],
     attributes: [
       {
@@ -1065,8 +1065,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یوول ۴۰ هزار با ظرفیت ۴۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "یوول ۴۰ هزار (Uwell 40000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Uwell", "uwell", "40000", "۴۰۰۰۰ پاف", "40000"],
     attributes: [
       {
@@ -1106,8 +1106,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "اسکوییز ۲۵ هزار با ظرفیت ۲۵۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "اسکوییز ۲۵ هزار (Squeeze 25000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "squeeze", "25000", "۲۵۰۰۰ پاف", "25000"],
     attributes: [
       {
@@ -1147,8 +1147,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "الفاخر ۸ هزار با ظرفیت ۸۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "الفاخر ۸ هزار (Al Fakher 8000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Al Fakher", "al", "fakher", "8000", "۸۰۰۰ پاف", "8000"],
     attributes: [
       {
@@ -1188,8 +1188,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "وزول ۲۰ هزار مجیک با ظرفیت ۲۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "وزول ۲۰ هزار مجیک (Vozol Magic 20000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Vozol", "vozol", "magic", "20000", "۲۰۰۰۰ پاف", "20000"],
     attributes: [
       {
@@ -1229,8 +1229,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "اس‌پی۲اس ۵ هزار با ظرفیت ۵۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "اس‌پی۲اس ۵ هزار (SP2S 5000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "sp2s", "5000", "۵۰۰۰ پاف", "5000"],
     attributes: [
       {
@@ -1270,8 +1270,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "پیلوتاک ۸۵۰۰ پاف با ظرفیت ۸۵۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "پیلوتاک ۸۵۰۰ پاف (Pilotak 8500) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "pilotak", "8500", "۸۵۰۰ پاف", "8500"],
     attributes: [
       {
@@ -1311,8 +1311,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "وزول ۲۵ هزار قلیونی با ظرفیت ۲۵۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "وزول ۲۵ هزار قلیونی (Vozol 25000 Shisha) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "Vozol", "vozol", "25000", "shisha", "۲۵۰۰۰ پاف", "25000"],
     attributes: [
       {
@@ -1352,8 +1352,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "جودو ۲۴ هزار با ظرفیت ۲۴۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "جودو ۲۴ هزار (Judo 24000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "judo", "24000", "۲۴۰۰۰ پاف", "24000"],
     attributes: [
       {
@@ -1393,8 +1393,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "رایپ ویپ ۴۰ هزار با ظرفیت ۴۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "رایپ ویپ ۴۰ هزار (Ripe Vapes 40000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "ripe", "vapes", "40000", "۴۰۰۰۰ پاف", "40000"],
     attributes: [
       {
@@ -1434,8 +1434,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "مکس پو ۵۰ هزار با ظرفیت ۵۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "مکس پو ۵۰ هزار (Max Pu 50000) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "max", "pu", "50000", "۵۰۰۰۰ پاف", "50000"],
     attributes: [
       {
@@ -1475,8 +1475,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "کارتریج مکس پو ۵۰ هزار با ظرفیت ۵۰۰۰۰ پاف و قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "کارتریج مکس پو ۵۰ هزار (Max Pu 50000 Cartridge) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["یکبارمصرف", "UFO Selection", "max", "pu", "50000", "cartridge", "۵۰۰۰۰ پاف", "50000"],
     attributes: [
       {
@@ -1516,8 +1516,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "آرگاس جی۳ مینی از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری پرظرفیت: باتری داخلی ۱۳۵۰ میلی‌آمپرساعت (شارژ سریع USB-C با جریان ۱A) با عمر طولانی مناسب برای استفاده روزمره. ⚡ توان خروجی قابل تنظیم: قابلیت تنظیم توان در بازه ۵--۳۰ وات برای کنترل حجم بخار و غلظت طعم. 🍉 طعم پایدار و خالص: فناوری iCOSM CODE 2.0 و کارتریج پرشونده ARGUS Top Fill V2 تضمین می‌کند تا طعم مطلوب مایع تا ۱۰۰ میلی‌لیتر باقی بماند. 📶 نمایشگر و نشانگر: مجهز به نشانگر LED باتری (بدون صفحه‌نمایش بزرگ). طراحی سبک (۴۰.۸۵ گرم) و بدنه آلومینیومی ظریف. 🔌 شارژ USB-C: پورت Type-C برای شارژ سریع. شارژ کامل در حدود ۴۰ دقیقه (بدون دخالت کاربر) با جریان ۱A. 🎯 مزایا: ✔️ کاربری آسان بدون نیاز به تنظیمات پیچیده (طراحی پاد سیستم دمیدن با کشیدن). ✔️ مناسب برای مبتدیان و حرفه‌ای‌ها (سازگار با انواع کارتریج‌های آرگوس). ✔️ تجربه طعم غنی و بخار یکنواخت تا پایان شارژ باتری. ✔️ سبک، جمع‌وجور و قابل حمل (مناسب حمل در جیب).",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Argus", "argus", "g3", "mini"],
     attributes: [
       {
@@ -1557,8 +1557,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "آرگاس پی۲ از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری قوی: باتری ۱۱۰۰ میلی‌آمپرساعتی داخلی با شارژ سریع USB-C (5V/2A) برای شارژ سریع و عمر طولانی. ⚡ دو حالت خروجی: قابلیت انتخاب بین دو حالت Power (تنظیم دقیق توان، ۵--۳۰W) و Shift (سه سطح توان پیش‌فرض SPT/NOR/ECO) برای تجربه متفاوت در سلیقه‌های گوناگون. 📺 صفحه OLED هوشمند: صفحه‌نمایش ۰.۵۴ اینچی OLED همراه با ۵ چراغ LED رنگی روی دستگاه، نشان‌دهنده وضعیت باتری و حالت انتخابی (قابل خاموش/روشن کردن چراغ‌ها و صفحه). 🍉 طعم و تنوع: سازگار با کارتریج‌های ARGUS Top Fill (۲ میلی‌لیتر)، کویل‌های ۰.۴ اهم (RDL) و ۰.۷ اهم (MTL) برای طیف گسترده‌ای از طعم و قدرت بخار. فناوری iCOSM طعم یکنواخت و خالص را تضمین می‌کند. 🔌 شارژ سریع USB-C: پشتیبانی از شارژ ۵ ولت/۲ آمپر. شارژ کامل در کمتر از ۱ ساعت. 🌀 کویل مش دوگانه: کویل‌های مش (ITO Mesh) به توزیع یکنواخت حرارت و تولید بخار غلیظ کمک می‌کند (بدون نیاز به تعویض کویل برای هر بار). 🎯 مزایا: ✔️ دارای صفحه‌نمایش زیبا و قابل شخصی‌سازی (هشدار باتری، ولتاژ، پاف‌شمار و...). ✔️ تنظیم توان و جریان هوا (سویچ جوی عملکرد) برای کنترل تجربه کشیدن. ✔️ سرعت شارژ بالا و عمر باتری طولانی (شارژ سریع، پاف‌های زیاد).",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Argus", "argus", "p2"],
     attributes: [
       {
@@ -1597,8 +1597,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "آرگاس اِی از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری مناسب: باتری ۱۱۰۰ میلی‌آمپرساعتی داخلی با شارژ سریع USB-C (5V/2A)؛ شارژ کامل در حدود ۴۰ دقیقه. ⚡ سه حالت توان: خروجی قابل تنظیم بین ۵--۳۰ وات با سه انیمیشن واکنش‌گر در سه حالت Power/Super/Eco. هر حالت متناسب با طعم و مصرف انرژی متعادل طراحی شده است. 📺 صفحه نمایش دو ناحیه‌ای: اولین دستگاه پاد دارای دو صفحه‌نمایش مجزا روی بدنه؛ انیمیشن‌های لامپ‌دار تعاملی بر اساس هر پاف فعال می‌شوند و اطلاعات کلی را نمایش می‌دهند. 🌀 کویل و کارتریج: کارتریج Top Fill V2 با ظرفیت ۳ میلی‌لیتر و کویل ۰.۴ اهم (RDL -- مناسب فری‌بیس) که طعم قوی و بخار سنگین فراهم می‌کند. 🔌 شارژ USB-C: با جریان ۲ آمپر، امکان شارژ سریع فراهم است؛ هر شارژ کامل تا چند روز استفاده را پشتیبانی می‌کند. پورت کناری برای شارژ دارد. 🎨 طراحی مدرن: بدنه فلزی باریک با صفحات شیشه‌ای و شش رنگ فانتزی؛ دارای قفل اسلایدی (On/Off) برای جلوگیری از فعال‌سازی ناخواسته. 🎯 مزایا: ✔️ تجربه تعاملی جذاب با نمایشگر دوگانه و انیمیشن‌ها. ✔️ دوام بالا و طراحی ضدنشتی عالی (ترکیب فلز و کیفیت ساخت). ✔️ شارژ سریع و دوام عالی باتری (سه روز استفاده با یک شارژ).",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Argus", "argus", "a"],
     attributes: [
       {
@@ -1637,8 +1637,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "آرگاس پی ۱ از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 شارژ فوق سریع: باتری داخلی ۸۰۰ میلی‌آمپرساعتی با پشتیبانی از شارژ PD ۱۵ وات؛ شارژ کامل ۰--۱۰۰٪ در ۱۸ دقیقه (شارژ ۰--۸۰٪ در ۱۲ دقیقه). ⚡ تطبیق خودکار توان: تراشه هوشمند GENE.AI 1.2 فشار هر پاف را تشخیص داده و توان خروجی را بین ۵--۲۰ وات تنظیم می‌کند. 🍉 طعم عمیق MTL: کویل‌های ITO سری (پیش‌نصب ۰.۷ و ۱.۲ اهم) با سیستم خنثی‌سازی هوشمند و فناوری iCOSM طعم مطلوب برای استعمال سالت نیکوتین را فراهم می‌کنند. 🔌 شارژ USB-C: پورت USB-C با PD 15W (شارژ با آداپتور PD)؛ هر ۵ دقیقه شارژ تا ۲ ساعت استفاده مداوم را پشتیبانی می‌کند. 🎨 طراحی شیک: بدنه نیمه فلزی شفاف با ویترین تراشه داخلی و دریچه جانبی تنظیم جریان هوا (دارای ۴ سوراخ ورودی هوا برای تنظیم از تونینگ تا آزاد). 🎯 مزایا: ✔️ سرعت شارژ بی‌رقیب (۱۸ دقیقه برای شارژ کامل). ✔️ سیستم Auto-Sense خودکار، تجربه کاربری ساده و صرفه‌جویی در انرژی باتری. ✔️ مناسب برای استایل MTL و سالت نیکوتین. ✔️ طراحی جمع‌وجور و بادوام با زیبایی بصری منحصربه‌فرد (نمایش داخلی تراشه).",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Argus", "argus", "p1"],
     attributes: [
       {
@@ -1678,8 +1678,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "آرگاس پی۳ از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری قوی: باتری ۱۵۰۰ میلی‌آمپرساعتی داخلی با پشتیبانی از شارژ USB-C (5V/2A) برای استفاده طولانی‌مدت. 📱 صفحه لمسی بزرگ: اولین دستگاه پاد با طراحی Mini BOX دارای نمایشگر ۲.۰۱ اینچی تمام‌لمسی (TFT HD)؛ تجربه کاربری جذاب با منوهای لمسی واقعی. ⚡ توان بالا: خروجی قابل تنظیم در بازه ۵--۳۰ وات برای انواع سبک‌ها (MTL و RDL). 🌀 کارتریج جدید: معرفی کارتریج قفل‌شونده SNAP با تکنولوژی iCOSM 2.0؛ عملکرد بدون نشت و طعم غنی. محتوی بسته شامل دو SNAP کارتریج ۰.۴ و ۰.۷ اهم ۲ میلی‌لیتری است. 🎨 طراحی شخصی‌سازی‌شده: دو بافت روی بدنه (چرم نرم و فلز براق)، وزن سبک (حدود ۸۲ گرم) و آویز بند برای حمل راحت. 🎯 مزایا: ✔️ صفحه‌نمایش بزرگ لمسی برای کنترل آسان (اولین در نوع خود). ✔️ عمر باتری بالا (۱۵۰۰ میلی‌آمپر) و پشتیبانی از شارژ سریع. ✔️ رابط کاربری پیشرفته و تم‌های مختلف برای تنظیم ظاهری دستگاه. ✔️ سازگاری کامل با کارتریج‌های URSA/ARGUS و تنوع فنی بالا.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Argus", "argus", "p3"],
     attributes: [
       {
@@ -1719,8 +1719,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "آرگاس ماتریکس از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری مطلوب: باتری ۱۳۵۰ میلی‌آمپرساعتی با شارژ سریع USB-C (5V/2A)؛ طراحی کم‌حجم و وزن سبک (۶۰ گرم) با دوام خوب. 📺 صفحه نمایش منحنی: اولین پاد با صفحه‌نمایش بزرگ Curved Full Screen با نورپردازی سایبری پویا؛ طراحی آینده‌نگرانه با نمایش تمام‌وجهی و لبه‌های بدون حاشیه. ⚡ خروجی قدرتمند: تنظیم توان ۱۰--۳۰ وات (حداکثر ۳۰W) برای بخار غلیظ و طعم قوی. 🍉 طعم غنی: فناوری iCOSM CODE 2.0 و کارتریج Top Fill V2 (۳ میلی‌لیتر) با دو کویل ۰.۴ و ۰.۷ اهم (ارائه تجربه MTL و RDL با طعم پایدار). 🎨 طراحی چشم‌گیر: بدنه فلزی با روکش IML رنگین، نورپردازی LED داخلی و نمای تراشه (Power Core)؛ نمایشگر شیشه‌ای خمیده و جلوه‌های نور دیجیتال. 🎯 مزایا: ✔️ ظاهر بسیار مدرن و جذاب (صفحه خمیده و نورپردازی متغیر). ✔️ کارکرد بی‌نقص و سازگار با کل خانواده ARGUS Pod (کارتریج‌های ARGUS). ✔️ عمر باتری مناسب و شارژ سریع (پایدار در طول روز). ✔️ عملکرد قوی در تنظیم بخار و طعم (خروجی ۳۰W و فناوری Mesh).",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Argus", "argus", "matrix"],
     attributes: [
       {
@@ -1760,8 +1760,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "آرگاس جی۳ از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری قوی: باتری ۱۵۰۰ میلی‌آمپرساعتی با شارژ سریع USB-C (5V/2A)؛ هر شارژ کامل تا ۴۵ دقیقه طول می‌کشد. 📺 صفحه TFT رنگی: نمایشگر ۰.۹۶ اینچی بزرگ (TFT) با حاشیه‌های فلزی/کریستالی؛ ۳ تم گرافیکی و انیمیشن‌های پویا برای سفارشی‌سازی ظاهر و نمایش اطلاعات. ⚡ توان ۳۰ وات: خروجی قابل تنظیم بین ۵--۳۰ وات برای انواع مایع‌ها و سبک‌های کشیدن (MTL/RDL). 🍉 کارتریج قدرتمند: شامل دو کارتریج Top Fill V2 با کویل‌های ۰.۴ اهم (بدنه) و ۰.۷ اهم (MTL)، هر کدام ظرفیت ۳ میلی‌لیتر. فناوری iCOSM تضمین ثبات طعم تا پایان عمر کارتریج. 🎨 طراحی لوکس: بدنه فلزی-پلاستیکی با روکش‌های مختلف رنگی؛ وزن سبک و سطح آلیاژ فلز با بافت ظریف. 🎯 مزایا: ✔️ عمر باتری بسیار بالا (۱۵۰۰mAh) و شارژ سریع (حدود ۴۵ دقیقه برای شارژ کامل). ✔️ نمایشگر با کیفیت و طراحی شیک (تجربه کاربری جذاب). ✔️ سازگار با تمام کارتریج‌های سری Argus و امکان تنظیم هم‌زمان توان و جریان هوا. ✔️ پاف طولانی و طعم قوی تا پایان عمر کارتریج.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Argus", "argus", "g3"],
     attributes: [
       {
@@ -1801,8 +1801,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "آرگاس جی۲ از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری ۱۰۰۰ میلی‌آمپر‌ساعت -- عمر بالا برای استفادهٔ روزمره. ⚡ توان خروجی ۵--۳۰ وات -- تنظیم وات برای تولید بخار غلیظ و حجم‌دهی بالا. 🍉 تجربه طعم‌دهی غنی -- طراحی کارتریج‌های پیشرفته ۳ میلی‌لیتری با کویل‌ مش (0.4/0.7/1.0Ω) و فناوری iCOSM CODE 2.0 برای طعم خالص. 📺 صفحه نمایش رنگی 0.96 اینچی -- نمایش وضعیت باتری، عدد پاف، مقاومت کویل و تنظیمات به‌طور واضح. 🌀 کویل‌های پیشرفته مش -- پخش حرارت یکنواخت و بهبود طعم‌دهی در هر پاف. 🔌 شارژ سریع USB-C -- شارژ ایمن و سریع با کابل USB نوع C. 🎯 مزایا: ✔️ کاربری آسان و بدون نیاز به نگهداری خاص (کارتریج قابل تعویض). ✔️ مناسب برای مبتدی‌ها و حرفه‌ای‌ها؛ کاملاً سفارشی‌پذیر (مودهای Super/Smart/Eco و تنظیم وات). ✔️ طراحی باریک و ارگونومیک با بدنه فلزی مقاوم.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Argus", "argus", "g2"],
     attributes: [
       {
@@ -1841,8 +1841,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "تاگبات دیمن پرو از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری ۱۰۰۰ میلی‌آمپر‌ساعت -- عمر طولانی برای استفادهٔ روزانه. ⚡ توان خروجی ۵--۳۰ وات -- تنظیم وات آزاد برای استایل‌های مختلف بخار. 🌀 کارتریج قابل پرکردن ۲ میلی‌لیتری -- ظرفیت مناسب برای مصرف طولانی. 🔧 هوای قابل تنظیم جانبی -- انتخاب بین حالت MTL (دهانی) و RDL (بلند) با سیستم جریان هوای کشویی. 🔌 شارژ USB-C -- شارژ سریع با کابل USB نوع C. 🎯 مزایا: ✔️ طراحی نوآورانه و ارگونومیک -- ظاهر مدرن با بدنه مقاوم. ✔️ قابلیت تنظیم جریان هوا برای تنوع سبک‌های کشیدن. ✔️ مناسب مبتدی‌ها و کاربران حرفه‌ای -- هماهنگی با انواع نمک‌ها و عصاره‌ها. ✔️ جمع‌وجور و سبک؛ قابل حمل در همه‌جا.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "UFO Selection", "tugboat", "dimon", "pro"],
     attributes: [
       {
@@ -1882,8 +1882,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "وزول ایس گو از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری ۱۳۰۰ میلی‌آمپر‌ساعت -- شارژدهی بسیار بالا برای کاربرانی که به عمر باتری اهمیت می‌دهند. ⚡ توان خروجی ۵--۳۰ وات -- تنظیم دلخواه قدرت برای حجم بخار و انتقال طعم متناسب. 📺 صفحه نمایش HD 0.75 اینچی -- نمایش وضعیت باتری، توان، جریان هوا و شمارش پاف در یک نگاه. 🍉 تکنولوژی S.i.L.C در کویل -- کویل مش برای طعم‌دهی قوی و یکنواخت. 🌀 تنظیم جریان هوا ۳ حالته -- سادگی در تغییر بین استایل MTL و RDL. 🔌 شارژ سریع USB-C -- شارژ ایمن و سریع (شارژ ۸۰٪ در ~۳۰ دقیقه). 🎯 مزایا: ✔️ استفادهٔ بسیار آسان -- با طراحی خوش‌دست و مدرن. ✔️ مناسب افراد تازه‌کار و حرفه‌ای -- تجربه کاربری بدون پیچیدگی. ✔️ طعم‌دهی غنی با تکنولوژی S.i.L.C و بخار نرم.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Vozol", "vozol", "ace", "go"],
     attributes: [
       {
@@ -1922,8 +1922,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "اسموک نوو از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری ۸۰۰ میلی‌آمپر‌ساعت -- حجم جمع‌وجور با شارژدهی مناسب. ⚡ توان خروجی حداکثر ۲۵ وات -- امکان تولید حجم بخار متوسط تا غلیظ. 🍉 کویل مش 0.8Ω -- طعم‌دهی عالی و مناسب نیکوتین سالت. 📺 نشانگر LED وضعیت باتری -- لایت‌ها رنگی وضعیت شارژ و عملکرد را اعلام می‌کنند. 🔌 شارژ میکرو USB -- شارژ ساده و امکان استفاده هنگام شارژ (Pass-through). 🎯 مزایا: ✔️ استفاده بی‌دردسر با فعال‌سازی اتوماتیک (کشش). ✔️ اندازه کوچک، سبک و قابل حمل -- مناسب حمل در جیب یا کیف. ✔️ طعم‌دهی خوب و بخار مطلوب برای مصرف روزانه. ✔️ کیفیت ساخت خوب با بدنه مستحکم فلزی.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "SMOK", "smok", "novo"],
     attributes: [
       {
@@ -1963,8 +1963,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "اسموک سولوس از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری ۷۰۰ میلی‌آمپر‌ساعت -- کوچک و سبک برای حمل آسان. ⚡ توان خروجی ۴--۱۶ وات -- مناسب کشیدن دهانی (MTL) و حجم بخار ملایم. 🍉 کویل مش 0.9Ω داخلی -- عمر بالا و طعم‌دهی یکنواخت. 📺 سازوکار فعال‌سازی اتوماتیک -- تنها با کشیدن شروع به کار می‌کند (بدون دکمه). 🌀 ساختار مستحکم فلزی -- بدنهٔ آلیاژی مقاوم و بادوام. 🎯 مزایا: ✔️ کاربری فوق‌العاده ساده و مبتدی‌پسند. ✔️ طراحی باریک و سبک -- حمل بسیار راحت. ✔️ عمر باتری و کارکرد ثابت در طول روز. ✔️ کیفیت ساخت بالا با استفاده از آلیاژ مقاوم.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "SMOK", "smok", "solus"],
     attributes: [
       {
@@ -2004,8 +2004,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "اسموک نورد کیت از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری ۱۱۰۰ میلی‌آمپر‌ساعت -- دوام طولانی برای یک دستگاه جمع‌وجور. ⚡ توان خروجی ۱۰--۱۵ وات -- امکان تغییر وضعیت بهینه بر اساس پاف‌شمار. 🍉 دو کویل مش مخصوص -- یک کویل 0.6Ω برای بخار حجیم و یک کویل 1.4Ω برای طعم قوی MTL. 🔘 بدون نمایشگر -- رابط ساده دکمه‌ای با نشانگر LED سطح باتری. 🔌 شارژ میکرو USB -- شارژ مطمئن با کابل استاندارد USB. 🎯 مزایا: ✔️ استفاده آسان با کلید فایر و کارتریج‌های نوورد اختصاصی. ✔️ طراحی جمع‌وجور و گوناگونی رنگ (۳۸ رنگ قابل انتخاب). ✔️ مناسب مبتدی‌ها و طرفداران MTL با امکان تولید حجم مطلوب بخار. ✔️ کیفیت ساخت خوب و پنجره نمایش مایع.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "SMOK", "smok", "nord", "kit"],
     attributes: [
       {
@@ -2045,8 +2045,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "اسموک نورد کیت پرو از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "🔋 باتری ۱۱۰۰ میلی‌آمپرساعت -- همانند نورد اصلی، عمر مناسب باتری. ⚡ توان خروجی ۳--۲۵ وات -- محدوده توان وسیع برای تنوع سبک‌های MTL و RDL. 🍉 دو کویل مش Nord PRO -- دو کویل جدید مش برای تولید بخار زیاد یا طعم‌دهی MTL بهینه. 🔀 حالت‌های فعال‌سازی دوگانه -- هر دو حالت کشش (اتو-درَ) و دکمه‌ای برای استفادهٔ انعطاف‌پذیر. 🔌 شارژ USB-C -- پورت نوع C برای شارژ سریع و امن. 🎯 مزایا: ✔️ انعطاف بالا با گزینه‌های فعال‌سازی خودکار و دکمه‌ای. ✔️ داکت گردش هوا قابل تنظیم با نصب معکوس کارتریج (انتخاب بین MTL و RDL). ✔️ بدنه باریک و طراحی مدرن -- مناسب جیب یا کیف‌دستی. ✔️ تجربه بخار و طعم پیشرفته با سخت‌افزار Nord PRO.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "SMOK", "smok", "nord", "kit", "pro"],
     attributes: [
       {
@@ -2087,8 +2087,8 @@ export const importedProducts: Product[] = [
       "گیک ویپ وناکس کیو پرو از لیست پادهای دائمی با قیمت در انتظار تکمیل کارفرما.",
     descriptionFa:
       "گیک ویپ وناکس کیو پرو (geek vape venax Q pro) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "GeekVape", "geek", "vape", "venax", "q"],
     attributes: [
       {
@@ -2124,8 +2124,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "گیک ویپ اِی یو کیت از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "گیک ویپ اِی یو کیت (geek vape au kit) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "GeekVape", "geek", "vape", "au", "kit"],
     attributes: [
       {
@@ -2190,8 +2190,8 @@ export const importedProducts: Product[] = [
     salesChannels: ["retail"],
     shortDescriptionFa: "گیک ویپ ساندر کیو لایت از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa: "– (خروجی ثابت MTL) 500 حدود ۱ روز",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "GeekVape", "geek", "vape", "sonder", "q"],
     attributes: [
       {
@@ -2225,8 +2225,8 @@ export const importedProducts: Product[] = [
     salesChannels: ["retail"],
     shortDescriptionFa: "گیک ویپ ساندر کیو از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa: "تا ۲۰ وات 1000 حدود ۲ روز نامحدود",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "GeekVape", "geek", "vape", "sonder", "q"],
     attributes: [
       {
@@ -2261,8 +2261,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "گیک ویپ ای کیو کیت از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "گیک ویپ ای کیو کیت (geekvape AQ kit) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "GeekVape", "geekvape", "aq", "kit"],
     attributes: [
       {
@@ -2329,8 +2329,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یوول تنت اسلیم از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "یوول تنت اسلیم (uwell tenet) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Uwell", "uwell", "tenet"],
     attributes: [
       {
@@ -2364,8 +2364,8 @@ export const importedProducts: Product[] = [
     salesChannels: ["retail"],
     shortDescriptionFa: "یوول تنت کوکو از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa: "تا ۱۸ وات 950 تقریباً ۱.۵ روز نامحدود",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Uwell", "uwell", "tenet", "koko"],
     attributes: [
       {
@@ -2400,8 +2400,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یوول جی کی۲ از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "یوول جی کی۲ (uwell gk2) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Uwell", "uwell", "gk2"],
     attributes: [
       {
@@ -2436,8 +2436,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یوول جی‌کی۳ از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "یوول جی‌کی۳ (uwell gk3) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Uwell", "uwell", "gk3"],
     attributes: [
       {
@@ -2472,8 +2472,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یوول جی۵ کوکو از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "یوول جی۵ کوکو (uwell G5 koko) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Uwell", "uwell", "g5", "koko"],
     attributes: [
       {
@@ -2508,8 +2508,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یوول جی۵ لایت از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "یوول جی۵ لایت (uwell G5 lite) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Uwell", "uwell", "g5", "lite"],
     attributes: [
       {
@@ -2544,8 +2544,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یوول جی۵ لایت اس ای از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "یوول جی۵ لایت اس ای (uwell G5 lite se) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Uwell", "uwell", "g5", "lite", "se"],
     attributes: [
       {
@@ -2580,8 +2580,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یوول جی۳ لایت کوکو از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "یوول جی۳ لایت کوکو (uwell G3 lite koko) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Uwell", "uwell", "g3", "lite", "koko"],
     attributes: [
       {
@@ -2616,8 +2616,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یوول جی۳ لایت کوکو لیمیتد از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "یوول جی۳ لایت کوکو لیمیتد (uwell G3 lite koko limited) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Uwell", "uwell", "g3", "lite", "koko"],
     attributes: [
       {
@@ -2652,8 +2652,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یوول جی۳ لایت قلمی از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "یوول جی۳ لایت قلمی (uwell G3 lite) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Uwell", "uwell", "g3", "lite"],
     attributes: [
       {
@@ -2688,8 +2688,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یوول اِی زد ۳ از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "یوول اِی زد ۳ (uwell Az3) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Uwell", "uwell", "az3"],
     attributes: [
       {
@@ -2724,8 +2724,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "یوول اِی ۲ اس از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "یوول اِی ۲ اس (uwell A2s) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Uwell", "uwell", "a2s"],
     attributes: [
       {
@@ -2787,8 +2787,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "ویپرسو ایکسراس ۴ از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "ویپرسو ایکسراس ۴ (vaporesso xros 4) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Vaporesso", "vaporesso", "xros", "4"],
     attributes: [
       {
@@ -2823,8 +2823,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "ویپرسو ایکسراس پرو از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "ویپرسو ایکسراس پرو (vaporesso xros pro) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Vaporesso", "vaporesso", "xros", "pro"],
     attributes: [
       {
@@ -2859,8 +2859,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "ویپرسو ایکسراس کیوب از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "ویپرسو ایکسراس کیوب (vaporesso xros cube) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Vaporesso", "vaporesso", "xros", "cube"],
     attributes: [
       {
@@ -2895,8 +2895,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "ویپرسو اکو نانو از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "ویپرسو اکو نانو (vaporesso eco nano) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Vaporesso", "vaporesso", "eco", "nano"],
     attributes: [
       {
@@ -2931,8 +2931,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "لاست ویپ اورسا بیبی۳ از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "لاست ویپ اورسا بیبی۳ (lostvape ursa baby3) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Lost Vape", "lostvape", "ursa", "baby3"],
     attributes: [
       {
@@ -2967,8 +2967,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "لاست ویپ اورسا بیبی۳ پرو از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "لاست ویپ اورسا بیبی۳ پرو (lostvape ursa baby3 pro) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Lost Vape", "lostvape", "ursa", "baby3", "pro"],
     attributes: [
       {
@@ -3003,8 +3003,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "لاست ویپ اورسا پاکت از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "لاست ویپ اورسا پاکت (lostvape ursa pocket) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Lost Vape", "lostvape", "ursa", "pocket"],
     attributes: [
       {
@@ -3039,8 +3039,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "لاست ویپ اورسا نانو ایر از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "لاست ویپ اورسا نانو ایر (lostvape ursa nano air) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Lost Vape", "lostvape", "ursa", "nano", "air"],
     attributes: [
       {
@@ -3075,8 +3075,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "لاست ویپ نانو آرت از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "لاست ویپ نانو آرت (lostvape ursa nano art) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Lost Vape", "lostvape", "ursa", "nano", "art"],
     attributes: [
       {
@@ -3111,8 +3111,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "لاست ویپ اورسا نانو اس۲ از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "لاست ویپ اورسا نانو اس۲ (lostvape ursa nano s2) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Lost Vape", "lostvape", "ursa", "nano", "s2"],
     attributes: [
       {
@@ -3147,8 +3147,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "گلکسی اس ۳۶۰ از لیست پادهای دائمی با قیمت به‌روز کارفرما.",
     descriptionFa:
       "گلکسی اس ۳۶۰ (lostvape galaxy S360) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد دائمی", "Lost Vape", "lostvape", "galaxy", "s360", "۳۶۰ پاف", "360"],
     attributes: [
       {
@@ -3189,8 +3189,8 @@ export const importedProducts: Product[] = [
       "پاد سالت بلو رز سیب یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "پاد سالت بلو رز سیب یخ (Pod Salt Blue RazApple ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "blue", "razapple"],
     attributes: [
       {
@@ -3226,8 +3226,8 @@ export const importedProducts: Product[] = [
       "سالت آدامس بادکنکی پاد سالت، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت آدامس بادکنکی پاد سالت (PODSALT BUBBLE BLUE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "podsalt", "bubble", "blue"],
     attributes: [
       {
@@ -3264,8 +3264,8 @@ export const importedProducts: Product[] = [
       "سالت انبه مرکبات پاد سالت، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت انبه مرکبات پاد سالت (POD SALT AMNESIA MANGO) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "amnesia", "mango"],
     attributes: [
       {
@@ -3302,8 +3302,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت آدامس نعنا، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت آدامس نعنا (pod salt spearmint) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "spearmint"],
     attributes: [
       {
@@ -3339,8 +3339,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت آناناس یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت آناناس یخ (Pod Salt Pineapple Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "pineapple", "ice"],
     attributes: [
       {
@@ -3376,8 +3376,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت انبه توت فرنگی هلو، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت انبه توت فرنگی هلو (pod salt mango strawberry peach) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "mango", "strawberry"],
     attributes: [
       {
@@ -3414,8 +3414,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت انبه یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت انبه یخ (pod salt mango ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "mango", "ice"],
     attributes: [
       {
@@ -3450,8 +3450,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت پاد سالت بلک جک، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت بلک جک (Pod Salt core Black Jack) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "core", "black"],
     attributes: [
       {
@@ -3486,8 +3486,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت پاد سالت بلو یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت بلو یخ (pod salt blue ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "blue", "ice"],
     attributes: [
       {
@@ -3523,8 +3523,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت بلوبری انار، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت بلوبری انار (pod salt blueberry pomegranate) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "blueberry", "pomegranate"],
     attributes: [
       {
@@ -3561,8 +3561,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت پاستیل خرسی سفید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت پاستیل خرسی سفید (Pod salt white gummy bear) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "white", "gummy"],
     attributes: [
       {
@@ -3599,8 +3599,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت ترو توباکو، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت ترو توباکو (pod salt true tobacco) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "true", "tobacco"],
     attributes: [
       {
@@ -3636,8 +3636,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت تنباکو نعنا، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت تنباکو نعنا (Pod Salt Menthol Tobacco) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "menthol", "tobacco"],
     attributes: [
       {
@@ -3674,8 +3674,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت توت فرنگی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت توت فرنگی (pod salt strawberry salt nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "strawberry", "salt"],
     attributes: [
       {
@@ -3711,8 +3711,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت توت فرنگی موز ریواس، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت توت فرنگی موز ریواس (pod salt strawberry banana rhubarb) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "strawberry", "banana"],
     attributes: [
       {
@@ -3749,8 +3749,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت توت فرنگی هندوانه کیوی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت توت فرنگی هندوانه کیوی (pod salt strawberry watermelon kiwi) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "strawberry", "watermelon"],
     attributes: [
       {
@@ -3787,8 +3787,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت رویال توباکو، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت رویال توباکو (pod salt royal tobacco) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "royal", "tobacco"],
     attributes: [
       {
@@ -3825,8 +3825,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت طالبی یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت طالبی یخ (Pod salt cantaloupe ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "cantaloupe", "ice"],
     attributes: [
       {
@@ -3861,8 +3861,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت پاد سالت قهوه، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت قهوه (Pod Salt Coffee) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "coffee"],
     attributes: [
       {
@@ -3898,8 +3898,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت کوبان کرم، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت کوبان کرم (Pod Salt Cuban Creme) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "cuban", "creme"],
     attributes: [
       {
@@ -3935,8 +3935,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت کیوی توت فرنگی یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت کیوی توت فرنگی یخ (Pod Salt Strawberry Kiwi ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "strawberry", "kiwi"],
     attributes: [
       {
@@ -3973,8 +3973,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت گیلاس لیموناد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت گیلاس لیموناد (podsalt cherry lemonade) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "podsalt", "cherry", "lemonade"],
     attributes: [
       {
@@ -4011,8 +4011,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت گیلاس یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت گیلاس یخ (pod salt cherry ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "cherry", "ice"],
     attributes: [
       {
@@ -4048,8 +4048,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت لیمو لایم کولا، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت لیمو لایم کولا (pod salt lemon lime ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "lemon", "lime"],
     attributes: [
       {
@@ -4086,8 +4086,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت لیمو لایم یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت لیمو لایم یخ (podsalt lemon lime ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "podsalt", "lemon", "lime", "ice"],
     attributes: [
       {
@@ -4123,8 +4123,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت پاد سالت موز یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت موز یخ (Pod Salt banana ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "banana", "ice"],
     attributes: [
       {
@@ -4160,8 +4160,8 @@ export const importedProducts: Product[] = [
       "سالت پاد سالت میکس بری، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت میکس بری (pod salt salt mixed berries) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "salt", "mixed"],
     attributes: [
       {
@@ -4196,8 +4196,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت پاد سالت هلو یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت هلو یخ (pod salt peach ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "peach", "ice"],
     attributes: [
       {
@@ -4232,8 +4232,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت پاد سالت وانیل، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پاد سالت وانیل (Pod Salt Vanilla) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "vanilla"],
     attributes: [
       {
@@ -4269,8 +4269,8 @@ export const importedProducts: Product[] = [
       "سالت پادسالت آدامس هندوانه یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پادسالت آدامس هندوانه یخ (podsalt fizzy watermelon gummy) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "podsalt", "fizzy", "watermelon", "gummy"],
     attributes: [
       {
@@ -4307,8 +4307,8 @@ export const importedProducts: Product[] = [
       "سالت پادسالت ادامس رزبری، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پادسالت ادامس رزبری (podsalt raspberry gummy) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "podsalt", "raspberry", "gummy"],
     attributes: [
       {
@@ -4344,8 +4344,8 @@ export const importedProducts: Product[] = [
       "سالت پادسالت انگور بری، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پادسالت انگور بری (pod salt grape berry burst) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "grape", "berry"],
     attributes: [
       {
@@ -4381,8 +4381,8 @@ export const importedProducts: Product[] = [
       "سالت پادسالت تنباکو شراب، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پادسالت تنباکو شراب (POD SALT LIQUIR TOBACCO) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "liquir", "tobacco"],
     attributes: [
       {
@@ -4418,8 +4418,8 @@ export const importedProducts: Product[] = [
       "سالت پادسالت توت فرنگی لیموناد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پادسالت توت فرنگی لیموناد (POD SALT sweet strawberry lemonade) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "sweet", "strawberry"],
     attributes: [
       {
@@ -4456,8 +4456,8 @@ export const importedProducts: Product[] = [
       "سالت پادسالت میکس میوه های ابی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پادسالت میکس میوه های ابی (POD SALT MR BLUE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "mr", "blue"],
     attributes: [
       {
@@ -4493,8 +4493,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت پادسالت نعنا یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پادسالت نعنا یخ (POD SALT ICE MENTHOL) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "ice", "menthol"],
     attributes: [
       {
@@ -4530,8 +4530,8 @@ export const importedProducts: Product[] = [
       "سالت تنباکو ویرجینیا پاد سالت، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت تنباکو ویرجینیا پاد سالت (Pod Salt Virginia Gold) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "virginia", "gold"],
     attributes: [
       {
@@ -4568,8 +4568,8 @@ export const importedProducts: Product[] = [
       "سالت رزبری گریپ فروت لیمو پاد سالت، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت رزبری گریپ فروت لیمو پاد سالت (Pod Salt Lime Raspberry Grapefruit) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "lime", "raspberry"],
     attributes: [
       {
@@ -4606,8 +4606,8 @@ export const importedProducts: Product[] = [
       "سالت موهیتو رزبری پاد سالت، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت موهیتو رزبری پاد سالت (Fresh Raspberry Mojito Pod Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "fresh", "raspberry", "mojito", "pod"],
     attributes: [
       {
@@ -4644,8 +4644,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت انگور سفید خیار و سیب، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت انگور سفید خیار و سیب (Pod Salt White Grape Cucumber Apple) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "white", "grape"],
     attributes: [
       {
@@ -4682,8 +4682,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت بلو رزبری، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت بلو رزبری (Pod Salt – Blue Raspberry) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "–", "blue"],
     attributes: [
       {
@@ -4720,8 +4720,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت بلوبری شاه توت لیموناد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت بلوبری شاه توت لیموناد (PodSalt Blueberry Blackberry Lemonade) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "podsalt", "blueberry", "blackberry", "lemonade"],
     attributes: [
       {
@@ -4758,8 +4758,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت پاستیل خرسی قرمز، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت پاستیل خرسی قرمز (Pod Salt Red Gummy Bear) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "red", "gummy"],
     attributes: [
       {
@@ -4796,8 +4796,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت پرتقال انبه و لیمو، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت پرتقال انبه و لیمو (Pod Salt Orange Mango Lime) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "orange", "mango"],
     attributes: [
       {
@@ -4834,8 +4834,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت پینک هیز (( لیمو تمشک))، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت پینک هیز (( لیمو تمشک)) (Pod Salt Pink Haze) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "pink", "haze"],
     attributes: [
       {
@@ -4872,8 +4872,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت تمشک آبی ترش، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت تمشک آبی ترش (Pod Salt Sour Blue Raspberry) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "sour", "blue"],
     attributes: [
       {
@@ -4910,8 +4910,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت توت فرنگی مارشمالو، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت توت فرنگی مارشمالو (Pod Salt Strawberry Marshmallow) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "strawberry", "marshmallow"],
     attributes: [
       {
@@ -4948,8 +4948,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت دو سیب، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت دو سیب (PodSalt Double Apple) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "podsalt", "double", "apple"],
     attributes: [
       {
@@ -4986,8 +4986,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت سیب سبز، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت سیب سبز (PodSalt Core Apple) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "podsalt", "core", "apple"],
     attributes: [
       {
@@ -5024,8 +5024,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت سیب هلو، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت سیب هلو (Pod Salt Apple Peach) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "apple", "peach"],
     attributes: [
       {
@@ -5062,8 +5062,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت سیگار، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت سیگار (Pod Salt Cigarette) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "cigarette"],
     attributes: [
       {
@@ -5100,8 +5100,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت کره بادام زمینی موز، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت کره بادام زمینی موز (Pod Salt Peanut Butter Banana Granola) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "peanut", "butter"],
     attributes: [
       {
@@ -5138,8 +5138,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت کولا لیمو، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت کولا لیمو (Pod Salt Cola with Lime) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "cola", "with"],
     attributes: [
       {
@@ -5176,8 +5176,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت گلابی سیب تمشک، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت گلابی سیب تمشک (Pod Salt Pear Apple Raspberry) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "pear", "apple"],
     attributes: [
       {
@@ -5214,8 +5214,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت لیچی یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت لیچی یخ (Pod Salt Lychee Ice SaltNic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "lychee", "ice"],
     attributes: [
       {
@@ -5252,8 +5252,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت مربای بلوبری، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت مربای بلوبری (Pod Salt Blueberry Jam) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "blueberry", "jam"],
     attributes: [
       {
@@ -5290,8 +5290,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاد سالت میکس بری یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاد سالت میکس بری یخ (Pod Salt Mixed Berries Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "mixed", "berries"],
     attributes: [
       {
@@ -5328,8 +5328,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پادسالت شکلات سفید موکا، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پادسالت شکلات سفید موکا (Pod Salt White Chocolate Mocha) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "white", "chocolate"],
     attributes: [
       {
@@ -5366,8 +5366,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین سیب قرمز یخ پاد سالت، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین سیب قرمز یخ پاد سالت (Pod Salt Red Apple ICED) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "red", "apple"],
     attributes: [
       {
@@ -5404,8 +5404,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین هندوانه یخ پاد سالت، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین هندوانه یخ پاد سالت (Pod Salt Watermelon Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "watermelon", "ice"],
     attributes: [
       {
@@ -5442,8 +5442,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت آبنبات میوه‌ای، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت آبنبات میوه‌ای (POD SALT RAINBOW) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "rainbow"],
     attributes: [
       {
@@ -5480,8 +5480,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت تمشک آبی گیلاس یخ پاد سالت، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت تمشک آبی گیلاس یخ پاد سالت (POD SALT BLUE RAZZ CHERRY BLAST) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "blue", "razz"],
     attributes: [
       {
@@ -5518,8 +5518,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت لیمو یخ پاد سالت، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت لیمو یخ پاد سالت (Pod Salt Lemon) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Pod Salt", "pod", "salt", "lemon"],
     attributes: [
       {
@@ -5556,8 +5556,8 @@ export const importedProducts: Product[] = [
       "سالت ادامس نعنا نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت ادامس نعنا نستی سری جدید (NASTY FRESH FRUITS SPEARMINT) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "spearmint"],
     attributes: [
       {
@@ -5594,8 +5594,8 @@ export const importedProducts: Product[] = [
       "سالت اناناس کیوی نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت اناناس کیوی نستی سری جدید (nasty fresh fruits kiwi pineapple) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "kiwi"],
     attributes: [
       {
@@ -5632,8 +5632,8 @@ export const importedProducts: Product[] = [
       "سالت انبه توت سیاه نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت انبه توت سیاه نستی (Nasty LIQ Mango Blackcurrant) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "mango", "blackcurrant"],
     attributes: [
       {
@@ -5669,8 +5669,8 @@ export const importedProducts: Product[] = [
       "سالت انبه سبز نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت انبه سبز نستی سری جدید (NASTY FRESH FRUITS GREEN MANGO) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "green"],
     attributes: [
       {
@@ -5706,8 +5706,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت انبه موز نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت انبه موز نستی (Nasty Mango Banana Cushman) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "mango", "banana", "cushman"],
     attributes: [
       {
@@ -5742,8 +5742,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت انرژی زا نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت انرژی زا نستی (Nasty Red RAGE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "red", "rage"],
     attributes: [
       {
@@ -5779,8 +5779,8 @@ export const importedProducts: Product[] = [
       "سالت انگور آلوئه ورا نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت انگور آلوئه ورا نستی (Nasty LIQ Aloe Grape) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "aloe", "grape"],
     attributes: [
       {
@@ -5817,8 +5817,8 @@ export const importedProducts: Product[] = [
       "سالت انگور بلوبری تمشک نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت انگور بلوبری تمشک نستی (NASTY PODMATE GRAPE & MIX BERRIES) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "podmate", "grape", "&"],
     attributes: [
       {
@@ -5855,8 +5855,8 @@ export const importedProducts: Product[] = [
       "سالت بلو رز یخ نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت بلو رز یخ نستی سری جدید (NASTY FRESH FRUITS BLUE RAZZ ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "blue"],
     attributes: [
       {
@@ -5893,8 +5893,8 @@ export const importedProducts: Product[] = [
       "سالت پشن فروت ترش نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پشن فروت ترش نستی سری جدید (nasty fresh fruits passion fruits burst) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "passion"],
     attributes: [
       {
@@ -5931,8 +5931,8 @@ export const importedProducts: Product[] = [
       "سالت پشن فروت یخ نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت پشن فروت یخ نستی (Nasty Passion Fruit Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "passion", "fruit", "ice"],
     attributes: [
       {
@@ -5968,8 +5968,8 @@ export const importedProducts: Product[] = [
       "سالت توت فرنگی یخ نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت توت فرنگی یخ نستی سری جدید (NASTY FRESH FRUITS STRAWBERRY ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "strawberry"],
     attributes: [
       {
@@ -6006,8 +6006,8 @@ export const importedProducts: Product[] = [
       "سالت توت‌فرنگی کیوی نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت توت‌فرنگی کیوی نستی (NASTY PODMATE STRAWBERRY KIWI) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "podmate", "strawberry", "kiwi"],
     attributes: [
       {
@@ -6042,8 +6042,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت سیب سبز نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت سیب سبز نستی (Nasty Green Apple) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "green", "apple"],
     attributes: [
       {
@@ -6079,8 +6079,8 @@ export const importedProducts: Product[] = [
       "سالت شیک توت فرنگی نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت شیک توت فرنگی نستی سری جدید (nasty fresh fruits milkshake strawberry) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "milkshake"],
     attributes: [
       {
@@ -6117,8 +6117,8 @@ export const importedProducts: Product[] = [
       "سالت قلیانی دو سیب نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت قلیانی دو سیب نستی (Nasty Shisha Double Apple) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "shisha", "double", "apple"],
     attributes: [
       {
@@ -6154,8 +6154,8 @@ export const importedProducts: Product[] = [
       "سالت نستی وانیل کاستارد توباکو، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی وانیل کاستارد توباکو (Nasty Vanilla Custard Tobacco Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "vanilla", "custard", "tobacco"],
     attributes: [
       {
@@ -6192,8 +6192,8 @@ export const importedProducts: Product[] = [
       "سالت نستی انبه هلو آناناس، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی انبه هلو آناناس (Nasty Peach Mango Pineapple Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "peach", "mango", "pineapple"],
     attributes: [
       {
@@ -6229,8 +6229,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی آدامس نعنا، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی آدامس نعنا (Nasty Liq Spearmint Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "spearmint", "salt"],
     attributes: [
       {
@@ -6265,8 +6265,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی انار انگور، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی انار انگور (Nasty Grape Pomegranate) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "grape", "pomegranate"],
     attributes: [
       {
@@ -6301,8 +6301,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی انار انگور، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی انار انگور (Nasty LIQ Grape Pomegranate) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "grape", "pomegranate"],
     attributes: [
       {
@@ -6337,8 +6337,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی انبه، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی انبه (Nasty Liq Mango Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "mango", "salt"],
     attributes: [
       {
@@ -6374,8 +6374,8 @@ export const importedProducts: Product[] = [
       "سالت نستی انبه آناناس، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی انبه آناناس (Nasty Liq Pineapple Mango Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "pineapple", "mango"],
     attributes: [
       {
@@ -6411,8 +6411,8 @@ export const importedProducts: Product[] = [
       "سالت نستی انبه انگور 30 میل، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی انبه انگور 30 میل (NASTY CUSHMAN MANGO GRAPE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "cushman", "mango", "grape"],
     attributes: [
       {
@@ -6449,8 +6449,8 @@ export const importedProducts: Product[] = [
       "سالت نستی انبه توت فرنگی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی انبه توت فرنگی (NASTY CUSHMAN MANGO STRAWBERRY) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "cushman", "mango", "strawberry"],
     attributes: [
       {
@@ -6485,8 +6485,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی انبه کاشمن، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی انبه کاشمن (nasty mango cushman) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "mango", "cushman"],
     attributes: [
       {
@@ -6521,8 +6521,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی انرژی زا، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی انرژی زا (Nasty Liq Vhimto Bull Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "vhimto", "bull"],
     attributes: [
       {
@@ -6558,8 +6558,8 @@ export const importedProducts: Product[] = [
       "سالت نستی انگور میکس بری، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی انگور میکس بری (Nasty Grape Mixed Berries) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "grape", "mixed", "berries"],
     attributes: [
       {
@@ -6594,8 +6594,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی بلوبری، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی بلوبری (Nasty Blueberry) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "blueberry"],
     attributes: [
       {
@@ -6630,8 +6630,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی بمب بری، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی بمب بری (NASTY LIQ BERRY BOMB) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "berry", "bomb"],
     attributes: [
       {
@@ -6667,8 +6667,8 @@ export const importedProducts: Product[] = [
       "سالت نستی پشن فروت یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی پشن فروت یخ (NASTY LIQ PASSION FRUIT ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "passion", "fruit"],
     attributes: [
       {
@@ -6704,8 +6704,8 @@ export const importedProducts: Product[] = [
       "سالت نستی توت فرنگی یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی توت فرنگی یخ (NASTY LIQ STRAWBERRY ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "strawberry", "ice"],
     attributes: [
       {
@@ -6741,8 +6741,8 @@ export const importedProducts: Product[] = [
       "سالت نستی توت فرنگی یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی توت فرنگی یخ (Nasty Strawberry Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "strawberry", "ice"],
     attributes: [
       {
@@ -6777,8 +6777,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی طالبی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی طالبی (Nasty Honeydew) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "honeydew"],
     attributes: [
       {
@@ -6813,8 +6813,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی فروت فیوژن، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی فروت فیوژن (Nasty LIQ Fruit Fusion) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "fruit", "fusion"],
     attributes: [
       {
@@ -6849,8 +6849,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی کوبانو، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی کوبانو (NASTY CUBANO SALT) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "cubano", "salt"],
     attributes: [
       {
@@ -6885,8 +6885,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی کوبانو، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی کوبانو (Nasty Liq Cubano Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "cubano", "salt"],
     attributes: [
       {
@@ -6922,8 +6922,8 @@ export const importedProducts: Product[] = [
       "سالت نستی کیوی توت‌فرنگی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی کیوی توت‌فرنگی (Nasty Liq Strawberry Kiwi Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "strawberry", "kiwi"],
     attributes: [
       {
@@ -6959,8 +6959,8 @@ export const importedProducts: Product[] = [
       "سالت نستی گواوا انگور، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی گواوا انگور (NASTY LIQ GUAVA GRAPE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "guava", "grape"],
     attributes: [
       {
@@ -6995,8 +6995,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی گواوا یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی گواوا یخ (Nasty Liq Guava Ice Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "guava", "ice"],
     attributes: [
       {
@@ -7032,8 +7032,8 @@ export const importedProducts: Product[] = [
       "سالت نستی گیلاس گازدار، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی گیلاس گازدار (Nasty Fizzy Cherry Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fizzy", "cherry", "salt"],
     attributes: [
       {
@@ -7068,8 +7068,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی هلو یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی هلو یخ (Nasty Peach Ice Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "peach", "ice", "salt"],
     attributes: [
       {
@@ -7104,8 +7104,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت نستی هندوانه یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی هندوانه یخ (NASTY PODMATE WATERMELON ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "podmate", "watermelon", "ice"],
     attributes: [
       {
@@ -7141,8 +7141,8 @@ export const importedProducts: Product[] = [
       "سالت نستی وانیل کاستارد تنباکو، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نستی وانیل کاستارد تنباکو (nasty vct salt nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "vct", "salt", "nic"],
     attributes: [
       {
@@ -7179,8 +7179,8 @@ export const importedProducts: Product[] = [
       "سالت نوشابه یخ نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نوشابه یخ نستی سری جدید (NASTY FRESH FRUITS COLA ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "cola"],
     attributes: [
       {
@@ -7217,8 +7217,8 @@ export const importedProducts: Product[] = [
       "سالت نوشیدنی انرژی زا نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نوشیدنی انرژی زا نستی سری جدید (nasty fresh fruits energy drink) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "energy"],
     attributes: [
       {
@@ -7255,8 +7255,8 @@ export const importedProducts: Product[] = [
       "سالت هلو انبه نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت هلو انبه نستی سری جدید (NASTY FRESH FRUITS PEACH MANGO) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "peach"],
     attributes: [
       {
@@ -7293,8 +7293,8 @@ export const importedProducts: Product[] = [
       "سالت هلو لیموناد نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت هلو لیموناد نستی (Nasty PodMate Peach Lemonade) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "podmate", "peach", "lemonade"],
     attributes: [
       {
@@ -7330,8 +7330,8 @@ export const importedProducts: Product[] = [
       "سالت هلو یخ نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت هلو یخ نستی سری جدید (nasty fresh fruits peach ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "peach"],
     attributes: [
       {
@@ -7368,8 +7368,8 @@ export const importedProducts: Product[] = [
       "سالت هندوانه توت فرنگی نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت هندوانه توت فرنگی نستی سری جدید (nasty fresh fruits watermelon strawberry) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "watermelon"],
     attributes: [
       {
@@ -7406,8 +7406,8 @@ export const importedProducts: Product[] = [
       "سالت هندوانه سیب نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت هندوانه سیب نستی سری جدید (nasty watermelon apple peach ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "watermelon", "apple", "peach"],
     attributes: [
       {
@@ -7444,8 +7444,8 @@ export const importedProducts: Product[] = [
       "سالت هندوانه یخ نستی سری جدید، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت هندوانه یخ نستی سری جدید (nasty fresh fruits watermelon ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "fresh", "fruits", "watermelon"],
     attributes: [
       {
@@ -7482,8 +7482,8 @@ export const importedProducts: Product[] = [
       "نیکوتین بلوبری رزبری لیموناد ۱۰ میل، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین بلوبری رزبری لیموناد ۱۰ میل (NASTY BLUEBERRY RASBERRY LEMONADE SALT) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "blueberry", "rasberry", "lemonade"],
     attributes: [
       {
@@ -7520,8 +7520,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت آب معدنی نستی ۱۰ میل، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت آب معدنی نستی ۱۰ میل (NASTY SALTNIC MINERAL WATER) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "saltnic", "mineral", "water"],
     attributes: [
       {
@@ -7558,8 +7558,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت آناناس یخ نستی ۱۰ میل، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت آناناس یخ نستی ۱۰ میل (NASTY PINEAPPLE ICE MINI SALT) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "pineapple", "ice", "mini"],
     attributes: [
       {
@@ -7596,8 +7596,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت انار میکس بری نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت انار میکس بری نستی (Nasty LIQ Pomegranate Berry Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "pomegranate", "berry"],
     attributes: [
       {
@@ -7634,8 +7634,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت انبه نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت انبه نستی (NASTY CUSHMAN) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "cushman"],
     attributes: [
       {
@@ -7671,8 +7671,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت انبه یخ نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت انبه یخ نستی (NASTY PODMATE MANGO ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "podmate", "mango", "ice"],
     attributes: [
       {
@@ -7709,8 +7709,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت انگور رزبری نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت انگور رزبری نستی (Nasty LIQ Grape Raspberry Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "grape", "raspberry"],
     attributes: [
       {
@@ -7747,8 +7747,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت بد بلاد انگور فرنگی نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت بد بلاد انگور فرنگی نستی (Bad Blood Nasty SALT Strawberry Grape) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "bad", "blood", "nasty", "salt"],
     attributes: [
       {
@@ -7785,8 +7785,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت بلو بنگز نستی ۱۰ میل، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت بلو بنگز نستی ۱۰ میل (NASTY BLUE BANGS MINI SALT) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "blue", "bangs", "mini"],
     attributes: [
       {
@@ -7823,8 +7823,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت بلوبری رزبری نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت بلوبری رزبری نستی (Nasty LIQ Blue Raspberry Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "blue", "raspberry"],
     attributes: [
       {
@@ -7861,8 +7861,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت تنباکو کارامل خامه نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت تنباکو کارامل خامه نستی (Nasty LIQ Creamy Tobacco Salt (30ml)) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "creamy", "tobacco"],
     attributes: [
       {
@@ -7899,8 +7899,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت توت فرنگی نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت توت فرنگی نستی (Nasty Strawberry Trap Queen Salt (30ml)) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "strawberry", "trap", "queen"],
     attributes: [
       {
@@ -7937,8 +7937,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت توت‌فرنگی بلوبری رزبری نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت توت‌فرنگی بلوبری رزبری نستی (Nasty LIQ Blueberry Raspberry Strawberry Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "blueberry", "raspberry"],
     attributes: [
       {
@@ -7975,8 +7975,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت توت‌فرنگی رزبری نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت توت‌فرنگی رزبری نستی (Nasty LIQ Strawberry Raspberry Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "strawberry", "raspberry"],
     attributes: [
       {
@@ -8013,8 +8013,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت رزبری هندوانه نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت رزبری هندوانه نستی (Nasty LIQ Raspberry Watermelon Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "raspberry", "watermelon"],
     attributes: [
       {
@@ -8051,8 +8051,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت شیر توت‌فرنگی نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت شیر توت‌فرنگی نستی (Nasty LIQ Strawberry Milk Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "strawberry", "milk"],
     attributes: [
       {
@@ -8089,8 +8089,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت قلیانی انگور سبز نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت قلیانی انگور سبز نستی (NASTY SHISHA GREEN GRAPE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "shisha", "green", "grape"],
     attributes: [
       {
@@ -8127,8 +8127,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت قلیانی لیمو نعناع نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت قلیانی لیمو نعناع نستی (Nasty Shisha Lemon Mint Salt (30ml)) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "shisha", "lemon", "mint"],
     attributes: [
       {
@@ -8165,8 +8165,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت کیوی پشن فروت گواوا نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت کیوی پشن فروت گواوا نستی (Nasty LIQ Kiwi Passion Fruit Guava Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "kiwi", "passion"],
     attributes: [
       {
@@ -8203,8 +8203,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت لیمو آناناس اسلو بلو نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت لیمو آناناس اسلو بلو نستی (Slow Blow – Nasty SALT Pineapple Lemonade) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "slow", "blow", "–", "nasty"],
     attributes: [
       {
@@ -8241,8 +8241,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت نستی انگور سیاه یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت نستی انگور سیاه یخ (NASTY ASAP grape ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "asap", "grape", "ice"],
     attributes: [
       {
@@ -8279,8 +8279,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت نعنا نستی ۱۰ میل، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت نعنا نستی ۱۰ میل (NASTY MENTHOL MINI SALT) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "menthol", "mini", "salt"],
     attributes: [
       {
@@ -8317,8 +8317,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت نوشابه کولا گیلاس نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت نوشابه کولا گیلاس نستی (Nasty LIQ Cherry Cola Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "cherry", "cola"],
     attributes: [
       {
@@ -8355,8 +8355,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت هلو انبه نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت هلو انبه نستی (Nasty LIQ Mango Peach Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "mango", "peach"],
     attributes: [
       {
@@ -8393,8 +8393,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت هلو یخ نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت هلو یخ نستی (Nasty LIQ Peach Ice Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "peach", "ice"],
     attributes: [
       {
@@ -8430,8 +8430,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت هندوانه توت‌فرنگی نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت هندوانه توت‌فرنگی نستی (Nasty LIQ Watermelon Strawberry) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "watermelon", "strawberry"],
     attributes: [
       {
@@ -8468,8 +8468,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت هندوانه یخ نستی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت هندوانه یخ نستی (Nasty LIQ Watermelon Ice Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Nasty", "nasty", "liq", "watermelon", "ice"],
     attributes: [
       {
@@ -8506,8 +8506,8 @@ export const importedProducts: Product[] = [
       "سالت سیب سبز یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت سیب سبز یخ ویگاد (VGOD APPLE BOMB ICED) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "apple", "bomb", "iced"],
     attributes: [
       {
@@ -8543,8 +8543,8 @@ export const importedProducts: Product[] = [
       "سالت کوبانو سیلور ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت کوبانو سیلور ویگاد (VGOD SaltNic Cubano Silver) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "saltnic", "cubano", "silver"],
     attributes: [
       {
@@ -8580,8 +8580,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین آدامس هندوانه یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین آدامس هندوانه یخ ویگاد (VGOD Mix Bubble Watermelon Iced) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "mix", "bubble", "watermelon"],
     attributes: [
       {
@@ -8618,8 +8618,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین انبه یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین انبه یخ ویگاد (VGOD Mango Bomb Iced Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "mango", "bomb", "iced"],
     attributes: [
       {
@@ -8656,8 +8656,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین انگور یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین انگور یخ ویگاد (VGOD Purple Bomb Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "purple", "bomb", "ice"],
     attributes: [
       {
@@ -8694,8 +8694,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین بلوبری تمشک یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین بلوبری تمشک یخ ویگاد (VGOD Mix Iced Blue Razz) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "mix", "iced", "blue"],
     attributes: [
       {
@@ -8732,8 +8732,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین بمب انبه ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین بمب انبه ویگاد (VGOD Mango Bomb Saltnic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "mango", "bomb", "saltnic"],
     attributes: [
       {
@@ -8770,8 +8770,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پاستیل هندوانه ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پاستیل هندوانه ویگاد (VGOD Luscious salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "luscious", "salt"],
     attributes: [
       {
@@ -8808,8 +8808,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین سیب و توت‌فرنگی یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین سیب و توت‌فرنگی یخ ویگاد (VGOD MIX Iced Strawberry Apple) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "mix", "iced", "strawberry"],
     attributes: [
       {
@@ -8846,8 +8846,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین گیلاس لیمو یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین گیلاس لیمو یخ ویگاد (VGOD MIX Cherry Lime Ice Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "mix", "cherry", "lime"],
     attributes: [
       {
@@ -8884,8 +8884,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین موز یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین موز یخ ویگاد (VGOD Banana Bomb Iced) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "banana", "bomb", "iced"],
     attributes: [
       {
@@ -8922,8 +8922,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین نعناع یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین نعناع یخ ویگاد (VGOD SaltNic – Mighty Mint) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "saltnic", "–", "mighty"],
     attributes: [
       {
@@ -8960,8 +8960,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین هلو انبه یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین هلو انبه یخ ویگاد (VGOD Mix Iced Peach Mango Salt) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "mix", "iced", "peach"],
     attributes: [
       {
@@ -8998,8 +8998,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین ویگاد دو سیب یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین ویگاد دو سیب یخ (VGOD Double Apple Ice Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "double", "apple", "ice"],
     attributes: [
       {
@@ -9036,8 +9036,8 @@ export const importedProducts: Product[] = [
       "سالت هندوانه طالبی ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت هندوانه طالبی ویگاد (VGOD MELON MIX) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "melon", "mix"],
     attributes: [
       {
@@ -9073,8 +9073,8 @@ export const importedProducts: Product[] = [
       "سالت هندوانه یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت هندوانه یخ ویگاد (LUSH ICE SALTNIC BY VGOD) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "lush", "ice", "saltnic", "by"],
     attributes: [
       {
@@ -9110,8 +9110,8 @@ export const importedProducts: Product[] = [
       "سالت ویگاد انبه پشن فروت یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت ویگاد انبه پشن فروت یخ (VGOD MANGO PASSION FRUIT ICED) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "mango", "passion", "fruit"],
     attributes: [
       {
@@ -9148,8 +9148,8 @@ export const importedProducts: Product[] = [
       "سالت ویگاد انبه ملون یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت ویگاد انبه ملون یخ (VGOD MANGO HONEYDEW ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "mango", "honeydew", "ice"],
     attributes: [
       {
@@ -9185,8 +9185,8 @@ export const importedProducts: Product[] = [
       "سالت ویگاد بری انار یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت ویگاد بری انار یخ (VGOD BERRY POMEGRANATE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "berry", "pomegranate"],
     attributes: [
       {
@@ -9222,8 +9222,8 @@ export const importedProducts: Product[] = [
       "سالت ویگاد بلک چری ((شاهتوت گیلاس))، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت ویگاد بلک چری ((شاهتوت گیلاس)) (VGOD BLACK CHERRY) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "black", "cherry"],
     attributes: [
       {
@@ -9260,8 +9260,8 @@ export const importedProducts: Product[] = [
       "سالت ویگاد بمب توت فرنگی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت ویگاد بمب توت فرنگی (VGOD BOMB STARWBERRY) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "bomb", "starwberry"],
     attributes: [
       {
@@ -9296,8 +9296,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت ویگاد بمب سیب، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت ویگاد بمب سیب (VGOD BOMB APPLE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "bomb", "apple"],
     attributes: [
       {
@@ -9333,8 +9333,8 @@ export const importedProducts: Product[] = [
       "سالت ویگاد پیناکولادا، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت ویگاد پیناکولادا (VGOD PINACOLADA SALT NIC) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "pinacolada", "salt", "nic"],
     attributes: [
       {
@@ -9370,8 +9370,8 @@ export const importedProducts: Product[] = [
       "سالت ویگاد تنباکو آمریکایی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت ویگاد تنباکو آمریکایی (VGOD American Backwoods Tobacco) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "american", "backwoods", "tobacco"],
     attributes: [
       {
@@ -9408,8 +9408,8 @@ export const importedProducts: Product[] = [
       "سالت ویگاد تنباکو تافی کره‌ای، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت ویگاد تنباکو تافی کره‌ای (VGOD Belgian Butterscotch Tobacco) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "belgian", "butterscotch", "tobacco"],
     attributes: [
       {
@@ -9446,8 +9446,8 @@ export const importedProducts: Product[] = [
       "سالت ویگاد تنباکو کلاسیک، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت ویگاد تنباکو کلاسیک (VGOD Tobacco Desert Blend) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "tobacco", "desert", "blend"],
     attributes: [
       {
@@ -9483,8 +9483,8 @@ export const importedProducts: Product[] = [
       "سالت ویگاد تنباکو میوه استوایی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت ویگاد تنباکو میوه استوایی (VGOD Tropical Reserve Tobacco) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "tropical", "reserve", "tobacco"],
     attributes: [
       {
@@ -9521,8 +9521,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت بمب انگور ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت بمب انگور ویگاد (VGOD PURPLE BOMB) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "purple", "bomb"],
     attributes: [
       {
@@ -9559,8 +9559,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت بمب توت فرنگی یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت بمب توت فرنگی یخ ویگاد (VGOD BERRY BOMB ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "berry", "bomb", "ice"],
     attributes: [
       {
@@ -9597,8 +9597,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت تنباکو وانیل ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت تنباکو وانیل ویگاد (VGOD CUBANO BLACK) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "cubano", "black"],
     attributes: [
       {
@@ -9635,8 +9635,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت تنباکوی خشک یخ ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت تنباکوی خشک یخ ویگاد (VGOD Dry Tobacco Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "dry", "tobacco", "ice"],
     attributes: [
       {
@@ -9673,8 +9673,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت کیک صورتی ویگاد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت کیک صورتی ویگاد (VGOD PINKCAKES) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "pinkcakes"],
     attributes: [
       {
@@ -9711,8 +9711,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت ویگاد تنباکو خامه کارامل، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت ویگاد تنباکو خامه کارامل (VGOD CUBANO RICH CREAMY) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "cubano", "rich", "creamy"],
     attributes: [
       {
@@ -9749,8 +9749,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت ویگاد تنباکو خشک، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت ویگاد تنباکو خشک (VGOD DRY TOBACCO) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "VGOD", "vgod", "dry", "tobacco"],
     attributes: [
       {
@@ -9787,8 +9787,8 @@ export const importedProducts: Product[] = [
       "سالت دکتر ویپز پینک اسموتی فروزن، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز پینک اسموتی فروزن (Dr Vapes Pink Frozen Smoothie) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "pink", "frozen"],
     attributes: [
       {
@@ -9825,8 +9825,8 @@ export const importedProducts: Product[] = [
       "سالت آدامس بادکنکی دکتر ویپز، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت آدامس بادکنکی دکتر ویپز (DR VAPES Bubblegum Kings Original) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "bubblegum", "kings"],
     attributes: [
       {
@@ -9863,8 +9863,8 @@ export const importedProducts: Product[] = [
       "سالت دکتر ویپز 30 میل تنباکو خالص، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز 30 میل تنباکو خالص (dr vapes pure tobacco) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "pure", "tobacco"],
     attributes: [
       {
@@ -9901,8 +9901,8 @@ export const importedProducts: Product[] = [
       "سالت دکتر ویپز 30 میل تنباکو قهوه، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز 30 میل تنباکو قهوه (dr vapes barista tobacco) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "barista", "tobacco"],
     attributes: [
       {
@@ -9939,8 +9939,8 @@ export const importedProducts: Product[] = [
       "سالت دکتر ویپز آدامس بادکنکی یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز آدامس بادکنکی یخ (Dr Vapes Bubblegum Kings Original Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "bubblegum", "kings"],
     attributes: [
       {
@@ -9976,8 +9976,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت دکتر ویپز انبه، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز انبه (Dr Vapes Panther Series Mango) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "panther", "series"],
     attributes: [
       {
@@ -10013,8 +10013,8 @@ export const importedProducts: Product[] = [
       "سالت دکتر ویپز بلک ۲.۰ تنباکو وانیل کاستارد، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز بلک ۲.۰ تنباکو وانیل کاستارد (Dr Vapes Black 2.0) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "black", "2.0"],
     attributes: [
       {
@@ -10051,8 +10051,8 @@ export const importedProducts: Product[] = [
       "سالت دکتر ویپز بلوبری، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز بلوبری (Dr Vapes Blue) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "blue"],
     attributes: [
       {
@@ -10088,8 +10088,8 @@ export const importedProducts: Product[] = [
       "سالت دکتر ویپز پینک اسموتی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز پینک اسموتی (Dr Vapes Pink Smoothie) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "pink", "smoothie"],
     attributes: [
       {
@@ -10126,8 +10126,8 @@ export const importedProducts: Product[] = [
       "سالت دکتر ویپز پینک یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز پینک یخ (Dr Vapes Pink ICED) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "pink", "iced"],
     attributes: [
       {
@@ -10163,8 +10163,8 @@ export const importedProducts: Product[] = [
       "سالت دکتر ویپز سیب قرمز، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز سیب قرمز (Dr Vapes Panther Series Red Apple) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "panther", "series"],
     attributes: [
       {
@@ -10200,8 +10200,8 @@ export const importedProducts: Product[] = [
       "سالت دکتر ویپز گلد یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز گلد یخ (Dr Vapes Gold ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "gold", "ice"],
     attributes: [
       {
@@ -10236,8 +10236,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت دکتر ویپز نعنا، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز نعنا (Dr Vapes Spearmint Panther) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "spearmint", "panther"],
     attributes: [
       {
@@ -10272,8 +10272,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت دکتر ویپز هلو، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز هلو (Dr Vapes Panther Series Peach) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "panther", "series"],
     attributes: [
       {
@@ -10309,8 +10309,8 @@ export const importedProducts: Product[] = [
       "سالت دکتر ویپز هندوانه، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت دکتر ویپز هندوانه (Dr Vapes Panther Series Watermelon) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "panther", "series"],
     attributes: [
       {
@@ -10346,8 +10346,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین آبنبات و انگور فرنگی یخ دکتر ویپز، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین آبنبات و انگور فرنگی یخ دکتر ویپز (Dr Vapes Pink Frozen Remix) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "pink", "frozen"],
     attributes: [
       {
@@ -10384,8 +10384,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین آدامس هندوانه یخ دکتر ویپز، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین آدامس هندوانه یخ دکتر ویپز (Bubble Gum Kings Watermelon Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "bubble", "gum", "kings", "watermelon"],
     attributes: [
       {
@@ -10422,8 +10422,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین انبه یخ دکتر ویپ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین انبه یخ دکتر ویپ (Dr Vapes Panther Series Mango Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "panther", "series"],
     attributes: [
       {
@@ -10460,8 +10460,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین بستنی لیمو یخ دکتر ویپز، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین بستنی لیمو یخ دکتر ویپز (Dr Vapes Green Ice Limy Lemon) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "green", "ice"],
     attributes: [
       {
@@ -10498,8 +10498,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پینک پشمک انگور فرنگی دکتر ویپز، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پینک پشمک انگور فرنگی دکتر ویپز (Dr. Vapes Pink Blackcurrant) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.", "vapes", "pink", "blackcurrant"],
     attributes: [
       {
@@ -10536,8 +10536,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین پینک کریزی انگور گواوا پشن یخ دکتر ویپ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین پینک کریزی انگور گواوا پشن یخ دکتر ویپ (Dr Vapes FROZEN PINK CRAZY) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "frozen", "pink"],
     attributes: [
       {
@@ -10574,8 +10574,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین دکتر ویپ پینک رویال فروزن، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین دکتر ویپ پینک رویال فروزن (Dr Vapes Pink Royale Frozen) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "pink", "royale"],
     attributes: [
       {
@@ -10612,8 +10612,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین سیب قرمز یخ دکتر ویپز، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین سیب قرمز یخ دکتر ویپز (Dr Vapes Panther Series Red Apple Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "panther", "series"],
     attributes: [
       {
@@ -10650,8 +10650,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین لوتوس چیز کیک دکتر ویپز، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین لوتوس چیز کیک دکتر ویپز (DR.VAPES Lotus) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.vapes", "lotus"],
     attributes: [
       {
@@ -10688,8 +10688,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین لیچی انبه گوآوا دکتر ویپ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین لیچی انبه گوآوا دکتر ویپ (Dr Vapes Gold Salt Nic) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "gold", "salt"],
     attributes: [
       {
@@ -10726,8 +10726,8 @@ export const importedProducts: Product[] = [
       "سالت نیکوتین هندوانه یخ دکتر ویپ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت نیکوتین هندوانه یخ دکتر ویپ (Dr Vapes Panther Series Watermelon Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "panther", "series"],
     attributes: [
       {
@@ -10763,8 +10763,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "سالت هلو یخ دکتر ویپ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "سالت هلو یخ دکتر ویپ (Dr Vapes Panther Series Peach Ice) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr", "vapes", "panther", "series"],
     attributes: [
       {
@@ -10800,8 +10800,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت آبنبات انگور فرنگی یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت آبنبات انگور فرنگی یخ (DR.VAPES PINK FROZEN REMIX) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.vapes", "pink", "frozen", "remix"],
     attributes: [
       {
@@ -10838,8 +10838,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت آبنبات ترش انگور فرنگی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت آبنبات ترش انگور فرنگی (DR.VAPES PINK SOUR) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.vapes", "pink", "sour"],
     attributes: [
       {
@@ -10876,8 +10876,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت آبنبات ترش انگور فرنگی و پشمک، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت آبنبات ترش انگور فرنگی و پشمک (DR.VAPES PINK REMIX) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.vapes", "pink", "remix"],
     attributes: [
       {
@@ -10914,8 +10914,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت آدامس بادکنکی کولا یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت آدامس بادکنکی کولا یخ (DR.VAPES BUBBLEGUM KINGS COLA ICE 30ML) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.vapes", "bubblegum", "kings", "cola"],
     attributes: [
       {
@@ -10952,8 +10952,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت آدامس بادکنکی موز یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت آدامس بادکنکی موز یخ (DR.VAPES BUBBLEGUM KINGS BANANA ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.vapes", "bubblegum", "kings", "banana"],
     attributes: [
       {
@@ -10990,8 +10990,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت آناناس خامه نارگیلی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت آناناس خامه نارگیلی (DR.VAPES PINK COLADA) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.vapes", "pink", "colada"],
     attributes: [
       {
@@ -11028,8 +11028,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت پشمک انگور فرنگی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت پشمک انگور فرنگی (DR.VAPES PINK EXTRA) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.vapes", "pink", "extra"],
     attributes: [
       {
@@ -11066,8 +11066,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت تمشک آبی یخ، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت تمشک آبی یخ (DR.VAPES BLUE RASPBERRY ICE) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.vapes", "blue", "raspberry", "ice"],
     attributes: [
       {
@@ -11103,8 +11103,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت تنباکو کارامل فندق، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت تنباکو کارامل فندق (DR.VAPES TB KINGS ORIGINAL) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.vapes", "tb", "kings", "original"],
     attributes: [
       {
@@ -11141,8 +11141,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت دکتر ویپز تنباکو وانیل بستنی، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت دکتر ویپز تنباکو وانیل بستنی (DR.VAPES BLACK PANTHER) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.vapes", "black", "panther"],
     attributes: [
       {
@@ -11179,8 +11179,8 @@ export const importedProducts: Product[] = [
       "نیکوتین سالت کاستارد وانیل، سالت نیکوتین ۳۰ میلی‌لیتر با قیمت تک‌فروشی ثبت‌شده.",
     descriptionFa:
       "نیکوتین سالت کاستارد وانیل (DR.VAPES BLACK CUSTARD) بر اساس دیتای کارفرما وارد کاتالوگ UFO Puff شده و از پنل ادمین قابل ویرایش است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["سالت نیکوتین", "Dr Vapes", "dr.vapes", "black", "custard"],
     attributes: [
       {
@@ -11217,8 +11217,8 @@ export const importedProducts: Product[] = [
       "پاد سیستم ویپرسو ارمور جی (VAPORESSO ARMOUR G) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "پاد سیستم ویپرسو ارمور جی | VAPORESSO ARMOUR G\n\nنوع محصول:\nویپ\n\nقیمت:\n۸٬۷۰۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "Vaporesso", "VAPORESSO ARMOUR G", "یوفوپاف"],
     attributes: [
       {
@@ -11259,8 +11259,8 @@ export const importedProducts: Product[] = [
       "پاد ماد ویپرسو لوکس XR مکس (VAPORESSO LUXE XR MAX POD SYSTEM) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "پاد ماد ویپرسو لوکس XR مکس | VAPORESSO LUXE XR MAX POD SYSTEM\n\nنوع محصول:\nویپ\n\nقیمت:\n۷٬۴۰۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "Vaporesso", "VAPORESSO LUXE XR MAX POD SYSTEM", "یوفوپاف"],
     attributes: [
       {
@@ -11301,8 +11301,8 @@ export const importedProducts: Product[] = [
       "پاد ماد ویپرسو لوکس ایکس آر (VAPORESSO LUXE XR) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "پاد ماد ویپرسو لوکس ایکس آر | VAPORESSO LUXE XR\n\nنوع محصول:\nویپ\n\nقیمت:\n۵٬۵۰۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "Vaporesso", "VAPORESSO LUXE XR", "یوفوپاف"],
     attributes: [
       {
@@ -11343,8 +11343,8 @@ export const importedProducts: Product[] = [
       "ویپ ویپرسو آرمور اس (Vaporesso Armour S) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "ویپ ویپرسو آرمور اس | Vaporesso Armour S\n\nنوع محصول:\nویپ\n\nقیمت:\n۱۳٬۸۰۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "Vaporesso", "Vaporesso Armour S", "یوفوپاف"],
     attributes: [
       {
@@ -11385,8 +11385,8 @@ export const importedProducts: Product[] = [
       "ویپ ویپرسو لوکس ایکس ۲ (Vaporesso Luxe X2) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "ویپ ویپرسو لوکس ایکس ۲ | Vaporesso Luxe X2\n\nنوع محصول:\nویپ\n\nقیمت:\n۵٬۵۵۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "Vaporesso", "Vaporesso Luxe X2", "یوفوپاف"],
     attributes: [
       {
@@ -11427,8 +11427,8 @@ export const importedProducts: Product[] = [
       "ویپ ویپرسو لوکس ایکس 3 (VAPORESSO LUXE X3) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "ویپ ویپرسو لوکس ایکس 3 | VAPORESSO LUXE X3\n\nنوع محصول:\nویپ\n\nقیمت:\n۶٬۸۰۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "Vaporesso", "VAPORESSO LUXE X3", "یوفوپاف"],
     attributes: [
       {
@@ -11469,8 +11469,8 @@ export const importedProducts: Product[] = [
       "پاد ماد اسموک نورد ۵۰ وات (SMOK Nord 50W Pod Mod) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "پاد ماد اسموک نورد ۵۰ وات | SMOK Nord 50W Pod Mod\n\nنوع محصول:\nویپ\n\nقیمت:\n۳٬۷۹۹٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "SMOK", "SMOK Nord 50W Pod Mod", "یوفوپاف"],
     attributes: [
       {
@@ -11511,8 +11511,8 @@ export const importedProducts: Product[] = [
       "پاد ماد ایجیس بوست گیک ویپ بی 60 (GEEKVAPE B60 AEGIS BOOST 2 POD SYSTEM) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "پاد ماد ایجیس بوست گیک ویپ بی 60 | GEEKVAPE B60 AEGIS BOOST 2 POD SYSTEM\n\nنوع محصول:\nویپ\n\nقیمت:\n۶٬۴۹۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "GeekVape", "GEEKVAPE B60 AEGIS BOOST 2 POD SYSTEM", "یوفوپاف"],
     attributes: [
       {
@@ -11553,8 +11553,8 @@ export const importedProducts: Product[] = [
       "ویپ اس 100 گیک ویپ (GEEKVAPE S100 VAPE) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "ویپ اس 100 گیک ویپ | GEEKVAPE S100 VAPE\n\nنوع محصول:\nویپ\n\nقیمت:\n۷٬۰۵۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "GeekVape", "GEEKVAPE S100 VAPE", "یوفوپاف"],
     attributes: [
       {
@@ -11594,8 +11594,8 @@ export const importedProducts: Product[] = [
       "ویپ ای ۱۰۰ گیک ویپ (Geekvape E100 Kit) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "ویپ ای ۱۰۰ گیک ویپ | Geekvape E100 Kit\n\nنوع محصول:\nویپ\n\nقیمت:\n۶٬۴۵۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "GeekVape", "Geekvape E100 Kit", "یوفوپاف"],
     attributes: [
       {
@@ -11635,8 +11635,8 @@ export const importedProducts: Product[] = [
       "ویپ ایجیس لجند ۳ گیک ویپ (Geekvape Aegis Legend 3 Kit) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "ویپ ایجیس لجند ۳ گیک ویپ | Geekvape Aegis Legend 3 Kit\n\nنوع محصول:\nویپ\n\nقیمت:\n۱۰٬۴۰۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "GeekVape", "Geekvape Aegis Legend 3 Kit", "یوفوپاف"],
     attributes: [
       {
@@ -11676,8 +11676,8 @@ export const importedProducts: Product[] = [
     shortDescriptionFa: "ویپ گیک ویپ ام 100 (geekvape m100) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "ویپ گیک ویپ ام 100 | geekvape m100\n\nنوع محصول:\nویپ\n\nقیمت:\n۷٬۵۵۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "GeekVape", "geekvape m100", "یوفوپاف"],
     attributes: [
       {
@@ -11717,8 +11717,8 @@ export const importedProducts: Product[] = [
       "ویپ گیک ویپ ایجیس سولو 3 (Geekvape Aegis SOLO 3) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "ویپ گیک ویپ ایجیس سولو 3 | Geekvape Aegis SOLO 3\n\nنوع محصول:\nویپ\n\nقیمت:\n۷٬۸۵۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "GeekVape", "Geekvape Aegis SOLO 3", "یوفوپاف"],
     attributes: [
       {
@@ -11759,8 +11759,8 @@ export const importedProducts: Product[] = [
       "ویپ گیک ویپ تی۲۰۰ (GEEKVAPE T200 (AEGIS TOUCH)) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "ویپ گیک ویپ تی۲۰۰ | GEEKVAPE T200 (AEGIS TOUCH)\n\nنوع محصول:\nویپ\n\nقیمت:\n۱۷٬۶۰۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "GeekVape", "GEEKVAPE T200 (AEGIS TOUCH)", "یوفوپاف"],
     attributes: [
       {
@@ -11801,8 +11801,8 @@ export const importedProducts: Product[] = [
       "ویپ گیک ویپ دیجی فلیور (Geekvape Digiflavor XP 77W) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "ویپ گیک ویپ دیجی فلیور | Geekvape Digiflavor XP 77W\n\nنوع محصول:\nویپ\n\nقیمت:\n۳٬۷۹۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "GeekVape", "Geekvape Digiflavor XP 77W", "یوفوپاف"],
     attributes: [
       {
@@ -11843,8 +11843,8 @@ export const importedProducts: Product[] = [
       "ویپ تلما اوربان 80 لاست ویپ (lost vape thelema urban 80) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "ویپ تلما اوربان 80 لاست ویپ | lost vape thelema urban 80\n\nنوع محصول:\nویپ\n\nقیمت:\n۴٬۶۹۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "Lost Vape", "lost vape thelema urban 80", "یوفوپاف"],
     attributes: [
       {
@@ -11885,8 +11885,8 @@ export const importedProducts: Product[] = [
       "ویپ ووپو آرگاس جی تی ۲ (Voopoo Argus Gt2 Vape) با قیمت ثبت‌شده در لیست جدید یوفوپاف.",
     descriptionFa:
       "ویپ ووپو آرگاس جی تی ۲ | Voopoo Argus Gt2 Vape\n\nنوع محصول:\nویپ\n\nقیمت:\n۱۲٬۲۰۰٬۰۰۰ تومان",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "VOOPOO", "Voopoo Argus Gt2 Vape", "یوفوپاف"],
     attributes: [
       {
@@ -11927,8 +11927,8 @@ export const importedProducts: Product[] = [
       "تانک ویپرسو آی‌تَنک ۸ میل (Vaporesso iTank 8ml) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nتانک ویپ (Tank)\r\n\r\nمشخصات:\r\n\r\n- ظرفیت مخزن: 8 میلی‌لیتر\r\n- کویل‌های سازگار: GTi Coil\r\n- مقاومت کویل‌های موجود:\r\n  - GTi 0.2Ω Mesh Coil\r\n  - GTi 0.4Ω Mesh Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با تانک Vaporesso iTank و کویل‌های GTi\r\n\r\nویژگی‌های اصلی:\r\n\r\n- ظرفیت بالای 8 میلی‌لیتر\r\n- سیستم پر کردن از بالا (Top Fill)\r\n- دارای سیستم Turbo Airflow\r\n- پشتیبانی از کویل‌های GTi Mesh\r\n- طراحی Sub Ohm برای بخاردهی بیشتر\r\n- سیستم کاهش نشتی مایع\r\n\r\nنقاط قوت:\r\n\r\n- حجم بسیار بالای مخزن\r\n- طعم‌دهی مناسب با کویل‌های Mesh\r\n- بخاردهی قوی\r\n- نیاز کمتر به پر کردن مجدد مخزن\r\n\r\nنقاط ضعف:\r\n\r\n- اندازه بزرگ‌تر نسبت به تانک‌های کوچک‌تر\r\n- مناسب دستگاه‌های کوچک پاد نیست\r\n\r\nجمع‌بندی:\r\n\r\nVaporesso iTank 8ml یک تانک حرفه‌ای با ظرفیت بالا و پشتیبانی از کویل‌های GTi است که برای کاربرانی مناسب است که بخار زیاد، طعم قوی و شارژ کمتر مخزن را ترجیح می‌دهند.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "Vaporesso", "Vaporesso iTank 8ml", "یوفوپاف"],
     attributes: [
       {
@@ -11990,8 +11990,8 @@ export const importedProducts: Product[] = [
       "باتری 18650 ویپ (Best 18650 Vape Battery) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nباتری ویپ\r\n\r\nمشخصات:\r\n\r\n- نوع باتری: 18650\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های ویپ دارای جایگاه باتری 18650\r\n\r\nویژگی‌های اصلی:\r\n\r\n- باتری قابل تعویض برای دستگاه‌های ویپ\r\n- مناسب استفاده در دستگاه‌های باتری‌خور\r\n\r\nنقاط قوت:\r\n\r\n- امکان تعویض باتری\r\n- سازگار با تعداد زیادی از دستگاه‌های ویپ\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به هماهنگی دقیق با دستگاه\r\n- نیازمند رعایت نکات ایمنی باتری\r\n\r\nجمع‌بندی:\r\n\r\nیک باتری سایز 18650 برای دستگاه‌های ویپ سازگار با این نوع باتری.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "UFO Selection", "Best 18650 Vape Battery", "یوفوپاف"],
     attributes: [
       {
@@ -12038,8 +12038,8 @@ export const importedProducts: Product[] = [
       "باتری گوریلا ویپ 18650 و 21700 (Gorilla Vape Battery 18650/21700) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nباتری ویپ\r\n\r\nمشخصات:\r\n\r\n- سایز باتری:\r\n  - 18650\r\n  - 21700\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های ویپ پشتیبانی‌کننده از باتری 18650 یا 21700\r\n\r\nویژگی‌های اصلی:\r\n\r\n- پشتیبانی از دو سایز رایج باتری ویپ\r\n- مناسب دستگاه‌های حرفه‌ای باتری‌خور\r\n\r\nنقاط قوت:\r\n\r\n- کاربرد گسترده‌تر به دلیل دو سایز مختلف\r\n- امکان استفاده در دستگاه‌های مختلف\r\n\r\nنقاط ضعف:\r\n\r\n- باید سایز مناسب دستگاه انتخاب شود\r\n\r\nجمع‌بندی:\r\n\r\nباتری Gorilla Vape برای کاربران دستگاه‌های ویپ حرفه‌ای که از باتری‌های قابل تعویض استفاده می‌کنند.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "UFO Selection", "Gorilla Vape Battery 18650/21700", "یوفوپاف"],
     attributes: [
       {
@@ -12086,8 +12086,8 @@ export const importedProducts: Product[] = [
       "باتری سونیک سل 2200 میلی‌آمپر (Soniccell 2200mAh Battery) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nباتری ویپ\r\n\r\nمشخصات:\r\n\r\n- ظرفیت: 2200mAh\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با این نوع باتری\r\n\r\nویژگی‌های اصلی:\r\n\r\n- ظرفیت 2200 میلی‌آمپر\r\n- مناسب استفاده روزمره\r\n\r\nنقاط قوت:\r\n\r\n- ظرفیت مناسب\r\n- مناسب برای استفاده طولانی‌تر\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\n\r\nباتری Soniccell 2200mAh یک باتری مناسب برای دستگاه‌های سازگار با این ظرفیت است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "UFO Selection", "Soniccell 2200mAh Battery", "یوفوپاف"],
     attributes: [
       {
@@ -12134,8 +12134,8 @@ export const importedProducts: Product[] = [
       "کارتریج آرگاس ۲ ووپو (VOOPOO Argus 2 Pod Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Argus 2 Pod Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سری Argus ووپو\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی برای سری Argus\r\n- تعویض آسان\r\n- مناسب استفاده روزانه\r\n\r\nنقاط قوت:\r\n\r\n- نصب و تعویض راحت\r\n- طراحی هماهنگ با دستگاه‌های Argus\r\n\r\nنقاط ضعف:\r\n\r\n- فقط برای دستگاه‌های سازگار قابل استفاده است\r\n\r\nجمع‌بندی:\r\n\r\nکارتریج جایگزین برای دستگاه‌های سری Argus ووپو.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "VOOPOO", "VOOPOO Argus 2 Pod Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -12182,8 +12182,8 @@ export const importedProducts: Product[] = [
       "کارتریج آرگاس تاپ فیل ۳ میل نسخه ۲ (VOOPOO Argus Top Fill Cartridge 3ml V2) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- ظرفیت: 3 میلی‌لیتر\r\n- نوع پر کردن: Top Fill\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سری Argus\r\n\r\nویژگی‌های اصلی:\r\n\r\n- پر شدن مایع از قسمت بالا\r\n- ظرفیت مناسب 3 میلی‌لیتر\r\n- طراحی مخصوص Argus\r\n\r\nنقاط قوت:\r\n\r\n- پر کردن راحت‌تر\r\n- ظرفیت مناسب مصرف روزانه\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\n\r\nکارتریج 3 میلی‌لیتری Argus با طراحی Top Fill برای استفاده راحت‌تر.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "VOOPOO", "VOOPOO Argus Top Fill Cartridge 3ml V2", "یوفوپاف"],
     attributes: [
       {
@@ -12234,8 +12234,8 @@ export const importedProducts: Product[] = [
       "کارتریج آرگاس ۳ میل (Argus Cartridge 3ml) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- ظرفیت: 3 میلی‌لیتر\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سری Argus\r\n\r\nویژگی‌های اصلی:\r\n\r\n- ظرفیت 3 میلی‌لیتر\r\n- طراحی مخصوص دستگاه‌های Argus\r\n\r\nنقاط قوت:\r\n\r\n- حجم مناسب\r\n- تعویض آسان\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار Argus\r\n\r\nجمع‌بندی:\r\n\r\nکارتریج 3 میلی‌لیتری ووپو Argus برای جایگزینی کارتریج دستگاه‌های سازگار.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "UFO Selection", "Argus Cartridge 3ml", "یوفوپاف"],
     attributes: [
       {
@@ -12282,8 +12282,8 @@ export const importedProducts: Product[] = [
       "کارتریج اسپایر سایبر X TSX سه میل (Aspire Cyber X TSX Pod Cartridge 3ml) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- ظرفیت: 3 میلی‌لیتر\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Aspire Cyber X\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Cyber X\r\n- ظرفیت 3 میلی‌لیتر\r\n\r\nنقاط قوت:\r\n\r\n- حجم مناسب\r\n- سازگاری اختصاصی با دستگاه\r\n\r\nنقاط ضعف:\r\n\r\n- فقط مناسب دستگاه‌های سازگار Aspire\r\n\r\nجمع‌بندی:\r\n\r\nکارتریج جایگزین Aspire Cyber X با ظرفیت 3 میلی‌لیتر.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Aspire", "Aspire Cyber X TSX Pod Cartridge 3ml", "یوفوپاف"],
     attributes: [
       {
@@ -12330,8 +12330,8 @@ export const importedProducts: Product[] = [
       "کارتریج اسپایر گو‌تک 0.6 اهم (Aspire Gotek Pod Cartridge 0.6Ω) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مقاومت: 0.6Ω\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Aspire Gotek\r\n\r\nویژگی‌های اصلی:\r\n\r\n- کویل داخلی با مقاومت 0.6 اهم\r\n- مناسب برای بخاردهی بیشتر نسبت به مقاومت‌های بالاتر\r\n\r\nنقاط قوت:\r\n\r\n- بخاردهی مناسب\r\n- طعم‌دهی خوب\r\n\r\nنقاط ضعف:\r\n\r\n- مصرف مایع بیشتر نسبت به اهم‌های بالاتر\r\n\r\nجمع‌بندی:\r\n\r\nکارتریج 0.6 اهم Aspire Gotek برای کاربرانی که بخار و کام قوی‌تر می‌خواهند.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Aspire", "Aspire Gotek Pod Cartridge 0.6Ω", "یوفوپاف"],
     attributes: [
       {
@@ -12381,8 +12381,8 @@ export const importedProducts: Product[] = [
       "کارتریج اسمُک سولاس (SMOK Solus Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: SMOK Solus Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سری SMOK Solus\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی برای Solus\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- استفاده راحت\r\n- نصب سریع\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های Solus\r\n\r\nجمع‌بندی:\r\n\r\nکارتریج جایگزین SMOK Solus برای استفاده در دستگاه‌های سازگار.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "SMOK", "SMOK Solus Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -12429,8 +12429,8 @@ export const importedProducts: Product[] = [
       "اسمُک نورد ۴ (SMOK Nord 4) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nدستگاه پاد ماد\r\n\r\nمشخصات:\r\n\r\n- مدل: Nord 4\r\n- برند: SMOK\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- کارتریج‌ها و کویل‌های سازگار با SMOK Nord 4\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی قابل حمل\r\n- مناسب استفاده روزمره\r\n- پشتیبانی از کارتریج و کویل‌های سری Nord\r\n\r\nنقاط قوت:\r\n\r\n- طراحی جمع‌وجور\r\n- قابلیت استفاده با کارتریج قابل تعویض\r\n- مناسب برای کاربران مبتدی و متوسط\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به قطعات سازگار با سری Nord\r\n\r\nجمع‌بندی:\r\nSMOK Nord 4 یک پاد ماد قابل حمل از برند SMOK است که با سیستم کارتریج و کویل‌های سری Nord کار می‌کند و برای استفاده روزمره طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد سیستم", "SMOK", "SMOK Nord 4", "یوفوپاف"],
     attributes: [
       {
@@ -12485,8 +12485,8 @@ export const importedProducts: Product[] = [
       "کارتریج پاوا (Pava Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Pava Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با کارتریج Pava\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص دستگاه‌های Pava\r\n- قابلیت تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- استفاده راحت\r\n- تعویض سریع کارتریج\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکارتریج Pava یک کارتریج جایگزین برای دستگاه‌های سازگار با این مدل است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "UFO Selection", "Pava Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -12533,8 +12533,8 @@ export const importedProducts: Product[] = [
       "کارتریج ووپو درگ نانو ۲ (VOOPOO Drag Nano 2 Pod) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Drag Nano 2 Pod\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- VOOPOO Drag Nano 2\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی برای Drag Nano 2\r\n- نصب و تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- سازگاری کامل با دستگاه\r\n- استفاده آسان\r\n\r\nنقاط ضعف:\r\n\r\n- فقط برای دستگاه‌های سازگار با Drag Nano 2\r\n\r\nجمع‌بندی:\r\nکارتریج VOOPOO Drag Nano 2 یک قطعه مصرفی اصلی برای دستگاه Drag Nano 2 است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "VOOPOO", "VOOPOO Drag Nano 2 Pod", "یوفوپاف"],
     attributes: [
       {
@@ -12581,8 +12581,8 @@ export const importedProducts: Product[] = [
       "کارتریج ویپرسو ایکس‌راس (Vaporesso XROS Pods) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- سری محصول: XROS Pods\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سری Vaporesso XROS\r\n\r\nویژگی‌های اصلی:\r\n\r\n- سازگار با خانواده XROS\r\n- طراحی مناسب برای استفاده روزانه\r\n\r\nنقاط قوت:\r\n\r\n- تنوع سازگاری با دستگاه‌های XROS\r\n- استفاده راحت\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سری XROS\r\n\r\nجمع‌بندی:\r\nکارتریج Vaporesso XROS Pods برای دستگاه‌های خانواده XROS طراحی شده و یکی از قطعات مصرفی اصلی این سری است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Vaporesso", "Vaporesso XROS Pods", "یوفوپاف"],
     attributes: [
       {
@@ -12629,8 +12629,8 @@ export const importedProducts: Product[] = [
       "گیک‌ویپ ایجیس نانو (Geekvape Aegis Nano) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nدستگاه پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Aegis Nano\r\n- برند: Geekvape\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- کارتریج‌های سازگار با Geekvape Aegis Nano\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی کوچک و قابل حمل\r\n- مناسب استفاده روزمره\r\n- طراحی مقاوم سری Aegis\r\n\r\nنقاط قوت:\r\n\r\n- ابعاد کوچک\r\n- حمل آسان\r\n- طراحی مقاوم\r\n\r\nنقاط ضعف:\r\n\r\n- ظرفیت و قدرت محدودتر نسبت به دستگاه‌های بزرگ‌تر\r\n\r\nجمع‌بندی:\r\nGeekvape Aegis Nano یک پاد کوچک و قابل حمل از سری Aegis است که برای استفاده روزمره ساخته شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد سیستم", "GeekVape", "Geekvape Aegis Nano", "یوفوپاف"],
     attributes: [
       {
@@ -12681,8 +12681,8 @@ export const importedProducts: Product[] = [
       "کارتریج اورسا مینی لاست ویپ (Lost Vape Ursa Mini Pod Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Ursa Mini Pod Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Lost Vape Ursa Mini\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Ursa Mini\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- سازگاری اختصاصی\r\n- استفاده راحت\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سری Ursa Mini\r\n\r\nجمع‌بندی:\r\nکارتریج Lost Vape Ursa Mini برای جایگزینی کارتریج دستگاه Ursa Mini طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Lost Vape", "Lost Vape Ursa Mini Pod Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -12729,8 +12729,8 @@ export const importedProducts: Product[] = [
       "کارتریج اورسا نانو لاست ویپ (Lost Vape Ursa Nano Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Ursa Nano Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Lost Vape Ursa Nano\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Ursa Nano\r\n- نصب آسان\r\n\r\nنقاط قوت:\r\n\r\n- سازگاری مناسب\r\n- تعویض سریع\r\n\r\nنقاط ضعف:\r\n\r\n- فقط برای دستگاه‌های سازگار Ursa Nano\r\n\r\nجمع‌بندی:\r\nکارتریج Lost Vape Ursa Nano یک کارتریج جایگزین برای دستگاه‌های سری Ursa Nano است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Lost Vape", "Lost Vape Ursa Nano Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -12777,8 +12777,8 @@ export const importedProducts: Product[] = [
       "کارتریج اورسا ورژن ۳ لاست ویپ (Lost Vape Ursa Cartridge V3) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Ursa Cartridge V3\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سری Lost Vape Ursa\r\n\r\nویژگی‌های اصلی:\r\n\r\n- نسخه V3 سری Ursa\r\n- طراحی اختصاصی Lost Vape\r\n\r\nنقاط قوت:\r\n\r\n- سازگاری با خانواده Ursa\r\n- استفاده آسان\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکارتریج Lost Vape Ursa V3 نسخه جدیدتر از خانواده کارتریج‌های Ursa است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Lost Vape", "Lost Vape Ursa Cartridge V3", "یوفوپاف"],
     attributes: [
       {
@@ -12825,8 +12825,8 @@ export const importedProducts: Product[] = [
       "کارتریج ای پلاس لاست ویپ (Lost Vape E Plus Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: E Plus Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Lost Vape E Plus\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی E Plus\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- نصب سریع\r\n- مناسب استفاده روزانه\r\n\r\nنقاط ضعف:\r\n\r\n- فقط برای دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکارتریج Lost Vape E Plus برای دستگاه‌های سری E Plus طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Lost Vape", "Lost Vape E Plus Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -12873,8 +12873,8 @@ export const importedProducts: Product[] = [
       "کارتریج اورسا (Ursa Pod) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Ursa Pod\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سری Lost Vape Ursa\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص سری Ursa\r\n- قابلیت تعویض\r\n\r\nنقاط قوت:\r\n\r\n- استفاده آسان\r\n- سازگاری با خانواده Ursa\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nUrsa Pod یک کارتریج جایگزین برای دستگاه‌های سازگار با سری Ursa از Lost Vape است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "UFO Selection", "Ursa Pod", "یوفوپاف"],
     attributes: [
       {
@@ -12921,8 +12921,8 @@ export const importedProducts: Product[] = [
       "کارتریج اکسا نکسلیم 4 میل (OXVA Nexlim Top Fill 4ml Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- ظرفیت: 4 میلی‌لیتر\r\n- نوع پر کردن: Top Fill\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- OXVA Nexlim\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی Top Fill برای پر کردن راحت‌تر\r\n- ظرفیت 4 میلی‌لیتر\r\n- مناسب دستگاه OXVA Nexlim\r\n\r\nنقاط قوت:\r\n\r\n- ظرفیت مناسب\r\n- پر کردن آسان\r\n- طراحی هماهنگ با دستگاه\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار با Nexlim\r\n\r\nجمع‌بندی:\r\nکارتریج OXVA Nexlim Top Fill با ظرفیت 4 میلی‌لیتر برای دستگاه Nexlim طراحی شده و برای استفاده روزانه مناسب است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "UFO Selection", "OXVA Nexlim Top Fill 4ml Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -12977,8 +12977,8 @@ export const importedProducts: Product[] = [
       "کارتریج اکسلایم (OXVA XLIM Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: XLIM Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سری OXVA XLIM\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی سری XLIM\r\n- تعویض آسان کارتریج\r\n\r\nنقاط قوت:\r\n\r\n- سازگاری با چند مدل از خانواده XLIM\r\n- استفاده آسان\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سری XLIM\r\n\r\nجمع‌بندی:\r\nکارتریج OXVA XLIM یک کارتریج مصرفی برای دستگاه‌های خانواده XLIM است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "UFO Selection", "OXVA XLIM Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -13025,8 +13025,8 @@ export const importedProducts: Product[] = [
       "کارتریج اسمُک نوو (SMOK Novo Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Novo Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سری SMOK Novo\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص سری Novo\r\n- استفاده آسان\r\n\r\nنقاط قوت:\r\n\r\n- نصب سریع\r\n- مناسب استفاده روزمره\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار Novo\r\n\r\nجمع‌بندی:\r\nکارتریج SMOK Novo برای دستگاه‌های سری Novo طراحی شده و جایگزین مناسبی برای کارتریج اصلی است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "SMOK", "SMOK Novo Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -13073,8 +13073,8 @@ export const importedProducts: Product[] = [
       "کارتریج یوول کالیبرن G3 (Uwell Caliburn G3 Pod) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Caliburn G3 Pod\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Uwell Caliburn G3\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Caliburn G3\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- کیفیت ساخت مناسب\r\n- سازگاری کامل با دستگاه\r\n\r\nنقاط ضعف:\r\n\r\n- مخصوص سری G3\r\n\r\nجمع‌بندی:\r\nکارتریج Uwell Caliburn G3 برای دستگاه Caliburn G3 طراحی شده و یکی از قطعات مصرفی اصلی آن است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Uwell", "Uwell Caliburn G3 Pod", "یوفوپاف"],
     attributes: [
       {
@@ -13121,8 +13121,8 @@ export const importedProducts: Product[] = [
       "کارتریج کالیبرن G2 یوول (Uwell Caliburn G2 Pod) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Caliburn G2 Pod\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Uwell Caliburn G2\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Caliburn G2\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- استفاده راحت\r\n- سازگاری مناسب\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سری G2\r\n\r\nجمع‌بندی:\r\nکارتریج Uwell Caliburn G2 برای دستگاه Caliburn G2 ساخته شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Uwell", "Uwell Caliburn G2 Pod", "یوفوپاف"],
     attributes: [
       {
@@ -13169,8 +13169,8 @@ export const importedProducts: Product[] = [
       "یوول کالیبرن X (Uwell Caliburn X) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nدستگاه پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Caliburn X\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- کارتریج‌های سازگار با Caliburn X\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی قابل حمل\r\n- مناسب استفاده روزمره\r\n\r\nنقاط قوت:\r\n\r\n- طراحی جمع‌وجور\r\n- استفاده آسان\r\n\r\nنقاط ضعف:\r\n\r\n- نیازمند قطعات سازگار مخصوص\r\n\r\nجمع‌بندی:\r\nUwell Caliburn X یک دستگاه پاد از خانواده Caliburn است که برای استفاده روزمره طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد سیستم", "Uwell", "Uwell Caliburn X", "یوفوپاف"],
     attributes: [
       {
@@ -13217,8 +13217,8 @@ export const importedProducts: Product[] = [
       "یوول کالیبرن A3 (Uwell Caliburn A3) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nدستگاه پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Caliburn A3\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- کارتریج‌های سازگار با Caliburn A3\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی باریک و سبک\r\n- مناسب استفاده روزانه\r\n\r\nنقاط قوت:\r\n\r\n- قابل حمل\r\n- کاربری ساده\r\n\r\nنقاط ضعف:\r\n\r\n- محدودیت نسبت به دستگاه‌های حرفه‌ای‌تر\r\n\r\nجمع‌بندی:\r\nUwell Caliburn A3 یک پاد سبک و ساده برای مصرف روزمره است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد سیستم", "Uwell", "Uwell Caliburn A3", "یوفوپاف"],
     attributes: [
       {
@@ -13265,8 +13265,8 @@ export const importedProducts: Product[] = [
       "کارتریج ویپرسو لاکس XR (Vaporesso Luxe XR Empty Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Luxe XR Empty Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Vaporesso Luxe XR\r\n\r\nویژگی‌های اصلی:\r\n\r\n- کارتریج خالی قابل پر کردن\r\n- طراحی مخصوص Luxe XR\r\n\r\nنقاط قوت:\r\n\r\n- امکان انتخاب کویل مناسب\r\n- قابلیت پر کردن مجدد\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به کویل جداگانه\r\n\r\nجمع‌بندی:\r\nکارتریج خالی Vaporesso Luxe XR برای کاربران دستگاه Luxe XR که می‌خواهند کویل را جداگانه انتخاب کنند مناسب است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Vaporesso", "Vaporesso Luxe XR Empty Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -13313,8 +13313,8 @@ export const importedProducts: Product[] = [
       "کارتریج گالکس (Galex Pod Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Galex Pod Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با Galex\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Galex\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- استفاده راحت\r\n- نصب سریع\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکارتریج Galex Pod برای دستگاه‌های سری Galex طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "UFO Selection", "Galex Pod Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -13361,8 +13361,8 @@ export const importedProducts: Product[] = [
       "کارتریج ویپرسو زیرو S (Vaporesso Zero S Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Zero S Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Vaporesso Zero S\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی Zero S\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- سازگاری مناسب\r\n- استفاده راحت\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه Zero S\r\n\r\nجمع‌بندی:\r\nکارتریج Vaporesso Zero S یک قطعه مصرفی مخصوص دستگاه Zero S است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Vaporesso", "Vaporesso Zero S Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -13409,8 +13409,8 @@ export const importedProducts: Product[] = [
       "کارتریج فری‌مکس ایوو ایکس (FreeMax Evo X Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Evo X Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با FreeMax Evo X\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی برای سری Evo X\r\n- قابلیت تعویض آسان\r\n- مناسب استفاده روزانه\r\n\r\nنقاط قوت:\r\n\r\n- نصب راحت\r\n- طراحی هماهنگ با دستگاه\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار Evo X\r\n\r\nجمع‌بندی:\r\nکارتریج FreeMax Evo X یک کارتریج جایگزین برای دستگاه‌های سازگار این سری است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "UFO Selection", "FreeMax Evo X Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -13457,8 +13457,8 @@ export const importedProducts: Product[] = [
       "کارتریج خالی بی 100 (B100 Empty Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج خالی پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: B100 Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با B100\r\n\r\nویژگی‌های اصلی:\r\n\r\n- کارتریج خالی قابل پر کردن\r\n- امکان انتخاب کویل مناسب\r\n\r\nنقاط قوت:\r\n\r\n- قابلیت استفاده مجدد\r\n- امکان شخصی‌سازی کویل\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به تهیه کویل جداگانه\r\n\r\nجمع‌بندی:\r\nکارتریج خالی B100 برای کاربرانی مناسب است که می‌خواهند کویل مورد نظر خود را انتخاب کنند.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "UFO Selection", "B100 Empty Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -13505,8 +13505,8 @@ export const importedProducts: Product[] = [
       "کارتریج خالی اسمُک نورد (SMOK Nord Empty Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج خالی پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Nord Empty Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سری SMOK Nord\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص سری Nord\r\n- قابلیت استفاده با کویل‌های سازگار\r\n\r\nنقاط قوت:\r\n\r\n- امکان تعویض کویل\r\n- استفاده اقتصادی‌تر\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به کویل جداگانه\r\n\r\nجمع‌بندی:\r\nکارتریج خالی SMOK Nord برای دستگاه‌های سری Nord طراحی شده و امکان تعویض کویل را فراهم می‌کند.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "SMOK", "SMOK Nord Empty Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -13553,8 +13553,8 @@ export const importedProducts: Product[] = [
       "کارتریج خالی اسمُک آر پی ام ۲ (SMOK Empty Cartridge RPM2) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج خالی پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: RPM2 Empty Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سیستم RPM2 اسمُک\r\n\r\nویژگی‌های اصلی:\r\n\r\n- پشتیبانی از کویل‌های RPM2\r\n- قابلیت پر کردن مجدد\r\n\r\nنقاط قوت:\r\n\r\n- امکان تعویض کویل\r\n- کاهش هزینه مصرفی\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به کویل RPM2 جداگانه\r\n\r\nجمع‌بندی:\r\nکارتریج خالی SMOK RPM2 برای دستگاه‌های دارای پشتیبانی از کویل‌های RPM2 مناسب است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "SMOK", "SMOK Empty Cartridge RPM2", "یوفوپاف"],
     attributes: [
       {
@@ -13601,8 +13601,8 @@ export const importedProducts: Product[] = [
       "کارتریج تلمئا نکسوس (Thelema Nexus Empty Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج خالی پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Thelema Nexus Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Lost Vape Thelema Nexus\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Thelema Nexus\r\n- قابلیت پر کردن مجدد\r\n\r\nنقاط قوت:\r\n\r\n- استفاده آسان\r\n- طراحی هماهنگ با دستگاه\r\n\r\nنقاط ضعف:\r\n\r\n- فقط برای دستگاه سازگار\r\n\r\nجمع‌بندی:\r\nکارتریج Thelema Nexus یک قطعه جایگزین برای دستگاه Lost Vape Thelema Nexus است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "UFO Selection", "Thelema Nexus Empty Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -13649,8 +13649,8 @@ export const importedProducts: Product[] = [
       "کارتریج اسمُک نورد (SMOK Nord Pod) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Nord Pod\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سری SMOK Nord\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Nord\r\n- قابلیت تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- سازگاری با خانواده Nord\r\n- استفاده راحت\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سری Nord\r\n\r\nجمع‌بندی:\r\nکارتریج SMOK Nord برای دستگاه‌های خانواده Nord طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "SMOK", "SMOK Nord Pod", "یوفوپاف"],
     attributes: [
       {
@@ -13697,8 +13697,8 @@ export const importedProducts: Product[] = [
       "کارتریج ووپو وینچی (VOOPOO Vinci Pod) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Vinci Pod\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سری VOOPOO Vinci\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Vinci\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- سازگاری مناسب\r\n- استفاده راحت\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار Vinci\r\n\r\nجمع‌بندی:\r\nکارتریج VOOPOO Vinci یک قطعه مصرفی برای دستگاه‌های سری Vinci است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "VOOPOO", "VOOPOO Vinci Pod", "یوفوپاف"],
     attributes: [
       {
@@ -13745,8 +13745,8 @@ export const importedProducts: Product[] = [
       "کارتریج ووپو آرگاس اسنپ پی ۳ (VOOPOO Argus Snap Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Argus Snap Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- VOOPOO Argus Snap\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی Argus Snap\r\n- تعویض سریع\r\n\r\nنقاط قوت:\r\n\r\n- نصب آسان\r\n- سازگاری اختصاصی\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به Argus Snap\r\n\r\nجمع‌بندی:\r\nکارتریج VOOPOO Argus Snap برای دستگاه Argus Snap ساخته شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "VOOPOO", "VOOPOO Argus Snap Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -13793,8 +13793,8 @@ export const importedProducts: Product[] = [
       "کارتریج آرگاس (Argus Pod) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Argus Pod\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سری VOOPOO Argus\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص سری Argus\r\n- قابلیت تعویض\r\n\r\nنقاط قوت:\r\n\r\n- سازگاری با خانواده Argus\r\n- استفاده ساده\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکارتریج Argus Pod یک قطعه مصرفی برای دستگاه‌های سری Argus ووپو است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "UFO Selection", "Argus Pod", "یوفوپاف"],
     attributes: [
       {
@@ -13841,8 +13841,8 @@ export const importedProducts: Product[] = [
       "کارتریج گیک‌ویپ Q تاپ فیل (Geekvape Q Cartridge Top Fill Version) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- نوع: Top Fill Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سری Geekvape Q\r\n\r\nویژگی‌های اصلی:\r\n\r\n- پر شدن از قسمت بالا\r\n- طراحی مخصوص سری Q\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- پر کردن راحت‌تر\r\n- کاهش احتمال نشتی\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سری Q\r\n\r\nجمع‌بندی:\r\nکارتریج Geekvape Q Top Fill نسخه‌ای با طراحی پر کردن از بالا برای دستگاه‌های سازگار سری Q است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "GeekVape", "Geekvape Q Cartridge Top Fill Version", "یوفوپاف"],
     attributes: [
       {
@@ -13889,8 +13889,8 @@ export const importedProducts: Product[] = [
       "کارتریج گیک‌ویپ U (Geekvape U Pod Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: U Pod Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سری Geekvape U\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی سری U\r\n- تعویض آسان کارتریج\r\n- مناسب استفاده روزانه\r\n\r\nنقاط قوت:\r\n\r\n- نصب سریع\r\n- سازگاری مناسب با دستگاه‌های سری U\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار Geekvape U\r\n\r\nجمع‌بندی:\r\nکارتریج Geekvape U برای دستگاه‌های سری U طراحی شده و یک قطعه مصرفی قابل تعویض است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "GeekVape", "Geekvape U Pod Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -13937,8 +13937,8 @@ export const importedProducts: Product[] = [
       "کارتریج گیک‌ویپ وینکس M1 (Geekvape Wenax M1 Pod) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Wenax M1 Pod\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Geekvape Wenax M1\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Wenax M1\r\n- نصب و تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- استفاده راحت\r\n- سازگاری کامل با دستگاه\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به Wenax M1\r\n\r\nجمع‌بندی:\r\nکارتریج Geekvape Wenax M1 برای دستگاه Wenax M1 ساخته شده و برای مصرف روزمره مناسب است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "GeekVape", "Geekvape Wenax M1 Pod", "یوفوپاف"],
     attributes: [
       {
@@ -13985,8 +13985,8 @@ export const importedProducts: Product[] = [
       "ویپرسو لاکس XR (Vaporesso Luxe XR) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nدستگاه پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Luxe XR\r\n- برند: Vaporesso\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- کارتریج‌ها و کویل‌های سازگار با Luxe XR\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مدرن\r\n- پشتیبانی از کارتریج‌های قابل تعویض\r\n- مناسب استفاده روزانه\r\n\r\nنقاط قوت:\r\n\r\n- کیفیت ساخت مناسب\r\n- قابلیت شخصی‌سازی با کارتریج و کویل\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به قطعات مصرفی مخصوص\r\n\r\nجمع‌بندی:\r\nVaporesso Luxe XR یک دستگاه پاد قابل تنظیم از برند ویپرسو است که برای کاربران روزمره طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد سیستم", "Vaporesso", "Vaporesso Luxe XR", "یوفوپاف"],
     attributes: [
       {
@@ -14037,8 +14037,8 @@ export const importedProducts: Product[] = [
       "کارتریج گیک‌ویپ B60 (Geekvape B60 Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: B60 Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Geekvape B60\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص B60\r\n- قابلیت تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- نصب سریع\r\n- سازگاری اختصاصی\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه B60\r\n\r\nجمع‌بندی:\r\nکارتریج Geekvape B60 یک قطعه مصرفی مخصوص دستگاه B60 است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "GeekVape", "Geekvape B60 Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -14085,8 +14085,8 @@ export const importedProducts: Product[] = [
       "کارتریج گیک‌ویپ ایجیس بوست لاکچری (Geekvape Aegis Boost Luxury Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Aegis Boost Luxury Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سری Aegis Boost\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مقاوم سری Aegis Boost\r\n- قابلیت تعویض\r\n\r\nنقاط قوت:\r\n\r\n- سازگاری مناسب\r\n- کیفیت ساخت خوب\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکارتریج Geekvape Aegis Boost Luxury برای دستگاه‌های سری Aegis Boost طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "GeekVape", "Geekvape Aegis Boost Luxury Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -14133,8 +14133,8 @@ export const importedProducts: Product[] = [
       "کارتریج گیک‌ویپ Q ساید فیل (Geekvape Q Cartridge Side Fill) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- نوع پر کردن: Side Fill\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سری Geekvape Q\r\n\r\nویژگی‌های اصلی:\r\n\r\n- پر شدن از قسمت کناری\r\n- طراحی مخصوص سری Q\r\n\r\nنقاط قوت:\r\n\r\n- استفاده آسان\r\n- تعویض سریع\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سری Q\r\n\r\nجمع‌بندی:\r\nکارتریج Geekvape Q Side Fill نسخه‌ای از کارتریج‌های سری Q با سیستم پر کردن از کنار است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "GeekVape", "Geekvape Q Cartridge Side Fill", "یوفوپاف"],
     attributes: [
       {
@@ -14181,8 +14181,8 @@ export const importedProducts: Product[] = [
       "کارتریج کیو ساندر (Q Sonder Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Q Sonder Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با Q Sonder\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص دستگاه Q Sonder\r\n- قابلیت تعویض\r\n\r\nنقاط قوت:\r\n\r\n- نصب آسان\r\n- استفاده راحت\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکارتریج Q Sonder برای دستگاه‌های سری Q Sonder طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "UFO Selection", "Q Sonder Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -14229,8 +14229,8 @@ export const importedProducts: Product[] = [
       "کارتریج یوول دیلون EM (Uwell Dillon EM Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Dillon EM Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Uwell Dillon EM\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی Dillon EM\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- سازگاری مناسب\r\n- استفاده راحت\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه Dillon EM\r\n\r\nجمع‌بندی:\r\nکارتریج Uwell Dillon EM قطعه مصرفی مخصوص دستگاه Dillon EM است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Uwell", "Uwell Dillon EM Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -14277,8 +14277,8 @@ export const importedProducts: Product[] = [
       "کارتریج GPP Alpha (GPP Alpha Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: GPP Alpha Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با GPP Alpha\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی\r\n- قابلیت تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- استفاده ساده\r\n- نصب سریع\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکارتریج GPP Alpha برای دستگاه‌های سازگار با این سیستم طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "UFO Selection", "GPP Alpha Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -14325,8 +14325,8 @@ export const importedProducts: Product[] = [
       "کارتریج یوول اکسپلورر (Uwell Explorer Empty Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج خالی پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Explorer Empty Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Uwell Explorer\r\n\r\nویژگی‌های اصلی:\r\n\r\n- کارتریج خالی قابل پر کردن\r\n- امکان استفاده مجدد\r\n\r\nنقاط قوت:\r\n\r\n- قابلیت پر کردن دوباره\r\n- امکان انتخاب کویل مناسب\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به کویل یا قطعات سازگار\r\n\r\nجمع‌بندی:\r\nکارتریج خالی Uwell Explorer برای دستگاه Explorer طراحی شده و امکان استفاده مجدد را فراهم می‌کند.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Uwell", "Uwell Explorer Empty Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -14373,8 +14373,8 @@ export const importedProducts: Product[] = [
       "کارتریج گیک‌ویپ U (Geekvape U Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: U Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سری Geekvape U\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی برای سری U\r\n- تعویض سریع و آسان\r\n- مناسب استفاده روزمره\r\n\r\nنقاط قوت:\r\n\r\n- نصب راحت\r\n- سازگاری مناسب با دستگاه‌های سری U\r\n\r\nنقاط ضعف:\r\n\r\n- فقط مناسب دستگاه‌های سازگار Geekvape U\r\n\r\nجمع‌بندی:\r\nکارتریج Geekvape U یک کارتریج مصرفی استاندارد برای دستگاه‌های سری U گیک‌ویپ است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "GeekVape", "Geekvape U Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -14421,8 +14421,8 @@ export const importedProducts: Product[] = [
       "کارتریج ویپرسو لاکس X (Vaporesso Luxe X Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Luxe X Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Vaporesso Luxe X\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی اختصاصی Luxe X\r\n- تعویض آسان\r\n- سازگار با سیستم کویل‌های مخصوص Luxe X\r\n\r\nنقاط قوت:\r\n\r\n- کیفیت ساخت مناسب\r\n- استفاده آسان\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه Luxe X\r\n\r\nجمع‌بندی:\r\nکارتریج Vaporesso Luxe X برای دستگاه Luxe X طراحی شده و گزینه‌ای مناسب برای جایگزینی کارتریج اصلی است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Vaporesso", "Vaporesso Luxe X Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -14469,8 +14469,8 @@ export const importedProducts: Product[] = [
       "ویپرسو لاکس PM40 (Vaporesso Luxe PM40) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nدستگاه پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Luxe PM40\r\n- برند: Vaporesso\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- کارتریج‌ها و کویل‌های سازگار با Luxe PM40\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی قابل حمل\r\n- پشتیبانی از کویل‌های GTX\r\n- مناسب برای استفاده روزمره\r\n\r\nنقاط قوت:\r\n\r\n- کیفیت ساخت خوب\r\n- قابلیت تنظیم و شخصی‌سازی\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به قطعات مصرفی مخصوص\r\n\r\nجمع‌بندی:\r\nVaporesso Luxe PM40 یک دستگاه پاد قدرتمند با پشتیبانی از کویل‌های GTX است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد سیستم", "Vaporesso", "Vaporesso Luxe PM40", "یوفوپاف"],
     attributes: [
       {
@@ -14521,8 +14521,8 @@ export const importedProducts: Product[] = [
       "کارتریج ویپرسو لاکس Q (Vaporesso Luxe Q Pod) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Luxe Q Pod\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Vaporesso Luxe Q\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Luxe Q\r\n- نصب آسان\r\n- مناسب مصرف روزانه\r\n\r\nنقاط قوت:\r\n\r\n- استفاده ساده\r\n- کیفیت ساخت مناسب\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه Luxe Q\r\n\r\nجمع‌بندی:\r\nکارتریج Vaporesso Luxe Q برای دستگاه Luxe Q طراحی شده و تعویض آن بسیار آسان است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Vaporesso", "Vaporesso Luxe Q Pod", "یوفوپاف"],
     attributes: [
       {
@@ -14569,8 +14569,8 @@ export const importedProducts: Product[] = [
       "گیک‌ویپ وینکس K1 (Geekvape Wenax K1 2ml) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nدستگاه پاد\r\n\r\nمشخصات:\r\n\r\n- ظرفیت کارتریج: 2 میلی‌لیتر\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- کارتریج‌های سازگار با Geekvape Wenax K1\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی باریک و سبک\r\n- مناسب استفاده روزانه\r\n- ظرفیت 2 میلی‌لیتر\r\n\r\nنقاط قوت:\r\n\r\n- حمل آسان\r\n- مصرف اقتصادی\r\n\r\nنقاط ضعف:\r\n\r\n- ظرفیت کمتر نسبت به بعضی مدل‌ها\r\n\r\nجمع‌بندی:\r\nGeekvape Wenax K1 یک پاد سبک و ساده با کاربری آسان برای استفاده روزمره است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد سیستم", "GeekVape", "Geekvape Wenax K1 2ml", "یوفوپاف"],
     attributes: [
       {
@@ -14617,8 +14617,8 @@ export const importedProducts: Product[] = [
       "کارتریج ویپرسو XROS COREX 3 (Vaporesso XROS COREX 3 Cartridge 3ml) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- ظرفیت: 3 میلی‌لیتر\r\n- تکنولوژی: COREX\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سری Vaporesso XROS\r\n\r\nویژگی‌های اصلی:\r\n\r\n- تکنولوژی COREX برای طعم بهتر\r\n- ظرفیت 3 میلی‌لیتر\r\n- طراحی مخصوص سری XROS\r\n\r\nنقاط قوت:\r\n\r\n- طعم‌دهی بهتر\r\n- عمر مناسب کویل داخلی\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سری XROS\r\n\r\nجمع‌بندی:\r\nکارتریج Vaporesso XROS COREX 3 با ظرفیت 3 میلی‌لیتر یکی از کارتریج‌های جدید سری XROS با تمرکز روی طعم‌دهی بهتر است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Vaporesso", "Vaporesso XROS COREX 3 Cartridge 3ml", "یوفوپاف"],
     attributes: [
       {
@@ -14669,8 +14669,8 @@ export const importedProducts: Product[] = [
       "کارتریج ویپرسو اکو نانو (Vaporesso Eco Nano Pod) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Eco Nano Pod\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Vaporesso Eco Nano\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Eco Nano\r\n- استفاده آسان\r\n- تعویض سریع\r\n\r\nنقاط قوت:\r\n\r\n- مصرف آسان\r\n- مناسب استفاده روزانه\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه Eco Nano\r\n\r\nجمع‌بندی:\r\nکارتریج Vaporesso Eco Nano برای دستگاه Eco Nano طراحی شده و گزینه‌ای ساده برای مصرف روزمره است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Vaporesso", "Vaporesso Eco Nano Pod", "یوفوپاف"],
     attributes: [
       {
@@ -14717,8 +14717,8 @@ export const importedProducts: Product[] = [
       "ویپرسو اوسمال 2 (Vaporesso OSMALL 2) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nدستگاه پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: OSMALL 2\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- کارتریج‌های سازگار با Vaporesso OSMALL 2\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی کوچک و قابل حمل\r\n- مناسب استفاده روزانه\r\n\r\nنقاط قوت:\r\n\r\n- اندازه کوچک\r\n- استفاده آسان\r\n\r\nنقاط ضعف:\r\n\r\n- امکانات کمتر نسبت به دستگاه‌های حرفه‌ای\r\n\r\nجمع‌بندی:\r\nVaporesso OSMALL 2 یک دستگاه پاد کوچک و ساده برای استفاده روزمره است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد سیستم", "Vaporesso", "Vaporesso OSMALL 2", "یوفوپاف"],
     attributes: [
       {
@@ -14765,8 +14765,8 @@ export const importedProducts: Product[] = [
       "کارتریج ویپرسو آرمور G (Vaporesso Armour G Empty Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج خالی پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Armour G Empty Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Vaporesso Armour G\r\n\r\nویژگی‌های اصلی:\r\n\r\n- کارتریج خالی قابل پر کردن\r\n- قابلیت استفاده با کویل‌های سازگار\r\n\r\nنقاط قوت:\r\n\r\n- امکان انتخاب کویل\r\n- قابلیت پر کردن مجدد\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به کویل جداگانه\r\n\r\nجمع‌بندی:\r\nکارتریج خالی Vaporesso Armour G برای کاربران دستگاه Armour G که نیاز به تعویض کارتریج دارند مناسب است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Vaporesso", "Vaporesso Armour G Empty Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -14813,8 +14813,8 @@ export const importedProducts: Product[] = [
       "کویل ویپرسو GTI (Vaporesso GTI Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: GTI Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌ها و تانک‌های سازگار با کویل GTI ویپرسو\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مش برای بخاردهی بهتر\r\n- مناسب دستگاه‌های توان بالاتر\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- طعم‌دهی مناسب\r\n- تولید بخار خوب\r\n\r\nنقاط ضعف:\r\n\r\n- مصرف مایع بیشتر نسبت به کویل‌های کم‌مصرف\r\n\r\nجمع‌بندی:\r\nکویل Vaporesso GTI برای دستگاه‌های سازگار با سیستم GTI طراحی شده و بیشتر مناسب افرادی است که بخار و طعم بیشتری می‌خواهند.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "Vaporesso", "Vaporesso GTI Coil", "یوفوپاف"],
     attributes: [
       {
@@ -14861,8 +14861,8 @@ export const importedProducts: Product[] = [
       "کویل گیک‌ویپ P Mesh (Geekvape P Mesh Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: P Mesh Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌ها و تانک‌های سازگار با سری کویل P گیک‌ویپ\r\n\r\nویژگی‌های اصلی:\r\n\r\n- ساختار Mesh برای افزایش سطح حرارت\r\n- تولید بخار بیشتر\r\n- بهبود طعم‌دهی\r\n\r\nنقاط قوت:\r\n\r\n- طعم‌دهی قوی\r\n- بخاردهی بالا\r\n\r\nنقاط ضعف:\r\n\r\n- مصرف جویس بیشتر نسبت به کویل‌های کم‌توان\r\n\r\nجمع‌بندی:\r\nکویل Geekvape P Mesh برای کاربرانی مناسب است که بخار زیاد و طعم قوی‌تر را ترجیح می‌دهند.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "GeekVape", "Geekvape P Mesh Coil", "یوفوپاف"],
     attributes: [
       {
@@ -14909,8 +14909,8 @@ export const importedProducts: Product[] = [
       "کویل گیک‌ویپ P (Geekvape P Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: P Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌ها و تانک‌های سازگار با سری P گیک‌ویپ\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص سری P\r\n- عملکرد پایدار\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- عمر مناسب\r\n- عملکرد قابل اعتماد\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به دستگاه سازگار با سری P\r\n\r\nجمع‌بندی:\r\nکویل Geekvape P یک کویل استاندارد برای دستگاه‌های سازگار گیک‌ویپ است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "GeekVape", "Geekvape P Coil", "یوفوپاف"],
     attributes: [
       {
@@ -14957,8 +14957,8 @@ export const importedProducts: Product[] = [
       "کویل بی (B Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: B Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سری B Coil گیک‌ویپ\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص سری B\r\n- مناسب استفاده روزانه\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- دسترسی آسان\r\n- عملکرد مناسب\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکویل B یک گزینه مصرفی برای دستگاه‌های پشتیبانی‌کننده از این سری کویل است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "UFO Selection", "B Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15005,8 +15005,8 @@ export const importedProducts: Product[] = [
       "کویل اولترا بوست V2 (Ultra Boost V2 Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: Ultra Boost V2\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با کویل Ultra Boost\r\n\r\nویژگی‌های اصلی:\r\n\r\n- نسل جدید کویل Ultra Boost\r\n- طعم‌دهی بهتر\r\n- تولید بخار مناسب\r\n\r\nنقاط قوت:\r\n\r\n- عملکرد بهتر نسبت به نسل‌های قدیمی\r\n- طعم‌دهی قوی\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکویل Ultra Boost V2 برای دستگاه‌های Lost Vape دارای پشتیبانی از این سیستم طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "UFO Selection", "Ultra Boost V2 Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15053,8 +15053,8 @@ export const importedProducts: Product[] = [
       "کویل اسمُک نورد (SMOK Nord Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: Nord Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سری SMOK Nord\r\n\r\nویژگی‌های اصلی:\r\n\r\n- سازگار با خانواده Nord\r\n- تنوع مقاومت‌های مختلف\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- تنوع انتخاب\r\n- مناسب استفاده روزمره\r\n\r\nنقاط ضعف:\r\n\r\n- فقط برای دستگاه‌های سازگار Nord\r\n\r\nجمع‌بندی:\r\nکویل SMOK Nord یک کویل محبوب برای دستگاه‌های سری Nord اسمُک است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "SMOK", "SMOK Nord Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15101,8 +15101,8 @@ export const importedProducts: Product[] = [
       "کویل اسمُک RPM (SMOK RPM Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: RPM Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های دارای پشتیبانی از کویل RPM اسمُک\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی Mesh در برخی مدل‌ها\r\n- طعم‌دهی مناسب\r\n- تولید بخار خوب\r\n\r\nنقاط قوت:\r\n\r\n- تنوع مدل\r\n- عملکرد مناسب\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به دستگاه سازگار با RPM\r\n\r\nجمع‌بندی:\r\nکویل SMOK RPM یکی از سیستم‌های محبوب کویل اسمُک برای دستگاه‌های پاد و پاد ماد است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "SMOK", "SMOK RPM Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15149,8 +15149,8 @@ export const importedProducts: Product[] = [
       "کویل اسمُک RPM2 (SMOK RPM2 Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: RPM2 Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سیستم RPM2 اسمُک\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص RPM2\r\n- طعم‌دهی بهتر\r\n- تولید بخار مناسب\r\n\r\nنقاط قوت:\r\n\r\n- عملکرد قوی\r\n- نصب آسان\r\n\r\nنقاط ضعف:\r\n\r\n- با کویل‌های RPM معمولی سازگار نیست\r\n\r\nجمع‌بندی:\r\nکویل SMOK RPM2 برای دستگاه‌هایی که از سیستم RPM2 پشتیبانی می‌کنند مناسب است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "SMOK", "SMOK RPM2 Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15197,8 +15197,8 @@ export const importedProducts: Product[] = [
       "کارتریج یوول کالیبرن G3 پرو (Uwell Caliburn G3 Pro Pod) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Caliburn G3 Pro Pod\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Uwell Caliburn G3 Pro\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Caliburn G3 Pro\r\n- تعویض آسان\r\n- مناسب استفاده روزمره\r\n\r\nنقاط قوت:\r\n\r\n- کیفیت ساخت خوب\r\n- نصب راحت\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه Caliburn G3 Pro\r\n\r\nجمع‌بندی:\r\nکارتریج Uwell Caliburn G3 Pro قطعه مصرفی اصلی برای دستگاه Caliburn G3 Pro است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Uwell", "Uwell Caliburn G3 Pro Pod", "یوفوپاف"],
     attributes: [
       {
@@ -15245,8 +15245,8 @@ export const importedProducts: Product[] = [
       "کارتریج یوول کالیبرن G4 (Uwell Caliburn GPP G4 Cartridge) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Caliburn GPP G4 Cartridge\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سیستم GPP یوول\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی جدید سری GPP\r\n- تعویض آسان\r\n- مناسب طعم‌دهی بهتر\r\n\r\nنقاط قوت:\r\n\r\n- کیفیت ساخت مناسب\r\n- عملکرد پایدار\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به دستگاه سازگار با GPP\r\n\r\nجمع‌بندی:\r\nکارتریج Uwell Caliburn GPP G4 برای دستگاه‌های جدید سری Caliburn با سیستم GPP طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Uwell", "Uwell Caliburn GPP G4 Cartridge", "یوفوپاف"],
     attributes: [
       {
@@ -15293,8 +15293,8 @@ export const importedProducts: Product[] = [
       "یوول کالیبرن G (Uwell Caliburn G) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nدستگاه پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Caliburn G\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- کارتریج‌ها و کویل‌های سازگار با Caliburn G\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی جمع‌وجور\r\n- سیستم کویل قابل تعویض\r\n- مناسب استفاده روزانه\r\n\r\nنقاط قوت:\r\n\r\n- طعم‌دهی خوب\r\n- کاربری ساده\r\n\r\nنقاط ضعف:\r\n\r\n- باتری و امکانات محدودتر نسبت به مدل‌های جدیدتر\r\n\r\nجمع‌بندی:\r\nUwell Caliburn G یکی از دستگاه‌های محبوب سری Caliburn است که به دلیل طعم‌دهی خوب و استفاده آسان شناخته می‌شود.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["پاد سیستم", "Uwell", "Uwell Caliburn G", "یوفوپاف"],
     attributes: [
       {
@@ -15341,8 +15341,8 @@ export const importedProducts: Product[] = [
       "کارتریج یوول کالیبرن A2 (Uwell Caliburn A2 Pod) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکارتریج پاد\r\n\r\nمشخصات:\r\n\r\n- مدل: Caliburn A2 Pod\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- Uwell Caliburn A2\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص Caliburn A2\r\n- نصب آسان\r\n- مناسب استفاده روزانه\r\n\r\nنقاط قوت:\r\n\r\n- طعم‌دهی مناسب\r\n- استفاده ساده\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه Caliburn A2\r\n\r\nجمع‌بندی:\r\nکارتریج Uwell Caliburn A2 یک قطعه مصرفی مخصوص دستگاه Caliburn A2 است که برای استفاده راحت و روزمره طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Uwell", "Uwell Caliburn A2 Pod", "یوفوپاف"],
     attributes: [
       {
@@ -15389,8 +15389,8 @@ export const importedProducts: Product[] = [
       "کویل ووپو TPP (VOOPOO TPP Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: TPP Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سیستم TPP ووپو\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی Mesh\r\n- تولید بخار زیاد\r\n- بهبود طعم‌دهی\r\n\r\nنقاط قوت:\r\n\r\n- بخاردهی بالا\r\n- طعم قوی\r\n\r\nنقاط ضعف:\r\n\r\n- مصرف جویس بیشتر نسبت به کویل‌های کم‌توان\r\n\r\nجمع‌بندی:\r\nکویل VOOPOO TPP برای دستگاه‌های قدرتمند ووپو طراحی شده و مناسب افرادی است که بخار و طعم بیشتری می‌خواهند.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "VOOPOO", "VOOPOO TPP Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15437,8 +15437,8 @@ export const importedProducts: Product[] = [
       "کویل ووپو PnP X (VOOPOO PnP X Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: PnP X Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سیستم PnP X ووپو\r\n\r\nویژگی‌های اصلی:\r\n\r\n- نسل جدید کویل‌های PnP\r\n- طعم‌دهی بهتر\r\n- عملکرد پایدار\r\n\r\nنقاط قوت:\r\n\r\n- عمر مناسب\r\n- کیفیت بخار خوب\r\n\r\nنقاط ضعف:\r\n\r\n- فقط با دستگاه‌های سازگار PnP X\r\n\r\nجمع‌بندی:\r\nکویل VOOPOO PnP X نسخه جدید سیستم PnP است که برای عملکرد بهتر و طعم‌دهی بیشتر طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "VOOPOO", "VOOPOO PnP X Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15485,8 +15485,8 @@ export const importedProducts: Product[] = [
       "کویل ووپو PnP TM2 (VOOPOO PnP TM2 Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: PnP TM2\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با کویل PnP ووپو\r\n\r\nویژگی‌های اصلی:\r\n\r\n- ساختار Mesh\r\n- مناسب تولید بخار و طعم متعادل\r\n\r\nنقاط قوت:\r\n\r\n- طعم‌دهی خوب\r\n- نصب آسان\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به دستگاه سازگار با PnP\r\n\r\nجمع‌بندی:\r\nکویل VOOPOO PnP TM2 یکی از کویل‌های سری PnP برای استفاده در دستگاه‌های سازگار ووپو است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "VOOPOO", "VOOPOO PnP TM2 Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15533,8 +15533,8 @@ export const importedProducts: Product[] = [
       "کویل ووپو PnP VM1 (VOOPOO PnP VM1 Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: PnP VM1\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سیستم PnP ووپو\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی Mesh\r\n- مناسب بخاردهی بالا\r\n\r\nنقاط قوت:\r\n\r\n- طعم خوب\r\n- عملکرد قدرتمند\r\n\r\nنقاط ضعف:\r\n\r\n- مصرف مایع بیشتر\r\n\r\nجمع‌بندی:\r\nکویل VOOPOO PnP VM1 برای کاربرانی مناسب است که بخار بیشتر و عملکرد قوی‌تر می‌خواهند.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "VOOPOO", "VOOPOO PnP VM1 Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15581,8 +15581,8 @@ export const importedProducts: Product[] = [
       "کویل گیک‌ویپ Z MeshTech (Geekvape Z Series MeshTech Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: Z Series MeshTech\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- تانک‌ها و دستگاه‌های سازگار با کویل Z گیک‌ویپ\r\n\r\nویژگی‌های اصلی:\r\n\r\n- تکنولوژی MeshTech\r\n- افزایش سطح حرارت\r\n- طعم‌دهی بهتر\r\n\r\nنقاط قوت:\r\n\r\n- تولید بخار زیاد\r\n- طعم قوی\r\n\r\nنقاط ضعف:\r\n\r\n- مصرف جویس بالا\r\n\r\nجمع‌بندی:\r\nکویل Geekvape Z MeshTech برای تانک‌های سری Z طراحی شده و مناسب ویپینگ پرقدرت است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "GeekVape", "Geekvape Z Series MeshTech Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15629,8 +15629,8 @@ export const importedProducts: Product[] = [
       "کویل ویپرسو QF (Vaporesso QF Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: QF Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌ها و تانک‌های سازگار با QF Coil\r\n\r\nویژگی‌های اصلی:\r\n\r\n- ساختار Mesh و Strip در برخی مدل‌ها\r\n- افزایش طعم‌دهی\r\n\r\nنقاط قوت:\r\n\r\n- بخاردهی مناسب\r\n- طعم خوب\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های دارای پشتیبانی QF\r\n\r\nجمع‌بندی:\r\nکویل Vaporesso QF برای دستگاه‌های سازگار با سیستم QF طراحی شده و عملکرد مناسبی در بخار و طعم دارد.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "Vaporesso", "Vaporesso QF Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15677,8 +15677,8 @@ export const importedProducts: Product[] = [
       "کویل لاست ویپ UB Lite (Lost Vape UB Lite Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: UB Lite Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سیستم UB Lite\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص UB Lite\r\n- طعم‌دهی مناسب\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- مصرف مناسب\r\n- کیفیت طعم خوب\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکویل Lost Vape UB Lite برای دستگاه‌های سازگار با سری UB Lite طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "Lost Vape", "Lost Vape UB Lite Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15725,8 +15725,8 @@ export const importedProducts: Product[] = [
       "کویل ووپو ITO (VOOPOO ITO Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: ITO Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سیستم ITO ووپو\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص ITO\r\n- مناسب مصرف روزانه\r\n\r\nنقاط قوت:\r\n\r\n- طعم‌دهی مناسب\r\n- مصرف متعادل\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار ITO\r\n\r\nجمع‌بندی:\r\nکویل VOOPOO ITO برای دستگاه‌های سری ITO طراحی شده و گزینه‌ای مناسب برای استفاده روزمره است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "VOOPOO", "VOOPOO ITO Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15773,8 +15773,8 @@ export const importedProducts: Product[] = [
       "کویل گیک‌ویپ G (Geekvape G Series Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: G Series Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سری G گیک‌ویپ\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص سری G\r\n- عملکرد پایدار\r\n\r\nنقاط قوت:\r\n\r\n- عمر مناسب\r\n- کیفیت بخار خوب\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکویل Geekvape G Series برای دستگاه‌های دارای پشتیبانی از کویل‌های G طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "GeekVape", "Geekvape G Series Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15821,8 +15821,8 @@ export const importedProducts: Product[] = [
       "کویل گیک‌ویپ B (Geekvape B Series Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: B Series Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سری کویل B گیک‌ویپ\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی Mesh در برخی مدل‌ها\r\n- مناسب تولید بخار و طعم متعادل\r\n- نصب و تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- طعم‌دهی مناسب\r\n- تنوع مقاومت\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های پشتیبانی‌کننده از سری B\r\n\r\nجمع‌بندی:\r\nکویل Geekvape B Series یکی از کویل‌های پرکاربرد گیک‌ویپ است که برای استفاده روزمره و بخاردهی مناسب طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "GeekVape", "Geekvape B Series Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15873,8 +15873,8 @@ export const importedProducts: Product[] = [
       "کویل زد گیک‌ویپ (Geekvape Z Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: Z Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- تانک‌ها و دستگاه‌های سازگار با سری Z گیک‌ویپ\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی Mesh\r\n- مناسب ویپینگ مستقیم به ریه (DTL)\r\n- تولید بخار زیاد\r\n\r\nنقاط قوت:\r\n\r\n- بخاردهی بالا\r\n- طعم‌دهی قوی\r\n\r\nنقاط ضعف:\r\n\r\n- مصرف جویس بیشتر\r\n\r\nجمع‌بندی:\r\nکویل Geekvape Z برای کاربران حرفه‌ای‌تر که بخار زیاد و طعم قوی‌تر می‌خواهند مناسب است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "GeekVape", "Geekvape Z Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15921,8 +15921,8 @@ export const importedProducts: Product[] = [
       "کویل ویپرسو GT (Vaporesso GT Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: GT Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- تانک‌ها و دستگاه‌های سازگار با سری GT ویپرسو\r\n\r\nویژگی‌های اصلی:\r\n\r\n- تنوع مقاومت\r\n- مناسب استفاده در توان‌های مختلف\r\n- تعویض آسان\r\n\r\nنقاط قوت:\r\n\r\n- تنوع بالا\r\n- عملکرد پایدار\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به دستگاه سازگار با GT\r\n\r\nجمع‌بندی:\r\nکویل Vaporesso GT یک سیستم محبوب و قدیمی ویپرسو است که مدل‌های متنوعی برای سبک‌های مختلف ویپینگ دارد.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "Vaporesso", "Vaporesso GT Coil", "یوفوپاف"],
     attributes: [
       {
@@ -15969,8 +15969,8 @@ export const importedProducts: Product[] = [
       "پاد ویپرسو GTX 22 (Vaporesso GTX Pod 22) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nپاد تانک / کارتریج\r\n\r\nمشخصات:\r\n\r\n- مدل: GTX Pod 22\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سیستم GTX ویپرسو\r\n\r\nویژگی‌های اصلی:\r\n\r\n- پشتیبانی از کویل‌های GTX\r\n- طراحی قابل تعویض\r\n- مناسب بخاردهی و طعم مناسب\r\n\r\nنقاط قوت:\r\n\r\n- امکان تعویض کویل\r\n- انعطاف‌پذیری بالا\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به خرید جداگانه کویل\r\n\r\nجمع‌بندی:\r\nVaporesso GTX Pod 22 برای کاربرانی مناسب است که می‌خواهند از کویل‌های GTX استفاده کنند و کنترل بیشتری روی تجربه ویپینگ داشته باشند.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کارتریج", "Vaporesso", "Vaporesso GTX Pod 22", "یوفوپاف"],
     attributes: [
       {
@@ -16017,8 +16017,8 @@ export const importedProducts: Product[] = [
       "کویل لاست ویپ UB Mini (Lost Vape UB Mini Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: UB Mini Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سیستم UB Mini لاست ویپ\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی مخصوص UB Mini\r\n- مناسب مصرف روزانه\r\n- عملکرد پایدار\r\n\r\nنقاط قوت:\r\n\r\n- طعم‌دهی مناسب\r\n- نصب آسان\r\n\r\nنقاط ضعف:\r\n\r\n- فقط برای دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکویل Lost Vape UB Mini برای دستگاه‌های دارای پشتیبانی از سیستم UB Mini طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "Lost Vape", "Lost Vape UB Mini Coil", "یوفوپاف"],
     attributes: [
       {
@@ -16065,8 +16065,8 @@ export const importedProducts: Product[] = [
       "کویل لاست ویپ UB Max (Lost Vape UB Max Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: UB Max Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سیستم UB Max\r\n\r\nویژگی‌های اصلی:\r\n\r\n- طراحی Mesh\r\n- بخاردهی بالا\r\n- طعم‌دهی قوی\r\n\r\nنقاط قوت:\r\n\r\n- تولید بخار زیاد\r\n- عملکرد قدرتمند\r\n\r\nنقاط ضعف:\r\n\r\n- مصرف مایع بیشتر\r\n\r\nجمع‌بندی:\r\nکویل Lost Vape UB Max برای ویپینگ پرقدرت و کاربرانی که بخار بیشتری می‌خواهند مناسب است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "Lost Vape", "Lost Vape UB Max Coil", "یوفوپاف"],
     attributes: [
       {
@@ -16113,8 +16113,8 @@ export const importedProducts: Product[] = [
       "کویل لاست ویپ UB Ultra V3 (Lost Vape UB Ultra V3 Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: UB Ultra V3\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سری UB Ultra\r\n\r\nویژگی‌های اصلی:\r\n\r\n- نسل جدید کویل UB Ultra\r\n- بهبود طعم‌دهی\r\n- عملکرد بهتر\r\n\r\nنقاط قوت:\r\n\r\n- کیفیت بخار خوب\r\n- عمر مناسب\r\n\r\nنقاط ضعف:\r\n\r\n- محدود به دستگاه‌های سازگار\r\n\r\nجمع‌بندی:\r\nکویل Lost Vape UB Ultra V3 برای دستگاه‌های سازگار با این سیستم طراحی شده و عملکرد بهتری نسبت به نسل‌های قدیمی‌تر دارد.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "Lost Vape", "Lost Vape UB Ultra V3 Coil", "یوفوپاف"],
     attributes: [
       {
@@ -16161,8 +16161,8 @@ export const importedProducts: Product[] = [
       "کویل ویپرسو GTX (Vaporesso GTX Coil) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nکویل ویپ\r\n\r\nمشخصات:\r\n\r\n- مدل: GTX Coil\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های سازگار با سیستم GTX ویپرسو\r\n\r\nویژگی‌های اصلی:\r\n\r\n- تکنولوژی Mesh\r\n- تنوع مقاومت\r\n- مناسب سبک‌های مختلف ویپینگ\r\n\r\nنقاط قوت:\r\n\r\n- طعم‌دهی خوب\r\n- تنوع زیاد\r\n- کیفیت ساخت مناسب\r\n\r\nنقاط ضعف:\r\n\r\n- نیاز به دستگاه‌های پشتیبانی‌کننده GTX\r\n\r\nجمع‌بندی:\r\nکویل Vaporesso GTX یکی از محبوب‌ترین سری کویل‌های ویپرسو است که برای طعم‌دهی، بخاردهی و استفاده در دستگاه‌های مختلف طراحی شده است.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["کویل", "Vaporesso", "Vaporesso GTX Coil", "یوفوپاف"],
     attributes: [
       {
@@ -16209,8 +16209,8 @@ export const importedProducts: Product[] = [
       "بند گردنی رینگ‌دار و بند انگشتی (Lanyard) از لیست تکمیلی قطعات و دستگاه‌ها؛ قیمت از پنل ادمین تکمیل شود.",
     descriptionFa:
       "نوع محصول:\r\nاکسسوری ویپ / بند نگهدارنده دستگاه\r\n\r\nمشخصات:\r\n\r\n- نوع: بند گردنی و بند انگشتی\r\n- دارای حلقه اتصال برای نگهداری دستگاه\r\n- مناسب حمل راحت‌تر دستگاه‌های پاد و ویپ\r\n- دارای طراحی سبک برای استفاده روزمره\r\n- رنگ‌ها: (قرمز . زرد . بنفش . سبز . آبی . رینگ بزرگ)\r\n\r\nسازگار با دستگاه‌ها:\r\n\r\n- دستگاه‌های پاد و ویپ دارای محل اتصال بند\r\n- مناسب برای دستگاه‌هایی که امکان اتصال لنیارد یا بند نگهدارنده دارند\r\n\r\nویژگی‌های اصلی:\r\n\r\n- جلوگیری از افتادن یا گم شدن دستگاه\r\n- امکان حمل دستگاه دور گردن یا با انگشت\r\n- دسترسی سریع به دستگاه در طول روز\r\n- طراحی ساده و کاربردی\r\n- مناسب برای استفاده همراه دستگاه‌های کوچک و قابل حمل\r\n\r\nنقاط قوت:\r\n\r\n- افزایش امنیت دستگاه هنگام حمل\r\n- استفاده آسان و سریع\r\n- مناسب برای دستگاه‌های پاد کوچک\r\n- حمل راحت بدون نیاز به قرار دادن دستگاه در جیب یا کیف\r\n\r\nنقاط ضعف:\r\n\r\n- فقط برای دستگاه‌هایی قابل استفاده است که محل اتصال بند داشته باشند\r\n- برای دستگاه‌های بزرگ و سنگین مناسب نیست\r\n\r\nجمع‌بندی:\r\nبند گردنی رینگ‌دار و بند انگشتی Lanyard یک اکسسوری کاربردی برای افرادی است که می‌خواهند دستگاه پاد یا ویپ خود را راحت‌تر حمل کنند و احتمال افتادن یا گم شدن آن را کاهش دهند. این محصول بیشتر برای دستگاه‌های کوچک و سبک مناسب است و با اتصال سریع، دسترسی به دستگاه را آسان‌تر می‌کند.",
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: ["ویپ", "UFO Selection", "Lanyard", "یوفوپاف"],
     attributes: [
       {

@@ -8,7 +8,7 @@ function ProductThumbnail({ src }: { src: string }) {
   const [failed, setFailed] = useState("");
   const source =
     !src || failed === src
-      ? "/images/ufo-hero.png"
+      ? "/images/ufo-hero.webp"
       : src.replace(/^(\/api\/product-images\/asset\/[0-9a-f-]+\/)detail$/i, "$1card");
   return (
     <Image

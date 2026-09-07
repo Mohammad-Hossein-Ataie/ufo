@@ -214,8 +214,8 @@ function buildDocuments(
   const brandId = input.brandId || current?.product.brandId || "brand-ufo";
   const image =
     input.image === undefined
-      ? current?.product.image || "/images/ufo-hero.png"
-      : input.image.trim() || "/images/ufo-hero.png";
+      ? current?.product.image || "/images/ufo-hero.webp"
+      : input.image.trim() || "/images/ufo-hero.webp";
   const images = [
     image,
     ...(input.images ?? current?.product.images ?? []).map((item) => item.trim()).filter(Boolean),
