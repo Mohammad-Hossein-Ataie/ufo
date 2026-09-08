@@ -15,7 +15,7 @@ let motion = false;
 let media: EventTarget & { matches: boolean };
 const images = Array.from({ length: 3 }, (_, i) => ({
   src: `/api/product-images/catalog/p${i}/primary/card?v=2`,
-  fallbackSrc: "/images/categories/pod.png",
+  fallbackSrc: "/images/categories/pod.webp",
 }));
 function Harness({ count, index }: { count: number; index: number }) {
   api = useProductCardCarousel(images.slice(0, count), index);

@@ -10,15 +10,15 @@ import type { Product } from "@ufo/types";
 const genericProductImages = new Set(["", "/images/ufo-hero.webp"]);
 
 export const categoryImageBySlug: Record<string, string> = {
-  pod: "/images/categories/pod.png",
-  vape: "/images/categories/vape.png",
-  disposable: "/images/categories/disposable.png",
-  "e-liquid": "/images/categories/e-liquid.png",
-  "salt-nicotine": "/images/categories/salt-nicotine.png",
-  coil: "/images/categories/coil.png",
-  cartridge: "/images/categories/cartridge.png",
-  lighter: "/images/categories/lighter.png",
-  accessories: "/images/categories/lighter.png",
+  pod: "/images/categories/pod.webp",
+  vape: "/images/categories/vape.webp",
+  disposable: "/images/categories/disposable.webp",
+  "e-liquid": "/images/categories/e-liquid.webp",
+  "salt-nicotine": "/images/categories/salt-nicotine.webp",
+  coil: "/images/categories/coil.webp",
+  cartridge: "/images/categories/cartridge.webp",
+  lighter: "/images/categories/lighter.webp",
+  accessories: "/images/categories/lighter.webp",
 };
 
 export function getCategoryImage(categoryId: string) {
@@ -39,7 +39,7 @@ export function getProductImage(product: Pick<Product, "id" | "categoryId" | "im
   if (!genericProductImages.has(product.image)) {
     return `${protectedProductSource(product.id, product.image, "primary", "card")}?v=${productCardImageVersion}`;
   }
-  return getCategoryImage(product.categoryId) ?? "/images/categories/lighter.png";
+  return getCategoryImage(product.categoryId) ?? "/images/categories/lighter.webp";
 }
 
 export function getProductImages(product: Pick<Product, "id" | "categoryId" | "image" | "images">) {

@@ -327,7 +327,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                       <StorefrontProductImage
                         src={getProductImage(related)}
                         fallbackSrc={
-                          getCategoryImage(related.categoryId) ?? "/images/categories/lighter.png"
+                          getCategoryImage(related.categoryId) ?? "/images/categories/lighter.webp"
                         }
                         alt={related.nameFa}
                       />

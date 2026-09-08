@@ -513,7 +513,7 @@ export default async function B2BCatalogPage({
                           key={`media-${product.id}`}
                           src={getProductImage(product)}
                           fallbackSrc={
-                            getCategoryImage(product.categoryId) ?? "/images/categories/lighter.png"
+                            getCategoryImage(product.categoryId) ?? "/images/categories/lighter.webp"
                           }
                           alt={product.nameFa}
                           sizes="(min-width: 1280px) 22vw, (min-width: 768px) 42vw, 92vw"

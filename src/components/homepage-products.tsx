@@ -17,7 +17,7 @@ export function HomepageProducts({ slots }: { slots: Slot[] }) {
           slotIndex={slotIndex}
           images={slot.rows.map(({ product }) => ({
             src: getProductImage(product),
-            fallbackSrc: getCategoryImage(product.categoryId) ?? "/images/categories/lighter.png",
+            fallbackSrc: getCategoryImage(product.categoryId) ?? "/images/categories/lighter.webp",
           }))}
           label={slot.category?.nameFa ?? "تازه‌های فروشگاه"}
           names={slot.rows.map(({ product }) => product.nameFa)}
@@ -36,7 +36,7 @@ export function HomepageProducts({ slots }: { slots: Slot[] }) {
                   <StorefrontProductImage
                     src={getProductImage(row.product)}
                     fallbackSrc={
-                      getCategoryImage(row.product.categoryId) ?? "/images/categories/lighter.png"
+                      getCategoryImage(row.product.categoryId) ?? "/images/categories/lighter.webp"
                     }
                     alt={row.product.nameFa}
                     sizes="(min-width: 1280px) 296px, (min-width: 1024px) 25vw, 50vw"
