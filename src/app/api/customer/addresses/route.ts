@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   createCustomerAddress,
+  parseLocation,
   listCustomerAddresses,
   type CustomerAddressInput,
 } from "@ufo/orders";
@@ -11,6 +12,7 @@ export const runtime = "nodejs";
 function addressInput(payload: Record<string, unknown>): CustomerAddressInput {
   const value = (key: string) => (typeof payload[key] === "string" ? payload[key] : "");
   return {
+    location: parseLocation(payload.location),
     label: value("label"),
     province: value("province"),
     city: value("city"),
@@ -24,7 +26,7 @@ function addressInput(payload: Record<string, unknown>): CustomerAddressInput {
 
 export async function GET(request: Request) {
   try {
-    const session = requireCustomerSession(request, "retail");
+    const session = requireCustomerSession(request);
     return NextResponse.json({ addresses: listCustomerAddresses(session.customerId) });
   } catch (error) {
     return NextResponse.json(
@@ -36,7 +38,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const session = requireCustomerSession(request, "retail");
+    const session = requireCustomerSession(request);
     const limit = checkRateLimit(`address:${session.customerId}`, 20, 60_000);
     if (!limit.allowed) {
       return NextResponse.json(

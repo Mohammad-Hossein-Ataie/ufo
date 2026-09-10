@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { updateSubmittedOrderStatus } from "@ufo/orders";
 import type { OrderStatus } from "@ufo/types";
+import { requireAdminMutation, adminRequestErrorStatus } from "@/lib/admin-request";
 
 export const runtime = "nodejs";
 
@@ -19,18 +20,25 @@ export async function PATCH(
   { params }: { params: Promise<{ orderId: string }> },
 ) {
   try {
+    await requireAdminMutation(request);
     const { orderId } = await params;
     const payload = (await request.json()) as Record<string, unknown>;
     const status = typeof payload.status === "string" ? payload.status : "";
     if (!allowedStatuses.includes(status as OrderStatus)) {
       return NextResponse.json({ error: "وضعیت سفارش معتبر نیست." }, { status: 400 });
     }
+    if (status === "delivered" && payload.deliveryConfirmed !== true) {
+      return NextResponse.json(
+        { error: "تحویل سفارش به مشتری را با تیک تأیید مشخص کنید." },
+        { status: 400 },
+      );
+    }
     const order = updateSubmittedOrderStatus(orderId, status as OrderStatus);
     return NextResponse.json({ order });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "به‌روزرسانی وضعیت انجام نشد." },
-      { status: 400 },
+      { status: adminRequestErrorStatus(error) },
     );
   }
 }

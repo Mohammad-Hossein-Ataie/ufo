@@ -68,6 +68,7 @@ export function OrdersClient() {
             <th className="px-4 py-3 text-right">شماره</th>
             <th className="px-4 py-3 text-right">تاریخ</th>
             <th className="px-4 py-3 text-right">وضعیت</th>
+            <th className="px-4 py-3 text-right">زمان تقریبی ارسال</th>
             <th className="px-4 py-3 text-right">تعداد کالا</th>
             <th className="px-4 py-3 text-right">مبلغ</th>
             <th className="px-4 py-3 text-right">عملیات</th>
@@ -82,6 +83,13 @@ export function OrdersClient() {
               <td className="px-4 py-3">{new Date(order.createdAt).toLocaleDateString("fa-IR")}</td>
               <td className="px-4 py-3">
                 <StatusPill tone="info">{orderStatusLabelsFa[order.status]}</StatusPill>
+              </td>
+              <td className="px-4 py-3">
+                {order.estimatedDispatchAt
+                  ? new Date(order.estimatedDispatchAt).toLocaleString("fa-IR", {
+                      timeZone: "Asia/Tehran",
+                    })
+                  : "پس از تأیید پرداخت"}
               </td>
               <td className="px-4 py-3">{order.items.length.toLocaleString("fa-IR")}</td>
               <td className="px-4 py-3 font-bold">

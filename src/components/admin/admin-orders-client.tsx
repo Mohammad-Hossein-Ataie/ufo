@@ -40,12 +40,14 @@ const orderStatusLabelsFa: Record<OrderStatus, string> = {
 };
 
 const paymentStatusLabelsFa: Record<PaymentReviewStatus, string> = {
+  awaiting_receipt: "در انتظار ارسال رسید",
   pending_review: "در انتظار بررسی رسید",
   approved: "پرداخت تایید شد",
   rejected: "پرداخت رد شد",
 };
 
 const activeStatuses: OrderStatus[] = [
+  "awaiting_receipt",
   "payment_under_review",
   "confirmed",
   "processing",
@@ -103,17 +105,19 @@ function nextActions(
   order: SubmittedOrder,
 ): Array<{ status: OrderStatus; label: string; tone?: "danger" }> {
   if (order.status === "payment_under_review") {
-    return [
-      { status: "confirmed", label: "تایید پرداخت" },
-      { status: "cancelled", label: "رد و لغو", tone: "danger" },
-    ];
+    return [{ status: "cancelled", label: "رد و لغو", tone: "danger" }];
   }
   if (order.status === "confirmed") return [{ status: "processing", label: "شروع آماده‌سازی" }];
   if (order.status === "processing") {
-    return [{ status: "ready_for_pickup", label: "آماده تحویل" }];
+    return order.shippingScope === "pickup" || order.shippingMethod === "pickup"
+      ? [{ status: "ready_for_pickup", label: "آماده دریافت حضوری" }]
+      : [{ status: "shipped", label: "ثبت ارسال" }];
   }
-  if (order.status === "ready_for_pickup") return [{ status: "shipped", label: "ثبت ارسال" }];
-  if (order.status === "shipped") return [{ status: "delivered", label: "تحویل شد" }];
+  if (order.status === "ready_for_pickup")
+    return order.shippingScope === "pickup" || order.shippingMethod === "pickup"
+      ? []
+      : [{ status: "shipped", label: "ثبت ارسال" }];
+  if (order.status === "shipped") return [];
   if (!terminalStatuses.includes(order.status))
     return [{ status: "cancelled", label: "لغو", tone: "danger" }];
   return [];
@@ -586,7 +590,13 @@ export function AdminOrdersClient() {
                     </td>
                     <td className="px-4 py-4">
                       <p className="font-bold">{order.shippingTitleFa}</p>
-                      <p className="mt-1 text-[#5F6C79]">{order.etaFa}</p>
+                      <p className="mt-1 text-[#5F6C79]">
+                        {order.estimatedDispatchAt
+                          ? new Date(order.estimatedDispatchAt).toLocaleString("fa-IR", {
+                              timeZone: "Asia/Tehran",
+                            })
+                          : order.etaFa}
+                      </p>
                     </td>
                     <td className="px-4 py-4 font-black">
                       <Price valueRial={order.totalRial} />
@@ -595,7 +605,7 @@ export function AdminOrdersClient() {
                       <div className="flex flex-wrap gap-2">
                         <Link href={`/admin/orders/${order.id}`}>
                           <Button size="sm" variant="secondary">
-                            جزئیات
+                            {order.status === "payment_under_review" ? "بررسی رسید" : "جزئیات"}
                           </Button>
                         </Link>
                         {nextActions(order).map((action) => (

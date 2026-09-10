@@ -22,10 +22,14 @@ export function adminRequestErrorStatus(error: unknown): number {
   return 400;
 }
 
-export async function requireAdminMutation(request: Request): Promise<void> {
+export async function requireAdminRead(request: Request): Promise<void> {
   const cookies = (request.headers.get("cookie") ?? "").split(";").map((part) => part.trim());
   const sessions = cookies.filter((part) => part.startsWith("ufo_admin_session="));
   const token = sessions.length === 1 ? sessions[0]!.slice("ufo_admin_session=".length) : undefined;
   if (!(await verifyAdminSessionToken(token))) throw new AdminAuthenticationError();
+}
+
+export async function requireAdminMutation(request: Request): Promise<void> {
+  await requireAdminRead(request);
   assertSameOrigin(request);
 }

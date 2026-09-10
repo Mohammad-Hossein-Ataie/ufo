@@ -252,6 +252,7 @@ export interface Invoice {
 }
 
 export interface ShippingAddress {
+  location?: { latitude: number; longitude: number } | undefined;
   province: string;
   city: string;
   line1: string;

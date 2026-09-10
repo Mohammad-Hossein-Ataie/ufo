@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { checkoutCustomerCart, listSubmittedOrders } from "@ufo/orders";
+import { checkoutCustomerCart, listSubmittedOrders, parseLocation } from "@ufo/orders";
 import type { ShippingMethodCode } from "@ufo/types";
 import { requireCustomerSession } from "@/lib/customer-session";
 
@@ -53,6 +53,7 @@ export async function POST(request: Request) {
       customerName,
       phone: phone || session.phone,
       address: {
+        location: parseLocation(payload.location),
         province,
         city,
         line1: addressLine,

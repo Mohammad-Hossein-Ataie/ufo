@@ -201,9 +201,16 @@ export function quoteConfiguredShipping(
 
 export function listAvailableShippingQuotes(
   address: ShippingAddress,
-): Array<ShippingQuote & { descriptionFa: string; scope: ShippingMethodConfig["scope"] }> {
+): Array<
+  ShippingQuote & {
+    code: ShippingMethodCode;
+    descriptionFa: string;
+    scope: ShippingMethodConfig["scope"];
+  }
+> {
   return listShippingMethods({ activeOnly: true }).map((method) => ({
     ...quoteConfiguredShipping(address, method.code),
+    code: method.code,
     descriptionFa: method.descriptionFa,
     scope: method.scope,
   }));

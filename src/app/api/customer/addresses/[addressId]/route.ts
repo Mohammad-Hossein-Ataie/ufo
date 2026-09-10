@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { deleteCustomerAddress, updateCustomerAddress } from "@ufo/orders";
+import { deleteCustomerAddress, updateCustomerAddress, parseLocation } from "@ufo/orders";
 import { checkRateLimit, requireCustomerSession } from "@/lib/customer-session";
 
 export const runtime = "nodejs";
@@ -8,7 +8,7 @@ type RouteContext = { params: Promise<{ addressId: string }> };
 
 export async function PATCH(request: Request, context: RouteContext) {
   try {
-    const session = requireCustomerSession(request, "retail");
+    const session = requireCustomerSession(request);
     const limit = checkRateLimit(`address:${session.customerId}`, 20, 60_000);
     if (!limit.allowed) {
       return NextResponse.json(
@@ -19,6 +19,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     const { addressId } = await context.params;
     const payload = (await request.json()) as Record<string, unknown>;
     const address = updateCustomerAddress(session.customerId, addressId, {
+      ...("location" in payload ? { location: parseLocation(payload.location) } : {}),
       ...(typeof payload.label === "string" ? { label: payload.label } : {}),
       ...(typeof payload.province === "string" ? { province: payload.province } : {}),
       ...(typeof payload.city === "string" ? { city: payload.city } : {}),
@@ -41,7 +42,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
 export async function DELETE(request: Request, context: RouteContext) {
   try {
-    const session = requireCustomerSession(request, "retail");
+    const session = requireCustomerSession(request);
     const { addressId } = await context.params;
     deleteCustomerAddress(session.customerId, addressId);
     return NextResponse.json({ ok: true });

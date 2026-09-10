@@ -1,7 +1,7 @@
 import { categories } from "@ufo/domain";
 import type { AdminProductRecord } from "@/lib/admin-products";
 
-export const homepageCategorySlugs = ["pod", "vape", "disposable", "e-liquid"] as const;
+export const homepageCategorySlugs = ["pod", "vape", "disposable", "salt-nicotine"] as const;
 
 export interface HomepageProductSlot {
   id: string;

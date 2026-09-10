@@ -18,12 +18,20 @@ import {
   Truck,
 } from "lucide-react";
 import { Alert, Button, EmptyState, Input, Price, Textarea } from "@ufo/ui";
-import type { CustomerAddress, ShippingMethodCode } from "@ufo/types";
+import type {
+  CustomerAddress,
+  ShippingMethodCode,
+  ShippingAddress,
+  SalesChannel,
+} from "@ufo/types";
 import type { CustomerCartView } from "@ufo/orders";
 import { authHeaders, fetchCustomerCart, readCustomerSession } from "@/lib/customer-client";
 import { IranProvinceCitySelect } from "@/components/iran-location-select";
+import { LocationPicker } from "@/components/location-picker";
+import { CommerceSkeleton } from "@/components/commerce-skeleton";
 
 interface CheckoutShippingMethod {
+  scope?: "nationwide" | "tehran" | "pickup";
   code: ShippingMethodCode;
   titleFa: string;
   descriptionFa: string;
@@ -55,7 +63,9 @@ function Step({ number, label, active }: { number: string; label: string; active
   );
 }
 
-export function CheckoutClient() {
+export function CheckoutClient({ channel = "retail" }: { channel?: SalesChannel }) {
+  const base = channel === "wholesale" ? "/b2b" : "";
+  const [location, setLocation] = useState<ShippingAddress["location"]>();
   const [cartView, setCartView] = useState<CustomerCartView | null>(null);
   const [addresses, setAddresses] = useState<CustomerAddress[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState("");
@@ -70,6 +80,10 @@ export function CheckoutClient() {
   const [makeDefault, setMakeDefault] = useState(true);
   const [shippingMethod, setShippingMethod] = useState<ShippingMethodCode>("tipax");
   const [shippingMethods, setShippingMethods] = useState<CheckoutShippingMethod[]>([]);
+  const [pickupStore, setPickupStore] = useState({
+    address: "تهران، بازار مولوی، پاساژ صفویه",
+    phone: "09362157181",
+  });
   const [isLoadingShipping, setIsLoadingShipping] = useState(false);
   const [receiptNote, setReceiptNote] = useState("");
   const [error, setError] = useState("");
@@ -87,6 +101,7 @@ export function CheckoutClient() {
     setCity(item.city);
     setAddress(item.line1);
     setPostalCode(item.postalCode ?? "");
+    setLocation(item.location);
     setShowAddressForm(false);
     if (item.city.trim() !== "تهران" && shippingMethod === "tehran_courier") {
       setShippingMethod("tipax");
@@ -94,7 +109,7 @@ export function CheckoutClient() {
   }
 
   useEffect(() => {
-    const session = readCustomerSession("retail");
+    const session = readCustomerSession(channel);
     setIsLoggedIn(Boolean(session));
     if (!session) {
       setIsLoading(false);
@@ -105,9 +120,9 @@ export function CheckoutClient() {
     setCustomerName(fullName);
     setPhone(session.customer.mobileNumber);
     void Promise.all([
-      fetchCustomerCart("retail"),
+      fetchCustomerCart(channel),
       fetch("/api/customer/addresses", {
-        headers: authHeaders("retail"),
+        headers: authHeaders(channel),
         cache: "no-store",
       }).then((response) => response.json() as Promise<{ addresses?: CustomerAddress[] }>),
     ])
@@ -124,44 +139,46 @@ export function CheckoutClient() {
   }, []);
 
   useEffect(() => {
-    if (!province || !city) {
-      setShippingMethods([]);
-      return;
-    }
     const controller = new AbortController();
+    setShippingMethods([]);
+    setIsLoadingShipping(true);
     const timer = window.setTimeout(() => {
-      setIsLoadingShipping(true);
       const query = new URLSearchParams({ province, city });
       void fetch(`/api/shipping/methods?${query}`, { signal: controller.signal })
         .then(async (response) => {
           const payload = (await response.json()) as {
             methods?: CheckoutShippingMethod[];
+            pickup?: { address: string; phone: string };
             error?: string;
           };
           if (!response.ok) throw new Error(payload.error ?? "دریافت روش‌های ارسال انجام نشد.");
           const methods = payload.methods ?? [];
+          if (controller.signal.aborted) return;
           setShippingMethods(methods);
-          const selected = methods.find(
-            (method) => method.code === shippingMethod && method.available,
+          if (payload.pickup) setPickupStore(payload.pickup);
+          setShippingMethod((current) =>
+            methods.some((method) => method.code === current && method.available)
+              ? current
+              : (methods.find((method) => method.available)?.code ?? ""),
           );
-          if (!selected) {
-            setShippingMethod(methods.find((method) => method.available)?.code ?? "");
-          }
         })
         .catch((requestError: unknown) => {
           if (requestError instanceof Error && requestError.name !== "AbortError") {
             setError(requestError.message);
           }
         })
-        .finally(() => setIsLoadingShipping(false));
+        .finally(() => {
+          if (!controller.signal.aborted) setIsLoadingShipping(false);
+        });
     }, 250);
     return () => {
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [city, province, shippingMethod]);
+  }, [city, province]);
 
   const shipping = shippingMethods.find((item) => item.code === shippingMethod);
+  const isPickup = shipping?.scope === "pickup" || shippingMethod === "pickup";
   const subtotalRial = cartView?.summary.subtotalRial ?? 0;
   const discountRial = cartView?.summary.discountRial ?? 0;
   const totalRial = subtotalRial - discountRial + (shipping?.costRial ?? 0);
@@ -172,7 +189,7 @@ export function CheckoutClient() {
   );
 
   function startNewAddress() {
-    const session = readCustomerSession("retail");
+    const session = readCustomerSession(channel);
     setAddressLabel("خانه");
     setCustomerName(
       session ? `${session.customer.firstName} ${session.customer.lastName}`.trim() : customerName,
@@ -182,6 +199,7 @@ export function CheckoutClient() {
     setCity("تهران");
     setAddress("");
     setPostalCode("");
+    setLocation(undefined);
     setMakeDefault(addresses.length === 0);
     setAddressError("");
     setShowAddressForm(true);
@@ -193,13 +211,14 @@ export function CheckoutClient() {
     try {
       const response = await fetch("/api/customer/addresses", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders("retail") },
+        headers: { "Content-Type": "application/json", ...authHeaders(channel) },
         body: JSON.stringify({
           label: addressLabel,
           province,
           city,
           line1: address,
           postalCode,
+          location,
           receiverName: customerName,
           receiverPhone: phone,
           isDefault: makeDefault,
@@ -219,6 +238,8 @@ export function CheckoutClient() {
         ...current.map((item) => (saved.isDefault ? { ...item, isDefault: false } : item)),
       ]);
       applyAddress(saved);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "ارتباط برقرار نشد؛ دوباره تلاش کنید.");
     } finally {
       setIsSavingAddress(false);
     }
@@ -226,23 +247,30 @@ export function CheckoutClient() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!address.trim() || !shipping?.available) {
+    if (
+      (!isPickup && !address.trim()) ||
+      !shipping?.available ||
+      !customerName.trim() ||
+      !phone.trim()
+    ) {
       setError("لطفاً آدرس و یک روش ارسال فعال را انتخاب کنید.");
       return;
     }
     setIsSubmitting(true);
     setError("");
     try {
-      const response = await fetch("/api/orders", {
+      const response = await fetch(channel === "wholesale" ? "/api/b2b/orders" : "/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders("retail") },
+        headers: { "Content-Type": "application/json", ...authHeaders(channel) },
         body: JSON.stringify({
           customerName,
           phone,
-          province,
-          city,
-          address,
-          postalCode,
+          province: isPickup ? "تهران" : province,
+          city: isPickup ? "تهران" : city,
+          address: isPickup ? "" : address,
+          postalCode: isPickup ? "" : postalCode,
+          location: isPickup ? undefined : location,
+          businessName: readCustomerSession(channel)?.customer.companyName,
           shippingMethod,
           receiptNote,
         }),
@@ -255,29 +283,28 @@ export function CheckoutClient() {
         setError(payload.error ?? "ثبت سفارش انجام نشد.");
         return;
       }
-      window.dispatchEvent(new CustomEvent("ufo-retail-cart-updated"));
-      window.location.href = `/orders/${payload.order.id}`;
+      window.dispatchEvent(
+        new CustomEvent(
+          channel === "wholesale" ? "ufo-b2b-cart-updated" : "ufo-retail-cart-updated",
+        ),
+      );
+      window.location.href = `${base}/orders/${payload.order.id}`;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "ارتباط برقرار نشد؛ دوباره تلاش کنید.");
     } finally {
       setIsSubmitting(false);
     }
   }
 
+  if (isLoading) return <CommerceSkeleton kind="checkout" />;
+
   if (!isLoggedIn) {
     return (
       <EmptyState title="برای پرداخت وارد شوید">
-        <Link href="/login?next=/checkout" className="mt-3 inline-flex">
+        <Link href={`${base}/login?next=${base}/checkout`} className="mt-3 inline-flex">
           <Button>ورود با کد پیامکی</Button>
         </Link>
       </EmptyState>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-64 items-center justify-center rounded-[24px] border border-retail-border bg-retail-surface">
-        <LoaderCircle className="animate-spin text-retail-accent" size={28} />
-        <span className="mr-3 text-sm text-retail-secondary">آماده‌سازی تسویه حساب...</span>
-      </div>
     );
   }
 
@@ -292,11 +319,11 @@ export function CheckoutClient() {
   return (
     <form id="retail-checkout" onSubmit={submit} className="pb-24 lg:pb-0">
       <div className="mb-5 flex items-center justify-between rounded-2xl border border-retail-border bg-retail-surface/70 px-4 py-3">
-        <Step number="۱" label="آدرس" active />
+        <Step number="۱" label="روش تحویل" active />
         <span className="h-px flex-1 bg-retail-border mx-2" />
-        <Step number="۲" label="ارسال" active={Boolean(address)} />
+        <Step number="۲" label="اطلاعات گیرنده" active={Boolean(shipping?.available)} />
         <span className="h-px flex-1 bg-retail-border mx-2" />
-        <Step number="۳" label="تأیید" active={Boolean(address && shippingMethod)} />
+        <Step number="۳" label="تأیید" active={Boolean((isPickup || address) && shippingMethod)} />
       </div>
 
       {error ? (
@@ -308,198 +335,7 @@ export function CheckoutClient() {
       ) : null}
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_23rem]">
-        <div className="grid gap-5">
-          <section className="checkout-panel">
-            <div className="checkout-section-heading">
-              <span className="checkout-section-icon">
-                <MapPin size={21} />
-              </span>
-              <div>
-                <h2 className="font-black text-white">آدرس تحویل</h2>
-                <p className="mt-1 text-xs text-retail-secondary">سفارش را کجا تحویل بگیرید؟</p>
-              </div>
-              <button
-                type="button"
-                onClick={startNewAddress}
-                className="mr-auto inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-bold text-retail-accent transition hover:bg-retail-accent/10"
-              >
-                <Plus size={17} /> آدرس جدید
-              </button>
-            </div>
-
-            {addresses.length > 0 ? (
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {addresses.map((item) => {
-                  const selected = item.id === selectedAddressId && !showAddressForm;
-                  return (
-                    <button
-                      type="button"
-                      key={item.id}
-                      onClick={() => applyAddress(item)}
-                      className={`relative min-h-36 rounded-2xl border p-4 text-right transition duration-200 ${
-                        selected
-                          ? "border-retail-accent bg-retail-accent/[0.07] shadow-[0_10px_35px_rgba(0,217,255,.08)]"
-                          : "border-retail-border bg-black/15 hover:border-white/20"
-                      }`}
-                    >
-                      <span className="flex items-start gap-3">
-                        <span
-                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${selected ? "bg-retail-accent text-retail-bg" : "bg-white/5 text-retail-secondary"}`}
-                        >
-                          {item.label === "محل کار" ? <Store size={19} /> : <Home size={19} />}
-                        </span>
-                        <span className="min-w-0">
-                          <span className="flex items-center gap-2 font-black text-white">
-                            {item.label}
-                            {item.isDefault ? (
-                              <span className="rounded-full bg-retail-accent-2/12 px-2 py-0.5 text-[10px] text-retail-accent-2">
-                                پیش‌فرض
-                              </span>
-                            ) : null}
-                          </span>
-                          <span className="mt-2 line-clamp-2 text-xs leading-6 text-retail-secondary">
-                            {item.province}، {item.city}، {item.line1}
-                          </span>
-                          <span className="mt-2 block text-xs text-retail-muted" dir="ltr">
-                            {item.receiverPhone}
-                          </span>
-                        </span>
-                      </span>
-                      <span
-                        className={`absolute left-3 top-3 flex h-6 w-6 items-center justify-center rounded-full border ${selected ? "border-retail-accent bg-retail-accent text-retail-bg" : "border-retail-border"}`}
-                      >
-                        {selected ? <Check size={14} strokeWidth={3} /> : null}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            ) : null}
-
-            {showAddressForm ? (
-              <div className="checkout-address-form mt-4 rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
-                <div className="mb-4 flex items-center justify-between">
-                  <div>
-                    <h3 className="font-black text-white">
-                      {addresses.length ? "افزودن آدرس جدید" : "اولین آدرس شما"}
-                    </h3>
-                    <p className="mt-1 text-xs text-retail-secondary">
-                      این اطلاعات برای ارسال سفارش استفاده می‌شود.
-                    </p>
-                  </div>
-                  {addresses.length ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowAddressForm(false);
-                        if (selectedAddress) applyAddress(selectedAddress);
-                      }}
-                      className="min-h-11 px-3 text-sm text-retail-secondary hover:text-white"
-                    >
-                      انصراف
-                    </button>
-                  ) : null}
-                </div>
-                {addressError ? (
-                  <Alert title="آدرس ذخیره نشد" tone="danger">
-                    {addressError}
-                  </Alert>
-                ) : null}
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  <fieldset className="sm:col-span-2">
-                    <legend className="mb-2 text-sm font-bold">عنوان آدرس</legend>
-                    <div className="flex gap-2">
-                      {["خانه", "محل کار", "سایر"].map((label) => (
-                        <button
-                          key={label}
-                          type="button"
-                          onClick={() => setAddressLabel(label)}
-                          className={`min-h-11 rounded-xl border px-4 text-sm font-bold transition ${addressLabel === label ? "border-retail-accent bg-retail-accent/10 text-retail-accent" : "border-retail-border text-retail-secondary"}`}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </fieldset>
-                  <label className="checkout-label">
-                    نام گیرنده
-                    <Input
-                      value={customerName}
-                      onChange={(event) => setCustomerName(event.target.value)}
-                      className={fieldClass}
-                      autoComplete="name"
-                      required
-                    />
-                  </label>
-                  <label className="checkout-label">
-                    شماره موبایل
-                    <Input
-                      value={phone}
-                      onChange={(event) => setPhone(event.target.value)}
-                      className={`${fieldClass} text-left`}
-                      inputMode="tel"
-                      autoComplete="tel"
-                      dir="ltr"
-                      required
-                    />
-                  </label>
-                  <IranProvinceCitySelect
-                    province={province}
-                    city={city}
-                    onProvinceChange={setProvince}
-                    onCityChange={setCity}
-                  />
-                  <label className="checkout-label sm:col-span-2">
-                    نشانی کامل
-                    <Textarea
-                      value={address}
-                      onChange={(event) => setAddress(event.target.value)}
-                      className={`${textareaClass} min-h-28`}
-                      autoComplete="street-address"
-                      placeholder="خیابان، کوچه، پلاک و واحد"
-                      required
-                    />
-                  </label>
-                  <label className="checkout-label">
-                    کد پستی <span className="font-normal text-retail-muted">(اختیاری)</span>
-                    <Input
-                      value={postalCode}
-                      onChange={(event) =>
-                        setPostalCode(event.target.value.replace(/\D/g, "").slice(0, 10))
-                      }
-                      className={`${fieldClass} text-left`}
-                      inputMode="numeric"
-                      dir="ltr"
-                      placeholder="۱۰ رقم"
-                    />
-                  </label>
-                  <label className="flex min-h-[52px] cursor-pointer items-center gap-3 self-end rounded-xl border border-retail-border px-4 text-sm text-retail-secondary">
-                    <input
-                      type="checkbox"
-                      checked={makeDefault}
-                      onChange={(event) => setMakeDefault(event.target.checked)}
-                      className="h-5 w-5 accent-cyan-300"
-                    />
-                    آدرس پیش‌فرض من باشد
-                  </label>
-                </div>
-                <Button
-                  type="button"
-                  onClick={() => void saveAddress()}
-                  disabled={isSavingAddress}
-                  className="mt-5 min-h-[52px] w-full rounded-xl sm:w-auto"
-                >
-                  {isSavingAddress ? (
-                    <LoaderCircle className="animate-spin" size={18} />
-                  ) : (
-                    <MapPin size={18} />
-                  )}
-                  {isSavingAddress ? "در حال ذخیره..." : "ذخیره و انتخاب آدرس"}
-                </Button>
-              </div>
-            ) : null}
-          </section>
-
+        <div className="flex min-w-0 flex-col gap-5">
           <section className="checkout-panel">
             <div className="checkout-section-heading">
               <span className="checkout-section-icon">
@@ -530,7 +366,7 @@ export function CheckoutClient() {
                 return (
                   <label
                     key={method.code}
-                    className={`relative flex min-h-[76px] cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 transition ${unavailable ? "cursor-not-allowed border-retail-border opacity-45" : selected ? "border-retail-accent bg-retail-accent/[0.07]" : "border-retail-border bg-black/15 hover:border-white/20"}`}
+                    className={`relative flex min-h-[76px] cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 transition focus-within:ring-2 focus-within:ring-retail-accent ${unavailable ? "cursor-not-allowed border-retail-border opacity-45" : selected ? "border-retail-accent bg-retail-accent/[0.07]" : "border-retail-border bg-black/15 hover:border-white/20"}`}
                   >
                     <input
                       type="radio"
@@ -546,6 +382,11 @@ export function CheckoutClient() {
                       {selected ? <Check size={14} strokeWidth={3} /> : null}
                     </span>
                     <span>
+                      {(method.scope === "pickup" || method.code === "pickup") && (
+                        <span className="mb-1 inline-flex items-center gap-1 text-[11px] font-bold text-cyan-300">
+                          <Store size={14} /> دریافت از مغازه
+                        </span>
+                      )}
                       <span className="block font-black text-white">{method.titleFa}</span>
                       <span className="mt-1 block text-xs text-retail-secondary">
                         {unavailable
@@ -561,6 +402,254 @@ export function CheckoutClient() {
               })}
             </div>
           </section>
+          {isPickup ? (
+            <section className="checkout-panel">
+              <div className="checkout-section-heading">
+                <span className="checkout-section-icon">
+                  <Store size={21} />
+                </span>
+                <div>
+                  <h2 className="font-black text-white">دریافت از مغازه</h2>
+                  <p className="mt-1 text-xs text-retail-secondary">
+                    بدون نیاز به آدرس پستی؛ دریافت با هماهنگی فروشگاه
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 rounded-xl border border-cyan-400/20 bg-cyan-400/5 p-4">
+                <p className="text-sm leading-7 text-white">{pickupStore.address}</p>
+                <p className="mt-2 text-xs leading-7 text-retail-secondary">
+                  پس از تأیید پرداخت، زمان تقریبی آماده‌شدن سفارش اعلام می‌شود. پیش از مراجعه با
+                  فروشگاه هماهنگ کنید.
+                </p>
+                <a
+                  href={`tel:${pickupStore.phone}`}
+                  className="mt-3 inline-flex min-h-10 items-center gap-2 text-sm font-bold text-cyan-300"
+                >
+                  هماهنگی مراجعه <bdi>{pickupStore.phone}</bdi>
+                </a>
+              </div>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <label className="checkout-label">
+                  نام تحویل‌گیرنده
+                  <Input
+                    value={customerName}
+                    onChange={(event) => setCustomerName(event.target.value)}
+                    className={fieldClass}
+                    required
+                  />
+                </label>
+                <label className="checkout-label">
+                  موبایل تحویل‌گیرنده
+                  <Input
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
+                    className={fieldClass}
+                    dir="ltr"
+                    inputMode="tel"
+                    required
+                  />
+                </label>
+              </div>
+            </section>
+          ) : (
+            <section className="checkout-panel">
+              <div className="checkout-section-heading">
+                <span className="checkout-section-icon">
+                  <MapPin size={21} />
+                </span>
+                <div>
+                  <h2 className="font-black text-white">آدرس تحویل</h2>
+                  <p className="mt-1 text-xs text-retail-secondary">سفارش را کجا تحویل بگیرید؟</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={startNewAddress}
+                  className="mr-auto inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-bold text-retail-accent transition hover:bg-retail-accent/10"
+                >
+                  <Plus size={17} /> آدرس جدید
+                </button>
+              </div>
+
+              {addresses.length > 0 ? (
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {addresses.map((item) => {
+                    const selected = item.id === selectedAddressId && !showAddressForm;
+                    return (
+                      <button
+                        type="button"
+                        key={item.id}
+                        onClick={() => applyAddress(item)}
+                        className={`relative min-h-36 rounded-2xl border p-4 text-right transition duration-200 ${
+                          selected
+                            ? "border-retail-accent bg-retail-accent/[0.07] shadow-[0_10px_35px_rgba(0,217,255,.08)]"
+                            : "border-retail-border bg-black/15 hover:border-white/20"
+                        }`}
+                      >
+                        <span className="flex items-start gap-3">
+                          <span
+                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${selected ? "bg-retail-accent text-retail-bg" : "bg-white/5 text-retail-secondary"}`}
+                          >
+                            {item.label === "محل کار" ? <Store size={19} /> : <Home size={19} />}
+                          </span>
+                          <span className="min-w-0">
+                            <span className="flex items-center gap-2 font-black text-white">
+                              {item.label}
+                              {item.isDefault ? (
+                                <span className="rounded-full bg-retail-accent-2/12 px-2 py-0.5 text-[10px] text-retail-accent-2">
+                                  پیش‌فرض
+                                </span>
+                              ) : null}
+                            </span>
+                            <span className="mt-2 line-clamp-2 text-xs leading-6 text-retail-secondary">
+                              {item.province}، {item.city}، {item.line1}
+                            </span>
+                            <span className="mt-2 block text-xs text-retail-muted" dir="ltr">
+                              {item.receiverPhone}
+                            </span>
+                          </span>
+                        </span>
+                        <span
+                          className={`absolute left-3 top-3 flex h-6 w-6 items-center justify-center rounded-full border ${selected ? "border-retail-accent bg-retail-accent text-retail-bg" : "border-retail-border"}`}
+                        >
+                          {selected ? <Check size={14} strokeWidth={3} /> : null}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
+
+              {showAddressForm ? (
+                <div className="checkout-address-form mt-4 rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div>
+                      <h3 className="font-black text-white">
+                        {addresses.length ? "افزودن آدرس جدید" : "اولین آدرس شما"}
+                      </h3>
+                      <p className="mt-1 text-xs text-retail-secondary">
+                        این اطلاعات برای ارسال سفارش استفاده می‌شود.
+                      </p>
+                    </div>
+                    {addresses.length ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowAddressForm(false);
+                          if (selectedAddress) applyAddress(selectedAddress);
+                        }}
+                        className="min-h-11 px-3 text-sm text-retail-secondary hover:text-white"
+                      >
+                        انصراف
+                      </button>
+                    ) : null}
+                  </div>
+                  {addressError ? (
+                    <Alert title="آدرس ذخیره نشد" tone="danger">
+                      {addressError}
+                    </Alert>
+                  ) : null}
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <fieldset className="sm:col-span-2">
+                      <legend className="mb-2 text-sm font-bold">عنوان آدرس</legend>
+                      <div className="flex gap-2">
+                        {["خانه", "محل کار", "سایر"].map((label) => (
+                          <button
+                            key={label}
+                            type="button"
+                            onClick={() => setAddressLabel(label)}
+                            className={`min-h-11 rounded-xl border px-4 text-sm font-bold transition ${addressLabel === label ? "border-retail-accent bg-retail-accent/10 text-retail-accent" : "border-retail-border text-retail-secondary"}`}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </fieldset>
+                    <label className="checkout-label">
+                      نام گیرنده
+                      <Input
+                        value={customerName}
+                        onChange={(event) => setCustomerName(event.target.value)}
+                        className={fieldClass}
+                        autoComplete="name"
+                        required
+                      />
+                    </label>
+                    <label className="checkout-label">
+                      شماره موبایل
+                      <Input
+                        value={phone}
+                        onChange={(event) => setPhone(event.target.value)}
+                        className={`${fieldClass} text-left`}
+                        inputMode="tel"
+                        autoComplete="tel"
+                        dir="ltr"
+                        required
+                      />
+                    </label>
+                    <IranProvinceCitySelect
+                      province={province}
+                      city={city}
+                      onProvinceChange={(next) => {
+                        setProvince(next);
+                        setLocation(undefined);
+                      }}
+                      onCityChange={(next) => {
+                        setCity(next);
+                        setLocation(undefined);
+                      }}
+                    />
+                    <LocationPicker value={location} onChange={setLocation} channel={channel} />
+                    <label className="checkout-label sm:col-span-2">
+                      نشانی کامل
+                      <Textarea
+                        value={address}
+                        onChange={(event) => setAddress(event.target.value)}
+                        className={`${textareaClass} min-h-28`}
+                        autoComplete="street-address"
+                        placeholder="خیابان، کوچه، پلاک و واحد"
+                        required
+                      />
+                    </label>
+                    <label className="checkout-label">
+                      کد پستی <span className="font-normal text-retail-muted">(اختیاری)</span>
+                      <Input
+                        value={postalCode}
+                        onChange={(event) =>
+                          setPostalCode(event.target.value.replace(/\D/g, "").slice(0, 10))
+                        }
+                        className={`${fieldClass} text-left`}
+                        inputMode="numeric"
+                        dir="ltr"
+                        placeholder="۱۰ رقم"
+                      />
+                    </label>
+                    <label className="flex min-h-[52px] cursor-pointer items-center gap-3 self-end rounded-xl border border-retail-border px-4 text-sm text-retail-secondary">
+                      <input
+                        type="checkbox"
+                        checked={makeDefault}
+                        onChange={(event) => setMakeDefault(event.target.checked)}
+                        className="h-5 w-5 accent-cyan-300"
+                      />
+                      آدرس پیش‌فرض من باشد
+                    </label>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={() => void saveAddress()}
+                    disabled={isSavingAddress}
+                    className="mt-5 min-h-[52px] w-full rounded-xl sm:w-auto"
+                  >
+                    {isSavingAddress ? (
+                      <LoaderCircle className="animate-spin" size={18} />
+                    ) : (
+                      <MapPin size={18} />
+                    )}
+                    {isSavingAddress ? "در حال ذخیره..." : "ذخیره و انتخاب آدرس"}
+                  </Button>
+                </div>
+              ) : null}
+            </section>
+          )}
 
           <section className="checkout-panel">
             <div className="checkout-section-heading">
@@ -614,7 +703,7 @@ export function CheckoutClient() {
               </p>
             </div>
             <Link
-              href="/cart"
+              href={`${base}/cart`}
               className="mr-auto min-h-11 px-2 py-3 text-xs font-bold text-retail-accent"
             >
               ویرایش سبد
@@ -670,7 +759,9 @@ export function CheckoutClient() {
           <Button
             type="submit"
             className="mt-5 hidden min-h-14 w-full rounded-xl text-base font-black lg:inline-flex"
-            disabled={isSubmitting || !address || !shipping?.available}
+            disabled={
+              isSubmitting || isLoadingShipping || (!isPickup && !address) || !shipping?.available
+            }
           >
             {isSubmitting ? (
               <LoaderCircle className="animate-spin" size={19} />
@@ -695,7 +786,9 @@ export function CheckoutClient() {
           <Button
             type="submit"
             className="mr-auto min-h-[52px] flex-1 rounded-xl font-black"
-            disabled={isSubmitting || !address || !shipping?.available}
+            disabled={
+              isSubmitting || isLoadingShipping || (!isPickup && !address) || !shipping?.available
+            }
           >
             {isSubmitting ? (
               <LoaderCircle className="animate-spin" size={18} />

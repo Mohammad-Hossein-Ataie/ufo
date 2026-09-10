@@ -28,13 +28,31 @@ import type {
 import { normalizeIranPhone } from "@ufo/validation";
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { isValidIranLocation, quoteConfiguredShipping } from "./shipping-settings";
+import {
+  isValidIranLocation,
+  quoteConfiguredShipping,
+  listShippingMethods,
+} from "./shipping-settings";
+import { parseLocation } from "./location";
+export { parseLocation } from "./location";
 
 export * from "./shipping-settings";
 
 export { createOrder, createOrderItemSnapshot, createOrderNumber } from "@ufo/domain";
 
-export type PaymentReviewStatus = "pending_review" | "approved" | "rejected";
+export type PaymentReviewStatus = "awaiting_receipt" | "pending_review" | "approved" | "rejected";
+export interface OrderReceipt {
+  id: string;
+  note: string;
+  imageKey?: string | undefined;
+  submittedAt: string;
+}
+export interface OrderSms {
+  id: string;
+  kind: "receipt" | "approved";
+  status: "pending" | "sending" | "sent" | "failed" | "mock";
+  updatedAt: string;
+}
 export type ChatSender = "customer" | "admin";
 
 export interface CartSubmissionLine {
@@ -89,6 +107,12 @@ function getSelectedVariantLabel(type: Exclude<ProductVariantType, "none">) {
 }
 
 export interface SubmittedOrder extends Order {
+  shippingScope?: "nationwide" | "tehran" | "pickup";
+  deliveredAt?: string;
+  receipts?: OrderReceipt[];
+  rejectionReason?: string | undefined;
+  estimatedDispatchAt?: string;
+  notifications?: OrderSms[] | undefined;
   customer: OrderCustomerSnapshot;
   shippingAddress: ShippingAddress;
   shippingTitleFa: string;
@@ -141,6 +165,7 @@ export const orderStatusLabelsFa: Record<OrderStatus, string> = {
 };
 
 export const paymentStatusLabelsFa: Record<PaymentReviewStatus, string> = {
+  awaiting_receipt: "در انتظار ارسال رسید",
   pending_review: "در انتظار بررسی رسید",
   approved: "پرداخت تایید شد",
   rejected: "پرداخت رد شد",
@@ -175,7 +200,15 @@ function readStore(): OrderStoreFile {
   if (!existsSync(storePath)) return emptyStore;
   try {
     const parsed = JSON.parse(readFileSync(storePath, "utf8")) as OrderStoreFile;
-    return Array.isArray(parsed.orders) ? parsed : emptyStore;
+    if (!Array.isArray(parsed.orders)) return emptyStore;
+    // Older checkout versions incorrectly marked orders as under review before a receipt existed.
+    return {
+      orders: parsed.orders.map((order) =>
+        order.status === "payment_under_review" && !order.receipts?.length
+          ? { ...order, status: "awaiting_receipt", paymentStatus: "awaiting_receipt" }
+          : order,
+      ),
+    };
   } catch {
     return emptyStore;
   }
@@ -462,6 +495,7 @@ export function updateCustomerAccountProfile(
 }
 
 export interface CustomerAddressInput {
+  location?: ShippingAddress["location"];
   label: string;
   province: string;
   city: string;
@@ -489,6 +523,7 @@ function normalizeAddressInput(
   if (postalCode && postalCode.length !== 10) throw new Error("کد پستی باید ۱۰ رقم باشد.");
   return {
     label,
+    location: parseLocation(input.location),
     province,
     city,
     line1,
@@ -822,6 +857,24 @@ export function getSubmittedOrderForCustomer(
 }
 
 export function createSubmittedOrder(input: CreateSubmittedOrderInput): SubmittedOrder {
+  const method = listShippingMethods({ activeOnly: true }).find(
+    (entry) => entry.code === input.shippingMethod,
+  );
+  if (method?.scope === "pickup") {
+    input = {
+      ...input,
+      address: {
+        province: "تهران",
+        city: "تهران",
+        line1: process.env.STORE_ADDRESS?.trim() || "تهران، بازار مولوی، پاساژ صفویه",
+        receiverName: input.address.receiverName || input.customerName,
+        receiverPhone: input.phone,
+      },
+    };
+  }
+  const location = parseLocation(input.address.location);
+  if (!input.address.line1.trim() || input.address.line1.length > 500)
+    throw new Error("نشانی کامل معتبر نیست.");
   const phone = normalizeIranPhone(input.phone);
   const customerName = input.customerName.trim();
   if (!customerName) throw new Error("نام مشتری الزامی است.");
@@ -853,7 +906,7 @@ export function createSubmittedOrder(input: CreateSubmittedOrderInput): Submitte
   const totals = calculateOrderTotals(items, quote.costRial);
   const submitted: SubmittedOrder = {
     ...order,
-    status: "payment_under_review",
+    status: "awaiting_receipt",
     subtotalRial: totals.subtotalRial,
     discountRial: totals.discountRial,
     totalRial: totals.totalRial,
@@ -864,19 +917,21 @@ export function createSubmittedOrder(input: CreateSubmittedOrderInput): Submitte
     },
     shippingAddress: {
       ...input.address,
+      location,
       receiverName: input.address.receiverName || customerName,
       receiverPhone: phone,
     },
     shippingTitleFa: quote.titleFa,
+    ...(method ? { shippingScope: method.scope } : {}),
     etaFa: quote.etaFa,
-    paymentStatus: "pending_review",
+    paymentStatus: "awaiting_receipt",
     receiptNote: input.receiptNote?.trim() ?? "",
     timeline: [
       createEvent(
         id,
-        "payment_under_review",
+        "awaiting_receipt",
         "customer",
-        "سفارش ثبت شد و رسید پرداخت برای بررسی ادمین ارسال شد.",
+        "سفارش ثبت شد؛ منتظر ارسال رسید پرداخت هستیم.",
       ),
     ],
     chat: [],
@@ -942,9 +997,30 @@ export function updateSubmittedOrderStatus(
 
   const current = store.orders[index];
   if (!current) throw new Error("سفارش پیدا نشد.");
+  if (status === current.status) return current;
+  const pickup = current.shippingScope === "pickup" || current.shippingMethod === "pickup";
+  const transitions: Partial<Record<OrderStatus, OrderStatus[]>> = {
+    awaiting_receipt: ["cancelled"],
+    awaiting_payment: ["cancelled"],
+    payment_under_review: ["cancelled"],
+    confirmed: ["processing", "cancelled"],
+    processing: pickup ? ["ready_for_pickup", "cancelled"] : ["shipped", "cancelled"],
+    ready_for_pickup: pickup ? ["delivered"] : ["shipped"],
+    shipped: ["delivered"],
+  };
+  if (!transitions[current.status]?.includes(status))
+    throw new Error(
+      "این تغییر وضعیت در مرحله فعلی سفارش مجاز نیست؛ تأیید پرداخت از بخش بررسی رسید انجام می‌شود.",
+    );
+  if (
+    ["processing", "ready_for_pickup", "shipped", "delivered"].includes(status) &&
+    current.paymentStatus !== "approved"
+  )
+    throw new Error("ابتدا پرداخت سفارش را تأیید کنید.");
   const next: SubmittedOrder = {
     ...current,
     status,
+    ...(status === "delivered" ? { deliveredAt: new Date().toISOString() } : {}),
     paymentStatus: updatePaymentStatus(status, current.paymentStatus),
     updatedAt: new Date().toISOString(),
     timeline: [
@@ -966,6 +1042,130 @@ export function updateSubmittedOrderStatus(
 
 export function listChatMessages(orderId: string): ChatMessageRecord[] {
   return getSubmittedOrder(orderId)?.chat ?? [];
+}
+
+function mutatePaymentOrder(
+  orderId: string,
+  mutate: (order: SubmittedOrder) => SubmittedOrder,
+): SubmittedOrder {
+  const store = readStore();
+  const index = store.orders.findIndex((order) => order.id === orderId);
+  const current = store.orders[index];
+  if (!current) throw new Error("سفارش پیدا نشد.");
+  const next = mutate(current);
+  store.orders[index] = next;
+  writeStore(store);
+  return next;
+}
+
+export function submitOrderReceipt(
+  orderId: string,
+  customerId: string,
+  channel: SalesChannel,
+  receipt: OrderReceipt,
+): SubmittedOrder {
+  return mutatePaymentOrder(orderId, (order) => {
+    if (order.userId !== customerId || order.channel !== channel)
+      throw new Error("دسترسی به سفارش مجاز نیست.");
+    if (order.status !== "awaiting_receipt")
+      throw new Error("این سفارش اکنون امکان ارسال رسید ندارد.");
+    const note = receipt.note.trim();
+    if ((!note && !receipt.imageKey) || note.length > 2000)
+      throw new Error("تصویر یا متن رسید معتبر لازم است.");
+    if ((order.receipts?.length ?? 0) >= 10)
+      throw new Error("حداکثر تعداد رسید ثبت شده است؛ با پشتیبانی تماس بگیرید.");
+    const now = new Date().toISOString();
+    return {
+      ...order,
+      status: "payment_under_review",
+      paymentStatus: "pending_review",
+      rejectionReason: undefined,
+      receipts: [...(order.receipts ?? []), { ...receipt, note }],
+      updatedAt: now,
+      notifications: [
+        ...(order.notifications ?? []),
+        { id: crypto.randomUUID(), kind: "receipt", status: "pending", updatedAt: now },
+      ],
+      timeline: [
+        createEvent(
+          order.id,
+          "payment_under_review",
+          "customer",
+          "رسید ارسال شد؛ در انتظار بررسی ادمین.",
+        ),
+        ...order.timeline,
+      ],
+    };
+  });
+}
+
+export function reviewOrderPayment(
+  orderId: string,
+  decision: "approve" | "reject",
+  estimatedDispatchAt?: string,
+  reason?: string,
+): SubmittedOrder {
+  return mutatePaymentOrder(orderId, (order) => {
+    if (order.status !== "payment_under_review" || !order.receipts?.length)
+      throw new Error("رسیدی برای بررسی وجود ندارد یا قبلاً بررسی شده است.");
+    const now = new Date().toISOString();
+    if (decision === "reject") {
+      const rejectionReason = reason?.trim();
+      if (!rejectionReason || rejectionReason.length > 500)
+        throw new Error("دلیل رد رسید را وارد کنید (حداکثر ۵۰۰ کاراکتر).");
+      return {
+        ...order,
+        status: "awaiting_receipt",
+        paymentStatus: "rejected",
+        rejectionReason,
+        updatedAt: now,
+        timeline: [
+          createEvent(order.id, "awaiting_receipt", "admin", `رسید رد شد: ${rejectionReason}`),
+          ...order.timeline,
+        ],
+      };
+    }
+    const dispatch = new Date(estimatedDispatchAt ?? "");
+    if (
+      !Number.isFinite(dispatch.getTime()) ||
+      dispatch.getTime() <= Date.now() ||
+      dispatch.getTime() > Date.now() + 90 * 86400000
+    )
+      throw new Error("زمان تقریبی ارسال باید در آینده و حداکثر تا ۹۰ روز باشد.");
+    return {
+      ...order,
+      status: "confirmed",
+      paymentStatus: "approved",
+      estimatedDispatchAt: dispatch.toISOString(),
+      updatedAt: now,
+      notifications: [
+        ...(order.notifications ?? []),
+        { id: crypto.randomUUID(), kind: "approved", status: "pending", updatedAt: now },
+      ],
+      timeline: [
+        createEvent(
+          order.id,
+          "confirmed",
+          "admin",
+          "واریز بررسی و تأیید شد؛ زمان تقریبی ارسال تعیین شد.",
+        ),
+        ...order.timeline,
+      ],
+    };
+  });
+}
+
+export function setOrderSmsStatus(
+  orderId: string,
+  notificationId: string,
+  status: OrderSms["status"],
+): SubmittedOrder {
+  return mutatePaymentOrder(orderId, (order) => ({
+    ...order,
+    notifications: order.notifications?.map((item) =>
+      item.id === notificationId ? { ...item, status, updatedAt: new Date().toISOString() } : item,
+    ),
+  }));
 }
 
 export function appendChatMessage(args: {

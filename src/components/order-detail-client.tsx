@@ -7,6 +7,8 @@ import { Button, EmptyState, Price, StatusPill } from "@ufo/ui";
 import type { SubmittedOrder } from "@ufo/orders";
 import type { OrderStatus, SalesChannel } from "@ufo/types";
 import { authHeaders, readCustomerSession } from "@/lib/customer-client";
+import { ManualPayment } from "@/components/manual-payment";
+import { CommerceSkeleton } from "@/components/commerce-skeleton";
 
 const orderStatusLabelsFa: Record<OrderStatus, string> = {
   draft: "پیش‌نویس",
@@ -23,6 +25,7 @@ const orderStatusLabelsFa: Record<OrderStatus, string> = {
 };
 
 const paymentStatusLabelsFa = {
+  awaiting_receipt: "در انتظار ارسال رسید",
   pending_review: "در انتظار بررسی رسید",
   approved: "پرداخت تایید شد",
   rejected: "پرداخت رد شد",
@@ -68,12 +71,38 @@ export function OrderDetailClient({
   }, [base, channel, orderId]);
 
   async function reorder() {
+    if (!order || !["delivered", "cancelled", "returned"].includes(order.status)) return;
     const response = await fetch(`${base}/${orderId}/reorder`, {
       method: "POST",
       headers: authHeaders(channel),
     });
     if (response.ok) window.location.href = cartHref;
   }
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const refresh = async () => {
+      if (document.visibilityState !== "visible" || !readCustomerSession(channel)) return;
+      try {
+        const response = await fetch(`${base}/${orderId}`, {
+          headers: authHeaders(channel),
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        const payload = await response.json();
+        if (response.ok && payload.order && !controller.signal.aborted) setOrder(payload.order);
+      } catch {
+        /* Keep the last known order while offline. */
+      }
+    };
+    const timer = window.setInterval(() => void refresh(), 15000);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(timer);
+      controller.abort();
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [base, channel, orderId]);
 
   if (error) {
     return (
@@ -91,12 +120,12 @@ export function OrderDetailClient({
   }
 
   if (!order) {
-    return <main className="mx-auto max-w-6xl px-4 py-10">در حال دریافت سفارش...</main>;
+    return <CommerceSkeleton kind="order" page />;
   }
 
   return (
     <main className="mx-auto grid max-w-6xl gap-6 px-4 py-10 lg:grid-cols-[1fr_22rem]">
-      <section className="grid gap-5">
+      <section className="grid min-w-0 gap-5">
         <div>
           <h1 className="text-3xl font-black">سفارش {order.orderNumber}</h1>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -111,9 +140,10 @@ export function OrderDetailClient({
         >
           <h2 className="text-xl font-bold">اقلام سفارش</h2>
           <div className="mt-4 grid gap-3">
-            {order.items.map((item) => (
+            {/* Saved order rows have a fixed order; different options can share a SKU. */}
+            {order.items.map((item, index) => (
               <div
-                key={item.sku}
+                key={`${item.sku}-${index}`}
                 className={`flex flex-wrap items-center justify-between gap-3 rounded-md p-3 ${isWholesale ? "bg-[#F7F7F2]" : "bg-white/5"}`}
               >
                 <div>
@@ -143,6 +173,18 @@ export function OrderDetailClient({
             ))}
           </div>
         </section>
+        <ManualPayment order={order} channel={channel} onUpdate={setOrder} />
+        {order.status === "delivered" && (
+          <section className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5">
+            <h2 className="font-bold">سفارش به شما تحویل داده شد</h2>
+            {order.deliveredAt && (
+              <p className="mt-2 text-sm">
+                زمان تحویل:{" "}
+                {new Date(order.deliveredAt).toLocaleString("fa-IR", { timeZone: "Asia/Tehran" })}
+              </p>
+            )}
+          </section>
+        )}
       </section>
       <aside
         className={`h-fit rounded-md border p-5 ${isWholesale ? "border-[#D5D9C9] bg-[#14201B] text-white" : "border-[#22303D] bg-[#141A22]"}`}
@@ -167,7 +209,11 @@ export function OrderDetailClient({
           </div>
         </div>
         <div className="mt-5 grid gap-2 border-t border-current/20 pt-4 text-sm">
-          <h3 className="font-bold">آدرس ارسال</h3>
+          <h3 className="font-bold">
+            {order.shippingScope === "pickup" || order.shippingMethod === "pickup"
+              ? "محل دریافت حضوری"
+              : "آدرس ارسال"}
+          </h3>
           <p>
             {order.shippingAddress.province}، {order.shippingAddress.city}
           </p>
@@ -177,10 +223,12 @@ export function OrderDetailClient({
             <span dir="ltr">{order.shippingAddress.receiverPhone}</span>
           </p>
         </div>
-        <Button className="mt-5 w-full" onClick={reorder}>
-          <RotateCcw size={18} />
-          خرید مجدد
-        </Button>
+        {["delivered", "cancelled", "returned"].includes(order.status) && (
+          <Button className="mt-5 w-full" onClick={reorder}>
+            <RotateCcw size={18} />
+            خرید مجدد
+          </Button>
+        )}
       </aside>
     </main>
   );

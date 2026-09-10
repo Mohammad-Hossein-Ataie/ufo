@@ -33,12 +33,13 @@ describe("homepage category discovery", () => {
   it("uses update freshness in category priority order, independently of input/creation order", () => {
     const rows = [
       row("old", "cat-pod", date(1), { createdAt: date(30) }),
-      row("juice", "cat-eliquid", date(3)),
+      row("juice", "cat-eliquid", date(31)),
+      row("salt", "cat-salt-nicotine", date(3)),
       row("pod", "cat-pod", date(20)),
       row("vape", "cat-vape", date(10)),
       row("disposable", "cat-disposable", date(5)),
     ];
-    expect(primaryIds(rows)).toEqual(["pod", "vape", "disposable", "juice"]);
+    expect(primaryIds(rows)).toEqual(["pod", "vape", "disposable", "salt"]);
     expect(rows[0]!.product.id).toBe("old");
   });
   it("reserves category primaries before filling missing slots and excludes unpublished/wholesale products", () => {
@@ -46,11 +47,11 @@ describe("homepage category discovery", () => {
       row("vape", "cat-vape", date(30)),
       row("spare", "cat-vape", date(20)),
       row("disposable", "cat-disposable", date(10)),
-      row("juice", "cat-eliquid", date(5)),
+      row("salt", "cat-salt-nicotine", date(5)),
       row("inactive", "cat-pod", date(31), { isActive: false }),
       row("wholesale", "cat-pod", date(31), { salesChannels: ["wholesale"] }),
     ];
-    expect(primaryIds(rows)).toEqual(["spare", "vape", "disposable", "juice"]);
+    expect(primaryIds(rows)).toEqual(["spare", "vape", "disposable", "salt"]);
     expect(getLatestHomepageProducts(rows)[0]!.category?.slug).toBe("vape");
   });
   it("fills four slots from one category before allocating extras, with no duplicates across any slides", () => {
@@ -63,13 +64,13 @@ describe("homepage category discovery", () => {
     expect(primaryIds(rows)).toEqual(["p9", "p8", "p7", "p6"]);
   });
   it("provides the three latest products per category when available", () => {
-    const rows = ["cat-pod", "cat-vape", "cat-disposable", "cat-eliquid"].flatMap((category) =>
+    const rows = ["cat-pod", "cat-vape", "cat-disposable", "cat-salt-nicotine"].flatMap((category) =>
       Array.from({ length: 4 }, (_, i) => row(`${category}-${i}`, category, date(i + 1))),
     );
     expect(
       getLatestHomepageProducts(rows).map((slot) => slot.rows.map(({ product }) => product.id)),
     ).toEqual(
-      ["cat-pod", "cat-vape", "cat-disposable", "cat-eliquid"].map((category) =>
+      ["cat-pod", "cat-vape", "cat-disposable", "cat-salt-nicotine"].map((category) =>
         [3, 2, 1].map((i) => `${category}-${i}`),
       ),
     );

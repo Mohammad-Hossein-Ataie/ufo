@@ -9,16 +9,21 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const province = (url.searchParams.get("province") ?? "").trim().slice(0, 80);
     const city = (url.searchParams.get("city") ?? "").trim().slice(0, 80);
-    if (!province || !city) return NextResponse.json({ methods: [] });
     const methods = listAvailableShippingQuotes({
       province,
       city,
       line1: "استعلام روش ارسال",
       receiverName: "مشتری",
       receiverPhone: "09120000000",
-    });
+    }).filter((method) => (province && city) || method.scope === "pickup");
     return NextResponse.json(
-      { methods },
+      {
+        methods,
+        pickup: {
+          address: process.env.STORE_ADDRESS?.trim() || "تهران، بازار مولوی، پاساژ صفویه",
+          phone: process.env.STORE_PHONE?.trim() || "09362157181",
+        },
+      },
       { headers: { "Cache-Control": "private, max-age=30, stale-while-revalidate=60" } },
     );
   } catch (error) {

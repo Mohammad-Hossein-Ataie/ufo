@@ -23,6 +23,7 @@ import {
 } from "@/lib/customer-client";
 import { CustomerOtpLogin } from "@/components/customer-otp-login";
 import { ProtectedProductImage } from "@/components/protected-product-image";
+import { CommerceSkeleton } from "@/components/commerce-skeleton";
 
 interface SelectedVariant {
   type: Exclude<ProductVariantType, "none">;
@@ -92,6 +93,8 @@ export function CartClient() {
   const [guestCart, setGuestCart] = useState<GuestCartLine[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     if (!loginOpen) return;
@@ -106,13 +109,22 @@ export function CartClient() {
   }, [loginOpen]);
 
   async function sync() {
-    const session = readCustomerSession("retail");
-    setIsLoggedIn(Boolean(session));
-    if (session) {
-      setCartView(await fetchCustomerCart("retail"));
-      return;
+    try {
+      setLoadError("");
+      const session = readCustomerSession("retail");
+      setIsLoggedIn(Boolean(session));
+      if (session) {
+        const cart = await fetchCustomerCart("retail");
+        if (!cart) throw new Error("دریافت سبد خرید انجام نشد.");
+        setCartView(cart);
+        return;
+      }
+      setGuestCart(readGuestCart("retail"));
+    } catch {
+      setLoadError("دریافت سبد خرید انجام نشد. دوباره تلاش کنید.");
+    } finally {
+      setIsLoading(false);
     }
-    setGuestCart(readGuestCart("retail"));
   }
 
   useEffect(() => {
@@ -185,6 +197,23 @@ export function CartClient() {
     saveGuestCart("retail", []);
     setGuestCart([]);
   }
+
+  if (isLoading) return <CommerceSkeleton kind="cart" />;
+  if (loadError)
+    return (
+      <div role="alert" className="rounded-2xl border border-retail-border p-6 text-center">
+        <p>{loadError}</p>
+        <Button
+          className="mt-4"
+          onClick={() => {
+            setIsLoading(true);
+            void sync();
+          }}
+        >
+          تلاش دوباره
+        </Button>
+      </div>
+    );
 
   if (lines.length === 0) {
     return (

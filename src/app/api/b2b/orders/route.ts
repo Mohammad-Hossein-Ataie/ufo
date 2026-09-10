@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { checkoutCustomerCart, listSubmittedOrders } from "@ufo/orders";
+import { checkoutCustomerCart, listSubmittedOrders, parseLocation } from "@ufo/orders";
 import type { ShippingMethodCode } from "@ufo/types";
 import { requireCustomerSession } from "@/lib/customer-session";
 
@@ -10,8 +10,9 @@ function stringValue(value: unknown, fallback = ""): string {
 }
 
 function shippingMethod(value: unknown): ShippingMethodCode {
-  if (value === "tehran_courier" || value === "pickup" || value === "tipax") return value;
-  return "tipax";
+  if (typeof value !== "string" || !/^[a-z][a-z0-9_]{2,39}$/.test(value))
+    throw new Error("روش ارسال معتبر نیست.");
+  return value;
 }
 
 export async function GET(request: Request) {
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
       customerName,
       phone: phone || session.phone,
       address: {
+        location: parseLocation(payload.location),
         province,
         city,
         line1: addressLine,

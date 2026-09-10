@@ -182,7 +182,7 @@ export default async function HomePage() {
             <div>
               <h2 className="text-2xl font-black text-white sm:text-3xl">محصولات جدید یوفوپاف</h2>
               <p className="mt-2 text-retail-secondary">
-                تازه‌ترین محصولات پاد، ویپ، پاد یک‌بارمصرف و جویس را کشف کنید.
+                تازه‌ترین محصولات پاد، ویپ، پاد یک‌بارمصرف و سالت نیکوتین را کشف کنید.
               </p>
             </div>
             <Link
