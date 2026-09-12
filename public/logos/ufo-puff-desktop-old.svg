@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="232" height="48" viewBox="0 0 232 48" fill="none">
+  <title>UFO Puff</title>
+  <g transform="translate(0 1)">
+    <path d="M15 19C16 3 38 3 39 19" stroke="#63E6FF" stroke-width="2.5"/>
+    <path d="M21 13C24 9 30 9 33 12" stroke="#F5F7FA" stroke-width="2" stroke-linecap="round"/>
+    <path d="M3 24C3 19 14 15 27 15S51 19 51 24S40 33 27 33S3 29 3 24Z" stroke="#63E6FF" stroke-width="2.5"/>
+    <path d="M4 24C15 28 39 28 50 24M15 34C21 40 33 40 39 34" stroke="#63E6FF" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M17 22H19M26 23H28M35 22H37" stroke="#F5F7FA" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <g fill="#F5F7FA" transform="translate(65 14)">
+    <path d="M0 0H4V14Q4 18 8 18H10Q14 18 14 14V0H18V14Q18 22 10 22H8Q0 22 0 14Z"/>
+    <path d="M23 0H40V4H27V9H38V13H27V22H23Z"/>
+    <path fill-rule="evenodd" d="M52 0H57Q65 0 65 8V14Q65 22 57 22H52Q44 22 44 14V8Q44 0 52 0ZM52 4Q48 4 48 8V14Q48 18 52 18H57Q61 18 61 14V8Q61 4 57 4Z"/>
+  </g>
+  <g fill="#63E6FF" transform="translate(140 14)">
+    <path fill-rule="evenodd" d="M0 0H10Q18 0 18 7Q18 14 10 14H4V22H0ZM4 4V10H10Q14 10 14 7Q14 4 10 4Z"/>
+    <path d="M23 0H27V14Q27 18 31 18H33Q37 18 37 14V0H41V14Q41 22 33 22H31Q23 22 23 14Z"/>
+    <path d="M46 0H63V4H50V9H61V13H50V22H46ZM68 0H85V4H72V9H83V13H72V22H68Z"/>
+  </g>
+</svg>

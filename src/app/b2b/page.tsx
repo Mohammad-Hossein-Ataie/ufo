@@ -14,7 +14,7 @@ import {
   Warehouse,
 } from "lucide-react";
 import { Button } from "@ufo/ui";
-import { brands, products, variants } from "@ufo/domain";
+import { brands } from "@ufo/domain";
 import { canonical, faqPageJsonLd, jsonLdScriptProps } from "@ufo/seo";
 
 export const metadata: Metadata = {
@@ -65,16 +65,6 @@ const workflow = [
     title: "پیش‌فاکتور",
     text: "سفارش برای هماهنگی ارسال و تایید ادمین ثبت می‌شود.",
   },
-];
-
-const stats = [
-  { value: `${products.length}`, label: "محصول قابل بررسی" },
-  {
-    value: `${variants.filter((item) => item.wholesaleEnabled !== false).length}`,
-    label: "واریانت همکاری",
-  },
-  { value: "+۵۰۰", label: "همکار فروشگاهی" },
-  { value: "۲۴h", label: "پیگیری سفارش" },
 ];
 
 export default function B2BHomePage() {
@@ -176,20 +166,6 @@ export default function B2BHomePage() {
               </ul>
             </div>
           </aside>
-        </div>
-      </section>
-
-      <section className="border-b border-[#D5D9C9] bg-white">
-        <div className="mx-auto grid max-w-7xl gap-3 px-4 py-6 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((item) => (
-            <div
-              key={item.label}
-              className="rounded-md border border-[#D5D9C9] bg-[#F7F7F2] p-5 text-center"
-            >
-              <div className="text-3xl font-black tabular-nums text-[#14201B]">{item.value}</div>
-              <div className="mt-2 text-sm text-[#596B61]">{item.label}</div>
-            </div>
-          ))}
         </div>
       </section>
 

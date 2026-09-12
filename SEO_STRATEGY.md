@@ -14,7 +14,7 @@
 
 - cart، checkout، account، login و search داخلی
 - صفحه‌های order و chat کاربر
-- `/b2b/catalog`, `/b2b/cart`, `/b2b/checkout`, `/b2b/login`, `/b2b/orders`, `/b2b/account`
+- `/b2b/catalog`, `/b2b/quick-order`, `/b2b/cart`, `/b2b/checkout`, `/b2b/login`, `/b2b/orders`, `/b2b/account`
 - همه مسیرهای `/admin`
 - همه مسیرهای `/api`
 - URLهای sort/filter کم‌ارزش
@@ -39,6 +39,13 @@
 - queryهای داخلی مثل `q`, `sort` و `filter` در canonical حفظ نمی‌شوند.
 - صفحات دسته مسیر تمیز `/products/category/[slug]` دارند؛ لینک‌های داخلی نباید به query دسته‌بندی متکی باشند.
 - `/b2b/catalog` به دلیل نمایش قیمت همکاری noindex است و در sitemap قرار نمی‌گیرد.
+
+## B2B Utility Indexation Safety
+
+- The B2B layout defaults to `noindex, nofollow`; existing public pages explicitly override this default.
+- Utility pages do not inherit the public homepage canonical or retail social metadata.
+- Production crawlers may fetch B2B utility pages to read their noindex directives. These routes are not blocked by robots.txt; noindex does not replace authentication.
+- Non-production crawling remains blocked. See `B2B_TECHNICAL_AUDIT.md` for the scoped changes and verification.
 
 ## Sitemap Behavior
 

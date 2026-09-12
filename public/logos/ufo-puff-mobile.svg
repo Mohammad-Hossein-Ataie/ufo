@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 64 64" fill="none">
+  <title>UFO Puff</title>
+  <path d="M18 26C19 7 45 7 46 26" stroke="#63E6FF" stroke-width="4"/>
+  <path d="M5 33C5 27 17 23 32 23S59 27 59 33S47 43 32 43S5 39 5 33Z" stroke="#63E6FF" stroke-width="4"/>
+  <path d="M7 33C19 38 45 38 57 33" stroke="#F5F7FA" stroke-width="3" stroke-linecap="round"/>
+  <path d="M21 48C27 53 37 53 43 48" stroke="#63E6FF" stroke-width="4" stroke-linecap="round"/>
+</svg>

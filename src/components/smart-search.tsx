@@ -201,6 +201,7 @@ export function SmartSearch({ channel, className, inputClassName }: SmartSearchP
           aria-hidden="true"
         />
         <input
+          aria-label={channel === "wholesale" ? "جستجوی کاتالوگ عمده" : undefined}
           value={query}
           onChange={(event) => {
             setQuery(event.target.value);

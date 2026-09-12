@@ -53,8 +53,7 @@
   }
 
   .retail-storefront .storefront-product-card,
-  .retail-storefront .retail-glass,
-  .retail-header {
+  .retail-storefront .retail-glass {
     background: linear-gradient(145deg, rgba(28, 37, 48, 0.82), rgba(12, 18, 26, 0.92));
     border-color: rgba(255, 255, 255, 0.12);
     -webkit-backdrop-filter: blur(16px);
@@ -72,6 +71,142 @@
     background: radial-gradient(ellipse at 75% 0%, rgba(0, 217, 255, 0.055), transparent 60%),
       rgba(15, 22, 31, 0.72);
     border-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* Header branding is separate from product surfaces. Keep heights deterministic. */
+.retail-header {
+  border-bottom: 1px solid rgba(99, 230, 255, 0.15);
+  background: rgba(7, 12, 18, 0.97);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.14);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.header-icon {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: #dce5ed;
+  transition: color 150ms, background-color 150ms, border-color 150ms;
+}
+
+.header-icon:hover {
+  border-color: rgba(99, 230, 255, 0.16);
+  background: rgba(99, 230, 255, 0.06);
+  color: #63e6ff;
+}
+
+.header-brand:focus-visible,
+.header-icon:focus-visible,
+.header-nav-link:focus-visible,
+.header-catalog:focus-visible {
+  outline: 2px solid #63e6ff;
+  outline-offset: 3px;
+}
+
+.header-nav-link {
+  position: relative;
+  display: inline-flex;
+  height: 100%;
+  align-items: center;
+  white-space: nowrap;
+  color: #aab6c2;
+  font-size: 13px;
+  transition: color 150ms;
+}
+
+.header-nav-link:hover,
+.header-nav-link[aria-current="page"] {
+  color: #f5f7fa;
+}
+
+.header-nav-link[aria-current="page"]::after {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: #63e6ff;
+  content: "";
+}
+
+.header-catalog {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding-inline: 12px;
+  color: #63e6ff;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 150ms;
+}
+
+.header-catalog:hover {
+  background: rgba(99, 230, 255, 0.08);
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --retail-header-height: 118px;
+  }
+
+  .retail-header .header-account {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .retail-header .header-cart {
+    color: #63e6ff;
+    background: rgba(99, 230, 255, 0.07);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-icon,
+  .header-nav-link,
+  .header-catalog {
+    transition: none;
+  }
+}
+
+/* Keep native controls and keyboard states consistent with the B2B light surface. */
+.b2b-shell {
+  color-scheme: light;
+}
+
+/* Override the shared primary button's cyan fill on the existing green controls.
+   This darker green provides sufficient contrast for normal-size white text. */
+.b2b-shell :is(a, button)[class~="bg-[#1F8A5B]"] {
+  background-color: #176d48;
+  border-color: #176d48;
+  color: #fff;
+}
+
+.b2b-shell :is(a, button)[class~="bg-[#1F8A5B]"]:hover {
+  background-color: #12583a;
+  border-color: #12583a;
+}
+
+.b2b-header [aria-current="page"] {
+  background-color: #e7e7dc;
+  color: #14201b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .b2b-shell *,
+  .b2b-shell *::before,
+  .b2b-shell *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }
 

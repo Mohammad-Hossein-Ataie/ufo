@@ -37,11 +37,8 @@ export default function robots(): MetadataRoute.Robots {
           "/login",
           "/orders",
           "/search",
-          "/b2b/cart",
-          "/b2b/checkout",
-          "/b2b/login",
-          "/b2b/orders",
-          "/b2b/account",
+          // B2B utility pages serve noindex metadata. Crawlers must be able to
+          // fetch it; robots.txt blocking alone does not prevent URL indexing.
           "/*?sort=",
           "/*?filter=",
           "/*?q=",

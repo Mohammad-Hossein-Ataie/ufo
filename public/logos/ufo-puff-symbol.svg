@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  <title>UFO Puff favicon source</title>
+  <rect width="64" height="64" rx="14" fill="#05070B"/>
+  <path d="M20 27C20 11 44 11 44 27" fill="#63E6FF"/>
+  <path d="M32 24C46 24 57 28 57 34S46 44 32 44S7 40 7 34S18 24 32 24Z" fill="#63E6FF" stroke="#05070B" stroke-width="3"/>
+  <path d="M15 33C24 37 40 37 49 33" stroke="#05070B" stroke-width="4" stroke-linecap="round"/>
+  <path d="M24 48H40L36 52H28Z" fill="#63E6FF"/>
+</svg>

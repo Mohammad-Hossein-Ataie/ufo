@@ -691,7 +691,7 @@ export function CheckoutClient({ channel = "retail" }: { channel?: SalesChannel 
           </section>
         </div>
 
-        <aside className="h-fit rounded-[24px] border border-retail-border bg-gradient-to-b from-[#141b23] to-[#0d1218] p-5 shadow-[0_24px_70px_rgba(0,0,0,.35)] lg:sticky lg:top-24">
+        <aside className="h-fit rounded-[24px] border border-retail-border bg-gradient-to-b from-[#141b23] to-[#0d1218] p-5 shadow-[0_24px_70px_rgba(0,0,0,.35)] lg:sticky lg:top-[calc(var(--retail-header-height)+1rem)]">
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-retail-accent">
               <PackageCheck size={20} />

@@ -29,7 +29,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (pathname.startsWith("/b2b")) {
     return (
-      <div className="min-h-screen bg-[#F7F7F2] text-[#14201B]">
+      <div className="b2b-shell min-h-screen bg-[#F7F7F2] text-[#14201B]">
         <a href="#main-content" className="skip-link">
           پرش به محتوای اصلی
         </a>

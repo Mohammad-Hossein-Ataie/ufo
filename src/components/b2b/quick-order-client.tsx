@@ -89,25 +89,47 @@ export function QuickOrderClient() {
   }
 
   return (
-    <div className="grid gap-5">
-      <div className="overflow-x-auto rounded-md border border-[#D5D9C9] bg-white">
+    <div className="grid min-w-0 gap-5">
+      <div
+        role="region"
+        aria-label="جدول اقلام"
+        tabIndex={0}
+        className="min-w-0 overflow-x-auto rounded-md border border-[#D5D9C9] bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1F8A5B]"
+      >
         <table className="w-full min-w-[820px] text-sm">
+          <caption className="sr-only">جدول اقلام</caption>
           <thead className="bg-[#EEF0E5] text-[#405148]">
             <tr>
-              <th className="px-4 py-3 text-right">محصول</th>
-              <th className="px-4 py-3 text-right">SKU</th>
-              <th className="px-4 py-3 text-right">تعداد در کارتن</th>
-              <th className="px-4 py-3 text-right">کارتن</th>
-              <th className="px-4 py-3 text-right">قیمت همکاری</th>
-              <th className="px-4 py-3 text-right">جمع</th>
+              <th scope="col" className="px-4 py-3 text-right">
+                محصول
+              </th>
+              <th scope="col" className="px-4 py-3 text-right">
+                SKU
+              </th>
+              <th scope="col" className="px-4 py-3 text-right">
+                تعداد در کارتن
+              </th>
+              <th scope="col" className="px-4 py-3 text-right">
+                کارتن
+              </th>
+              <th scope="col" className="px-4 py-3 text-right">
+                قیمت همکاری
+              </th>
+              <th scope="col" className="px-4 py-3 text-right">
+                جمع
+              </th>
             </tr>
           </thead>
           <tbody>
             {lines.map((line) => (
               <tr key={line.variant.id} className="border-t border-[#E2E4D8]">
-                <td className="px-4 py-3 font-bold text-[#12201A]">
+                <th
+                  scope="row"
+                  id={`quick-order-item-${line.variant.id}`}
+                  className="px-4 py-3 text-right font-bold text-[#12201A]"
+                >
                   {line.product?.nameFa ?? "محصول"}
-                </td>
+                </th>
                 <td className="px-4 py-3 text-[#12201A]" dir="ltr">
                   {line.variant.sku}
                 </td>
@@ -122,6 +144,7 @@ export function QuickOrderClient() {
                           type="button"
                           className="inline-flex h-11 w-11 items-center justify-center text-[#12201A] transition hover:bg-[#EEF0E5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1F8A5B]"
                           aria-label="کاهش تعداد کارتن"
+                          aria-describedby={`quick-order-item-${line.variant.id}`}
                           onClick={() => updateCarton(line.variant.id, line.cartonCount - 1)}
                         >
                           <Minus size={16} aria-hidden="true" />
@@ -129,6 +152,7 @@ export function QuickOrderClient() {
                         <output
                           className="min-w-12 px-3 text-center font-black tabular-nums text-[#12201A]"
                           aria-live="polite"
+                          aria-describedby={`quick-order-item-${line.variant.id}`}
                         >
                           {formatter.format(line.cartonCount)}
                         </output>
@@ -136,6 +160,7 @@ export function QuickOrderClient() {
                           type="button"
                           className="inline-flex h-11 w-11 items-center justify-center text-[#12201A] transition hover:bg-[#EEF0E5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1F8A5B]"
                           aria-label="افزایش تعداد کارتن"
+                          aria-describedby={`quick-order-item-${line.variant.id}`}
                           onClick={() => updateCarton(line.variant.id, line.cartonCount + 1)}
                         >
                           <Plus size={16} aria-hidden="true" />
@@ -151,6 +176,7 @@ export function QuickOrderClient() {
                   ) : (
                     <Button
                       type="button"
+                      aria-describedby={`quick-order-item-${line.variant.id}`}
                       size="sm"
                       className="border-[#1F8A5B] bg-[#1F8A5B] text-white hover:bg-[#176D48]"
                       onClick={() => updateCarton(line.variant.id, 1)}

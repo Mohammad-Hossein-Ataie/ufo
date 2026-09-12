@@ -305,7 +305,7 @@ export default async function ProductsPage({
           </span>
           <span className="text-xs font-medium text-retail-secondary">نمایش گزینه‌ها</span>
         </label>
-        <aside className="retail-glass catalog-filter-aside hidden h-fit rounded-retail border border-retail-border bg-retail-surface p-4 shadow-retail-lg peer-checked:block lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:overscroll-contain">
+        <aside className="retail-glass catalog-filter-aside hidden h-fit rounded-retail border border-retail-border bg-retail-surface p-4 shadow-retail-lg peer-checked:block lg:sticky lg:top-[calc(var(--retail-header-height)+1rem)] lg:block lg:max-h-[calc(100vh-var(--retail-header-height)-2rem)] lg:overflow-y-auto lg:overscroll-contain">
           <div className="flex items-center gap-2 border-b border-retail-border pb-4">
             <SlidersHorizontal size={18} className="text-retail-accent" aria-hidden="true" />
             <h2 className="font-black text-white">فیلتر محصولات</h2>

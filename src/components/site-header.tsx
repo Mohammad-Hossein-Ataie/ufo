@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -15,7 +14,8 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { Button, IconButton } from "@ufo/ui";
+import { IconButton } from "@ufo/ui";
+import { BrandLogo } from "@/components/brand-logo";
 import { SmartSearch } from "@/components/smart-search";
 import { fetchCustomerCart, readCustomerSession } from "@/lib/customer-client";
 
@@ -182,90 +182,78 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="retail-header sticky top-0 z-40 border-b border-retail-border bg-[#05070B]/88 backdrop-blur-xl">
-        <div className="relative mx-auto flex h-[60px] max-w-7xl items-center justify-between px-3 sm:h-16 sm:px-4">
+      <header className="retail-header sticky top-0 z-40">
+        <div className="mx-auto grid h-[60px] max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-3 sm:px-4 lg:h-[72px] lg:grid-cols-[232px_minmax(0,1fr)_auto] lg:gap-8">
           <div className="flex items-center gap-1 lg:hidden">
             <IconButton
               label="باز کردن منو"
-              className="border-transparent bg-transparent"
+              className="header-icon"
+              aria-expanded={menuOpen}
+              aria-controls="retail-mobile-menu"
               onClick={() => setMenuOpen(true)}
             >
               <Menu size={22} aria-hidden="true" />
             </IconButton>
-            <Link href="/search" aria-label="جستجو" className="inline-flex">
-              <IconButton label="جستجو" className="border-transparent bg-transparent">
-                <Search size={21} aria-hidden="true" />
-              </IconButton>
+            <Link href="/search" aria-label="جستجو" className="header-icon">
+              <Search size={21} aria-hidden="true" />
             </Link>
           </div>
           <Link
             href="/"
             aria-label="یوفوپاف، صفحه خانه"
-            className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 lg:static lg:translate-x-0 lg:translate-y-0"
+            className="header-brand inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg"
           >
-            <span className="relative h-11 w-11 shrink-0 sm:h-12 sm:w-12">
-              <Image
-                src="/logos/logo.png"
-                alt="UFO Puff"
-                fill
-                sizes="48px"
-                className="object-contain"
-                priority
-                unoptimized
-              />
-            </span>
-            <span className="hidden leading-tight lg:block">
-              <span className="block font-black text-white">یوفوپاف</span>
-              <span className="block text-[11px] tracking-[0.16em] text-retail-secondary" dir="ltr">
-                UFO PUFF
-              </span>
-            </span>
+            <BrandLogo />
           </Link>
-          <nav aria-label="ناوبری اصلی" className="hidden items-center gap-1 lg:flex">
-            {navItems.map((item) => {
-              const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`rounded-lg px-3 py-2 text-sm transition ${active ? "bg-white/10 text-white" : "text-retail-secondary hover:bg-white/5 hover:text-white"}`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
           <SmartSearch
             channel="retail"
-            className="hidden flex-1 md:block lg:max-w-md xl:max-w-xl"
+            className="header-search hidden min-w-0 lg:block lg:max-w-none"
+            inputClassName="!rounded-xl !border-white/10 !bg-white/[0.035] placeholder:!text-retail-secondary focus:!border-retail-accent/60"
           />
-          <div className="flex items-center gap-1">
+          <div className="flex items-center justify-self-end gap-1 lg:gap-3">
             <Link
               href={accountHref}
               aria-label={loggedIn ? "حساب کاربری" : "ورود"}
-              className="inline-flex"
+              className="header-account header-icon lg:!w-auto lg:gap-2.5 lg:!px-4"
             >
-              <IconButton
-                label={loggedIn ? "حساب کاربری" : "ورود"}
-                className="border-transparent bg-transparent lg:border-white/15 lg:bg-white/5"
-              >
-                <UserRound size={20} aria-hidden="true" />
-              </IconButton>
+              <UserRound size={20} aria-hidden="true" />
+              <span className="hidden whitespace-nowrap text-xs font-medium lg:block">
+                {loggedIn ? "حساب کاربری" : "ورود / ثبت‌نام"}
+              </span>
             </Link>
+            <span className="hidden h-6 w-px bg-white/10 lg:block" aria-hidden="true" />
             <button
               type="button"
               onClick={openCart}
               aria-label="سبد خرید"
-              className="relative inline-flex h-11 w-11 items-center justify-center rounded-md text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-retail-accent"
+              className="header-icon header-cart relative"
             >
               <ShoppingBag size={21} aria-hidden="true" />
               <CountBadge count={cartCount} />
             </button>
-            <Link href="/products" className="hidden lg:inline-flex">
-              <Button size="sm">
-                <PackageSearch size={17} aria-hidden="true" />
-                کاتالوگ
-              </Button>
+          </div>
+        </div>
+        <div className="hidden border-t border-white/[0.06] lg:block">
+          <div className="mx-auto flex h-11 max-w-7xl items-center justify-between px-4">
+            <nav aria-label="ناوبری اصلی" className="flex h-full items-center gap-7">
+              {navItems.map((item) => {
+                const active =
+                  item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className="header-nav-link"
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+            <Link href="/products" className="header-catalog">
+              <PackageSearch size={16} aria-hidden="true" />
+              <span>کاتالوگ محصولات</span>
             </Link>
           </div>
         </div>
@@ -282,27 +270,15 @@ export function SiteHeader() {
           className={`absolute inset-0 bg-black/75 backdrop-blur-[2px] transition-opacity duration-300 ease-mobile ${menuOpen ? "opacity-100" : "opacity-0"}`}
         />
         <aside
+          id="retail-mobile-menu"
           role="dialog"
           aria-modal="true"
           aria-label="منوی موبایل"
-          className={`absolute inset-y-0 right-0 flex w-[min(88vw,24rem)] flex-col border-l border-retail-border bg-[#080c12]/98 shadow-2xl transition-transform duration-300 ease-mobile ${menuOpen ? "translate-x-0" : "translate-x-full"}`}
+          className={`absolute inset-y-0 right-0 flex w-[min(88vw,24rem)] flex-col border-l border-retail-border bg-[#080c12] shadow-2xl transition-transform duration-300 ease-mobile ${menuOpen ? "translate-x-0" : "translate-x-full"}`}
         >
           <div className="flex min-h-20 items-center justify-between border-b border-retail-border px-4 pt-[env(safe-area-inset-top)]">
-            <div className="flex items-center gap-3">
-              <span className="relative h-11 w-11">
-                <Image
-                  src="/logos/logo.png"
-                  alt="UFO Puff"
-                  fill
-                  sizes="44px"
-                  className="object-contain"
-                  unoptimized
-                />
-              </span>
-              <div>
-                <p className="font-black text-white">یوفوپاف</p>
-                <p className="text-xs text-retail-secondary">فروشگاه تخصصی ویپ</p>
-              </div>
+            <div role="img" aria-label="یوفوپاف UFO Puff" className="min-w-0 [&_img]:max-w-full">
+              <BrandLogo compact={false} />
             </div>
             <IconButton
               label="بستن منو"
@@ -322,6 +298,7 @@ export function SiteHeader() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  aria-current={active ? "page" : undefined}
                   className={`flex min-h-14 items-center gap-4 rounded-xl px-4 font-bold transition ${active ? "border border-retail-accent/30 bg-retail-accent/10 text-retail-accent" : "text-[#dce5ed] hover:bg-white/5"}`}
                 >
                   <item.icon size={21} aria-hidden="true" />
