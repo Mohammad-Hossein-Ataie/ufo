@@ -18,6 +18,13 @@ Local SMS credentials are in the gitignored `.env`. Next.js loads `.env.local`
 before `.env`; do not duplicate SMS settings there. Deployment uses host env vars.
 All names below are server-only (never use NEXT_PUBLIC prefixes).
 
+Website admin login uses `ADMIN_USERNAME` and `ADMIN_PASSWORD` only. These are
+separate from the Melipayamak panel account. For production deployments, keep
+the website admin values under `ADMIN_*`, add the panel login as
+`MELIPAYAMAK_USERNAME`, and use `MELIPAYAMAK_API_KEY` (or
+`MELIPAYAMAK_PASSWORD`) for the panel secret. Do not reuse the admin login
+credentials for SMS. Both OTP and order SMS read these `MELIPAYAMAK_*` names.
+
 - `SMS_PROVIDER=melipayamak`
 - `MELIPAYAMAK_USERNAME`: panel username.
 - `MELIPAYAMAK_PASSWORD`: panel password.
