@@ -75,7 +75,7 @@ export default function StorePage() {
 
       <section className="showcase-grid relative isolate overflow-hidden border-b border-retail-border">
         <Image
-          src="/images/ufo-hero.png"
+          src="/images/ufo-hero.webp"
           alt="ویترین محصولات پاد و ویپ یوفوپاف در تهران"
           fill
           priority

@@ -142,7 +142,7 @@ export default function B2BHomePage() {
           <aside className="reveal-up-delay-1 overflow-hidden rounded-md border border-[#D5D9C9] bg-white shadow-[0_16px_40px_rgba(20,32,27,0.12)]">
             <div className="relative aspect-[4/3] bg-[#EEF0E5]">
               <Image
-                src="/images/ufo-hero.png"
+                src="/images/ufo-hero.webp"
                 alt="ویترین محصولات یوفوپاف برای سفارش عمده"
                 fill
                 priority

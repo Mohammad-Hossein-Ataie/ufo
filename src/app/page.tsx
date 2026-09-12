@@ -108,7 +108,7 @@ export default async function HomePage() {
 
       <section className="relative isolate overflow-hidden">
         <Image
-          src="/images/ufo-hero.png"
+          src="/images/ufo-hero.webp"
           alt="نمای فروشگاهی محصولات پاد و ویپ UFO Puff"
           fill
           priority

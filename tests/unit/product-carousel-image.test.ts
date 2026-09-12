@@ -14,7 +14,7 @@ class FakeImage {
 }
 const input = {
   src: "/api/product-images/catalog/p1/primary/card?v=2",
-  fallbackSrc: "/images/categories/pod.png",
+  fallbackSrc: "/images/categories/pod.webp",
 };
 beforeEach(() => {
   instances = [];

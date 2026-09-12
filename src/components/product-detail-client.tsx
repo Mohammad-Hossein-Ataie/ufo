@@ -61,7 +61,7 @@ export function ProductDetailClient({
   variantImages,
   variantOptions,
 }: ProductDetailClientProps) {
-  const firstImage = galleryImages[0] ?? "/images/categories/lighter.png";
+  const firstImage = galleryImages[0] ?? "/images/categories/lighter.webp";
   const variantImageMap = useMemo(
     () => buildVariantImageMap(variantOptions, variantImages),
     [variantImages, variantOptions],

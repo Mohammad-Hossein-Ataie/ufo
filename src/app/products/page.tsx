@@ -498,7 +498,7 @@ export default async function ProductsPage({
                         key={`media-${product.id}`}
                         src={getProductImage(product)}
                         fallbackSrc={
-                          getCategoryImage(product.categoryId) ?? "/images/categories/lighter.png"
+                          getCategoryImage(product.categoryId) ?? "/images/categories/lighter.webp"
                         }
                         alt={product.nameFa}
                       />

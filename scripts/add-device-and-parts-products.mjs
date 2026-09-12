@@ -8,7 +8,7 @@ if (!attachmentPath) {
 
 const outputPath = resolve("packages/domain/src/imported-products.ts");
 const importedAt = "2026-08-09T00:00:00.000Z";
-const defaultImage = "/images/ufo-hero.png";
+const defaultImage = "/images/ufo-hero.webp";
 
 const directDeviceRows = [
   ["پاد سیستم ویپرسو ارمور جی", "VAPORESSO ARMOUR G", "VAPORESSO", 8_700_000],

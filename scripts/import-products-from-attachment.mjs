@@ -195,8 +195,8 @@ parsed.forEach((item, productIndex) => {
       item.category === "pod"
         ? `${item.name} در کاتالوگ پادهای دائمی ثبت شده و قیمت/موجودی آن از پنل ادمین قابل به‌روزرسانی است.`
         : `${item.name} از لیست محصول‌های یکبارمصرف وارد شد. طعم‌های فعال به عنوان واریانت جداگانه قابل انتخاب هستند.`,
-    image: "/images/ufo-hero.png",
-    images: ["/images/ufo-hero.png"],
+    image: "/images/ufo-hero.webp",
+    images: ["/images/ufo-hero.webp"],
     tags: [
       item.category === "pod" ? "پاد دائمی" : "یکبارمصرف",
       brand,

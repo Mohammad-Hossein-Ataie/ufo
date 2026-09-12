@@ -147,7 +147,7 @@ export async function GET(request: Request) {
       const priceRial =
         channel === "wholesale" ? row.variant.wholesalePriceRial : row.variant.retailPriceRial;
       const fallbackImage =
-        getCategoryImage(row.product.categoryId) ?? "/images/categories/lighter.png";
+        getCategoryImage(row.product.categoryId) ?? "/images/categories/lighter.webp";
       return {
         id: row.product.id,
         title: row.product.nameFa,
