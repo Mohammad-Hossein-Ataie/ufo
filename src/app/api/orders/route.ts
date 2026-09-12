@@ -26,7 +26,32 @@ export async function GET(request: Request) {
   try {
     const session = requireCustomerSession(request, "retail");
     const orders = listSubmittedOrders({ channel: "retail", customerId: session.customerId });
-    return NextResponse.json({ orders });
+    const url = new URL(request.url);
+    const pageParam = url.searchParams.get("page");
+    if (pageParam === null) return NextResponse.json({ orders });
+
+    const requestedPage = Number(pageParam);
+    const requestedPageSize = Number(url.searchParams.get("pageSize") ?? 5);
+    if (
+      !Number.isSafeInteger(requestedPage) ||
+      requestedPage < 1 ||
+      !Number.isSafeInteger(requestedPageSize) ||
+      requestedPageSize < 1 ||
+      requestedPageSize > 20
+    ) {
+      return NextResponse.json(
+        { error: "شماره صفحه یا تعداد سفارش‌ها معتبر نیست." },
+        { status: 400 },
+      );
+    }
+
+    const total = orders.length;
+    const pageCount = Math.max(1, Math.ceil(total / requestedPageSize));
+    const page = Math.min(requestedPage, pageCount);
+    return NextResponse.json({
+      orders: orders.slice((page - 1) * requestedPageSize, page * requestedPageSize),
+      pagination: { page, pageSize: requestedPageSize, pageCount, total },
+    });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "دریافت سفارش‌ها انجام نشد." },

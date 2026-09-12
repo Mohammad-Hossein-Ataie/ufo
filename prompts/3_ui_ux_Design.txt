@@ -1,0 +1,668 @@
+You are now responsible for a professional UI/UX redesign of the UFO Puff B2B storefront.
+
+The SEO/content work should already be considered the source of truth.
+
+DO NOT casually rewrite the newly optimized SEO copy.
+
+Your main responsibility in this task is VISUAL DESIGN, INFORMATION ARCHITECTURE, RESPONSIVE UX, and COMPONENT QUALITY.
+
+==================================================
+BACKGROUND
+==================================================
+
+UFO Puff has two storefront experiences:
+
+1. Retail / B2C
+2. Wholesale / B2B
+
+The current retail experience has a much stronger, more polished and recognizable visual identity.
+
+The current B2B pages feel significantly weaker:
+- too plain
+- too generic
+- visually closer to a basic corporate template
+- excessive empty space in some sections
+- weak hierarchy
+- low brand personality
+- weak commerce/product emphasis
+- insufficient differentiation between sections
+- inconsistent perceived quality compared with the B2C storefront
+
+I am providing screenshots of both systems.
+
+Use them as visual context.
+
+The goal is NOT to clone the B2C interface.
+
+The goal is to bring B2B to the SAME QUALITY LEVEL while keeping it appropriate for professional wholesale buyers.
+
+==================================================
+FIRST: INSPECT THE PROJECT
+==================================================
+
+Before changing code, inspect:
+
+DESIGN_SYSTEM.md
+UI_UX_GUIDELINES.md
+STOREFRONT_REFINEMENT.md
+
+Then inspect:
+
+src/app/b2b/layout.tsx
+src/app/b2b/page.tsx
+src/app/b2b/catalog/page.tsx
+src/app/b2b/about/page.tsx
+src/app/b2b/quick-order/page.tsx
+
+and:
+
+src/components/b2b/b2b-header.tsx
+src/components/b2b/quick-order-client.tsx
+
+Also inspect relevant shared components and global styles.
+
+Study the retail storefront for reusable visual principles:
+
+src/app/page.tsx
+src/components/site-header.tsx
+src/components/homepage-products.tsx
+
+But DO NOT blindly reuse retail components if their behavior does not fit B2B.
+
+==================================================
+DESIGN GOAL
+==================================================
+
+Design the B2B storefront as a premium wholesale commerce interface.
+
+It should communicate:
+
+- professional supplier
+- reliable inventory
+- wholesale purchasing
+- commercial efficiency
+- clear pricing/order rules
+- fast product discovery
+- strong UFO Puff brand identity
+
+Think:
+
+premium wholesale commerce platform
+
+NOT:
+
+generic corporate landing page
+
+and NOT:
+
+copy of consumer storefront.
+
+==================================================
+BRAND RELATIONSHIP
+==================================================
+
+B2C and B2B must clearly belong to the same UFO Puff ecosystem.
+
+Share:
+
+- typography logic
+- spacing discipline
+- border radius language
+- icon style
+- brand cyan / turquoise accents
+- logo/identity
+- interaction quality
+- visual precision
+
+But their personalities may differ.
+
+B2C:
+immersive / dark / product-discovery oriented
+
+B2B:
+efficient / structured / professional / data-oriented
+
+The B2B interface can remain lighter if that produces better wholesale usability.
+
+Do NOT force dark mode simply because retail is dark.
+
+However, the new light B2B design must feel intentional and premium rather than washed out or generic.
+
+==================================================
+CURRENT VISUAL PROBLEMS
+==================================================
+
+Based on the current screenshots, carefully evaluate issues such as:
+
+- weak hero composition
+- very large empty areas
+- weak visual hierarchy
+- generic cards
+- excessive borders
+- repeated rectangular boxes
+- weak differentiation between feature sections
+- statistics disconnected from the main narrative
+- page sections appearing as independent templates
+- product catalog feeling visually basic
+- filter sidebar dominating catalog space
+- B2B header feeling less polished than retail header
+- typography not strong enough
+- CTA hierarchy
+- spacing rhythm
+- icon usage
+- product-card density
+- excessive beige/white flat surfaces
+- insufficient UFO Puff brand personality
+
+Do your own audit before implementation.
+
+Do not assume every item above is necessarily correct.
+
+==================================================
+B2B HOMEPAGE
+==================================================
+
+Redesign /b2b as a premium B2B landing page.
+
+The hero must communicate the offer within seconds.
+
+Improve:
+
+- H1 prominence
+- supporting content
+- primary CTA
+- secondary CTA
+- supporting visual
+- wholesale trust indicators
+
+The current large visual card should not feel disconnected from the headline.
+
+Create a stronger visual relationship between:
+brand
+commercial value
+catalog
+ordering workflow
+
+Possible hero structure:
+
+content + commerce visual
+
+with clear B2B indicators such as:
+
+- قیمت همکاری
+- حداقل سفارش
+- موجودی
+- پیش‌فاکتور
+
+where these features genuinely exist.
+
+Avoid visual clutter.
+
+==================================================
+TRUST / VALUE PROPOSITION
+==================================================
+
+Redesign competitive advantages so they do not look like generic feature cards.
+
+Create meaningful hierarchy.
+
+For example:
+
+Primary B2B advantages:
+- wholesale/cooperation pricing
+- transparent minimum order
+- stock availability
+- order workflow
+
+Secondary support:
+- tracking
+- support
+- proforma
+- quick ordering
+
+Use layout, icons and typography to distinguish importance.
+
+Do not put eight identical cards on the page just because there are eight messages.
+
+==================================================
+PROCESS SECTION
+==================================================
+
+Current cooperation steps should feel like a workflow.
+
+Instead of independent boxes, visually communicate a sequence such as:
+
+01
+انتخاب کالا
+
+02
+بررسی حداقل سفارش و موجودی
+
+03
+ثبت سفارش
+
+04
+تایید / پیش‌فاکتور
+
+05
+پیگیری
+
+Only include steps supported by the actual application.
+
+Use responsive horizontal/vertical stepper patterns where appropriate.
+
+Do not add a heavy dependency for this.
+
+==================================================
+B2B CATALOG
+==================================================
+
+The catalog is one of the most important B2B pages.
+
+Treat it as a professional commerce tool.
+
+Improve:
+
+- product density
+- filter usability
+- card hierarchy
+- product information scanning
+- MOQ presentation
+- carton quantity
+- wholesale price
+- SKU
+- variants
+- stock state
+- CTA
+- pagination
+
+A buyer should be able to compare products quickly.
+
+The current design should not feel like retail product cards copied into a wholesale grid.
+
+B2B cards should prioritize commercial information.
+
+Recommended visual hierarchy:
+
+Product Image
+Product Name
+Brand / Category
+Availability
+MOQ / carton quantity
+Wholesale price
+Relevant variants
+Primary order action
+
+Do not display every piece of metadata with equal visual weight.
+
+==================================================
+FILTER UX
+==================================================
+
+Reassess the current catalog sidebar.
+
+Desktop:
+- professional sticky filtering is acceptable
+- keep filter width efficient
+- avoid stealing too much grid space
+
+Tablet/mobile:
+- do NOT show a huge permanent sidebar
+- use a filter drawer/sheet/expandable control consistent with the current stack
+- show active filter count
+- make clear/reset actions obvious
+
+Do not install a UI dependency simply to implement a drawer if it can be built with existing project patterns.
+
+==================================================
+B2B PRODUCT GRID
+==================================================
+
+Review responsive columns.
+
+Cards should feel dense enough for wholesale scanning while remaining readable.
+
+Avoid:
+- enormous cards
+- excessive vertical whitespace
+- inconsistent card heights
+- CTA buttons jumping vertically
+- excessive badges
+- huge product photography
+
+Use a predictable card structure.
+
+==================================================
+ABOUT / COOPERATION PAGE
+==================================================
+
+The current /b2b/about page should feel like a genuine partnership page.
+
+Improve visual storytelling around:
+
+- who the service is for
+- wholesale benefits
+- cooperation workflow
+- business requirements
+- contact / next step
+
+Do not create another homepage.
+
+Avoid a large hero followed by multiple generic cards with the same layout.
+
+Use more varied but consistent composition.
+
+==================================================
+QUICK ORDER
+==================================================
+
+Make Quick Order feel like a productivity tool.
+
+The user should instantly understand:
+
+- what they can enter/select
+- current quantity
+- MOQ
+- stock status
+- what happens next
+
+Prioritize speed and clarity.
+
+Avoid decorative design that slows down ordering.
+
+==================================================
+HEADER
+==================================================
+
+Review the B2B header independently.
+
+It should use the improved UFO Puff branding system and look as polished as the retail header.
+
+But it should make the current context obvious:
+
+UFO Puff Wholesale / B2B
+
+The B2B navigation should have strong hierarchy for:
+
+خانه
+کاتالوگ
+سفارش سریع
+درباره همکاری
+
+and relevant account/cart actions.
+
+Do not overload the header.
+
+Improve:
+- logo presentation
+- search
+- nav spacing
+- active state
+- CTA
+- icon alignment
+- vertical centering
+- mobile behavior
+
+==================================================
+MOBILE B2B EXPERIENCE
+==================================================
+
+Mobile must be redesigned intentionally.
+
+Do not merely stack desktop sections.
+
+At:
+
+430
+390
+375
+360
+
+verify:
+
+- hero
+- navigation
+- CTAs
+- card spacing
+- catalog
+- filters
+- product information
+- quick order
+- typography
+- touch targets
+
+No horizontal overflow.
+
+Avoid sections requiring excessive scrolling due only to decorative whitespace.
+
+==================================================
+DESIGN SYSTEM
+==================================================
+
+Reuse or extend the existing design system.
+
+Create reusable B2B primitives/tokens only if needed.
+
+Examples:
+
+b2b-section
+b2b-container
+b2b-card
+b2b-eyebrow
+b2b-button-primary
+b2b-muted
+b2b-surface
+
+But do not create dozens of abstraction components for trivial markup.
+
+Prefer consistent primitives over duplicated Tailwind class strings when there is genuine reuse.
+
+==================================================
+TYPOGRAPHY
+==================================================
+
+Improve Persian typography hierarchy.
+
+Define clear levels for:
+
+Display
+H1
+H2
+H3
+Body
+Secondary
+Caption
+Commerce metadata
+
+Do not rely only on font-size.
+
+Use:
+- weight
+- contrast
+- line-height
+- spacing
+
+RTL must remain correct.
+
+Numbers, SKU and Latin brand names must render cleanly inside RTL content.
+
+==================================================
+VISUAL DEPTH
+==================================================
+
+The current B2B interface feels too flat.
+
+Introduce subtle depth using:
+
+- layered surfaces
+- controlled shadows
+- borders only when meaningful
+- soft brand accents
+- intentional background sections
+- subtle gradients where useful
+
+Do not:
+
+- add glassmorphism everywhere
+- add huge shadows
+- add excessive gradients
+- add neon glow everywhere
+- animate every component
+
+Professional B2B UI should remain calm.
+
+==================================================
+CTA SYSTEM
+==================================================
+
+Create a clear CTA hierarchy.
+
+Primary:
+commercial action
+
+Examples:
+مشاهده کاتالوگ عمده
+ثبت سفارش سریع
+
+Secondary:
+navigation/supporting action
+
+Avoid multiple equally prominent cyan buttons competing inside the same viewport.
+
+==================================================
+MICROINTERACTIONS
+==================================================
+
+Use subtle states:
+
+hover
+focus
+active
+pressed
+loading
+disabled
+
+Animations should be fast and functional.
+
+Respect prefers-reduced-motion if animations exist.
+
+==================================================
+ACCESSIBILITY
+==================================================
+
+Maintain:
+
+- semantic headings
+- visible focus states
+- sufficient contrast
+- keyboard usability
+- accessible controls
+- form labels
+- useful aria-labels where necessary
+
+Do not turn semantic buttons/links into generic divs.
+
+==================================================
+PERFORMANCE
+==================================================
+
+Do not harm Core Web Vitals.
+
+Avoid:
+- giant client components
+- unnecessary client-side state
+- extra animation libraries
+- excessive image loading
+- layout shifts
+- oversized assets
+
+Prefer Server Components unless client behavior is actually needed.
+
+==================================================
+DO NOT BREAK FUNCTIONALITY
+==================================================
+
+Do not change:
+
+- B2B pricing logic
+- B2B authentication
+- MOQ logic
+- inventory logic
+- cart logic
+- checkout
+- orders
+- customer data
+- APIs
+- admin behavior
+
+This is primarily a frontend presentation/UX refactor.
+
+If you discover a functional bug, report it separately instead of casually rewriting business logic.
+
+==================================================
+RESPONSIVE QA
+==================================================
+
+Check:
+
+1440
+1280
+1024
+768
+430
+390
+375
+360
+
+At each breakpoint inspect:
+
+- header
+- hero
+- statistics
+- process
+- feature sections
+- catalog
+- filters
+- product grid
+- product cards
+- CTAs
+- footer
+- RTL
+- text wrapping
+
+==================================================
+TESTS
+==================================================
+
+After implementation:
+
+- TypeScript
+- lint
+- relevant tests
+- production build if reasonable
+
+Also visually inspect all public B2B pages.
+
+Do not consider the task complete merely because the build passes.
+
+==================================================
+FINAL REPORT
+==================================================
+
+At completion report:
+
+1. UX problems found
+2. Visual strategy selected
+3. Components redesigned
+4. Reusable styles/components introduced
+5. Desktop improvements
+6. Mobile improvements
+7. Catalog/filter improvements
+8. Accessibility improvements
+9. Files changed
+10. Tests/build results
+11. Remaining limitations
+
+Do not stop at recommendations.
+
+Implement the redesign.

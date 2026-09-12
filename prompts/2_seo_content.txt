@@ -1,0 +1,585 @@
+You are working on the UFO Puff e-commerce project.
+
+Your task is to professionally audit and rewrite the PUBLIC B2B storefront content for SEO, search intent, conversion, semantic relevance, and competitive positioning.
+
+This is NOT just a metadata task.
+
+The current B2B pages contain many generic, repetitive, low-value marketing texts that do not clearly answer user search intent, do not communicate strong competitive advantages, and do not contribute enough semantic value to the page.
+
+The goal is to turn the B2B section into a high-quality Persian wholesale landing/catalog experience that can realistically target relevant commercial search queries while still reading naturally for real store owners and wholesale buyers.
+
+==================================================
+IMPORTANT PROJECT CONTEXT
+==================================================
+
+First inspect the existing project and read, if relevant:
+
+- SEO_STRATEGY.md
+- SEO_AEO_AUDIT.md
+- DESIGN_SYSTEM.md
+- UI_UX_GUIDELINES.md
+
+Then inspect at minimum:
+
+src/app/b2b/page.tsx
+src/app/b2b/catalog/page.tsx
+src/app/b2b/about/page.tsx
+src/app/b2b/quick-order/page.tsx
+src/app/b2b/layout.tsx
+src/components/b2b/b2b-header.tsx
+
+Also inspect:
+- actual product/category data sources
+- metadata implementation
+- sitemap
+- robots
+- structured data if already present
+- global layout metadata
+- any reusable SEO helpers/components
+
+Do not assume how SEO is currently implemented.
+Inspect it first.
+
+==================================================
+PRIMARY BUSINESS POSITIONING
+==================================================
+
+The B2B experience is for wholesale / retail-store partners.
+
+The content should communicate real B2B value instead of generic marketing slogans.
+
+Examples of meaningful value propositions already represented by the current product/business experience include concepts such as:
+
+- carton-based wholesale pricing
+- transparent minimum-order requirements
+- wholesale/cooperation pricing
+- actual inventory availability
+- inventory reservation before final confirmation, where supported
+- proforma invoice workflow, where supported
+- fast ordering
+- searchable wholesale catalog
+- brand/category discovery
+- direct support and coordination
+- order tracking
+- availability suitable for retail-store purchasing
+- B2B ordering workflow separate from ordinary retail purchasing
+
+IMPORTANT:
+Verify every claim against the actual application, code, data or existing business copy before publishing it.
+
+Do NOT invent:
+- fake statistics
+- fake delivery times
+- fake discounts
+- fake number of customers
+- fake number of products
+- fake guarantees
+- fake brand partnerships
+- fake stock availability promises
+- fake prices
+
+If a statistic such as:
+"500+ partners"
+"400 products"
+"21 brands"
+"24h tracking"
+
+exists in the current UI, verify whether it is backed by real project/business data.
+
+If it cannot be verified, rewrite it into a truthful non-numeric benefit instead of keeping a potentially false claim.
+
+==================================================
+SEARCH INTENT
+==================================================
+
+Build the copy around actual B2B search intent.
+
+Primary Persian commercial topics may include concepts such as:
+
+خرید عمده ویپ
+خرید عمده پاد
+فروش عمده ویپ
+فروش عمده پاد
+پخش عمده ویپ و پاد
+قیمت عمده ویپ
+قیمت عمده پاد
+خرید کارتنی ویپ
+خرید کارتنی پاد
+عمده فروشی ویپ
+عمده فروشی پاد
+همکاری فروشگاهی ویپ
+خرید عمده پاد یکبار مصرف
+خرید عمده سالت نیکوتین
+
+But:
+
+DO NOT keyword-stuff.
+
+Do not blindly insert every phrase.
+
+Derive final keyword/topic usage from:
+- the actual categories available in this store
+- the actual B2B services
+- the actual page purpose
+- user search intent
+
+Use semantic variations naturally.
+
+==================================================
+PAGE INTENT SEPARATION
+==================================================
+
+Each page must have a distinct search purpose.
+
+------------------------------------------
+/b2b
+------------------------------------------
+
+Intent:
+Wholesale hub / commercial landing page.
+
+It should clearly answer:
+
+- What is UFO Puff wholesale?
+- Who is it for?
+- What can a store owner buy?
+- Why use this wholesale channel?
+- How does collaboration/order flow work?
+- What are the actual advantages?
+- Where should the user continue?
+
+Suggested semantic direction:
+
+خرید عمده ویپ و پاد
+فروش عمده محصولات ویپ
+همکاری با فروشگاه‌ها
+قیمت همکاری
+سفارش کارتنی
+کاتالوگ عمده
+
+The H1 should be explicit and search-relevant.
+
+Avoid generic H1s such as:
+"همکاری با یوفوپاف"
+
+when a stronger intent-oriented heading can accurately describe the page.
+
+For example, derive something closer to:
+
+"خرید عمده ویپ و پاد برای فروشگاه‌ها"
+
+but choose the final wording based on the actual page content.
+
+------------------------------------------
+/b2b/catalog
+------------------------------------------
+
+Intent:
+Wholesale product discovery.
+
+Focus semantic content on:
+
+- wholesale catalog
+- carton pricing
+- MOQ / minimum order
+- available categories
+- brands
+- stock
+- wholesale product selection
+- filtering
+
+The text above the product grid should help Google AND users understand what can be found on the page.
+
+Do not create a large SEO article above the catalog.
+
+Keep commerce first.
+
+Useful SEO copy should be concise and contextual.
+
+------------------------------------------
+/b2b/quick-order
+------------------------------------------
+
+Intent:
+Fast B2B ordering.
+
+Explain:
+- what quick order is
+- when it is useful
+- how carton/minimum order works
+- how availability is handled
+- what happens after submitting
+
+Avoid vague phrases like:
+"مسیر سریع سفارش"
+
+without explaining what actually makes it fast.
+
+------------------------------------------
+/b2b/about
+------------------------------------------
+
+Intent:
+Wholesale cooperation / business relationship.
+
+Explain:
+- who the cooperation service is for
+- how a retailer begins working with UFO Puff
+- pricing/cooperation workflow
+- stock/order coordination
+- support
+- next steps
+
+Do NOT duplicate the homepage paragraph.
+
+==================================================
+CONTENT QUALITY
+==================================================
+
+Rewrite weak generic content.
+
+Bad example:
+
+"برای تصمیم سریع همکاران، محصولات دسته‌بندی شده‌اند."
+
+Better content should explain concrete value:
+
+- what information is available
+- why that information matters to a wholesale buyer
+- what problem it solves
+
+Every section should provide at least one of:
+
+- useful buying information
+- differentiation
+- trust
+- navigation
+- commercial intent
+- answer to a real question
+
+If a paragraph provides none of these, remove or replace it.
+
+==================================================
+COMPETITIVE ADVANTAGES
+==================================================
+
+Build a clear competitive positioning system.
+
+Do not fill the page with generic advantages such as:
+
+- کیفیت بالا
+- بهترین خدمات
+- خرید آسان
+- پشتیبانی عالی
+
+unless there is concrete evidence.
+
+Prefer operational B2B advantages such as:
+
+قیمت همکاری مشخص
+حداقل سفارش شفاف
+مشاهده موجودی
+انتخاب بر اساس برند و دسته
+سفارش کارتنی
+پیش‌فاکتور
+رزرو یا بررسی موجودی
+پیگیری سفارش
+سفارش سریع
+پشتیبانی فروشگاهی
+
+Only include capabilities that really exist.
+
+Make these advantages visible in:
+
+- hero
+- trust strip
+- process sections
+- catalog intro
+- FAQ
+
+without repeating identical text everywhere.
+
+==================================================
+CONTENT HIERARCHY
+==================================================
+
+Maintain a strong semantic hierarchy.
+
+Each indexable page should generally have:
+
+ONE H1
+
+Then meaningful H2 sections.
+
+Use H3 only where there is a real subsection.
+
+Do not use headings only for visual styling.
+
+Do not create several H1s.
+
+Do not hide important semantic content in images.
+
+==================================================
+SEO METADATA
+==================================================
+
+Audit and improve:
+
+- title
+- description
+- canonical
+- OpenGraph
+- Twitter metadata where appropriate
+- robots directives
+- sitemap inclusion
+
+Write unique metadata for each PUBLIC B2B page.
+
+Avoid repeating the same title/description across:
+
+/b2b
+/b2b/catalog
+/b2b/about
+/b2b/quick-order
+
+Brand naming should remain consistent.
+
+Use realistic Persian titles and descriptions.
+
+Do not create absurdly long titles.
+
+Do not stuff keywords.
+
+==================================================
+INDEXATION RULES
+==================================================
+
+Carefully distinguish PUBLIC LANDING pages from transactional/private pages.
+
+Likely public/indexable candidates:
+
+/b2b
+/b2b/catalog
+/b2b/about
+
+Evaluate /b2b/quick-order based on actual content.
+
+Pages such as:
+
+/b2b/login
+/b2b/account
+/b2b/cart
+/b2b/checkout
+/b2b/orders
+/b2b/orders/[orderId]
+
+should generally NOT become SEO landing pages.
+
+Review their existing robots/indexation behavior.
+
+Do not accidentally make customer/account/order pages indexable.
+
+==================================================
+STRUCTURED DATA
+==================================================
+
+Audit existing JSON-LD before adding anything.
+
+Use only structured data that accurately represents visible content.
+
+Potentially relevant types may include:
+
+Organization
+WebSite
+BreadcrumbList
+CollectionPage
+ItemList
+Product
+
+Do NOT:
+
+- add fake reviews
+- add fake aggregateRating
+- add FAQ schema purely for ranking
+- add structured data for content not actually visible
+- duplicate existing schema implementations
+
+Follow current search-engine eligibility requirements conservatively.
+
+==================================================
+FAQ / AEO CONTENT
+==================================================
+
+Create useful FAQ content only where it helps users.
+
+Questions should represent actual B2B purchase concerns.
+
+Examples:
+
+- حداقل سفارش عمده چگونه محاسبه می‌شود؟
+- قیمت همکاری چگونه نمایش داده می‌شود؟
+- آیا موجودی محصولات عمده قابل مشاهده است؟
+- سفارش کارتنی چگونه ثبت می‌شود؟
+- پیش‌فاکتور سفارش عمده چگونه دریافت می‌شود؟
+- تفاوت خرید عمده و خرید تکی در یوفوپاف چیست؟
+- چطور محصولات یک برند خاص را در کاتالوگ عمده پیدا کنیم؟
+
+Do not answer with unsupported business promises.
+
+Use the application's real behavior.
+
+==================================================
+INTERNAL LINKING
+==================================================
+
+Create meaningful internal links between relevant public pages.
+
+Examples:
+
+homepage -> wholesale
+wholesale -> catalog
+wholesale -> quick order
+wholesale -> cooperation/about
+catalog -> useful category/product pages where appropriate
+B2B content -> relevant B2B routes
+
+Anchor text should describe the destination.
+
+Avoid repeated:
+"مشاهده بیشتر"
+"کلیک کنید"
+
+when a descriptive label would be better.
+
+==================================================
+RETAIL VS B2B SEO
+==================================================
+
+Avoid keyword cannibalization between retail and wholesale pages.
+
+Retail pages should focus on individual/customer purchasing intent.
+
+B2B should focus on:
+- عمده
+- همکاری
+- کارتنی
+- فروشگاهی
+- قیمت همکاری
+- سفارش عمده
+
+Do not rewrite the retail site unless technically required for:
+- internal linking
+- metadata conflict
+- canonical/indexation issue
+
+==================================================
+PERSIAN WRITING QUALITY
+==================================================
+
+Write natural professional Persian.
+
+Avoid:
+- robotic text
+- literal English translations
+- keyword stuffing
+- excessive نیم‌فاصله mistakes
+- overusing slogans
+- exaggerated claims
+- unnecessary English terminology
+
+The target audience is:
+shop owners and professional wholesale buyers.
+
+Tone:
+professional
+commercial
+clear
+confident
+concise
+
+Not:
+corporate jargon
+SEO spam
+advertising clichés
+
+==================================================
+MOBILE CONTENT
+==================================================
+
+Content must work on mobile.
+
+Avoid very long hero paragraphs.
+
+Use:
+- short headings
+- concise supporting text
+- scannable value propositions
+
+SEO must not destroy UX.
+
+==================================================
+DO NOT CHANGE BUSINESS LOGIC
+==================================================
+
+Do not modify:
+- pricing calculations
+- inventory rules
+- authentication
+- checkout
+- cart
+- B2B eligibility
+- order creation
+- APIs
+- admin functionality
+
+unless you discover a direct SEO bug that requires a very small technical fix.
+
+==================================================
+TESTING
+==================================================
+
+After changes:
+
+- run TypeScript checks
+- run lint
+- run relevant tests
+- run production build if reasonable
+
+Check generated page metadata.
+
+Check:
+- only one H1
+- correct Persian content
+- internal links
+- canonical
+- robots
+- sitemap behavior
+- no broken routes
+- no hydration problems
+
+==================================================
+DELIVERABLE
+==================================================
+
+Do not stop at an audit.
+
+Implement the improvements.
+
+At the end report:
+
+1. SEO problems found
+2. Search intent assigned to each B2B page
+3. Copy/content changed
+4. Competitive advantages surfaced
+5. Metadata changed
+6. Internal linking changes
+7. Structured data changes
+8. Indexation decisions
+9. Files changed
+10. Tests/build results
+
+Keep the implementation focused.
+
+Do not rewrite unrelated retail content.
+Do not fabricate business claims.
+Do not add SEO filler just to increase word count.

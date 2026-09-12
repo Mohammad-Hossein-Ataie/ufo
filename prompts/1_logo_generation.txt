@@ -1,0 +1,334 @@
+You are working on the UFO Puff e-commerce website.
+
+I am providing reference images for:
+1. The current desktop header/navbar
+2. The current mobile header/homepage
+3. The current browser tab/favicon appearance
+4. The current UFO Puff logo artwork
+
+Your task is to professionally redesign the header/navbar branding system for UFO Puff across desktop and mobile, and also create improved logo assets that fit the new design.
+
+IMPORTANT:
+You are allowed to redesign the header visually to make it feel premium, modern, polished, and production-ready.
+Do not keep the current header design if it looks average or weak.
+The goal is a professional, high-end result.
+
+However:
+- Do not break existing functionality.
+- Do not redesign unrelated sections of the website.
+- Do not change business logic.
+- Do not touch product/cart/auth/search behavior except for visual/header-level integration.
+- Keep the implementation focused, maintainable, and production-ready.
+
+==================================================
+MAIN GOAL
+==================================================
+
+Create a much more professional and visually refined header/navbar system for UFO Puff.
+
+The current header is not good enough visually.
+It should be redesigned so that:
+
+- the brand looks premium,
+- the logo placement feels intentional,
+- desktop and mobile both have their own optimized branding,
+- the header looks clean, modern, futuristic, dark-mode native, and commercially strong.
+
+This is not just a small tweak.
+This is a professional redesign of the header branding experience.
+
+==================================================
+DESIGN DIRECTION
+==================================================
+
+Brand personality:
+- premium
+- modern
+- futuristic
+- dark / neon / tech-inspired
+- clean and minimal
+- suitable for a vape-related e-commerce brand
+- visually memorable
+
+Color direction:
+- preserve the UFO Puff cyan / turquoise / teal visual identity
+- keep compatibility with dark backgrounds
+- avoid overusing glow or excessive visual noise
+- use highlights carefully and tastefully
+
+The final result should feel like a professionally designed e-commerce brand header, not a template navbar.
+
+==================================================
+CURRENT ISSUES TO FIX
+==================================================
+
+Current desktop issues:
+- Branding feels fragmented
+- Persian brand name and English name are separately written in a weak way
+- The logo and text do not feel like one coherent brand lockup
+- The overall header lacks a premium visual hierarchy
+
+Current mobile issues:
+- The current logo is too detailed for small sizes
+- The header branding is not optimized for mobile clarity
+- The visual balance between logo and action icons is not ideal
+
+Current favicon issue:
+- The full detailed logo is too complex for a favicon-scale symbol
+
+==================================================
+YOUR RESPONSIBILITIES
+==================================================
+
+You must do all of the following:
+
+1. Inspect the current header/navbar implementation in the codebase
+2. Identify all header-related components for desktop and mobile
+3. Identify all existing logo/brand assets and favicon-related files
+4. Redesign the visual structure of the header to a more professional level
+5. Create improved logo assets yourself if needed
+6. Implement desktop and mobile logo variants
+7. Create a minimal favicon/source symbol asset concept
+8. Keep the favicon file naming structure unchanged
+9. Validate responsiveness and visual quality
+
+==================================================
+HEADER REDESIGN REQUIREMENTS
+==================================================
+
+You are allowed to improve the header layout and visual design professionally.
+
+Possible improvements include:
+- better spacing
+- better visual hierarchy
+- better alignment
+- improved logo placement
+- better relationship between brand/search/actions/navigation
+- cleaner sizing and proportions
+- more professional desktop composition
+- more polished mobile top bar
+
+But:
+- do not introduce unnecessary complexity
+- do not make the header too tall
+- do not create clutter
+- do not negatively impact responsiveness
+- do not break RTL layout
+
+The redesigned header should feel premium and deliberate.
+
+==================================================
+LOGO SYSTEM REQUIREMENTS
+==================================================
+
+Create a responsive logo system with 3 variants:
+
+1. Desktop logo / brand lockup
+2. Mobile logo
+3. Minimal favicon symbol source artwork
+
+------------------------------------------
+1) Desktop Logo
+------------------------------------------
+
+Create a professional desktop brand lockup.
+
+The current approach of showing separate pieces of branding should be replaced with a unified and intentional design.
+
+Requirements:
+- preserve UFO Puff identity
+- use the current logo artwork as inspiration/reference
+- keep the UFO / saucer concept recognizable
+- create a cleaner, more usable desktop lockup
+- it should look good in a dark navbar
+- it should feel like a real brand system, not just image + random text
+
+Recommended direction:
+- a compact horizontal lockup
+- UFO/saucer symbol + UFO Puff wordmark
+- optional Persian support only if it truly improves the design
+- avoid forcing too much text into the header
+
+Do not simply reuse the current detailed circular logo at large size and place text next to it.
+Create something more professional and more suitable for a navbar.
+
+------------------------------------------
+2) Mobile Logo
+------------------------------------------
+
+Create a dedicated mobile logo variant.
+
+Requirements:
+- simpler than desktop
+- more compact
+- optimized for very small header usage
+- minimal or no tiny unreadable text
+- clear at around 28–40 px display size
+- visually balanced with menu/search/account/cart icons
+
+Do not just shrink the desktop logo.
+Create a mobile-optimized mark.
+
+------------------------------------------
+3) Favicon Source Artwork
+------------------------------------------
+
+Create a minimal favicon-style symbol based on UFO Puff branding.
+
+IMPORTANT:
+- Do NOT rename the existing favicon file names used in the project
+- Do NOT change the naming convention of the current favicon files
+- You may replace their visual source asset/content if needed, but keep the names intact
+- I will personally handle external favicon generation/conversion if necessary
+
+So your job is:
+- create a minimal brand symbol suitable as the source artwork
+- keep favicon-related filenames unchanged in the project
+- keep the implementation compatible with the current naming structure
+
+The favicon symbol should be:
+- very minimal
+- high contrast
+- recognizable
+- derived from UFO / saucer identity
+- no tiny text
+- no detailed smoke/cloud illustration
+- suitable to later convert into favicon formats manually
+
+==================================================
+ASSET CREATION
+==================================================
+
+You are allowed to generate/create the logo assets yourself as part of implementation.
+
+Prefer:
+- SVG for logos where practical
+- clean vector-like shapes
+- responsive and sharp output
+- production-friendly asset usage
+
+You may create:
+- desktop logo asset
+- mobile logo asset
+- minimal favicon source artwork
+
+Do not rely on external URLs.
+Do not add unnecessary packages.
+
+If the current project supports inline SVG or local asset usage, follow the most maintainable existing convention.
+
+==================================================
+RESPONSIVE BEHAVIOR
+==================================================
+
+Desktop:
+- show the desktop brand lockup
+- maintain strong alignment with nav items
+- keep the navbar visually elegant
+- no duplicated brand text around the logo
+- improve the overall header design professionally
+
+Mobile:
+- use the mobile-optimized logo
+- ensure the header remains clean and balanced
+- no overflow
+- no awkward spacing
+- no tiny unreadable details
+- no layout shift
+
+==================================================
+TECHNICAL CONSTRAINTS
+==================================================
+
+Do not:
+- change business logic
+- modify search behavior
+- modify cart behavior
+- modify auth behavior
+- redesign the whole homepage
+- refactor unrelated parts of the app
+- install unnecessary dependencies
+- rename current favicon files
+
+Do:
+- inspect the existing structure first
+- modify only what is needed
+- keep the result clean and maintainable
+- preserve current functionality
+- keep RTL compatibility
+- keep responsiveness strong
+
+==================================================
+ACCESSIBILITY & PERFORMANCE
+==================================================
+
+Ensure:
+- appropriate alt text where relevant
+- no unnecessary accessibility noise
+- image dimensions avoid layout shift
+- asset sizes remain lightweight
+- no hydration issues
+- no broken header interactions
+- no CLS caused by branding changes
+
+==================================================
+VISUAL QUALITY BAR
+==================================================
+
+The new header must feel:
+- more premium than the current one
+- more cohesive
+- more modern
+- more intentional
+- visually stronger in both mobile and desktop
+- like a real finished e-commerce product, not a work-in-progress
+
+Think like a senior product designer + front-end engineer.
+
+==================================================
+VALIDATION / QA
+==================================================
+
+Test and verify at least:
+
+Desktop:
+- 1440px
+- 1280px
+- 1024px
+
+Mobile:
+- 430px
+- 390px
+- 375px
+- 360px
+
+Check:
+- visual quality
+- spacing
+- alignment
+- readability
+- logo clarity
+- no duplicate branding
+- no overflow
+- no distorted images
+- no layout shifts
+- correct RTL behavior
+
+==================================================
+FINAL OUTPUT FORMAT
+==================================================
+
+When finished, provide:
+
+1. A brief audit of the old header problems
+2. Your design strategy
+3. Files changed
+4. Assets created or replaced
+5. How desktop branding now works
+6. How mobile branding now works
+7. How favicon/source symbol was handled
+8. What tests/checks you performed
+9. Any remaining limitations
+
+Do not stop at analysis.
+Inspect the codebase, redesign the header professionally, create/implement the branding assets, and complete the work.
