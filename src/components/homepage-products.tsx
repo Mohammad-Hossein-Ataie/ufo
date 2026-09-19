@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Price, ProductCard, StockStatus } from "@ufo/ui";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { HomepageProductDeck } from "@/components/homepage-product-deck";
 import { HomepageProductSlot } from "@/components/homepage-product-slot";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { getCatalogRowStock } from "@/lib/catalog-data";
@@ -10,15 +11,19 @@ import type { HomepageProductSlot as Slot } from "@/lib/homepage-products";
 
 export function HomepageProducts({ slots }: { slots: Slot[] }) {
   return (
-    <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+    <HomepageProductDeck
+      key={slots.map((slot) => slot.rows.map((row) => row.product.id).join(":")).join("|")}
+      images={slots.map((slot) =>
+        slot.rows.map(({ product }) => ({
+          src: getProductImage(product),
+          fallbackSrc: getCategoryImage(product.categoryId) ?? "/images/categories/lighter.webp",
+        })),
+      )}
+    >
       {slots.map((slot, slotIndex) => (
         <HomepageProductSlot
           key={slot.rows.map(({ product }) => product.id).join(":")}
           slotIndex={slotIndex}
-          images={slot.rows.map(({ product }) => ({
-            src: getProductImage(product),
-            fallbackSrc: getCategoryImage(product.categoryId) ?? "/images/categories/lighter.webp",
-          }))}
           label={slot.category?.nameFa ?? "تازه‌های فروشگاه"}
           names={slot.rows.map(({ product }) => product.nameFa)}
         >
@@ -60,6 +65,6 @@ export function HomepageProducts({ slots }: { slots: Slot[] }) {
           ))}
         </HomepageProductSlot>
       ))}
-    </div>
+    </HomepageProductDeck>
   );
 }

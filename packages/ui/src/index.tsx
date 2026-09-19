@@ -6,6 +6,8 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { clsx, type ClassValue } from "clsx";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { X } from "lucide-react";
+import { MediaFrame } from "./media-frame";
+export { MediaFrame } from "./media-frame";
 
 export function cn(...inputs: ClassValue[]): string {
   return clsx(inputs);
@@ -190,15 +192,15 @@ export function ProductCard({
         compactOnMobile && "mobile-product-card",
       )}
     >
-      <div
+      <MediaFrame
         className={cn(
-          "aspect-square overflow-hidden bg-black/10",
+          "bg-black/10",
           compactOnMobile && "mobile-product-media",
           mediaClassName,
         )}
       >
         {media}
-      </div>
+      </MediaFrame>
       <div
         className={cn(
           "grid h-full grid-rows-[auto_auto_1fr] gap-3 p-4 sm:p-5",

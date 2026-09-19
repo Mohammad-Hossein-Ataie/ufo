@@ -13,7 +13,7 @@ import {
   Truck,
   Warehouse,
 } from "lucide-react";
-import { Button } from "@ufo/ui";
+import { Button, MediaFrame } from "@ufo/ui";
 import { brands } from "@ufo/domain";
 import { canonical, faqPageJsonLd, jsonLdScriptProps } from "@ufo/seo";
 
@@ -130,7 +130,7 @@ export default function B2BHomePage() {
           </div>
 
           <aside className="reveal-up-delay-1 overflow-hidden rounded-md border border-[#D5D9C9] bg-white shadow-[0_16px_40px_rgba(20,32,27,0.12)]">
-            <div className="relative aspect-[4/3] bg-[#EEF0E5]">
+            <MediaFrame ratio="4 / 3" fit="cover" position="center 72%" className="bg-[#EEF0E5]">
               <Image
                 src="/images/ufo-hero.webp"
                 alt="ویترین محصولات یوفوپاف برای سفارش عمده"
@@ -138,9 +138,8 @@ export default function B2BHomePage() {
                 priority
                 unoptimized
                 sizes="(min-width: 1024px) 27rem, 100vw"
-                className="object-cover"
               />
-            </div>
+            </MediaFrame>
             <div className="p-5">
               <div className="flex items-center justify-between gap-4 border-b border-[#E2E4D8] pb-4">
                 <div>

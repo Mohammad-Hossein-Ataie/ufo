@@ -17,12 +17,18 @@ const images = Array.from({ length: 3 }, (_, i) => ({
   src: `/api/product-images/catalog/p${i}/primary/card?v=2`,
   fallbackSrc: "/images/categories/pod.webp",
 }));
-function Harness({ count, index }: { count: number; index: number }) {
-  api = useProductCardCarousel(images.slice(0, count), index);
+function Harness({ count, groups }: { count: number; groups: number }) {
+  api = useProductCardCarousel(
+    Array.from({ length: groups }, (_, group) =>
+      images
+        .slice(0, count)
+        .map((image) => ({ ...image, src: group ? `${image.src}&slot=${group}` : image.src })),
+    ),
+  );
   return createElement("div", { ref: api.containerRef, dir: "rtl" }, api.activeIndex);
 }
-async function mount(count = 3, index = 0) {
-  await act(async () => root.render(createElement(Harness, { count, index })));
+async function mount(count = 3, groups = 1) {
+  await act(async () => root.render(createElement(Harness, { count, groups })));
   await inView(true);
 }
 async function inView(visible: boolean) {
@@ -55,7 +61,9 @@ beforeEach(() => {
     },
   });
   Object.defineProperty(media, "matches", { get: () => motion });
-  vi.stubGlobal("matchMedia", () => media);
+  vi.stubGlobal("matchMedia", (query: string) =>
+    query === "(min-width: 1024px)" ? { matches: true } : media,
+  );
   Object.defineProperty(document, "visibilityState", {
     configurable: true,
     get: () => (hidden ? "hidden" : "visible"),
@@ -98,7 +106,7 @@ describe("product card carousel", () => {
       expect(api.activeIndex).toBe(0);
       expect(vi.getTimerCount()).toBe(0);
       await act(async () => api.resume("hover"));
-      await advance(4700);
+      await advance(4760);
       expect(api.activeIndex).toBe(1);
     } finally {
       matches.mockRestore();
@@ -112,39 +120,73 @@ describe("product card carousel", () => {
     expect(vi.getTimerCount()).toBe(0);
   });
   it.each([2, 3])(
-    "loops %s products at 4500ms with an atomic 200ms out / 200ms in transition",
+    "loops %s products at 4500ms with an atomic 260ms out / 260ms in transition",
     async (count) => {
       await mount(count);
       for (let step = 1; step <= count; step++) {
-        await advance(step === 1 ? 4500 : 4100);
+        await advance(step === 1 ? 4500 : 3980);
         expect(api.phase).toBe("out");
         expect(api.activeIndex).toBe((step - 1) % count);
-        await advance(200);
+        await advance(260);
         expect(api.activeIndex).toBe(step % count);
         expect(api.image?.src).toBe(images[step % count]!.src);
         expect(api.phase).toBe("in");
-        await advance(200);
+        await advance(260);
         expect(api.phase).toBe("idle");
       }
     },
   );
-  it("staggers the first rotation deterministically and resets manual timing", async () => {
+  it("rotates the whole deck at once and resets manual timing", async () => {
     await mount(3, 2);
-    await advance(5299);
+    await advance(4499);
     expect(api.phase).toBe("idle");
     await advance(1);
     expect(api.phase).toBe("out");
-    await advance(400);
+    await advance(520);
     await act(async () => {
       void api.goTo(2);
     });
-    await advance(200);
-    await advance(200);
-    await advance(4299);
+    await advance(260);
+    await advance(260);
+    await advance(4239);
     expect(api.activeIndex).toBe(2);
     expect(api.phase).toBe("idle");
     await advance(1);
     expect(api.phase).toBe("out");
+  });
+  it("waits for every decoded image before committing the entire deck", async () => {
+    let resolve!: (value: PreparedCarouselImage) => void;
+    const slowSrc = `${images[1]!.src}&slot=1`;
+    vi.mocked(prepareCarouselImage).mockImplementation((image) =>
+      image.src === slowSrc
+        ? new Promise((done) => {
+            resolve = done;
+          })
+        : Promise.resolve({ src: image.src, resolvedSrc: image.src }),
+    );
+    await mount(3, 2);
+    await advance(4500);
+    expect(api.phase).toBe("idle");
+    expect(api.activeIndex).toBe(0);
+    await act(async () => resolve({ src: slowSrc, resolvedSrc: slowSrc }));
+    expect(api.phase).toBe("out");
+    await advance(260);
+    expect(api.activeIndex).toBe(1);
+    expect(api.images?.map((image) => image.src)).toEqual([images[1]!.src, slowSrc]);
+    expect(api.phase).toBe("in");
+  });
+  it("reverses direction and cancels obsolete exits during rapid navigation", async () => {
+    await mount();
+    await act(async () => api.next());
+    expect(api.direction).toBe(1);
+    await advance(100);
+    await act(async () => api.previous());
+    expect(api.direction).toBe(-1);
+    await advance(260);
+    expect(api.activeIndex).toBe(2);
+    expect(api.phase).toBe("in");
+    await advance(260);
+    expect(api.phase).toBe("idle");
   });
   it("combines hover/focus/touch pause reasons and restarts a full interval on resume", async () => {
     await mount();
@@ -165,12 +207,12 @@ describe("product card carousel", () => {
     await act(async () => api.resume("focus"));
     await advance(4499);
     expect(api.phase).toBe("idle");
-    await advance(201);
+    await advance(261);
     expect(api.activeIndex).toBe(1);
   });
   it("stops offscreen and hidden tabs and resumes from the current product", async () => {
     await mount();
-    await advance(4900);
+    await advance(5020);
     expect(api.activeIndex).toBe(1);
     await visibility(true);
     await advance(20000);
@@ -180,7 +222,7 @@ describe("product card carousel", () => {
     await advance(10000);
     expect(api.activeIndex).toBe(1);
     await inView(true);
-    await advance(4700);
+    await advance(4760);
     expect(api.activeIndex).toBe(2);
   });
   it("uses manual-only instant changes with reduced motion, including a live preference change", async () => {
@@ -197,7 +239,7 @@ describe("product card carousel", () => {
     await act(async () => {
       media.dispatchEvent(new Event("change"));
     });
-    await advance(4700);
+    await advance(4760);
     expect(api.activeIndex).toBe(2);
   });
   it("retains the old complete card while an image is slow, and latest manual selection wins", async () => {
@@ -216,10 +258,10 @@ describe("product card carousel", () => {
     await act(async () => {
       void api.goTo(2);
     });
-    await advance(400);
+    await advance(520);
     expect(api.activeIndex).toBe(2);
     await act(async () => resolve({ src: images[1]!.src, resolvedSrc: images[1]!.src }));
-    await advance(400);
+    await advance(520);
     expect(api.activeIndex).toBe(2);
   });
   it("never lets autoplay override a slow swipe/manual selection and gives the new card a full interval", async () => {
@@ -238,7 +280,7 @@ describe("product card carousel", () => {
     await advance(9000);
     expect(api.activeIndex).toBe(0);
     await act(async () => resolve({ src: images[2]!.src, resolvedSrc: images[2]!.src }));
-    await advance(200);
+    await advance(260);
     expect(api.activeIndex).toBe(2);
     await advance(4499);
     expect(api.activeIndex).toBe(2);
@@ -249,7 +291,7 @@ describe("product card carousel", () => {
   it("keeps the current item on image/fallback failure and retries later", async () => {
     vi.mocked(prepareCarouselImage).mockResolvedValue(undefined);
     await mount();
-    await advance(4900);
+    await advance(5020);
     expect(api.activeIndex).toBe(0);
     expect(api.phase).toBe("idle");
     vi.mocked(prepareCarouselImage).mockImplementation(async (image) => ({
@@ -268,22 +310,13 @@ describe("product card carousel", () => {
       api.pause("hover");
       api.pause("focus");
     });
-    await advance(400);
+    await advance(520);
     expect(api.activeIndex).toBe(0);
     await act(async () => {
       void api.goTo(2);
     });
-    await advance(400);
+    await advance(520);
     expect(api.activeIndex).toBe(2);
-  });
-  it("supports persistent user pause", async () => {
-    await mount();
-    await act(async () => api.setUserPaused(true));
-    await advance(20000);
-    expect(api.activeIndex).toBe(0);
-    await act(async () => api.setUserPaused(false));
-    await advance(4700);
-    expect(api.activeIndex).toBe(1);
   });
   it("selecting the current indicator cancels an outstanding transition", async () => {
     await mount();
@@ -294,7 +327,7 @@ describe("product card carousel", () => {
     await act(async () => {
       void api.goTo(0);
     });
-    await advance(400);
+    await advance(520);
     expect(api.activeIndex).toBe(0);
     expect(api.phase).toBe("idle");
   });

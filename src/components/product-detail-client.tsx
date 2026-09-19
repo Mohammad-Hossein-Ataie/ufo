@@ -11,6 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { ProductImageCrossfade } from "@/components/product-image-crossfade";
 import { ProtectedProductImage } from "@/components/protected-product-image";
 import {
   FlavorVisual,
@@ -100,21 +101,15 @@ export function ProductDetailClient({
   return (
     <section className="retail-glass grid gap-6 rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(0,217,255,0.10),transparent_34%),#0D1117] p-3 shadow-retail-lg sm:p-5 lg:grid-cols-[minmax(0,1.03fr)_minmax(24rem,0.97fr)] lg:gap-7 lg:p-6">
       <div className="grid gap-3 lg:order-2">
-        <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#0A0F15] p-3 sm:p-4">
-          <div className="relative mx-auto aspect-square max-h-[34rem] max-w-[34rem] overflow-hidden rounded-lg bg-[#0B1118] shadow-inner">
-            <ProtectedProductImage
-              key={`foreground-${selectedImage}`}
+        <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#0A0F15]">
+          <div className="relative mx-auto aspect-square w-full overflow-hidden bg-[#0B1118] shadow-inner">
+            <ProductImageCrossfade
               src={selectedImage}
               alt={
                 selectedVariantOption
                   ? `${product.nameFa} - ${selectedVariantOption.labelFa}`
                   : product.nameFa
               }
-              fill
-              loading="lazy"
-              unoptimized
-              className="product-detail-image-enter object-cover"
-              sizes="(min-width: 1024px) 47vw, 100vw"
             />
           </div>
           {selectedVariantOption ? (
@@ -146,22 +141,12 @@ export function ProductDetailClient({
               >
                 <ProtectedProductImage
                   src={image}
-                  alt=""
-                  fill
-                  loading="lazy"
-                  unoptimized
-                  sizes="112px"
-                  className="scale-110 object-cover blur-xl opacity-35"
-                  aria-hidden="true"
-                />
-                <ProtectedProductImage
-                  src={image}
                   alt={`${product.nameFa} ${thumbnailOption?.labelFa ?? index + 1}`}
                   fill
                   loading="lazy"
                   unoptimized
                   sizes="112px"
-                  className="relative z-[1] object-contain p-1"
+                  className="object-cover"
                 />
                 {thumbnailOption ? (
                   <span className="absolute bottom-1 right-1 z-[2]">

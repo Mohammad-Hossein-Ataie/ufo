@@ -11,42 +11,64 @@ import {
 } from "@/lib/product-image-protection";
 
 describe("product image protection", () => {
+  it.each(["card", "detail"] as const)(
+    "preserves both ends of a narrow studio product in %s",
+    async (preset) => {
+      const original = await sharp({
+        create: { width: 100, height: 300, channels: 3, background: "white" },
+      })
+        .composite([
+          {
+            input: Buffer.from(
+              '<svg width="100" height="300"><rect x="40" y="10" width="20" height="280" fill="red"/><rect x="40" y="10" width="20" height="20" fill="blue"/><rect x="40" y="270" width="20" height="20" fill="#00ff00"/></svg>',
+            ),
+          },
+        ])
+        .png()
+        .toBuffer();
+      const output = await generateProtectedProductImage(original, preset);
+      const { data, info } = await sharp(output).raw().toBuffer({ resolveWithObject: true });
+      const pixel = (x: number, y: number, channel: number) =>
+        data[(y * info.width + x) * info.channels + channel]!;
+      expect(pixel(info.width / 2, Math.round(info.height * 0.05), 2)).toBeGreaterThan(200);
+      expect(pixel(info.width / 2, Math.round(info.height * 0.95), 1)).toBeGreaterThan(200);
+      expect(pixel(2, 2, 0)).toBeGreaterThan(245);
+    },
+  );
   it.each([
     [100, 300],
     [300, 100],
-  ])(
-    "fills a %s × %s card without white letterboxing or cropping foreground edges",
-    async (width, height) => {
-      const original = await sharp({
-        create: { width, height, channels: 3, background: "#e02030" },
-      })
-        .png()
-        .toBuffer();
-      const card = await generateProtectedProductImage(original, "card");
-      const { data, info } = await sharp(card).raw().toBuffer({ resolveWithObject: true });
-      const pixel = (x: number, y: number) =>
-        Array.from(
-          data.subarray(
-            (y * info.width + x) * info.channels,
-            (y * info.width + x) * info.channels + 3,
-          ),
-        );
-      expect(pixel(10, 10).every((channel) => channel < 240)).toBe(true);
-      for (const [x, y] of width < height
-        ? [
-            [300, 2],
-            [300, 597],
-          ]
-        : [
-            [2, 300],
-            [597, 300],
-          ]) {
-        expect(pixel(x!, y!)[0]).toBeGreaterThan(200);
-      }
-      expect(generatedProductKey("asset", "card")).toContain("card-v2.webp");
-      expect(generatedProductKey("asset", "detail")).toContain("asset-detail.webp");
-    },
-  );
+  ])("fills a %s × %s card edge to edge without synthetic fill bands", async (width, height) => {
+    const original = await sharp({
+      create: { width, height, channels: 3, background: "#e02030" },
+    })
+      .png()
+      .toBuffer();
+    const card = await generateProtectedProductImage(original, "card");
+    const { data, info } = await sharp(card).raw().toBuffer({ resolveWithObject: true });
+    const pixel = (x: number, y: number) =>
+      Array.from(
+        data.subarray(
+          (y * info.width + x) * info.channels,
+          (y * info.width + x) * info.channels + 3,
+        ),
+      );
+    expect(pixel(10, 10)[0]).toBeGreaterThan(200);
+    expect(pixel(10, 10)[1]).toBeLessThan(60);
+    for (const [x, y] of width < height
+      ? [
+          [300, 2],
+          [300, 597],
+        ]
+      : [
+          [2, 300],
+          [597, 300],
+        ]) {
+      expect(pixel(x!, y!)[0]).toBeGreaterThan(200);
+    }
+    expect(generatedProductKey("asset", "card")).toContain("card-v4.webp");
+    expect(generatedProductKey("asset", "detail")).toContain("asset-detail-v4.webp");
+  });
   it("creates exact WebP card and detail derivatives with a visible low-opacity watermark", async () => {
     const original = await sharp({
       create: { width: 160, height: 100, channels: 3, background: "#ffffff" },

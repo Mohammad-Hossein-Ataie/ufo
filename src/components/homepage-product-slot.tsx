@@ -1,72 +1,45 @@
 "use client";
 
 import { useId, useRef, type CSSProperties, type ReactNode } from "react";
-import { Pause, Play } from "lucide-react";
-import { useProductCardCarousel } from "@/hooks/use-product-card-carousel";
-import type { CarouselImage } from "@/lib/product-carousel-image";
+import { productCarouselHalfTransition } from "@/hooks/use-product-card-carousel";
+import { useHomepageProductDeck } from "@/components/homepage-product-deck";
 import { StorefrontProductImageSource } from "@/components/storefront-product-image";
 
 export function HomepageProductSlot({
   children,
   names,
   label,
-  images,
   slotIndex,
 }: {
   children: ReactNode[];
   names: string[];
   label: string;
-  images: CarouselImage[];
   slotIndex: number;
 }) {
-  const carousel = useProductCardCarousel(images, slotIndex);
+  const carousel = useHomepageProductDeck();
   const id = useId();
   const touch = useRef<{ id: number; x: number; y: number; vertical: boolean } | undefined>(
     undefined,
   );
   const suppressClick = useRef(false);
-  const active = carousel.activeIndex;
+  const active = carousel.activeIndex % children.length;
   const hasChoices = children.length > 1;
   const sign = (carousel.rtl ? 1 : -1) * carousel.direction;
 
   return (
     <div
-      ref={carousel.containerRef}
       className="homepage-product-slot grid min-w-0 grid-rows-[auto_1fr_auto]"
       data-active-index={active}
       data-phase={carousel.phase}
-      onPointerEnter={(event) => {
-        if (event.pointerType === "mouse") carousel.pause("hover");
-      }}
-      onPointerLeave={(event) => {
-        if (event.pointerType === "mouse") carousel.resume("hover");
-      }}
-      onFocusCapture={() => carousel.pause("focus")}
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) carousel.resume("focus");
-      }}
+      data-motion-direction={sign}
+      style={{ "--carousel-phase-duration": `${productCarouselHalfTransition}ms` } as CSSProperties}
     >
       <div className="mb-3 flex min-h-11 items-center justify-between gap-2">
         <p className="truncate text-sm font-bold text-retail-secondary">{label}</p>
-        {hasChoices && !carousel.reducedMotion ? (
-          <button
-            type="button"
-            onClick={() => carousel.setUserPaused((value) => !value)}
-            aria-label={carousel.userPaused ? "ادامه نمایش خودکار" : "توقف نمایش خودکار"}
-            aria-pressed={carousel.userPaused}
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-retail-secondary hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-retail-accent"
-          >
-            {carousel.userPaused ? (
-              <Play size={14} aria-hidden="true" />
-            ) : (
-              <Pause size={14} aria-hidden="true" />
-            )}
-          </button>
-        ) : null}
       </div>
       <div
         id={id}
-        className="grid min-w-0 touch-pan-y touch-pinch-zoom"
+        className="homepage-product-perspective grid min-w-0 touch-pan-y touch-pinch-zoom"
         role="group"
         aria-roledescription="اسلاید محصول"
         aria-label={`${label}؛ محصول ${active + 1} از ${children.length}`}
@@ -113,15 +86,14 @@ export function HomepageProductSlot({
           }
         }}
       >
-        <StorefrontProductImageSource.Provider value={carousel.image ?? null}>
+        <StorefrontProductImageSource.Provider value={carousel.images?.[slotIndex] ?? null}>
           <div
             key={active}
             className="homepage-product-slide grid min-w-0"
             data-phase={carousel.phase}
             style={
               {
-                "--carousel-out-x": `${sign * 6}px`,
-                "--carousel-in-x": `${sign * -6}px`,
+                "--carousel-sign": sign,
               } as CSSProperties
             }
           >
@@ -163,7 +135,8 @@ export function HomepageProductSlot({
               className="inline-flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-retail-accent"
             >
               <span
-                className={`h-1.5 rounded-full transition-all duration-[400ms] motion-reduce:transition-none ${index === active ? "w-5 bg-retail-accent" : "w-1.5 bg-retail-secondary"}`}
+                className={`homepage-product-indicator h-1.5 w-5 rounded-full ${index === active ? "bg-retail-accent" : "bg-retail-secondary"}`}
+                data-active={index === active}
               />
             </button>
           ))

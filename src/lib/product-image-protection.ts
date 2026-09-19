@@ -6,8 +6,8 @@ export const productImagePresets = {
 } as const;
 
 export type ProductImagePreset = keyof typeof productImagePresets;
-export const productCardImageVersion = "2";
-export const productDetailImageVersion = "2";
+export const productCardImageVersion = "4";
+export const productDetailImageVersion = "4";
 
 export const productOriginalPrefix = "storage/products/original/";
 export const productGeneratedPrefix = "storage/products/generated/";
@@ -95,54 +95,55 @@ export async function generateProtectedProductImage(
 ): Promise<Uint8Array> {
   await validateProductImage(input);
   const config = productImagePresets[preset];
-  if (preset === "card") {
-    // Preserve portrait packaging and landscape artwork in full. A defocused copy
-    // fills the square without white letterboxing or stretching the foreground.
-    const source = sharp(input, {
-      failOn: "error",
-      limitInputPixels: maxProductImagePixels,
-    }).rotate();
-    const foreground = await source
-      .clone()
-      .resize(config.width, config.height, { fit: "contain", background: "#00000000" })
-      .png()
-      .toBuffer();
-    const card = await source
-      .clone()
-      .resize(config.width, config.height, { fit: "cover" })
-      .flatten({ background: "#141a22" })
-      .blur(24)
-      .modulate({ brightness: 0.7, saturation: 0.65 })
-      .composite([
-        { input: foreground },
-        { input: watermarkSvg(config.width, config.height), gravity: "southeast" },
-      ])
-      .webp({ quality: config.quality, effort: 5, smartSubsample: true })
-      .toBuffer();
-    return new Uint8Array(card);
-  }
-  // Detail pages use the same visual treatment as catalog cards: keep the
-  // original artwork fully visible and fill unused square space with a soft,
-  // defocused copy instead of white letterboxing.
   const source = sharp(input, {
     failOn: "error",
     limitInputPixels: maxProductImagePixels,
   }).rotate();
-  const foreground = await source
-    .clone()
-    .resize(config.width, config.height, { fit: "contain", background: "#00000000" })
-    .png()
-    .toBuffer();
+  const metadata = await source.metadata();
+  const aspect = (metadata.width ?? 1) / (metadata.height ?? 1);
+  let studioBackground: { r: number; g: number; b: number } | undefined;
+  if (aspect < 2 / 3 || aspect > 1.5) {
+    // A cover crop would cut off a narrow device. When the photo has a uniform
+    // studio backdrop, extend that same color instead of adding blurred bands.
+    const { data, info } = await source
+      .clone()
+      .resize(64, 64, { fit: "fill" })
+      .flatten({ background: "#141a22" })
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const corners = [
+      [1, 1],
+      [62, 1],
+      [1, 62],
+      [62, 62],
+    ].map(([x, y]) => {
+      const offset = (y! * info.width + x!) * info.channels;
+      return [data[offset]!, data[offset + 1]!, data[offset + 2]!];
+    });
+    if (
+      [0, 1, 2].every(
+        (channel) =>
+          Math.max(...corners.map((c) => c[channel]!)) -
+            Math.min(...corners.map((c) => c[channel]!)) <=
+          16,
+      )
+    ) {
+      const average = (channel: number) =>
+        Math.round(corners.reduce((sum, c) => sum + c[channel]!, 0) / corners.length);
+      studioBackground = { r: average(0), g: average(1), b: average(2) };
+    }
+  }
   const output = await source
-    .clone()
-    .resize(config.width, config.height, { fit: "cover" })
+    .resize(
+      config.width,
+      config.height,
+      studioBackground
+        ? { fit: "contain", background: studioBackground }
+        : { fit: "cover", position: "centre" },
+    )
     .flatten({ background: "#141a22" })
-    .blur(34)
-    .modulate({ brightness: 0.72, saturation: 0.72 })
-    .composite([
-      { input: foreground },
-      { input: watermarkSvg(config.width, config.height), gravity: "southeast" },
-    ])
+    .composite([{ input: watermarkSvg(config.width, config.height), gravity: "southeast" }])
     .webp({ quality: config.quality, effort: 5, smartSubsample: true })
     .toBuffer();
   return new Uint8Array(output);

@@ -267,8 +267,8 @@ export function ChatThreadClient({
                         src={file.url}
                         alt={file.name ?? "تصویر چت"}
                         fill
-                        sizes="240px"
-                        className="object-cover"
+                        sizes="(min-width: 640px) 320px, calc(100vw - 64px)"
+                        className="object-contain"
                       />
                     </a>
                   ))}

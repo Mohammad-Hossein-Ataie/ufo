@@ -28,6 +28,10 @@ for (const route of ["/", "/b2b"]) {
       }
       await expect.poll(async () => (await header.boundingBox())!.x).toBe(0);
       expect((await header.boundingBox())!.y).toBe(0);
+      await expect(header).toHaveCSS("background-color", /0\.62/);
+      expect(await header.evaluate((el) => getComputedStyle(el).backdropFilter)).toContain(
+        "blur(24px)",
+      );
       expect((await header.boundingBox())!.height).toBe(initial!.height);
       expect(
         await page.locator("main").evaluate((el) => el.getBoundingClientRect().top + scrollY),

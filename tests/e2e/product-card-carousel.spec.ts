@@ -1,4 +1,35 @@
-﻿import { expect, test } from "@playwright/test";
+import { expect as baseExpect, test } from "@playwright/test";
+
+// Preparation may try an 8s protected derivative and then its fallback.
+const expect = baseExpect.configure({ timeout: 20000 });
+test.setTimeout(90000);
+
+test("all new-product slots rotate together without play/pause controls", async ({ page }) => {
+  await page.goto("/");
+  const deck = page.locator(".homepage-product-deck");
+  await deck.scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0);
+  await expect(deck.getByRole("button", { name: /نمایش خودکار/ })).toHaveCount(0);
+  await expect
+    .poll(
+      () =>
+        deck
+          .locator(".homepage-product-slot")
+          .evaluateAll((slots) => slots.map((slot) => slot.getAttribute("data-active-index"))),
+      { timeout: 25000 },
+    )
+    .toEqual(["1", "1", "1", "1"]);
+  await deck.locator("[data-slide-index='1']").first().focus();
+  await expect(deck).toHaveAttribute("data-phase", "idle");
+  await page.waitForTimeout(5000);
+  await expect
+    .poll(() =>
+      deck
+        .locator(".homepage-product-slot")
+        .evaluateAll((slots) => slots.map((slot) => slot.getAttribute("data-active-index"))),
+    )
+    .toEqual(["1", "1", "1", "1"]);
+});
 
 test("automatic and manual rotations keep the guest cart, price, image and details synchronized", async ({
   page,

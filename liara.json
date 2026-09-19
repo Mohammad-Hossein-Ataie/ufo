@@ -1,12 +1,8 @@
 {
   "app": "ufopuff",
-  "platform": "node",
+  "platform": "next",
   "port": 3000,
-  "node": {
+  "next": {
     "mirror": false
-  },
-  "build": {
-    "command": "npm ci && npm run build"
-  },
-  "start": "npm run start"
+  }
 }

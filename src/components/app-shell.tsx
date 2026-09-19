@@ -6,6 +6,7 @@ import { Clock3, Mail, MapPin, MessageCircle, Phone, Send, ShieldCheck, Shopping
 import { usePathname } from "next/navigation";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { B2BHeader } from "@/components/b2b/b2b-header";
+import { MotionReveal } from "@/components/motion-reveal";
 import { SiteHeader } from "@/components/site-header";
 import { storeSettings } from "@ufo/domain";
 
@@ -46,8 +47,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </a>
       <SiteHeader />
       {children}
-      <footer className="border-t border-[#22303D] bg-[#0D1117] pb-20 text-[#D9E2EC] lg:pb-0">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[1.2fr_1fr_1fr]">
+      <footer className="border-t border-[#22303D] bg-[#0D1117] pb-[calc(5rem+env(safe-area-inset-bottom))] text-[#D9E2EC] lg:pb-0">
+        <MotionReveal className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[1.2fr_1fr_1fr]">
           <section aria-label="UFO Puff">
             <Link href="/" className="inline-flex items-center gap-3">
               <span className="relative h-12 w-12 shrink-0">
@@ -76,7 +77,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="inline-flex min-h-9 items-center gap-2 text-sm text-[#9BA7B4] transition hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
+                className="inline-flex min-h-11 items-center gap-2 text-sm text-[#9BA7B4] transition hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
               >
                 <item.icon size={17} aria-hidden="true" />
                 <span>{item.label}</span>
@@ -88,14 +89,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <h2 className="text-sm font-bold text-white">ارتباط با فروشگاه</h2>
             <a
               href={`tel:${storeSettings.phone}`}
-              className="inline-flex min-h-9 items-center gap-2 text-sm text-[#9BA7B4] transition hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
+              className="inline-flex min-h-11 items-center gap-2 text-sm text-[#9BA7B4] transition hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
             >
               <Phone size={17} aria-hidden="true" />
               <span>{storeSettings.phone}</span>
             </a>
             <a
               href="mailto:admin@ufopuff.com"
-              className="inline-flex min-h-9 items-center gap-2 text-sm text-[#9BA7B4] transition hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
+              className="inline-flex min-h-11 items-center gap-2 text-sm text-[#9BA7B4] transition hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
               dir="ltr"
             >
               <Mail size={17} aria-hidden="true" />
@@ -109,13 +110,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               href={storeSettings.telegramUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-9 items-center gap-2 text-sm text-[#9BA7B4] transition hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
+              className="inline-flex min-h-11 items-center gap-2 text-sm text-[#9BA7B4] transition hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
             >
               <Send size={17} aria-hidden="true" />
               <span>تلگرام فروشگاه</span>
             </a>
           </section>
-        </div>
+        </MotionReveal>
 
         <div className="border-t border-[#22303D]">
           <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 text-xs text-[#9BA7B4] sm:flex-row sm:items-center sm:justify-between">

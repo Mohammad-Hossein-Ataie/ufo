@@ -24,7 +24,7 @@ export function StorefrontProductImage({
   const prepared = useContext(StorefrontProductImageSource);
   const currentSrc =
     prepared?.src === src ? prepared.resolvedSrc : !src || failedSrc === src ? fallbackSrc : src;
-  const imageClassName = className ?? "h-full w-full object-cover";
+  const imageClassName = className ?? "h-full w-full object-contain";
 
   return (
     <span className="relative block h-full w-full">

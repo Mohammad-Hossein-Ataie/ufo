@@ -8,14 +8,14 @@ import {
 } from "@/lib/product-carousel-image";
 
 export const productCarouselInterval = 4500;
-export const productCarouselHalfTransition = 200;
+export const productCarouselHalfTransition = 260;
 type PauseReason = "hover" | "focus" | "touch";
 
-export function useProductCardCarousel(images: CarouselImage[], slotIndex: number) {
+export function useProductCardCarousel(images: CarouselImage[][]) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef(images);
   imagesRef.current = images;
-  const [slide, setSlide] = useState<{ index: number; image?: PreparedCarouselImage }>({
+  const [slide, setSlide] = useState<{ index: number; images?: PreparedCarouselImage[] }>({
     index: 0,
   });
   const activeRef = useRef(0);
@@ -27,10 +27,8 @@ export function useProductCardCarousel(images: CarouselImage[], slotIndex: numbe
   const [reducedMotion, setReducedMotion] = useState(false);
   const reducedRef = useRef(false);
   const [paused, setPaused] = useState(false);
-  const [userPaused, setUserPaused] = useState(false);
   const pauseReasons = useRef(new Set<PauseReason>());
   const [clock, setClock] = useState(0);
-  const firstSchedule = useRef(true);
   const runningRef = useRef(false);
   const operation = useRef(0);
   const origin = useRef<"auto" | "manual">("auto");
@@ -38,8 +36,8 @@ export function useProductCardCarousel(images: CarouselImage[], slotIndex: numbe
   const transitionTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const controller = useRef<AbortController | undefined>(undefined);
   const prepared = useRef(new Map<string, Promise<PreparedCarouselImage | undefined>>());
-  const count = images.length;
-  const running = count > 1 && nearViewport && visible && !paused && !userPaused && !reducedMotion;
+  const count = Math.max(0, ...images.map((group) => group.length));
+  const running = count > 1 && nearViewport && visible && !paused && !reducedMotion;
   runningRef.current = running;
 
   useEffect(() => {
@@ -81,35 +79,43 @@ export function useProductCardCarousel(images: CarouselImage[], slotIndex: numbe
     };
   }, []);
 
-  const prepare = useCallback((index: number) => {
-    const image = imagesRef.current[index];
+  const prepare = useCallback(async (index: number) => {
     const signal = controller.current?.signal;
-    if (!image || !signal || signal.aborted) return Promise.resolve(undefined);
-    const key = `${image.src}\0${image.fallbackSrc}`;
-    let promise = prepared.current.get(key);
-    if (!promise) {
-      promise = prepareCarouselImage(image, signal).then((result) => {
-        if (!result && prepared.current.get(key) === promise) prepared.current.delete(key);
-        return result;
-      });
-      prepared.current.set(key, promise);
-    }
-    return promise;
+    if (!signal || signal.aborted) return undefined;
+    const results = await Promise.all(
+      imagesRef.current.map((group) => {
+        const image = group[index % group.length];
+        if (!image) return Promise.resolve(undefined);
+        const key = `${image.src}\0${image.fallbackSrc}`;
+        let promise = prepared.current.get(key);
+        if (!promise) {
+          promise = prepareCarouselImage(image, signal).then((result) => {
+            if (!result && prepared.current.get(key) === promise) prepared.current.delete(key);
+            return result;
+          });
+          prepared.current.set(key, promise);
+        }
+        return promise;
+      }),
+    );
+    // One slow or failed image keeps the entire current deck intact.
+    return results.every((image): image is PreparedCarouselImage => Boolean(image))
+      ? results
+      : undefined;
   }, []);
 
-  // Only one upcoming image is warmed; offscreen cards do no speculative loading.
+  // Warm only the upcoming page, using protected derivatives for every slot.
   useEffect(() => {
     if (nearViewport && visible && count > 1) void prepare((slide.index + 1) % count);
   }, [count, nearViewport, visible, slide.index, prepare]);
 
   const resetAutoplay = useCallback(() => {
-    firstSchedule.current = false;
     setClock((value) => value + 1);
   }, []);
 
   const goTo = useCallback(
     async (requested: number, source: "auto" | "manual" = "manual", step = 1) => {
-      const length = imagesRef.current.length;
+      const length = Math.max(0, ...imagesRef.current.map((group) => group.length));
       if (length < 2) return;
       if (source === "manual") resetAutoplay();
       const index = ((requested % length) + length) % length;
@@ -122,10 +128,10 @@ export function useProductCardCarousel(images: CarouselImage[], slotIndex: numbe
         manualPending.current = false;
         return;
       }
-      const image = await prepare(index);
-      if (ticket === operation.current && !image) manualPending.current = false;
+      const images = await prepare(index);
+      if (ticket === operation.current && !images) manualPending.current = false;
       if (
-        !image ||
+        !images ||
         ticket !== operation.current ||
         controller.current?.signal.aborted ||
         (source === "auto" && !runningRef.current)
@@ -138,7 +144,7 @@ export function useProductCardCarousel(images: CarouselImage[], slotIndex: numbe
         manualPending.current = false;
         if (source === "manual") resetAutoplay();
         // Content and its decoded image source commit in one React state update.
-        setSlide({ index, image });
+        setSlide({ index, images });
         setPhase(reducedRef.current ? "idle" : "in");
         if (!reducedRef.current)
           transitionTimer.current = setTimeout(
@@ -169,11 +175,9 @@ export function useProductCardCarousel(images: CarouselImage[], slotIndex: numbe
       if (!manualPending.current) void goTo(activeRef.current + 1, "auto");
       timer = setTimeout(tick, productCarouselInterval);
     };
-    const stagger = firstSchedule.current ? slotIndex * 400 : 0;
-    firstSchedule.current = false;
-    timer = setTimeout(tick, productCarouselInterval + stagger);
+    timer = setTimeout(tick, productCarouselInterval);
     return () => clearTimeout(timer);
-  }, [running, slotIndex, clock, goTo]);
+  }, [running, clock, goTo]);
 
   const pause = useCallback((reason: PauseReason) => {
     pauseReasons.current.add(reason);
@@ -193,13 +197,12 @@ export function useProductCardCarousel(images: CarouselImage[], slotIndex: numbe
   return {
     containerRef,
     activeIndex: slide.index,
-    image: slide.image,
+    images: slide.images,
+    image: slide.images?.[0],
     phase,
     direction,
     rtl,
     reducedMotion,
-    userPaused,
-    setUserPaused,
     goTo,
     next,
     previous,

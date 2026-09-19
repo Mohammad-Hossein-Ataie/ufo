@@ -1,0 +1,68 @@
+import { expect, test } from "@playwright/test";
+
+for (const { slug, width } of ["vaporesso-xros-4", "vozol-vista-plug-15k"].flatMap((slug) =>
+  [1440, 390].map((width) => ({ slug, width })),
+)) {
+  test(`${slug} gallery crossfades without an empty frame at ${width}px`, async ({ page }) => {
+    test.setTimeout(90000);
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto(`/products/${slug}`);
+    const gallery = page.locator("[data-product-crossfade]");
+    await expect(gallery).toBeVisible();
+    await gallery.locator("img").evaluate((img: HTMLImageElement) => img.decode());
+    const original = await gallery.locator("img").getAttribute("src");
+    const before = await gallery.boundingBox();
+    // These products have image-backed color/flavor choices.
+    await page.getByRole("radio").nth(2).click();
+    await expect(gallery).toHaveAttribute("data-transitioning", "true", { timeout: 20000 });
+    const frame = await gallery.evaluate((el) => {
+      const images = [...el.querySelectorAll("img")];
+      return {
+        count: images.length,
+        accessible: images.filter((img) => img.getAttribute("aria-hidden") !== "true").length,
+        oldOpacity: getComputedStyle(images[0]!).opacity,
+        decoded: images.every((img) => img.complete && img.naturalWidth > 0),
+        duration: getComputedStyle(images[1]!).animationDuration,
+      };
+    });
+    expect(frame).toEqual({
+      count: 2,
+      accessible: 1,
+      oldOpacity: "1",
+      decoded: true,
+      duration: "0.62s",
+    });
+    await expect(gallery).toHaveAttribute("data-transitioning", "false");
+    await expect(gallery.locator("img")).not.toHaveAttribute("src", original!);
+    await expect(gallery.locator("img")).toHaveCSS("object-fit", "cover");
+    const after = await gallery.boundingBox();
+    expect(after!.height).toBe(before!.height);
+    expect(after!.width).toBe(before!.width);
+    // Rapid choices coalesce to the last selection without introducing extra layers.
+    const lastLabel = await page.getByRole("radio").nth(3).innerText();
+    await page.getByRole("radio").nth(1).click();
+    await page.getByRole("radio").nth(3).click();
+    await expect(page.getByRole("radio").nth(3)).toHaveAttribute("aria-checked", "true");
+    await expect
+      .poll(() => gallery.locator('img:not([aria-hidden="true"])').getAttribute("alt"), {
+        timeout: 20000,
+      })
+      .toContain(lastLabel.trim());
+    await expect(gallery).toHaveAttribute("data-transitioning", "false");
+    await gallery.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `temp/product-gallery/${slug}-${width}.png` });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
+      false,
+    );
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const firstLabel = await page.getByRole("radio").nth(0).innerText();
+    await page.getByRole("radio").nth(0).click();
+    await expect
+      .poll(() => gallery.locator('img:not([aria-hidden="true"])').getAttribute("alt"), {
+        timeout: 20000,
+      })
+      .toContain(firstLabel.trim());
+    await expect(gallery).toHaveAttribute("data-transitioning", "false");
+    await expect(gallery.locator("img")).toHaveCount(1);
+  });
+}

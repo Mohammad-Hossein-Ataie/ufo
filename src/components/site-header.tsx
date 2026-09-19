@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { IconButton } from "@ufo/ui";
+import { ModalSurface } from "@/components/modal-surface";
 import { BrandLogo } from "@/components/brand-logo";
 import { useHeaderDocked } from "@/hooks/use-header-docked";
 import { SmartSearch } from "@/components/smart-search";
@@ -51,21 +52,6 @@ function readRetailCartCount() {
   }
 }
 
-function usePageLock(locked: boolean) {
-  useEffect(() => {
-    if (!locked) return;
-    const overflow = document.body.style.overflow;
-    const paddingRight = document.body.style.paddingRight;
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    document.body.style.overflow = "hidden";
-    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
-    return () => {
-      document.body.style.overflow = overflow;
-      document.body.style.paddingRight = paddingRight;
-    };
-  }, [locked]);
-}
-
 function CountBadge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
@@ -76,37 +62,20 @@ function CountBadge({ count }: { count: number }) {
 }
 
 function EmptyCartSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
-  usePageLock(open);
-  useEffect(() => {
-    if (!open) return;
-    const close = (event: KeyboardEvent) => event.key === "Escape" && onClose();
-    window.addEventListener("keydown", close);
-    return () => window.removeEventListener("keydown", close);
-  }, [onClose, open]);
-
   return (
-    <div
-      className={`fixed inset-0 z-[70] ${open ? "pointer-events-auto" : "pointer-events-none"}`}
-      aria-hidden={!open}
-    >
-      <button
-        type="button"
-        aria-label="بستن سبد خرید"
-        onClick={onClose}
-        className={`absolute inset-0 bg-black/75 backdrop-blur-[2px] transition-opacity duration-300 ease-mobile ${open ? "opacity-100" : "opacity-0"}`}
-      />
+    <ModalSurface open={open} onClose={onClose} title="سبد خرید">
       <section
         role="dialog"
         aria-modal="true"
         aria-labelledby="empty-cart-title"
-        className={`absolute inset-x-0 bottom-0 mx-auto max-w-xl rounded-t-[28px] border border-retail-border bg-[#0b1016]/98 px-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-24px_80px_rgba(0,0,0,.65)] transition-transform duration-300 ease-mobile ${open ? "translate-y-0" : "translate-y-full"}`}
+        className={`fixed z-[70] inset-x-0 bottom-0 max-h-[90dvh] overflow-y-auto mx-auto max-w-xl rounded-t-[28px] border border-retail-border bg-[#0b1016]/98 px-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-24px_80px_rgba(0,0,0,.65)] transition-transform duration-300 ease-mobile ${open ? "translate-y-0" : "translate-y-full"}`}
       >
         <div className="mx-auto mb-5 h-1 w-12 rounded-full bg-white/20" />
         <button
           type="button"
           onClick={onClose}
           aria-label="بستن"
-          className="absolute left-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-full text-retail-secondary transition hover:bg-white/10 hover:text-white"
+          className="absolute end-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-full text-retail-secondary transition hover:bg-white/10 hover:text-white"
         >
           <X size={20} aria-hidden="true" />
         </button>
@@ -130,7 +99,7 @@ function EmptyCartSheet({ open, onClose }: { open: boolean; onClose: () => void 
           <PackageSearch size={19} aria-hidden="true" />
         </Link>
       </section>
-    </div>
+    </ModalSurface>
   );
 }
 
@@ -169,12 +138,13 @@ export function SiteHeader() {
     setEmptyCartOpen(false);
   }, [pathname]);
 
-  usePageLock(menuOpen);
   useEffect(() => {
     if (!menuOpen) return;
-    const close = (event: KeyboardEvent) => event.key === "Escape" && setMenuOpen(false);
-    window.addEventListener("keydown", close);
-    return () => window.removeEventListener("keydown", close);
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => { if (desktop.matches) setMenuOpen(false); };
+    closeOnDesktop();
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
   }, [menuOpen]);
 
   const accountHref = loggedIn ? "/account" : "/login";
@@ -262,22 +232,13 @@ export function SiteHeader() {
         </div>
       </header>
 
-      <div
-        className={`fixed inset-0 z-[60] lg:hidden ${menuOpen ? "pointer-events-auto" : "pointer-events-none"}`}
-        aria-hidden={!menuOpen}
-      >
-        <button
-          type="button"
-          aria-label="بستن منو"
-          onClick={() => setMenuOpen(false)}
-          className={`absolute inset-0 bg-black/75 backdrop-blur-[2px] transition-opacity duration-300 ease-mobile ${menuOpen ? "opacity-100" : "opacity-0"}`}
-        />
+      <ModalSurface open={menuOpen} onClose={() => setMenuOpen(false)} title="منوی موبایل">
         <aside
           id="retail-mobile-menu"
           role="dialog"
           aria-modal="true"
           aria-label="منوی موبایل"
-          className={`absolute inset-y-0 right-0 flex w-[min(88vw,24rem)] flex-col border-l border-retail-border bg-[#080c12] shadow-2xl transition-transform duration-300 ease-mobile ${menuOpen ? "translate-x-0" : "translate-x-full"}`}
+          className={`fixed z-[70] inset-y-0 start-0 overflow-y-auto overscroll-contain flex w-[min(88vw,24rem)] flex-col border-e border-retail-border bg-[#080c12] shadow-2xl transition-transform duration-300 ease-mobile ${menuOpen ? "translate-x-0" : "translate-x-full"}`}
         >
           <div className="flex min-h-20 items-center justify-between border-b border-retail-border px-4 pt-[env(safe-area-inset-top)]">
             <div role="img" aria-label="یوفوپاف UFO Puff" className="min-w-0 [&_img]:max-w-full">
@@ -325,7 +286,7 @@ export function SiteHeader() {
             </Link>
           </div>
         </aside>
-      </div>
+      </ModalSurface>
 
       <nav
         aria-label="دسترسی سریع موبایل"
