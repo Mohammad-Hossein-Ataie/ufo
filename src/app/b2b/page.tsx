@@ -71,7 +71,7 @@ export default function B2BHomePage() {
   const partnerBrands = brands.slice(0, 6);
 
   return (
-    <main id="main-content" className="bg-[#F7F7F2] text-[#14201B]">
+    <main id="main-content" className="header-overlay-home bg-[#F7F7F2] text-[#14201B]">
       <script {...jsonLdScriptProps(faqPageJsonLd(b2bFaq))} />
 
       <section className="relative isolate overflow-hidden border-b border-[#D5D9C9] bg-[#F7F7F2]">

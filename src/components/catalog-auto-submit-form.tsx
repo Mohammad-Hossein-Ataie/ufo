@@ -54,6 +54,7 @@ export function CatalogAutoSubmitForm({
   function handleChange(event: FormEvent<HTMLFormElement>) {
     const target = event.target;
     if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
+    if (!target.name) return;
     submit(
       target instanceof HTMLInputElement && target.type === "range"
         ? 850

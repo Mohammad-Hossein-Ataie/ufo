@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Check, ChevronDown, Search } from "lucide-react";
 import { VariantOptionVisual } from "@/components/product-variant-visuals";
 import type { StorefrontVariantOption } from "@/lib/storefront-variants";
 
@@ -20,9 +20,17 @@ export function CatalogFlavorFilter({
 }: CatalogFlavorFilterProps) {
   const [value, setValue] = useState(defaultValue ?? "");
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const selected = options.find((option) => option.id === value);
   const isDark = tone === "dark";
+  const filteredOptions = useMemo(() => {
+    const normalized = query.trim().toLocaleLowerCase("fa").replace(/ي/g, "ی").replace(/ك/g, "ک");
+    if (!normalized) return options;
+    return options.filter((option) =>
+      `${option.labelFa} ${option.id}`.toLocaleLowerCase("fa").replace(/ي/g, "ی").replace(/ك/g, "ک").includes(normalized),
+    );
+  }, [options, query]);
 
   function submitForm() {
     requestAnimationFrame(() => {
@@ -32,7 +40,10 @@ export function CatalogFlavorFilter({
 
   useEffect(() => {
     function closeOnOutsideClick(event: MouseEvent) {
-      if (!wrapperRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!wrapperRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+        setQuery("");
+      }
     }
     document.addEventListener("mousedown", closeOnOutsideClick);
     return () => document.removeEventListener("mousedown", closeOnOutsideClick);
@@ -61,14 +72,27 @@ export function CatalogFlavorFilter({
 
       {open ? (
         <div
-          className={`absolute inset-x-0 top-[calc(100%+0.35rem)] z-30 max-h-64 overflow-y-auto rounded-md border p-1 shadow-xl ${
+          className={`absolute inset-x-0 top-[calc(100%+0.35rem)] z-40 overflow-hidden rounded-lg border shadow-xl ${
             isDark
               ? "border-retail-border bg-retail-bg text-white"
               : "border-[#C8D6C7] bg-white text-[#14201B]"
           }`}
-          role="listbox"
         >
-          {[undefined, ...options].map((option) => {
+          <div className={`border-b p-2 ${isDark ? "border-white/10" : "border-[#E1E5DA]"}`}>
+            <span className="relative block">
+              <Search size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 opacity-50" aria-hidden="true" />
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="جستجوی طعم"
+                aria-label="جستجوی طعم"
+                className={`min-h-10 w-full rounded-md border pe-9 ps-3 text-sm outline-none ${isDark ? "border-white/10 bg-white/[0.05] text-white focus:border-retail-accent" : "border-[#D5D9C9] bg-[#F7F7F2] text-[#14201B] focus:border-[#1F8A5B]"}`}
+              />
+            </span>
+          </div>
+          <div className="max-h-56 overflow-y-auto overscroll-contain p-1" role="listbox">
+          {[...(query ? [] : [undefined]), ...filteredOptions].map((option) => {
             const optionId = option?.id ?? "";
             const active = optionId === value;
             return (
@@ -78,6 +102,7 @@ export function CatalogFlavorFilter({
                 onClick={() => {
                   setValue(optionId);
                   setOpen(false);
+                  setQuery("");
                   submitForm();
                 }}
                 className={`flex min-h-10 w-full select-none items-center justify-between gap-3 rounded-md px-3 text-right text-sm font-bold transition motion-reduce:transition-none ${
@@ -104,6 +129,8 @@ export function CatalogFlavorFilter({
               </button>
             );
           })}
+          {filteredOptions.length === 0 ? <p className="px-3 py-4 text-center text-xs opacity-60">طعم موردنظر پیدا نشد.</p> : null}
+          </div>
         </div>
       ) : null}
     </div>

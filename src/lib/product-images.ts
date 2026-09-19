@@ -3,6 +3,7 @@ import {
   productCatalogImageUrl,
   protectedAssetUrl,
   productCardImageVersion,
+  productDetailImageVersion,
   type ProductImagePreset,
 } from "@/lib/product-image-protection";
 import type { Product } from "@ufo/types";
@@ -46,12 +47,15 @@ export function getProductImages(product: Pick<Product, "id" | "categoryId" | "i
   const images = product.images
     .map((image, index) => ({ image, index }))
     .filter(({ image }) => !genericProductImages.has(image))
-    .map(({ image, index }) =>
-      protectedProductSource(product.id, image, `gallery-${index}`, "detail"),
+    .map(
+      ({ image, index }) =>
+        `${protectedProductSource(product.id, image, `gallery-${index}`, "detail")}?v=${productDetailImageVersion}`,
     );
   if (images.length > 0) return images;
   if (!genericProductImages.has(product.image)) {
-    return [protectedProductSource(product.id, product.image, "primary", "detail")];
+    return [
+      `${protectedProductSource(product.id, product.image, "primary", "detail")}?v=${productDetailImageVersion}`,
+    ];
   }
   return [getProductImage(product)];
 }
@@ -77,7 +81,7 @@ export function getProductVariantImages(
       .filter(([, image]) => !genericProductImages.has(image))
       .map(([valueId, image, index]) => [
         valueId,
-        protectedProductSource(product.id, image, `variant-${index}`, "detail"),
+        `${protectedProductSource(product.id, image, `variant-${index}`, "detail")}?v=${productDetailImageVersion}`,
       ]),
   );
 }

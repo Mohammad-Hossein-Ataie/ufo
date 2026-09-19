@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { IconButton } from "@ufo/ui";
 import { BrandLogo } from "@/components/brand-logo";
+import { useHeaderDocked } from "@/hooks/use-header-docked";
 import { SmartSearch } from "@/components/smart-search";
 import { fetchCustomerCart, readCustomerSession } from "@/lib/customer-client";
 
@@ -139,6 +140,7 @@ export function SiteHeader() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [emptyCartOpen, setEmptyCartOpen] = useState(false);
+  const headerDocked = useHeaderDocked();
 
   useEffect(() => {
     const sync = async () => {
@@ -166,6 +168,7 @@ export function SiteHeader() {
     setMenuOpen(false);
     setEmptyCartOpen(false);
   }, [pathname]);
+
   usePageLock(menuOpen);
   useEffect(() => {
     if (!menuOpen) return;
@@ -182,7 +185,7 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="retail-header sticky top-0 z-40">
+      <header data-docked={headerDocked} className="storefront-header retail-header z-40">
         <div className="mx-auto grid h-[60px] max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-3 sm:px-4 lg:h-[72px] lg:grid-cols-[232px_minmax(0,1fr)_auto] lg:gap-8">
           <div className="flex items-center gap-1 lg:hidden">
             <IconButton

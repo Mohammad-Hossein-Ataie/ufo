@@ -14,6 +14,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
+import { useHeaderDocked } from "@/hooks/use-header-docked";
 import { SmartSearch } from "@/components/smart-search";
 
 interface CartLine {
@@ -62,6 +63,7 @@ export function B2BHeader() {
   const [cartCount, setCartCount] = useState(0);
   const [loggedIn, setLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerDocked = useHeaderDocked();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const formattedCount = useMemo(
     () => new Intl.NumberFormat("fa-IR").format(cartCount),
@@ -102,8 +104,11 @@ export function B2BHeader() {
   const accountLabel = loggedIn ? "حساب همکاری" : "ورود عمده";
 
   return (
-    <header className="b2b-header sticky top-0 z-30 border-b border-[#D5D9C9] bg-[#F7F7F2]/95 text-[#14201B] backdrop-blur">
-      <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-3 px-4">
+    <header
+      data-docked={headerDocked}
+      className="storefront-header b2b-header z-30 border-b border-[#D5D9C9] bg-[#F7F7F2]/95 text-[#14201B] backdrop-blur"
+    >
+      <div className="b2b-header-row mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-3 px-4">
         <Link
           href="/b2b"
           aria-label="یوفوپاف عمده، صفحه خانه"
@@ -120,7 +125,7 @@ export function B2BHeader() {
               unoptimized
             />
           </span>
-          <span className="leading-tight">
+          <span className="b2b-header-name leading-tight">
             <span className="block">یوفوپاف عمده</span>
             <span className="block text-xs text-[#596B61]" dir="ltr">
               UFO Puff B2B
@@ -172,11 +177,7 @@ export function B2BHeader() {
               </span>
             ) : null}
           </Link>
-          <Link
-            href={accountHref}
-            aria-label={accountLabel}
-            className={`${iconLinkClass} !hidden sm:!inline-flex`}
-          >
+          <Link href={accountHref} aria-label={accountLabel} className={iconLinkClass}>
             <UserRound size={18} aria-hidden="true" />
           </Link>
           <Link
@@ -203,7 +204,7 @@ export function B2BHeader() {
       {menuOpen ? (
         <div
           id="b2b-mobile-menu"
-          className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-[#D5D9C9] bg-white xl:hidden"
+          className="absolute inset-x-0 top-full rounded-b-2xl shadow-lg max-h-[calc(100dvh-6rem)] overflow-y-auto overscroll-contain border-t border-[#D5D9C9] bg-white xl:hidden"
         >
           <div className="mx-auto max-w-7xl px-4 pt-4 md:hidden">
             <SmartSearch channel="wholesale" />

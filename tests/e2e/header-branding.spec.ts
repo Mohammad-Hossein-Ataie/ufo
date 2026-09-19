@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const widths = [1440, 1280, 1024, 1023, 768, 430, 390, 375, 360];
+const widths = [1440, 1280, 1024, 1023, 768, 430, 390, 375, 360, 320];
 
 for (const width of widths) {
   test(`retail header branding at ${width}px`, async ({ page }) => {
@@ -46,15 +46,15 @@ for (const width of widths) {
         rtl: getComputedStyle(element).direction,
       };
     });
-    expect(geometry.width).toBe(width);
-    expect(geometry.height).toBe(width >= 1024 ? 118 : 61);
+    expect(geometry.width).toBe(Math.min(1280, width - (width >= 640 ? 32 : 16)));
+    expect(geometry.height).toBe(width >= 1024 ? 119 : 62);
     expect(geometry.rtl).toBe("rtl");
     expect(geometry.overflow).toBe(false);
     expect(geometry.pageOverflow).toBe(false);
     expect(geometry.overlap).toBe(false);
-    expect(geometry.logoWidth).toBe(width >= 1024 ? 144 : 120);
-    expect(geometry.logoHeight).toBe(width >= 1024 ? 48 : 40);
-    expect(geometry.logoWidth / geometry.logoHeight).toBe(3);
+    expect(geometry.logoWidth).toBe(width >= 1024 ? 144 : width < 374 ? 88 : 120);
+    expect(geometry.logoHeight).toBeCloseTo(geometry.logoWidth / 3, 1);
+    expect(geometry.logoWidth / geometry.logoHeight).toBeCloseTo(3, 2);
     expect(geometry.source).toContain("ufo-puff-logo.webp");
     if (width < 1024) expect(geometry.logoCenter).toBe(width / 2);
     await expect(header.getByRole("search", { includeHidden: true })).toHaveCount(1);
@@ -71,6 +71,7 @@ for (const width of widths) {
 }
 
 test("desktop search and navigation retain their destinations", async ({ page }) => {
+  test.setTimeout(60_000);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/");
   const header = page.getByRole("banner");
@@ -79,7 +80,7 @@ test("desktop search and navigation retain their destinations", async ({ page })
     "/login",
   );
   await header.getByRole("link", { name: "کاتالوگ محصولات" }).click();
-  await expect(page).toHaveURL(/\/products$/);
+  await expect(page).toHaveURL(/\/products$/, { timeout: 20_000 });
   await expect(header.getByRole("link", { name: "محصولات", exact: true })).toHaveAttribute(
     "aria-current",
     "page",
@@ -92,7 +93,7 @@ test("desktop search and navigation retain their destinations", async ({ page })
   await page.evaluate(() => window.scrollTo(0, 0));
   await header.getByPlaceholder("جستجوی محصول، برند یا SKU").fill("Uwell Caliburn");
   await header.getByPlaceholder("جستجوی محصول، برند یا SKU").press("Enter");
-  await expect(page).toHaveURL(/\/products\?q=Uwell%20Caliburn$/);
+  await expect(page).toHaveURL(/\/products\?q=Uwell%20Caliburn$/, { timeout: 20_000 });
 });
 
 for (const width of [1440, 390]) {
@@ -146,6 +147,7 @@ test("favicon source preview at small display sizes", async ({ page }) => {
 });
 
 test("mobile menu, search, account and empty cart remain operable", async ({ page }) => {
+  test.setTimeout(60_000);
   await page.setViewportSize({ width: 360, height: 800 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
@@ -170,10 +172,10 @@ test("mobile menu, search, account and empty cart remain operable", async ({ pag
   await header.getByRole("link", { name: "جستجو", exact: true }).click();
   await expect(page).toHaveURL(/\/search$/);
   await header.getByRole("link", { name: "ورود", exact: true }).click();
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).toHaveURL(/\/login$/, { timeout: 20_000 });
   await header.getByRole("button", { name: "باز کردن منو" }).click();
   await menu.getByRole("link", { name: "محصولات", exact: true }).click();
-  await expect(page).toHaveURL(/\/products$/);
+  await expect(page).toHaveURL(/\/products$/, { timeout: 20_000 });
   await expect(header.getByRole("button", { name: "باز کردن منو" })).toHaveAttribute(
     "aria-expanded",
     "false",

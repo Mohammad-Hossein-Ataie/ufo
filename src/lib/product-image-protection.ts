@@ -7,6 +7,7 @@ export const productImagePresets = {
 
 export type ProductImagePreset = keyof typeof productImagePresets;
 export const productCardImageVersion = "2";
+export const productDetailImageVersion = "2";
 
 export const productOriginalPrefix = "storage/products/original/";
 export const productGeneratedPrefix = "storage/products/generated/";
@@ -45,7 +46,8 @@ export function originalProductKey(assetId: string): string {
 }
 
 export function generatedProductKey(cacheId: string, preset: ProductImagePreset): string {
-  const version = preset === "card" ? `-v${productCardImageVersion}` : "";
+  const version =
+    preset === "card" ? `-v${productCardImageVersion}` : `-v${productDetailImageVersion}`;
   return `${productGeneratedPrefix}${cacheId}-${preset}${version}.webp`;
 }
 
@@ -119,18 +121,28 @@ export async function generateProtectedProductImage(
       .toBuffer();
     return new Uint8Array(card);
   }
-  const output = await sharp(input, {
+  // Detail pages use the same visual treatment as catalog cards: keep the
+  // original artwork fully visible and fill unused square space with a soft,
+  // defocused copy instead of white letterboxing.
+  const source = sharp(input, {
     failOn: "error",
     limitInputPixels: maxProductImagePixels,
-  })
-    .rotate()
-    .resize(config.width, config.height, {
-      fit: "contain",
-      background: { r: 255, g: 255, b: 255, alpha: 1 },
-      withoutEnlargement: false,
-    })
-    .flatten({ background: "#ffffff" })
-    .composite([{ input: watermarkSvg(config.width, config.height), gravity: "southeast" }])
+  }).rotate();
+  const foreground = await source
+    .clone()
+    .resize(config.width, config.height, { fit: "contain", background: "#00000000" })
+    .png()
+    .toBuffer();
+  const output = await source
+    .clone()
+    .resize(config.width, config.height, { fit: "cover" })
+    .flatten({ background: "#141a22" })
+    .blur(34)
+    .modulate({ brightness: 0.72, saturation: 0.72 })
+    .composite([
+      { input: foreground },
+      { input: watermarkSvg(config.width, config.height), gravity: "southeast" },
+    ])
     .webp({ quality: config.quality, effort: 5, smartSubsample: true })
     .toBuffer();
   return new Uint8Array(output);

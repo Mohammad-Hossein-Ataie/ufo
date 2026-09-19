@@ -8,6 +8,7 @@ import { CatalogFlavorFilter } from "@/components/catalog-flavor-filter";
 import { CatalogOptionFilter } from "@/components/catalog-option-filter";
 import { CatalogPagination } from "@/components/catalog-pagination";
 import { CatalogPriceRangeFilter } from "@/components/catalog-price-range-filter";
+import { CatalogSearchableSelect } from "@/components/catalog-searchable-select";
 import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { getCatalogRowStock, listCatalogRows, searchCatalogRows } from "@/lib/catalog-data";
@@ -329,87 +330,84 @@ export default async function ProductsPage({
             </label>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-              <label className="grid gap-2 text-sm text-retail-secondary">
-                دسته‌بندی
-                <select
+              <div className="grid gap-2 text-sm text-retail-secondary">
+                <span>دسته‌بندی</span>
+                <CatalogSearchableSelect
                   name="category"
-                  defaultValue={params.category ?? ""}
-                  className="min-h-11 rounded-md border border-retail-border bg-retail-bg px-3 text-white outline-none focus:border-retail-accent focus:ring-2 focus:ring-retail-accent/30"
-                >
-                  <option value="">همه دسته‌ها</option>
-                  {categories.map((item) => (
-                    <option key={item.id} value={item.slug}>
-                      {item.nameFa}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-2 text-sm text-retail-secondary">
-                برند
-                <select
+                  defaultValue={params.category}
+                  allLabel="همه دسته‌ها"
+                  searchPlaceholder="جستجوی دسته‌بندی"
+                  options={categories.map((item) => ({
+                    value: item.slug,
+                    label: item.nameFa,
+                    keywords: [item.id],
+                  }))}
+                />
+              </div>
+              <div className="grid gap-2 text-sm text-retail-secondary">
+                <span>برند</span>
+                <CatalogSearchableSelect
                   name="brand"
-                  defaultValue={params.brand ?? ""}
-                  className="min-h-11 rounded-md border border-retail-border bg-retail-bg px-3 text-white outline-none focus:border-retail-accent focus:ring-2 focus:ring-retail-accent/30"
-                >
-                  <option value="">همه برندها</option>
-                  {brands.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.nameFa}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-2 text-sm text-retail-secondary">
-                نوع محصول
-                <select
+                  defaultValue={params.brand}
+                  allLabel="همه برندها"
+                  searchPlaceholder="جستجوی برند"
+                  options={brands.map((item) => ({
+                    value: item.id,
+                    label: item.nameFa,
+                    keywords: [item.slug],
+                  }))}
+                />
+              </div>
+              <div className="grid gap-2 text-sm text-retail-secondary">
+                <span>نوع محصول</span>
+                <CatalogSearchableSelect
                   name="kind"
-                  defaultValue={params.kind ?? ""}
-                  className="min-h-11 rounded-md border border-retail-border bg-retail-bg px-3 text-white outline-none focus:border-retail-accent focus:ring-2 focus:ring-retail-accent/30"
-                >
-                  <option value="">همه نوع‌ها</option>
-                  {Object.entries(productKindLabels).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-2 text-sm text-retail-secondary">
-                موجودی
-                <select
+                  defaultValue={params.kind}
+                  allLabel="همه نوع‌ها"
+                  searchPlaceholder="جستجوی نوع محصول"
+                  options={Object.entries(productKindLabels).map(([value, label]) => ({
+                    value,
+                    label,
+                  }))}
+                />
+              </div>
+              <div className="grid gap-2 text-sm text-retail-secondary">
+                <span>موجودی</span>
+                <CatalogSearchableSelect
                   name="stock"
-                  defaultValue={params.stock ?? ""}
-                  className="min-h-11 rounded-md border border-retail-border bg-retail-bg px-3 text-white outline-none focus:border-retail-accent focus:ring-2 focus:ring-retail-accent/30"
-                >
-                  <option value="">همه وضعیت‌ها</option>
-                  <option value="available">فقط موجود</option>
-                  <option value="low">موجودی محدود</option>
-                  <option value="preorder">پیش‌سفارش</option>
-                </select>
-              </label>
+                  defaultValue={params.stock}
+                  allLabel="همه وضعیت‌ها"
+                  searchPlaceholder="جستجوی وضعیت موجودی"
+                  options={[
+                    { value: "available", label: "فقط موجود" },
+                    { value: "low", label: "موجودی محدود" },
+                    { value: "preorder", label: "پیش‌سفارش" },
+                  ]}
+                />
+              </div>
               {flavorFilterOptions.length > 0 ? (
-                <label className="grid gap-2 text-sm text-retail-secondary">
-                  طعم
+                <div className="grid gap-2 text-sm text-retail-secondary">
+                  <span>طعم</span>
                   <CatalogFlavorFilter
                     defaultValue={params.flavor}
                     options={flavorFilterOptions}
                     tone="dark"
                   />
-                </label>
+                </div>
               ) : null}
               {colorFilterPalette.length > 0 ? (
-                <label className="grid gap-2 text-sm text-retail-secondary">
-                  رنگ
+                <div className="grid gap-2 text-sm text-retail-secondary">
+                  <span>رنگ</span>
                   <CatalogColorFilter
                     defaultValue={params.color}
                     options={colorFilterPalette}
                     tone="dark"
                   />
-                </label>
+                </div>
               ) : null}
               {resistanceFilterOptions.length > 0 ? (
-                <label className="grid gap-2 text-sm text-retail-secondary">
-                  مقاومت
+                <div className="grid gap-2 text-sm text-retail-secondary">
+                  <span>مقاومت</span>
                   <CatalogOptionFilter
                     name="resistance"
                     defaultValue={params.resistance}
@@ -417,7 +415,7 @@ export default async function ProductsPage({
                     allLabel="همه اهم‌ها"
                     tone="dark"
                   />
-                </label>
+                </div>
               ) : null}
             </div>
 
@@ -429,20 +427,23 @@ export default async function ProductsPage({
               tone="dark"
             />
 
-            <label className="grid gap-2 text-sm text-retail-secondary">
-              مرتب‌سازی
-              <select
+            <div className="grid gap-2 text-sm text-retail-secondary">
+              <span>مرتب‌سازی</span>
+              <CatalogSearchableSelect
                 name="sort"
                 defaultValue={params.sort ?? "featured"}
-                className="min-h-11 rounded-md border border-retail-border bg-retail-bg px-3 text-white outline-none focus:border-retail-accent focus:ring-2 focus:ring-retail-accent/30"
-              >
-                <option value="featured">پیشنهادی</option>
-                <option value="price-asc">ارزان‌ترین</option>
-                <option value="price-desc">گران‌ترین</option>
-                <option value="stock-desc">بیشترین موجودی</option>
-                <option value="name">نام محصول</option>
-              </select>
-            </label>
+                allLabel="پیشنهادی"
+                searchPlaceholder="جستجوی روش مرتب‌سازی"
+                includeAllOption={false}
+                options={[
+                  { value: "featured", label: "پیشنهادی" },
+                  { value: "price-asc", label: "ارزان‌ترین" },
+                  { value: "price-desc", label: "گران‌ترین" },
+                  { value: "stock-desc", label: "بیشترین موجودی" },
+                  { value: "name", label: "نام محصول" },
+                ]}
+              />
+            </div>
 
             <div className="grid gap-2">
               <Link

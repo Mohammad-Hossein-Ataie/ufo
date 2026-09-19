@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Clock3, MapPin, MessageCircle, Phone, Send, ShieldCheck, ShoppingBag } from "lucide-react";
+import { Clock3, Mail, MapPin, MessageCircle, Phone, Send, ShieldCheck, ShoppingBag } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { B2BHeader } from "@/components/b2b/b2b-header";
@@ -92,6 +92,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <Phone size={17} aria-hidden="true" />
               <span>{storeSettings.phone}</span>
+            </a>
+            <a
+              href="mailto:admin@ufopuff.com"
+              className="inline-flex min-h-9 items-center gap-2 text-sm text-[#9BA7B4] transition hover:text-cyan-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
+              dir="ltr"
+            >
+              <Mail size={17} aria-hidden="true" />
+              <span>admin@ufopuff.com</span>
             </a>
             <p className="inline-flex items-start gap-2 text-sm leading-7 text-[#9BA7B4]">
               <MapPin size={17} aria-hidden="true" className="mt-1 shrink-0" />

@@ -101,7 +101,7 @@ export default async function HomePage() {
   const homepageSlots = getLatestHomepageProducts(await listCatalogRows());
 
   return (
-    <main id="main-content" className="retail-storefront">
+    <main id="main-content" className="retail-storefront header-overlay-home">
       <script {...jsonLdScriptProps(organizationJsonLd())} />
       <script {...jsonLdScriptProps(websiteJsonLd())} />
       <script {...jsonLdScriptProps(faqPageJsonLd(homeFaq))} />

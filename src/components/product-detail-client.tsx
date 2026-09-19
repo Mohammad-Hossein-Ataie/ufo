@@ -100,10 +100,10 @@ export function ProductDetailClient({
   return (
     <section className="retail-glass grid gap-6 rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(0,217,255,0.10),transparent_34%),#0D1117] p-3 shadow-retail-lg sm:p-5 lg:grid-cols-[minmax(0,1.03fr)_minmax(24rem,0.97fr)] lg:gap-7 lg:p-6">
       <div className="grid gap-3 lg:order-2">
-        <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#F5F7FA] p-3 sm:p-4">
-          <div className="relative mx-auto aspect-square max-h-[34rem] max-w-[34rem] overflow-hidden rounded-lg bg-white">
+        <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#0A0F15] p-3 sm:p-4">
+          <div className="relative mx-auto aspect-square max-h-[34rem] max-w-[34rem] overflow-hidden rounded-lg bg-[#0B1118] shadow-inner">
             <ProtectedProductImage
-              key={selectedImage}
+              key={`foreground-${selectedImage}`}
               src={selectedImage}
               alt={
                 selectedVariantOption
@@ -113,7 +113,7 @@ export function ProductDetailClient({
               fill
               loading="lazy"
               unoptimized
-              className="object-contain p-3 transition-opacity duration-200 motion-reduce:transition-none"
+              className="product-detail-image-enter object-cover"
               sizes="(min-width: 1024px) 47vw, 100vw"
             />
           </div>
@@ -136,7 +136,7 @@ export function ProductDetailClient({
                 key={`${image}-${index}`}
                 type="button"
                 onClick={() => selectImage(image)}
-                className={`relative aspect-square w-[4.25rem] shrink-0 snap-start select-none overflow-hidden rounded-xl border bg-white transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 sm:w-auto motion-reduce:transition-none ${
+                className={`group relative aspect-square w-[4.25rem] shrink-0 snap-start select-none overflow-hidden rounded-xl border bg-[#091019] transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 sm:w-auto motion-reduce:transition-none ${
                   active
                     ? "border-cyan-300 ring-2 ring-cyan-300/30"
                     : "border-white/10 hover:border-cyan-300/70"
@@ -146,15 +146,25 @@ export function ProductDetailClient({
               >
                 <ProtectedProductImage
                   src={image}
+                  alt=""
+                  fill
+                  loading="lazy"
+                  unoptimized
+                  sizes="112px"
+                  className="scale-110 object-cover blur-xl opacity-35"
+                  aria-hidden="true"
+                />
+                <ProtectedProductImage
+                  src={image}
                   alt={`${product.nameFa} ${thumbnailOption?.labelFa ?? index + 1}`}
                   fill
                   loading="lazy"
                   unoptimized
                   sizes="112px"
-                  className="object-contain p-1.5"
+                  className="relative z-[1] object-contain p-1"
                 />
                 {thumbnailOption ? (
-                  <span className="absolute bottom-1 right-1">
+                  <span className="absolute bottom-1 right-1 z-[2]">
                     <VariantOptionVisual option={thumbnailOption} size="sm" />
                   </span>
                 ) : null}
