@@ -79,9 +79,15 @@ export function getProductVariantImages(
     Object.entries(product.variantImages ?? product.colorImages ?? {})
       .map(([valueId, image], index) => [valueId, image.trim(), index] as const)
       .filter(([, image]) => !genericProductImages.has(image))
-      .map(([valueId, image, index]) => [
-        valueId,
-        `${protectedProductSource(product.id, image, `variant-${index}`, "detail")}?v=${productDetailImageVersion}`,
-      ]),
+      .map(([valueId, image, index]) => {
+        // Reuse the thumbnail's protected URL for the same source. Different slot
+        // URLs would download and generate the same detail image a second time.
+        const galleryIndex = product.images.findIndex((source) => source === image);
+        const slot = galleryIndex >= 0 ? `gallery-${galleryIndex}` : `variant-${index}`;
+        return [
+          valueId,
+          `${protectedProductSource(product.id, image, slot, "detail")}?v=${productDetailImageVersion}`,
+        ];
+      }),
   );
 }

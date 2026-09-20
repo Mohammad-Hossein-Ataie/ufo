@@ -8,10 +8,16 @@ export interface PreparedCarouselImage {
   resolvedSrc: string;
 }
 
-function decodeImage(src: string, signal: AbortSignal, timeoutMs: number): Promise<boolean> {
+function decodeImage(
+  src: string,
+  signal: AbortSignal,
+  timeoutMs: number,
+  priority: "high" | "low" | "auto",
+): Promise<boolean> {
   return new Promise((resolve) => {
     if (signal.aborted || !src) return resolve(false);
     const image = new Image();
+    image.fetchPriority = priority;
     let settled = false;
     const finish = (ready: boolean) => {
       if (settled) return;
@@ -42,9 +48,11 @@ export async function prepareCarouselImage(
   image: CarouselImage,
   signal: AbortSignal,
   timeoutMs = 8000,
+  priority: "high" | "low" | "auto" = "auto",
 ): Promise<PreparedCarouselImage | undefined> {
-  if (await decodeImage(image.src, signal, timeoutMs)) return { src: image.src, resolvedSrc: image.src };
-  if (!signal.aborted && (await decodeImage(image.fallbackSrc, signal, timeoutMs))) {
+  if (await decodeImage(image.src, signal, timeoutMs, priority))
+    return { src: image.src, resolvedSrc: image.src };
+  if (!signal.aborted && (await decodeImage(image.fallbackSrc, signal, timeoutMs, priority))) {
     return { src: image.src, resolvedSrc: image.fallbackSrc };
   }
   return undefined;

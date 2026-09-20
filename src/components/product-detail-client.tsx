@@ -69,6 +69,10 @@ export function ProductDetailClient({
     () => buildVariantImageMap(variantOptions, variantImages),
     [variantImages, variantOptions],
   );
+  const imagePreloadSources = useMemo(
+    () => [...new Set([...variantImageMap.values(), ...galleryImages])],
+    [variantImageMap, galleryImages],
+  );
   const imageVariantValueMap = useMemo(() => {
     const entries = Array.from(variantImageMap.entries()).map(
       ([valueId, image]): [string, string] => [image, valueId],
@@ -114,6 +118,7 @@ export function ProductDetailClient({
           >
             <ProductImageCrossfade
               src={selectedImage}
+              preloadSources={imagePreloadSources}
               alt={
                 selectedVariantOption
                   ? `${product.nameFa} - ${selectedVariantOption.labelFa}`

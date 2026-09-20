@@ -1,31 +1,55 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ProtectedProductImage } from "@/components/protected-product-image";
-import { prepareCarouselImage } from "@/lib/product-carousel-image";
+import { createGalleryImageCache } from "@/lib/gallery-image-cache";
 
 type Frame = { src: string; alt: string };
+const noPreloadSources: string[] = [];
 
 /** Keep the old image intact until the requested image is decoded. Rapid choices
  * coalesce behind the current fade, so there is never an empty gallery frame. */
-export function ProductImageCrossfade({ src, alt }: Frame) {
+export function ProductImageCrossfade({
+  src,
+  alt,
+  preloadSources = noPreloadSources,
+}: Frame & { preloadSources?: string[] }) {
   const [current, setCurrent] = useState<Frame>({ src, alt });
   const [incoming, setIncoming] = useState<Frame>();
+  const [firstFrameReady, setFirstFrameReady] = useState(false);
+  const cache = useRef<ReturnType<typeof createGalleryImageCache> | null>(null);
+  if (!cache.current) cache.current = createGalleryImageCache();
+
+  useEffect(() => () => cache.current?.dispose(), []);
+
+  useEffect(() => {
+    if (!firstFrameReady) return;
+    const connection = (
+      navigator as Navigator & {
+        connection?: { saveData?: boolean; effectiveType?: string };
+      }
+    ).connection;
+    if (connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType ?? "")) return;
+    const warm = () => {
+      if (!document.hidden) void cache.current?.warm(preloadSources);
+    };
+    warm();
+    document.addEventListener("visibilitychange", warm);
+    return () => document.removeEventListener("visibilitychange", warm);
+  }, [firstFrameReady, preloadSources]);
 
   useEffect(() => {
     if (incoming || src === current.src) return;
-    const controller = new AbortController();
-    // Detail derivatives may arrive slowly on a cold cache. Keep the old frame
-    // visible while allowing the requested image more time than automatic cards.
-    void prepareCarouselImage({ src, fallbackSrc: current.src }, controller.signal, 30_000).then(
-      (image) => {
-        if (controller.signal.aborted || !image || image.resolvedSrc === current.src) return;
-        const frame = { src: image.resolvedSrc, alt };
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setCurrent(frame);
-        else setIncoming(frame);
-      },
-    );
-    return () => controller.abort();
+    let cancelled = false;
+    void cache.current!.load(src).then((image) => {
+      if (cancelled || !image || image.resolvedSrc === current.src) return;
+      const frame = { src: image.resolvedSrc, alt };
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setCurrent(frame);
+      else setIncoming(frame);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [src, alt, current.src, incoming]);
 
   useEffect(() => {
@@ -56,6 +80,7 @@ export function ProductImageCrossfade({ src, alt }: Frame) {
         unoptimized
         className="object-contain"
         sizes="(min-width: 1024px) 47vw, 100vw"
+        onLoad={() => setFirstFrameReady(true)}
       />
       {incoming ? (
         <ProtectedProductImage

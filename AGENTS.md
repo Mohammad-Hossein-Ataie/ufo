@@ -22,6 +22,10 @@
   There are no play/pause buttons. CSS phase duration comes from the shared hook.
 - Product detail image changes use `ProductImageCrossfade`: retain the old frame until
   decode, overlap for 620ms, and coalesce rapid choices. Only one image is accessible.
+  Matching gallery/choice sources must share the same protected URL. After the first frame
+  loads, warm at most 12 protected detail images with two low-priority requests at a time;
+  skip background warming for data saver/2G, and start it only while the page is visible.
+  Reuse page-local pending/decoded requests and abort them when the gallery unmounts.
 
 - Retail and B2B storefront headers start as rounded floating headers with viewport spacing and dock
   to the top after the user scrolls; keep both experiences behaviorally aligned and respect reduced motion.

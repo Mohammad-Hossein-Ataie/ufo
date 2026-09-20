@@ -8,15 +8,33 @@ import { prepareCarouselImage, type PreparedCarouselImage } from "@/lib/product-
 
 vi.mock("@/lib/product-carousel-image", () => ({ prepareCarouselImage: vi.fn() }));
 vi.mock("@/components/protected-product-image", () => ({
-  ProtectedProductImage: (props: { src: string; alt: string; "aria-hidden"?: boolean }) =>
-    createElement("img", { src: props.src, alt: props.alt, "aria-hidden": props["aria-hidden"] }),
+  ProtectedProductImage: (props: {
+    src: string;
+    alt: string;
+    "aria-hidden"?: boolean;
+    onLoad?: () => void;
+  }) =>
+    createElement("img", {
+      src: props.src,
+      alt: props.alt,
+      "aria-hidden": props["aria-hidden"],
+      onLoad: props.onLoad,
+    }),
 }));
 let root: Root;
 let host: HTMLDivElement;
 let reduced = false;
 let media: EventTarget;
-const render = async (src: string) => {
-  await act(async () => root.render(createElement(ProductImageCrossfade, { src, alt: src })));
+const render = async (src: string, preloadSources?: string[]) => {
+  await act(async () =>
+    root.render(
+      createElement(ProductImageCrossfade, {
+        src,
+        alt: src,
+        ...(preloadSources ? { preloadSources } : {}),
+      }),
+    ),
+  );
 };
 const sources = () => [...host.querySelectorAll("img")].map((img) => img.getAttribute("src"));
 
@@ -28,6 +46,8 @@ beforeEach(() => {
   media = new EventTarget();
   Object.defineProperty(media, "matches", { get: () => reduced });
   vi.stubGlobal("matchMedia", () => media);
+  Object.defineProperty(document, "hidden", { configurable: true, value: false });
+  Object.defineProperty(navigator, "connection", { configurable: true, value: undefined });
   vi.mocked(prepareCarouselImage).mockImplementation(async (image) => ({
     src: image.src,
     resolvedSrc: image.src,
@@ -101,4 +121,40 @@ it("finishes an active fade when reduced motion is enabled", async () => {
   await act(async () => media.dispatchEvent(new Event("change")));
   expect(sources()).toEqual(["/b.webp"]);
   expect(vi.getTimerCount()).toBe(0);
+});
+
+it("prepares images after the first frame loads and starts a warmed transition without another request", async () => {
+  const next = "/api/product-images/catalog/demo/gallery-1/detail?v=5";
+  const sourcesToWarm = [next];
+  await render("/initial.webp", sourcesToWarm);
+  expect(prepareCarouselImage).not.toHaveBeenCalled();
+  await act(async () => host.querySelector("img")!.dispatchEvent(new Event("load")));
+  expect(prepareCarouselImage).toHaveBeenCalledTimes(1);
+  await render(next, sourcesToWarm);
+  expect(sources()).toEqual(["/initial.webp", next]);
+  expect(prepareCarouselImage).toHaveBeenCalledTimes(1);
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(680);
+  });
+  expect(sources()).toEqual([next]);
+});
+
+it.each([{ saveData: true }, { effectiveType: "2g" }, { effectiveType: "slow-2g" }])(
+  "skips speculative requests on restricted connections: %j",
+  async (connection) => {
+    Object.defineProperty(navigator, "connection", { configurable: true, value: connection });
+    await render("/initial.webp", ["/api/product-images/catalog/demo/gallery-1/detail?v=5"]);
+    await act(async () => host.querySelector("img")!.dispatchEvent(new Event("load")));
+    expect(prepareCarouselImage).not.toHaveBeenCalled();
+  },
+);
+
+it("waits until the page is visible before starting warm requests", async () => {
+  Object.defineProperty(document, "hidden", { configurable: true, value: true });
+  await render("/initial.webp", ["/api/product-images/catalog/demo/gallery-1/detail?v=5"]);
+  await act(async () => host.querySelector("img")!.dispatchEvent(new Event("load")));
+  expect(prepareCarouselImage).not.toHaveBeenCalled();
+  Object.defineProperty(document, "hidden", { configurable: true, value: false });
+  await act(async () => document.dispatchEvent(new Event("visibilitychange")));
+  expect(prepareCarouselImage).toHaveBeenCalledTimes(1);
 });
