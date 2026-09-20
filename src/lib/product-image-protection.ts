@@ -1,13 +1,13 @@
 import sharp from "sharp";
 
 export const productImagePresets = {
-  card: { width: 600, height: 600, quality: 80 },
-  detail: { width: 1200, height: 1200, quality: 84 },
+  card: { width: 600, height: 800, quality: 80 },
+  detail: { width: 1200, height: 1600, quality: 84 },
 } as const;
 
 export type ProductImagePreset = keyof typeof productImagePresets;
-export const productCardImageVersion = "4";
-export const productDetailImageVersion = "4";
+export const productCardImageVersion = "5";
+export const productDetailImageVersion = "5";
 
 export const productOriginalPrefix = "storage/products/original/";
 export const productGeneratedPrefix = "storage/products/generated/";
@@ -99,17 +99,14 @@ export async function generateProtectedProductImage(
     failOn: "error",
     limitInputPixels: maxProductImagePixels,
   }).rotate();
-  const metadata = await source.metadata();
-  const aspect = (metadata.width ?? 1) / (metadata.height ?? 1);
   let studioBackground: { r: number; g: number; b: number } | undefined;
-  if (aspect < 2 / 3 || aspect > 1.5) {
-    // A cover crop would cut off a narrow device. When the photo has a uniform
-    // studio backdrop, extend that same color instead of adding blurred bands.
+  {
+    // Extend a uniform opaque studio backdrop. Other sources retain transparency
+    // around the complete image so each storefront can supply its own surface.
     const { data, info } = await source
       .clone()
       .resize(64, 64, { fit: "fill" })
-      .flatten({ background: "#141a22" })
-      .removeAlpha()
+      .ensureAlpha()
       .raw()
       .toBuffer({ resolveWithObject: true });
     const corners = [
@@ -119,9 +116,10 @@ export async function generateProtectedProductImage(
       [62, 62],
     ].map(([x, y]) => {
       const offset = (y! * info.width + x!) * info.channels;
-      return [data[offset]!, data[offset + 1]!, data[offset + 2]!];
+      return [data[offset]!, data[offset + 1]!, data[offset + 2]!, data[offset + 3]!];
     });
     if (
+      corners.every((corner) => corner[3]! >= 250) &&
       [0, 1, 2].every(
         (channel) =>
           Math.max(...corners.map((c) => c[channel]!)) -
@@ -135,14 +133,10 @@ export async function generateProtectedProductImage(
     }
   }
   const output = await source
-    .resize(
-      config.width,
-      config.height,
-      studioBackground
-        ? { fit: "contain", background: studioBackground }
-        : { fit: "cover", position: "centre" },
-    )
-    .flatten({ background: "#141a22" })
+    .resize(config.width, config.height, {
+      fit: "contain",
+      background: studioBackground ?? { r: 0, g: 0, b: 0, alpha: 0 },
+    })
     .composite([{ input: watermarkSvg(config.width, config.height), gravity: "southeast" }])
     .webp({ quality: config.quality, effort: 5, smartSubsample: true })
     .toBuffer();

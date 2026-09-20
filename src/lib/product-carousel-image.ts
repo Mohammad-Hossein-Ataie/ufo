@@ -8,7 +8,7 @@ export interface PreparedCarouselImage {
   resolvedSrc: string;
 }
 
-function decodeImage(src: string, signal: AbortSignal): Promise<boolean> {
+function decodeImage(src: string, signal: AbortSignal, timeoutMs: number): Promise<boolean> {
   return new Promise((resolve) => {
     if (signal.aborted || !src) return resolve(false);
     const image = new Image();
@@ -24,7 +24,7 @@ function decodeImage(src: string, signal: AbortSignal): Promise<boolean> {
       resolve(ready);
     };
     const abort = () => finish(false);
-    const timeout = setTimeout(() => finish(false), 8000);
+    const timeout = setTimeout(() => finish(false), timeoutMs);
     signal.addEventListener("abort", abort, { once: true });
     image.onload = () => {
       void image.decode().then(
@@ -41,9 +41,10 @@ function decodeImage(src: string, signal: AbortSignal): Promise<boolean> {
 export async function prepareCarouselImage(
   image: CarouselImage,
   signal: AbortSignal,
+  timeoutMs = 8000,
 ): Promise<PreparedCarouselImage | undefined> {
-  if (await decodeImage(image.src, signal)) return { src: image.src, resolvedSrc: image.src };
-  if (!signal.aborted && (await decodeImage(image.fallbackSrc, signal))) {
+  if (await decodeImage(image.src, signal, timeoutMs)) return { src: image.src, resolvedSrc: image.src };
+  if (!signal.aborted && (await decodeImage(image.fallbackSrc, signal, timeoutMs))) {
     return { src: image.src, resolvedSrc: image.fallbackSrc };
   }
   return undefined;

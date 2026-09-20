@@ -15,7 +15,9 @@ export function ProductImageCrossfade({ src, alt }: Frame) {
   useEffect(() => {
     if (incoming || src === current.src) return;
     const controller = new AbortController();
-    void prepareCarouselImage({ src, fallbackSrc: current.src }, controller.signal).then(
+    // Detail derivatives may arrive slowly on a cold cache. Keep the old frame
+    // visible while allowing the requested image more time than automatic cards.
+    void prepareCarouselImage({ src, fallbackSrc: current.src }, controller.signal, 30_000).then(
       (image) => {
         if (controller.signal.aborted || !image || image.resolvedSrc === current.src) return;
         const frame = { src: image.resolvedSrc, alt };
@@ -52,7 +54,7 @@ export function ProductImageCrossfade({ src, alt }: Frame) {
         fill
         loading="eager"
         unoptimized
-        className="object-cover"
+        className="object-contain"
         sizes="(min-width: 1024px) 47vw, 100vw"
       />
       {incoming ? (
@@ -64,7 +66,7 @@ export function ProductImageCrossfade({ src, alt }: Frame) {
           fill
           loading="eager"
           unoptimized
-          className="product-image-crossfade-in object-cover"
+          className="product-image-crossfade-in object-contain"
           sizes="(min-width: 1024px) 47vw, 100vw"
           onAnimationEnd={() => {
             setCurrent(incoming);

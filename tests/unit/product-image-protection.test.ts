@@ -11,6 +11,56 @@ import {
 } from "@/lib/product-image-protection";
 
 describe("product image protection", () => {
+  it.each([
+    [300, 400],
+    [400, 400],
+    [500, 200],
+    [100, 400],
+  ])("retains all four artwork corners for a %s x %s source", async (width, height) => {
+    const original = await sharp(
+      Buffer.from(
+        `<svg width="${width}" height="${height}"><rect width="100%" height="100%" fill="white"/><rect width="20%" height="20%" fill="red"/><rect x="80%" width="20%" height="20%" fill="blue"/><rect y="80%" width="20%" height="20%" fill="#00ff00"/><rect x="80%" y="80%" width="20%" height="20%" fill="#ffff00"/></svg>`,
+      ),
+    )
+      .png()
+      .toBuffer();
+    const output = await generateProtectedProductImage(original, "card");
+    const { data, info } = await sharp(output).raw().toBuffer({ resolveWithObject: true });
+    const scale = Math.min(info.width / width, info.height / height);
+    const pixel = (x: number, y: number) => {
+      const px = Math.round((info.width - width * scale) / 2 + x * width * scale);
+      const py = Math.round((info.height - height * scale) / 2 + y * height * scale);
+      return Array.from(
+        data.subarray(
+          (py * info.width + px) * info.channels,
+          (py * info.width + px) * info.channels + 3,
+        ),
+      );
+    };
+    expect(pixel(0.1, 0.1)[0]).toBeGreaterThan(220);
+    expect(pixel(0.9, 0.1)[2]).toBeGreaterThan(220);
+    expect(pixel(0.1, 0.9)[1]).toBeGreaterThan(220);
+    expect(pixel(0.9, 0.9)[0]).toBeGreaterThan(220);
+    expect(pixel(0.9, 0.9)[1]).toBeGreaterThan(220);
+    expect(info.width / info.height).toBe(3 / 4);
+  });
+
+  it("preserves transparent margins for theme-aware packshot backgrounds", async () => {
+    const input = await sharp(
+      Buffer.from(
+        '<svg width="100" height="300"><rect x="30" y="10" width="40" height="280" fill="red"/></svg>',
+      ),
+    )
+      .png()
+      .toBuffer();
+    const result = await generateProtectedProductImage(input, "card");
+    const { data, info } = await sharp(result)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    expect(data[3]).toBe(0);
+    expect(data[(400 * info.width + 300) * 4 + 3]).toBe(255);
+  });
   it.each(["card", "detail"] as const)(
     "preserves both ends of a narrow studio product in %s",
     async (preset) => {
@@ -66,8 +116,8 @@ describe("product image protection", () => {
         ]) {
       expect(pixel(x!, y!)[0]).toBeGreaterThan(200);
     }
-    expect(generatedProductKey("asset", "card")).toContain("card-v4.webp");
-    expect(generatedProductKey("asset", "detail")).toContain("asset-detail-v4.webp");
+    expect(generatedProductKey("asset", "card")).toContain("card-v5.webp");
+    expect(generatedProductKey("asset", "detail")).toContain("asset-detail-v5.webp");
   });
   it("creates exact WebP card and detail derivatives with a visible low-opacity watermark", async () => {
     const original = await sharp({
@@ -82,8 +132,8 @@ describe("product image protection", () => {
     const detailMetadata = await sharp(detail).metadata();
     const cardStats = await sharp(card).stats();
 
-    expect(cardMetadata).toMatchObject({ format: "webp", width: 600, height: 600 });
-    expect(detailMetadata).toMatchObject({ format: "webp", width: 1200, height: 1200 });
+    expect(cardMetadata).toMatchObject({ format: "webp", width: 600, height: 800 });
+    expect(detailMetadata).toMatchObject({ format: "webp", width: 1200, height: 1600 });
     expect(cardStats.channels.some((channel) => channel.min < 245)).toBe(true);
   });
 

@@ -109,6 +109,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             <ProductCard
               key={product.id}
               title={product.nameFa}
+              subtitle={product.nameEn}
               description={product.shortDescriptionFa}
               media={
                 <StorefrontProductImage

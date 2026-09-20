@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
 
+// The local catalog can take longer on a cold data/cache read.
+test.setTimeout(90_000);
+
 for (const route of ["/", "/b2b"]) {
   for (const width of [1440, 1280, 1024, 430, 390, 375, 320]) {
     test(`${route} floating and docked at ${width}px`, async ({ page }) => {
@@ -15,7 +18,10 @@ for (const route of ["/", "/b2b"]) {
         .locator("main")
         .evaluate((el) => el.getBoundingClientRect().top + scrollY);
       expect(contentTop).toBeCloseTo(0, 0);
-      await expect(header).toHaveCSS("border-radius", "999px");
+      await expect(header).toHaveCSS(
+        "border-radius",
+        route === "/" && width >= 1024 ? "60px" : "34px",
+      );
       expect(await header.evaluate((el) => getComputedStyle(el).backdropFilter)).toContain(
         "blur(24px)",
       );

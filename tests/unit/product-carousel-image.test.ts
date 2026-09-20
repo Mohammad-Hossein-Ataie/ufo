@@ -48,6 +48,14 @@ describe("carousel protected-image preparation", () => {
     expect(await promise).toBeUndefined();
     expect(vi.getTimerCount()).toBe(0);
   });
+  it("allows a slow detail image to decode within its explicit time budget", async () => {
+    const promise = prepareCarouselImage(input, new AbortController().signal, 30000);
+    await vi.advanceTimersByTimeAsync(9000);
+    expect(instances).toHaveLength(1);
+    instances[0]!.onload!();
+    expect(await promise).toEqual({ src: input.src, resolvedSrc: input.src });
+    expect(vi.getTimerCount()).toBe(0);
+  });
   it("aborts without starting a fallback or leaking timers/listeners", async () => {
     const abort = new AbortController();
     const promise = prepareCarouselImage(input, abort.signal);

@@ -168,6 +168,7 @@ export function ErrorState({ title, children }: { title: string; children: React
 
 export function ProductCard({
   title,
+  subtitle,
   description,
   media,
   price,
@@ -177,6 +178,7 @@ export function ProductCard({
   compactOnMobile = false,
 }: {
   title: string;
+  subtitle?: string | undefined;
   description: string;
   media: ReactNode;
   price: ReactNode;
@@ -193,11 +195,8 @@ export function ProductCard({
       )}
     >
       <MediaFrame
-        className={cn(
-          "bg-black/10",
-          compactOnMobile && "mobile-product-media",
-          mediaClassName,
-        )}
+        ratio="3 / 4"
+        className={cn("bg-black/10", compactOnMobile && "mobile-product-media", mediaClassName)}
       >
         {media}
       </MediaFrame>
@@ -209,18 +208,26 @@ export function ProductCard({
       >
         <div
           className={cn(
-            "flex min-h-14 flex-wrap items-start justify-between gap-2",
+            "grid min-h-[8.5rem] content-start justify-items-start gap-2 sm:min-h-[9rem]",
             compactOnMobile && "mobile-product-title-row",
           )}
         >
           <h3
             className={cn(
-              "min-w-0 flex-1 basis-28 line-clamp-2 text-base font-black leading-7",
+              "min-w-0 line-clamp-2 text-base font-black leading-7",
               compactOnMobile && "mobile-product-title",
             )}
           >
             {title}
           </h3>
+          {subtitle ? (
+            <p
+              dir="ltr"
+              className="product-card-subtitle line-clamp-2 min-w-0 max-w-full text-start text-xs leading-5 text-current/70 [overflow-wrap:anywhere]"
+            >
+              {subtitle}
+            </p>
+          ) : null}
           {badge}
         </div>
         <p

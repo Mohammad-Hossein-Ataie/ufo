@@ -16,13 +16,15 @@ import {
   getProductVariantImages,
 } from "@/lib/product-images";
 import { getStorefrontVariantOptions } from "@/lib/storefront-variants";
-import { productCatalogImageUrl } from "@/lib/product-image-protection";
+import { productCatalogImageUrl, productDetailImageVersion } from "@/lib/product-image-protection";
 import {
   brands,
   categories,
   getProductVariantType,
   productColorAttributeTechnicalValue,
   productFlavorAttributeTechnicalValue,
+  productResistanceAttributeTechnicalValue,
+  productCapacityAttributeTechnicalValue,
 } from "@ufo/domain";
 import { breadcrumbJsonLd, jsonLdScriptProps, productJsonLd } from "@ufo/seo";
 import { Button, Price, ProductCard, StockStatus } from "@ufo/ui";
@@ -57,7 +59,7 @@ function renderRichDescription(product: { id: string; descriptionFa: string }) {
   return blocks.map((block, index) => {
     const imageMatch = block.match(imageBlockPattern);
     if (imageMatch?.groups?.url) {
-      const imageUrl = productCatalogImageUrl(product.id, `description-${index}`, "detail");
+      const imageUrl = `${productCatalogImageUrl(product.id, `description-${index}`, "detail")}?v=${productDetailImageVersion}`;
       return (
         <figure key={`${block}-${index}`} className="overflow-hidden rounded-xl bg-white/[0.04]">
           <div className="relative aspect-[16/10]">
@@ -68,7 +70,7 @@ function renderRichDescription(product: { id: string; descriptionFa: string }) {
               loading="lazy"
               unoptimized
               sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
+              className="object-contain"
             />
           </div>
         </figure>
@@ -233,7 +235,14 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 .filter(
                   (attribute) =>
                     attribute.technicalValue !== productColorAttributeTechnicalValue &&
-                    attribute.technicalValue !== productFlavorAttributeTechnicalValue,
+                    attribute.technicalValue !== productFlavorAttributeTechnicalValue &&
+                    !(
+                      variantOptions.length > 0 &&
+                      ((variantType === "resistance" &&
+                        attribute.technicalValue === productResistanceAttributeTechnicalValue) ||
+                        (variantType === "capacity" &&
+                          attribute.technicalValue === productCapacityAttributeTechnicalValue))
+                    ),
                 )
                 .map((attribute) => (
                   <div
@@ -247,10 +256,16 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               {variantOptions.length > 0 ? (
                 <div className="pt-2">
                   <dt className="text-[#9BA7B4]">
-                    {variantType === "flavor" ? "طعم‌های قابل انتخاب" : "رنگ‌های قابل سفارش"}
+                    {variantType === "resistance"
+                      ? "مقاومت (Ω)"
+                      : variantType === "capacity"
+                        ? "ظرفیت"
+                        : variantType === "flavor"
+                          ? "طعم‌ها"
+                          : "رنگ‌ها"}
                   </dt>
                   <dd className="mt-2">
-                    <ProductVariantSummary options={variantOptions} />
+                    <ProductVariantSummary options={variantOptions} max={variantOptions.length} />
                   </dd>
                 </div>
               ) : null}
@@ -321,6 +336,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   <ProductCard
                     key={related.id}
                     title={related.nameFa}
+                    subtitle={related.nameEn}
                     description={related.shortDescriptionFa}
                     compactOnMobile
                     media={

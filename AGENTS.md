@@ -28,20 +28,21 @@
 - Storefront facet dropdowns are searchable custom controls with their own bounded scroll area. Search
   inputs inside auto-submit forms must not trigger catalog navigation while the user is typing.
 
-- Product `card` and `detail` derivatives fill the square without generated blurred side bands.
-  Use cover for artwork; for narrow/wide studio photos with matching corner colors, preserve
-  the whole object and extend its own backdrop. Bump image versions when changing output.
+- Product `card` and `detail` derivatives use portrait 3:4 canvases (600x800 / 1200x1600).
+  Always contain the complete source without cropping or blurred side bands. Extend matching
+  opaque studio corners; otherwise retain alpha so the theme supplies the backdrop. Bump both
+  image versions when changing output; keep originals private.
 
 - Root `tsconfig.json` intentionally maps `@ufo/*` directly to `packages/*/src/index.ts(x)` as a
   deployment-safe fallback. Keep this mapping when changing workspace/package resolution so Next builds
   still resolve shared packages even when the hosting installer does not materialize npm workspace links.
 
 - Retail and B2B headers share `useHeaderDocked` (20px dock / 16px restore) and `.storefront-header` geometry. Keep the top margin and header height constant in document flow; CSS sticky consumes the top gap without moving the hero. Homepages use `header-overlay-home` to extend hero artwork to viewport top behind the frosted pill; its responsive offsets must match header row heights and safe-area padding. Keep hero content below the header. Do not clip header overflow: search suggestions must escape the rounded surface.
-- Product detail gallery images and thumbnails fill their frames with object-cover and no inset padding. Retail and B2B headers retain translucent glass backgrounds and backdrop blur in both floating and docked states.
+- Product cards, detail galleries and thumbnails use 3:4 frames and object-contain with no inset padding. Retail and B2B headers retain translucent glass backgrounds and backdrop blur in both floating and docked states.
 
 - Shared `MediaFrame` in `@ufo/ui` reserves an explicit aspect ratio and defaults to
   `contain` for unprepared media. Opt into `cover` for decorative artwork; set its focal
-  position explicitly. Prepared square product derivatives and detail-gallery rules remain unchanged.
+  position explicitly. Product media explicitly uses ratio="3 / 4"; decorative hero backgrounds have their own framing.
 - `MotionReveal` progressively enhances visible server markup with one viewport-entry
   animation. Use shared `--motion-*` tokens and respect reduced motion; do not use
   replaying scroll timelines for section entrances.
@@ -49,3 +50,13 @@
   default to Retail; `.b2b-shell` supplies light/green values. Keep palette overrides scoped.
 - Use `ModalSurface` for storefront modal overlays: it reuses Radix focus containment,
   Escape handling and focus restoration. Closed overlays must not remain keyboard reachable.
+
+- `ImageLightbox` shows only the existing protected derivative inside `ModalSurface`, with
+  backdrop blur, Escape and focus restoration. Do not expose originals or add download links;
+  context-menu/drag restrictions discourage casual saving but cannot prevent browser capture.
+- Header width and radius ease together over 420ms only on dock-state changes; use a radius
+  matching the actual pill height, not 999px, so curvature visibly interpolates. Reduced motion
+  disables transitions, and block geometry must remain fixed.
+- Shared product cards show `subtitle` (English name, LTR) below the Persian title and above
+  status. Read-only variant summaries must label resistance with Ω, capacity with its actual
+  value, and reserve color swatches for color data.

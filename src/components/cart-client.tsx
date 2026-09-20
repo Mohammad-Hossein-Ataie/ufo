@@ -262,7 +262,7 @@ export function CartClient() {
                   fill
                   loading="lazy"
                   sizes="(min-width: 640px) 7rem, 100vw"
-                  className="object-cover"
+                  className="object-contain"
                 />
               </div>
               <div className="min-w-0">

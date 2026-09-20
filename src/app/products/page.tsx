@@ -492,6 +492,7 @@ export default async function ProductsPage({
                   <ProductCard
                     key={product.id}
                     title={product.nameFa}
+                    subtitle={product.nameEn}
                     description={product.shortDescriptionFa}
                     compactOnMobile
                     media={

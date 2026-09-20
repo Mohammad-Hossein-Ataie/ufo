@@ -117,6 +117,14 @@ export function ProductVariantSummary({
   const isDark = tone === "dark";
   const visible = options.slice(0, max);
   const hidden = Math.max(0, options.length - visible.length);
+  const unitLabel =
+    variantType === "resistance"
+      ? "مقدار مقاومت"
+      : variantType === "capacity"
+        ? "ظرفیت"
+        : variantType === "flavor"
+          ? "طعم"
+          : "رنگ";
 
   return (
     <div className="grid gap-2 text-xs">
@@ -130,8 +138,16 @@ export function ProductVariantSummary({
                 : "border-[#D5D9C9] bg-white text-[#596B61]"
             }`}
           >
-            <VariantOptionVisual option={option} size="sm" />
-            {variantType === "color" ? option.labelFa : null}
+            {option.type === "resistance" ? (
+              <bdi dir="ltr">{option.labelFa.replace(/\s*(?:Ω|ohms?|اهم)\s*$/i, "")} Ω</bdi>
+            ) : option.type === "capacity" ? (
+              <bdi>{option.labelFa}</bdi>
+            ) : (
+              <>
+                <VariantOptionVisual option={option} size="sm" />
+                <span>{option.labelFa}</span>
+              </>
+            )}
           </span>
         ))}
         {hidden > 0 ? (
@@ -145,8 +161,7 @@ export function ProductVariantSummary({
         ) : null}
       </div>
       <p className={isDark ? "text-retail-secondary" : "text-[#596B61]"}>
-        {new Intl.NumberFormat("fa-IR").format(options.length)}{" "}
-        {variantType === "flavor" ? "طعم موجود" : "رنگ موجود"}
+        {new Intl.NumberFormat("fa-IR").format(options.length)} {unitLabel}
       </p>
     </div>
   );

@@ -506,18 +506,22 @@ export default async function B2BCatalogPage({
                   >
                     <ProductCard
                       title={product.nameFa}
+                      subtitle={product.nameEn}
                       description={`حداقل ${new Intl.NumberFormat("fa-IR").format(variant.minWholesaleCartonCount)} کارتن، هر کارتن ${new Intl.NumberFormat("fa-IR").format(variant.cartonSize)} عدد؛ هر عدد حدود ${new Intl.NumberFormat("fa-IR").format(unitToman)} تومان`}
-                      mediaClassName="bg-black"
+                      mediaClassName="bg-[#EEF0E5]"
                       media={
                         <StorefrontProductImage
+                          zoomable
+                          viewerTone="light"
                           key={`media-${product.id}`}
                           src={getProductImage(product)}
                           fallbackSrc={
-                            getCategoryImage(product.categoryId) ?? "/images/categories/lighter.webp"
+                            getCategoryImage(product.categoryId) ??
+                            "/images/categories/lighter.webp"
                           }
                           alt={product.nameFa}
                           sizes="(min-width: 1280px) 22vw, (min-width: 768px) 42vw, 92vw"
-                          className="h-full w-full object-contain p-4 transition duration-200 group-hover:scale-[1.03] motion-reduce:transition-none"
+                          className="h-full w-full object-contain"
                         />
                       }
                       badge={

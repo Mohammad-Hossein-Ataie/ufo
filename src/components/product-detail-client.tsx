@@ -9,7 +9,9 @@ import {
   PackageCheck,
   Palette,
   Sparkles,
+  ZoomIn,
 } from "lucide-react";
+import { ImageLightbox } from "@/components/image-lightbox";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { ProductImageCrossfade } from "@/components/product-image-crossfade";
 import { ProtectedProductImage } from "@/components/protected-product-image";
@@ -74,6 +76,7 @@ export function ProductDetailClient({
     return new Map<string, string>(entries);
   }, [variantImageMap]);
   const [selectedImage, setSelectedImage] = useState(firstImage);
+  const [imageOpen, setImageOpen] = useState(false);
   const [selectedVariantValueId, setSelectedVariantValueId] = useState<string | null>(null);
   const selectedVariantOption = variantOptions.find(
     (option) => option.id === selectedVariantValueId,
@@ -100,9 +103,15 @@ export function ProductDetailClient({
 
   return (
     <section className="retail-glass grid gap-6 rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(0,217,255,0.10),transparent_34%),#0D1117] p-3 shadow-retail-lg sm:p-5 lg:grid-cols-[minmax(0,1.03fr)_minmax(24rem,0.97fr)] lg:gap-7 lg:p-6">
-      <div className="grid gap-3 lg:order-2">
+      <div className="grid min-w-0 content-start gap-3 lg:order-2">
         <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#0A0F15]">
-          <div className="relative mx-auto aspect-square w-full overflow-hidden bg-[#0B1118] shadow-inner">
+          <button
+            type="button"
+            onClick={() => setImageOpen(true)}
+            aria-label="بزرگ‌نمایی تصویر"
+            aria-haspopup="dialog"
+            className="relative mx-auto block aspect-[3/4] w-full cursor-zoom-in overflow-hidden bg-[#0B1118] shadow-inner focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-300"
+          >
             <ProductImageCrossfade
               src={selectedImage}
               alt={
@@ -111,7 +120,13 @@ export function ProductDetailClient({
                   : product.nameFa
               }
             />
-          </div>
+            <span
+              className="pointer-events-none absolute bottom-3 end-3 rounded-full border border-white/25 bg-black/60 p-2 text-white"
+              aria-hidden="true"
+            >
+              <ZoomIn size={20} />
+            </span>
+          </button>
           {selectedVariantOption ? (
             <span className="absolute right-4 top-4 inline-flex select-none items-center gap-2 rounded-md border border-slate-200 bg-white/95 px-3 py-1.5 text-xs font-black text-slate-800 shadow-sm">
               <VariantOptionVisual option={selectedVariantOption} size="sm" />
@@ -131,7 +146,7 @@ export function ProductDetailClient({
                 key={`${image}-${index}`}
                 type="button"
                 onClick={() => selectImage(image)}
-                className={`group relative aspect-square w-[4.25rem] shrink-0 snap-start select-none overflow-hidden rounded-xl border bg-[#091019] transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 sm:w-auto motion-reduce:transition-none ${
+                className={`group relative aspect-[3/4] w-[4.25rem] shrink-0 snap-start select-none overflow-hidden rounded-xl border bg-[#091019] transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 sm:w-auto motion-reduce:transition-none ${
                   active
                     ? "border-cyan-300 ring-2 ring-cyan-300/30"
                     : "border-white/10 hover:border-cyan-300/70"
@@ -146,7 +161,7 @@ export function ProductDetailClient({
                   loading="lazy"
                   unoptimized
                   sizes="112px"
-                  className="object-cover"
+                  className="object-contain"
                 />
                 {thumbnailOption ? (
                   <span className="absolute bottom-1 right-1 z-[2]">
@@ -157,6 +172,16 @@ export function ProductDetailClient({
             );
           })}
         </div>
+        <ImageLightbox
+          open={imageOpen}
+          onClose={() => setImageOpen(false)}
+          src={selectedImage}
+          alt={
+            selectedVariantOption
+              ? `${product.nameFa} - ${selectedVariantOption.labelFa}`
+              : product.nameFa
+          }
+        />
       </div>
 
       <div className="flex min-w-0 flex-col py-1 lg:order-1">

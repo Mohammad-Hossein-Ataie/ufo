@@ -20,7 +20,7 @@ test("mobile drawer contains keyboard focus and restores its opener", async ({ p
 });
 
 for (const route of ["/", "/b2b"]) {
-  test(`${route} media frames reserve square space and theme focus is scoped`, async ({ page }) => {
+  test(`${route} media frames reserve stable space and theme focus is scoped`, async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto(route);
     const frames = page.locator(".media-frame");

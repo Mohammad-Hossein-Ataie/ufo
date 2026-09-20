@@ -32,6 +32,7 @@ export function HomepageProducts({ slots }: { slots: Slot[] }) {
               key={row.product.id}
               compactOnMobile
               title={row.product.nameFa}
+              subtitle={row.product.nameEn}
               description={row.product.shortDescriptionFa}
               media={
                 <Link

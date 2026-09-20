@@ -9,11 +9,13 @@ export function ModalSurface({
   onClose,
   title,
   children,
+  overlayClassName = "backdrop-blur-[2px]",
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   children: ReactElement<{ children?: ReactNode }>;
+  overlayClassName?: string;
 }) {
   const returnFocus = useRef<HTMLElement | null>(null);
   return (
@@ -24,7 +26,9 @@ export function ModalSurface({
       }}
     >
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[60] bg-black/75 backdrop-blur-[2px]" />
+        <Dialog.Overlay
+          className={`fixed inset-0 z-[60] bg-black/75 ${overlayClassName}`}
+        />
         <Dialog.Content
           asChild
           aria-describedby={undefined}
