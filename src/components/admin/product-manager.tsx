@@ -46,6 +46,8 @@ import { ProductTable } from "./products/product-table";
 import { Pagination } from "./products/pagination";
 import { BulkActions, ConfirmationDialog } from "./products/bulk-actions";
 import { ProductTabs, type ProductTab } from "./products/product-tabs";
+import { SearchableSelect } from "./products/searchable-select";
+import { PriceInput } from "./products/price-input";
 import type { ProductListRow, ProductQuery } from "@/lib/admin-product-query";
 import type { BulkProductInput } from "@/lib/admin-product-bulk";
 const ImageManager = dynamic(() => import("./products/image-manager"), {
@@ -1265,49 +1267,39 @@ export function ProductManager() {
                           onChange={(event) => update("slug", event.target.value)}
                         />
                       </label>
-                      <label className="grid gap-1 text-sm">
-                        نوع محصول
-                        <select
-                          className="min-h-11 rounded-md border border-slate-300 bg-white px-3"
-                          aria-label="نوع محصول"
+                      <div className="grid gap-1 text-sm">
+                        <span>نوع محصول</span>
+                        <SearchableSelect
+                          label="نوع محصول"
                           value={form.productKind}
-                          onChange={(event) => updateProductKind(event.target.value as ProductKind)}
-                        >
-                          {productKindOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label className="grid gap-1 text-sm">
-                        دسته
-                        <select
-                          className="min-h-11 rounded-md border border-slate-300 bg-white px-3"
+                          options={productKindOptions}
+                          onChange={(value) => updateProductKind(value as ProductKind)}
+                        />
+                      </div>
+                      <div className="grid gap-1 text-sm">
+                        <span>دسته</span>
+                        <SearchableSelect
+                          label="دسته"
                           value={form.categoryId}
-                          onChange={(event) => updateCategory(event.target.value)}
-                        >
-                          {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                              {category.nameFa}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label className="grid gap-1 text-sm">
-                        برند
-                        <select
-                          className="min-h-11 rounded-md border border-slate-300 bg-white px-3"
+                          options={categories.map((category) => ({
+                            value: category.id,
+                            label: category.nameFa,
+                          }))}
+                          onChange={updateCategory}
+                        />
+                      </div>
+                      <div className="grid gap-1 text-sm">
+                        <span>برند</span>
+                        <SearchableSelect
+                          label="برند"
                           value={form.brandId}
-                          onChange={(event) => update("brandId", event.target.value)}
-                        >
-                          {brands.map((brand) => (
-                            <option key={brand.id} value={brand.id}>
-                              {brand.nameFa}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
+                          options={brands.map((brand) => ({
+                            value: brand.id,
+                            label: brand.nameFa,
+                          }))}
+                          onChange={(value) => update("brandId", value)}
+                        />
+                      </div>
                     </div>
                     <label className="mt-3 grid gap-1 text-sm">
                       توضیح کوتاه
@@ -1647,24 +1639,16 @@ export function ProductManager() {
                     <div className="mt-3 grid gap-3">
                       <label className="grid gap-1 text-sm">
                         قیمت فروش تکی هر عدد (تومان)
-                        <Input
-                          type="number"
-                          min={0}
+                        <PriceInput
                           value={form.retailPriceToman}
-                          onChange={(event) =>
-                            update("retailPriceToman", Number(event.target.value))
-                          }
+                          onValueChange={(value) => update("retailPriceToman", Number(value))}
                         />
                       </label>
                       <label className="grid gap-1 text-sm">
                         قیمت عمده هر عدد داخل کارتن (تومان)
-                        <Input
-                          type="number"
-                          min={0}
+                        <PriceInput
                           value={form.wholesalePriceToman}
-                          onChange={(event) =>
-                            update("wholesalePriceToman", Number(event.target.value))
-                          }
+                          onValueChange={(value) => update("wholesalePriceToman", Number(value))}
                         />
                       </label>
                       <div className="grid grid-cols-2 gap-3">

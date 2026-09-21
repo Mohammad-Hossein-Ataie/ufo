@@ -7,7 +7,40 @@ test.beforeEach(async ({ page }) => {
   });
   expect(response.ok()).toBeTruthy();
   await page.goto("/admin/products");
-  await expect(page.getByRole("button", { name: "ویرایش", exact: true }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "افزودن محصول", exact: true })).toBeVisible();
+});
+
+test("searchable brands stay in the viewport and prices show three-digit groups", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 900, height: 650 });
+  await page.getByRole("button", { name: "افزودن محصول", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "ایجاد محصول", exact: true });
+  const brand = editor.getByRole("button", { name: "برند", exact: true });
+  await brand.click();
+  const list = page.getByRole("listbox", { name: "برند" });
+  await expect(list).toBeVisible();
+  const bounds = await list.boundingBox();
+  expect(bounds).not.toBeNull();
+  expect(bounds!.y).toBeGreaterThanOrEqual(0);
+  expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(650);
+  await page.getByRole("textbox", { name: "جست‌وجوی برند" }).fill("vapor10");
+  await expect(list.getByRole("option")).toHaveCount(1);
+  await list.getByRole("option", { name: "Vapor10" }).click();
+  await expect(brand).toContainText("Vapor10");
+  await brand.click();
+  await page.getByRole("textbox", { name: "جست‌وجوی برند" }).fill("tokyo");
+  await list.getByRole("option", { name: "Tokyo" }).click();
+  await expect(brand).toContainText("Tokyo");
+
+  await editor.getByRole("tab", { name: "قیمت و موجودی" }).click();
+  const retail = editor.getByLabel("قیمت فروش تکی هر عدد (تومان)");
+  const wholesale = editor.getByLabel("قیمت عمده هر عدد داخل کارتن (تومان)");
+  await retail.fill("2450000");
+  await wholesale.fill("۲۲۵۴۰۰۰");
+  await expect(retail).toHaveValue("2,450,000");
+  await expect(wholesale).toHaveValue("2,254,000");
+  await page.screenshot({ path: "test-results/admin-product-searchable-brand-price.png" });
 });
 
 test("server pagination, filtering, selection and sorting", async ({ page }) => {
@@ -47,8 +80,10 @@ test("tabbed editing, image order, unsaved warning, SEO and bulk actions", async
   const editor = page.getByRole("dialog", { name: "ایجاد محصول", exact: true });
   await editor.getByLabel("نام فارسی", { exact: true }).fill("محصول آزمایشی کاتالوگ");
   await editor.getByLabel("Slug", { exact: true }).fill(slug);
-  await editor.getByRole("combobox", { name: "نوع محصول", exact: true }).selectOption("accessory");
-  await editor.getByRole("combobox", { name: "دسته", exact: true }).selectOption("cat-lighter");
+  await editor.getByRole("button", { name: "نوع محصول", exact: true }).click();
+  await page.getByRole("option", { name: "اکسسوری", exact: true }).click();
+  await editor.getByRole("button", { name: "دسته", exact: true }).click();
+  await page.getByRole("option", { name: "فندک", exact: true }).click();
   await editor.getByRole("tab", { name: "قیمت و موجودی" }).click();
   await editor.getByLabel("قیمت فروش تکی هر عدد (تومان)").fill("125000");
   await editor.getByLabel("موجودی کل", { exact: true }).fill("12");
@@ -114,12 +149,14 @@ test("tabbed editing, image order, unsaved warning, SEO and bulk actions", async
   await expect(edit).toHaveCount(0);
   await expect(page.getByRole("button", { name: "ویرایش", exact: true })).toHaveCount(1);
   await page.getByLabel("انتخاب محصولات همین صفحه").check();
-  await page.getByLabel("عملیات گروهی").selectOption("deactivate");
+  await page.getByRole("button", { name: "عملیات گروهی" }).click();
+  await page.getByRole("option", { name: "غیرفعال‌سازی" }).click();
   await page.getByRole("button", { name: "اعمال تغییرات" }).click();
   await page.getByRole("dialog").getByRole("button", { name: "تأیید", exact: true }).click();
   await expect(page.getByRole("cell", { name: "غیرفعال", exact: true })).toBeVisible();
   await page.getByLabel("انتخاب محصولات همین صفحه").check();
-  await page.getByLabel("عملیات گروهی").selectOption("delete");
+  await page.getByRole("button", { name: "عملیات گروهی" }).click();
+  await page.getByRole("option", { name: "حذف محصولات" }).click();
   await page.getByRole("button", { name: "اعمال تغییرات" }).click();
   await page.getByRole("dialog").getByRole("button", { name: "تأیید", exact: true }).click();
   await expect(page.getByText("محصولی با این مشخصات پیدا نشد")).toBeVisible();

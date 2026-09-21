@@ -100,6 +100,8 @@ export const brands: Brand[] = [
   { id: "brand-ufo", nameFa: "UFO Selection", slug: "ufo-selection" },
   { id: "brand-orbit", nameFa: "Orbit Lab", slug: "orbit-lab" },
   { id: "brand-neon", nameFa: "Neon Cloud", slug: "neon-cloud" },
+  { id: "brand-tokyo", nameFa: "Tokyo", slug: "tokyo" },
+  { id: "brand-vapor10", nameFa: "Vapor10", slug: "vapor10" },
   ...importedBrands,
 ];
 

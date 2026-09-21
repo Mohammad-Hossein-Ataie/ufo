@@ -2,6 +2,7 @@
 import { Search, SlidersHorizontal } from "lucide-react";
 import { Button, Input } from "@ufo/ui";
 import type { Brand, Category } from "@ufo/types";
+import { SearchableSelect } from "./searchable-select";
 export interface FilterState {
   q: string;
   category: string;
@@ -102,21 +103,16 @@ export function ProductFilters({
       </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
         {fields.map((field) => (
-          <label key={field.key} className="grid gap-2 text-xs font-bold text-slate-600">
-            {field.label}
-            <select
-              className="h-11 min-w-0 rounded-md border border-[#D7DDE4] bg-white px-2 text-sm text-slate-900"
+          <div key={field.key} className="grid min-w-0 gap-2 text-xs font-bold text-slate-600">
+            <span>{field.label}</span>
+            <SearchableSelect
+              label={field.label}
               value={value[field.key]}
-              onChange={(e) => onChange({ ...value, [field.key]: e.target.value })}
-            >
-              <option value="">همه</option>
-              {field.options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+              options={[{ value: "", label: "همه" }, ...field.options]}
+              onChange={(next) => onChange({ ...value, [field.key]: next })}
+              className="w-full"
+            />
+          </div>
         ))}
       </div>
     </section>

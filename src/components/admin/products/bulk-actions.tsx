@@ -1,9 +1,11 @@
 "use client";
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Button, Input } from "@ufo/ui";
+import { Button } from "@ufo/ui";
 import type { Brand, Category } from "@ufo/types";
 import type { BulkProductInput } from "@/lib/admin-product-bulk";
+import { SearchableSelect } from "./searchable-select";
+import { PriceInput } from "./price-input";
 export function ConfirmationDialog({
   open,
   title,
@@ -100,59 +102,47 @@ export function BulkActions({
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-md border border-blue-200 bg-blue-50 p-4 text-sm">
       <strong>{ids.length.toLocaleString("fa-IR")} محصول انتخاب شده</strong>
-      <select
-        aria-label="عملیات گروهی"
+      <SearchableSelect
+        label="عملیات گروهی"
         disabled={disabled}
-        className="h-10 rounded-md border bg-white px-3"
+        className="min-w-36"
         value={action}
-        onChange={(e) => {
-          setAction(e.target.value as keyof typeof labels);
+        options={Object.entries(labels).map(([value, label]) => ({ value, label }))}
+        onChange={(next) => {
+          setAction(next as keyof typeof labels);
           setValue("");
         }}
-      >
-        {Object.entries(labels).map(([key, label]) => (
-          <option key={key} value={key}>
-            {label}
-          </option>
-        ))}
-      </select>
+      />
       {(action === "category" || action === "brand") && (
-        <select
-          aria-label="مقدار جدید گروهی"
+        <SearchableSelect
+          label="مقدار جدید گروهی"
           disabled={disabled}
-          className="h-10 rounded-md border bg-white px-3"
+          className="min-w-44"
           value={value}
-          onChange={(e) => setValue(e.target.value)}
-        >
-          <option value="">انتخاب کنید</option>
-          {(action === "category" ? categories : brands).map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.nameFa}
-            </option>
-          ))}
-        </select>
+          options={(action === "category" ? categories : brands).map((item) => ({
+            value: item.id,
+            label: item.nameFa,
+          }))}
+          onChange={setValue}
+        />
       )}
       {action === "prices" && (
         <>
-          <Input
+          <PriceInput
             className="w-48"
             aria-label="قیمت تکی جدید به تومان"
             placeholder="تکی (تومان)، خالی: حفظ"
-            type="number"
-            min={0}
             disabled={disabled}
             value={retail}
-            onChange={(e) => setRetail(e.target.value)}
+            onValueChange={setRetail}
           />
-          <Input
+          <PriceInput
             className="w-48"
             aria-label="قیمت عمده جدید به تومان"
             placeholder="عمده (تومان)، خالی: حفظ"
-            type="number"
-            min={0}
             disabled={disabled}
             value={wholesale}
-            onChange={(e) => setWholesale(e.target.value)}
+            onValueChange={setWholesale}
           />
         </>
       )}
