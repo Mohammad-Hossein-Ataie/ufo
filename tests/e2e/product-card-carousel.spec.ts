@@ -21,7 +21,7 @@ test("all new-product slots rotate together without play/pause controls", async 
     .toEqual(["1", "1", "1", "1"]);
   await deck.locator("[data-slide-index='1']").first().focus();
   await expect(deck).toHaveAttribute("data-phase", "idle");
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(8000);
   await expect
     .poll(() =>
       deck
@@ -89,14 +89,14 @@ test("hover pauses for a long interaction, RTL keyboard and focused controls sel
   const slot = page.locator(".homepage-product-slot").first();
   await slot.hover();
   const initial = await slot.getAttribute("data-active-index");
-  await page.waitForTimeout(5100);
+  await page.waitForTimeout(8100);
   await expect(slot).toHaveAttribute("data-active-index", initial!);
   await slot.locator('[data-slide-index="0"]').focus();
   await page.mouse.move(0, 0);
   await slot.locator('[data-slide-index="0"]').press("ArrowLeft");
   await expect(slot).toHaveAttribute("data-active-index", "1");
   await expect(slot.locator('[data-slide-index="1"]')).toBeFocused();
-  await page.waitForTimeout(4700);
+  await page.waitForTimeout(7700);
   await expect(slot).toHaveAttribute("data-active-index", "1");
   await slot.locator('[data-slide-index="1"]').press("ArrowRight");
   await expect(slot).toHaveAttribute("data-active-index", "0");

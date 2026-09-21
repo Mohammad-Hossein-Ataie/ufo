@@ -7,7 +7,7 @@ import {
   type PreparedCarouselImage,
 } from "@/lib/product-carousel-image";
 
-export const productCarouselInterval = 4500;
+export const productCarouselInterval = 7000;
 export const productCarouselHalfTransition = 260;
 type PauseReason = "hover" | "focus" | "touch";
 

@@ -106,7 +106,7 @@ describe("product card carousel", () => {
       expect(api.activeIndex).toBe(0);
       expect(vi.getTimerCount()).toBe(0);
       await act(async () => api.resume("hover"));
-      await advance(4760);
+      await advance(7260);
       expect(api.activeIndex).toBe(1);
     } finally {
       matches.mockRestore();
@@ -120,11 +120,11 @@ describe("product card carousel", () => {
     expect(vi.getTimerCount()).toBe(0);
   });
   it.each([2, 3])(
-    "loops %s products at 4500ms with an atomic 260ms out / 260ms in transition",
+    "loops %s products at 7000ms with an atomic 260ms out / 260ms in transition",
     async (count) => {
       await mount(count);
       for (let step = 1; step <= count; step++) {
-        await advance(step === 1 ? 4500 : 3980);
+        await advance(step === 1 ? 7000 : 6480);
         expect(api.phase).toBe("out");
         expect(api.activeIndex).toBe((step - 1) % count);
         await advance(260);
@@ -138,7 +138,7 @@ describe("product card carousel", () => {
   );
   it("rotates the whole deck at once and resets manual timing", async () => {
     await mount(3, 2);
-    await advance(4499);
+    await advance(6999);
     expect(api.phase).toBe("idle");
     await advance(1);
     expect(api.phase).toBe("out");
@@ -148,7 +148,7 @@ describe("product card carousel", () => {
     });
     await advance(260);
     await advance(260);
-    await advance(4239);
+    await advance(6739);
     expect(api.activeIndex).toBe(2);
     expect(api.phase).toBe("idle");
     await advance(1);
@@ -165,7 +165,7 @@ describe("product card carousel", () => {
         : Promise.resolve({ src: image.src, resolvedSrc: image.src }),
     );
     await mount(3, 2);
-    await advance(4500);
+    await advance(7000);
     expect(api.phase).toBe("idle");
     expect(api.activeIndex).toBe(0);
     await act(async () => resolve({ src: slowSrc, resolvedSrc: slowSrc }));
@@ -205,14 +205,14 @@ describe("product card carousel", () => {
     await advance(10000);
     expect(api.activeIndex).toBe(0);
     await act(async () => api.resume("focus"));
-    await advance(4499);
+    await advance(6999);
     expect(api.phase).toBe("idle");
     await advance(261);
     expect(api.activeIndex).toBe(1);
   });
   it("stops offscreen and hidden tabs and resumes from the current product", async () => {
     await mount();
-    await advance(5020);
+    await advance(7520);
     expect(api.activeIndex).toBe(1);
     await visibility(true);
     await advance(20000);
@@ -222,7 +222,7 @@ describe("product card carousel", () => {
     await advance(10000);
     expect(api.activeIndex).toBe(1);
     await inView(true);
-    await advance(4760);
+    await advance(7260);
     expect(api.activeIndex).toBe(2);
   });
   it("uses manual-only instant changes with reduced motion, including a live preference change", async () => {
@@ -239,7 +239,7 @@ describe("product card carousel", () => {
     await act(async () => {
       media.dispatchEvent(new Event("change"));
     });
-    await advance(4760);
+    await advance(7260);
     expect(api.activeIndex).toBe(2);
   });
   it("retains the old complete card while an image is slow, and latest manual selection wins", async () => {
@@ -252,7 +252,7 @@ describe("product card carousel", () => {
         : Promise.resolve({ src: image.src, resolvedSrc: image.src }),
     );
     await mount();
-    await advance(4500);
+    await advance(7000);
     expect(api.activeIndex).toBe(0);
     expect(api.phase).toBe("idle");
     await act(async () => {
@@ -277,12 +277,12 @@ describe("product card carousel", () => {
     await act(async () => {
       void api.goTo(2);
     });
-    await advance(9000);
+    await advance(14000);
     expect(api.activeIndex).toBe(0);
     await act(async () => resolve({ src: images[2]!.src, resolvedSrc: images[2]!.src }));
     await advance(260);
     expect(api.activeIndex).toBe(2);
-    await advance(4499);
+    await advance(6999);
     expect(api.activeIndex).toBe(2);
     expect(api.phase).toBe("idle");
     await advance(1);
@@ -291,20 +291,20 @@ describe("product card carousel", () => {
   it("keeps the current item on image/fallback failure and retries later", async () => {
     vi.mocked(prepareCarouselImage).mockResolvedValue(undefined);
     await mount();
-    await advance(5020);
+    await advance(7520);
     expect(api.activeIndex).toBe(0);
     expect(api.phase).toBe("idle");
     vi.mocked(prepareCarouselImage).mockImplementation(async (image) => ({
       src: image.src,
       resolvedSrc: image.fallbackSrc,
     }));
-    await advance(4500);
+    await advance(7000);
     expect(api.activeIndex).toBe(1);
     expect(api.image?.resolvedSrc).toBe(images[1]!.fallbackSrc);
   });
   it("cancels an automatic exit on hover but still permits manual selection while focused", async () => {
     await mount();
-    await advance(4500);
+    await advance(7000);
     expect(api.phase).toBe("out");
     await act(async () => {
       api.pause("hover");
@@ -334,7 +334,7 @@ describe("product card carousel", () => {
   it("cleans timers and aborts pending image preparation on unmount/route change", async () => {
     await mount();
     const signal = vi.mocked(prepareCarouselImage).mock.calls[0]![1];
-    await advance(4500);
+    await advance(7000);
     await act(async () => root.unmount());
     expect(vi.getTimerCount()).toBe(0);
     expect(signal.aborted).toBe(true);
