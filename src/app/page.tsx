@@ -24,6 +24,7 @@ import { HomepageProducts } from "@/components/homepage-products";
 import { getLatestHomepageProducts } from "@/lib/homepage-products";
 import { listCatalogRows } from "@/lib/catalog-data";
 import { categoryImageBySlug } from "@/lib/product-images";
+import { partnerBrandLogoById } from "@/lib/partner-brand-logos";
 import { faqPageJsonLd, jsonLdScriptProps, organizationJsonLd, websiteJsonLd } from "@ufo/seo";
 
 export const dynamic = "force-dynamic";
@@ -99,6 +100,10 @@ const categoryAccent: Record<string, string> = {
 
 export default async function HomePage() {
   const homepageSlots = getLatestHomepageProducts(await listCatalogRows());
+  const partnerBrands = brands.flatMap((brand) => {
+    const logo = partnerBrandLogoById[brand.id];
+    return logo ? [{ brand, logo }] : [];
+  });
 
   return (
     <main id="main-content" className="retail-storefront header-overlay-home">
@@ -273,22 +278,53 @@ export default async function HomePage() {
             ))}
           </div>
 
-          <div className="mt-12">
-            <div className="flex items-center justify-center gap-2 text-sm text-retail-secondary">
-              <Users size={16} aria-hidden="true" />
-              <span>برندهای همکار</span>
+          <div className="relative mt-12 overflow-hidden rounded-[2rem] border border-white/10 bg-[#080E15] px-4 py-8 shadow-2xl shadow-black/25 sm:px-8 sm:py-10">
+            <div
+              className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-retail-accent/10 blur-3xl"
+              aria-hidden="true"
+            />
+            <div
+              className="pointer-events-none absolute -bottom-32 -left-24 h-72 w-72 rounded-full bg-retail-accent-2/10 blur-3xl"
+              aria-hidden="true"
+            />
+            <div className="relative flex flex-col items-center text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-retail-accent/20 bg-retail-accent/5 px-4 py-2 text-xs font-bold tracking-wide text-retail-accent">
+                <Users size={15} aria-hidden="true" />
+                شبکه برندهای منتخب یوفوپاف
+              </span>
+              <h2 className="mt-4 text-2xl font-black text-white sm:text-3xl">برندهای همکار</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-retail-secondary sm:text-base">
+                روی لوگوی هر برند بزنید تا محصولات همان برند را مستقیم در کاتالوگ ببینید.
+              </p>
             </div>
             <ul
-              className="mt-6 flex flex-wrap items-center justify-center gap-3"
+              className="relative mt-8 flex flex-wrap items-stretch justify-center gap-3"
               aria-label="فیلتر محصولات بر اساس برند"
             >
-              {brands.map((brand) => (
-                <li key={brand.id}>
+              {partnerBrands.map(({ brand, logo }) => (
+                <li
+                  key={brand.id}
+                  className="w-[calc(50%_-_0.375rem)] sm:w-[calc(33.333%_-_0.5rem)] lg:w-[calc(20%_-_0.6rem)]"
+                >
                   <Link
                     href={`/products?brand=${encodeURIComponent(brand.id)}`}
-                    className="inline-flex min-h-11 items-center rounded-full border border-retail-border bg-retail-surface px-5 py-2 text-sm font-bold text-[#D9E2EC] transition hover:-translate-y-0.5 hover:border-retail-accent/70 hover:text-retail-accent hover:shadow-retail focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
+                    aria-label={`مشاهده محصولات برند ${brand.nameFa}`}
+                    className="group relative flex min-h-28 w-full items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.025] px-4 py-5 transition duration-300 hover:-translate-y-1 hover:border-retail-accent/50 hover:bg-white/[0.09] hover:shadow-[0_18px_45px_rgba(0,0,0,0.32)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent motion-reduce:transform-none motion-reduce:transition-none sm:min-h-32"
                   >
-                    {brand.nameFa}
+                    <span
+                      className="pointer-events-none absolute inset-x-8 -bottom-px h-px bg-gradient-to-r from-transparent via-retail-accent/70 to-transparent opacity-0 transition group-hover:opacity-100"
+                      aria-hidden="true"
+                    />
+                    <span className="relative block h-16 w-[88%] sm:h-20">
+                      <Image
+                        src={logo}
+                        alt=""
+                        fill
+                        sizes="(min-width: 1024px) 12rem, (min-width: 640px) 28vw, 42vw"
+                        loading="lazy"
+                        className="object-contain opacity-90 drop-shadow-[0_0_18px_rgba(255,255,255,0.04)] transition duration-300 group-hover:scale-105 group-hover:opacity-100 group-hover:drop-shadow-[0_0_20px_rgba(0,229,255,0.14)] motion-reduce:transform-none motion-reduce:transition-none"
+                      />
+                    </span>
                   </Link>
                 </li>
               ))}

@@ -62,6 +62,38 @@ test("content remains visible without JavaScript", async ({ browser }) => {
   await context.close();
 });
 
+test("footer exposes the official trust seal and contact email responsively", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto("/");
+
+  const footer = page.locator("footer");
+  const seal = footer.getByRole("link", {
+    name: "اعتبارسنجی نماد اعتماد الکترونیکی یوفوپاف",
+    exact: true,
+  });
+  await seal.scrollIntoViewIfNeeded();
+  await expect(seal).toBeVisible();
+  await expect(seal).toHaveAttribute(
+    "href",
+    "https://trustseal.enamad.ir/?id=7628595&Code=9H4ALixgxYdhUO3XrI7dMMNT5ULunNIC",
+  );
+  await expect(seal).toHaveAttribute("target", "_blank");
+  await expect(seal.locator("img")).toHaveAttribute(
+    "src",
+    "https://trustseal.enamad.ir/logo.aspx?id=7628595&Code=9H4ALixgxYdhUO3XrI7dMMNT5ULunNIC",
+  );
+  await expect(footer.getByRole("link", { name: "admin@ufopuff.com", exact: true })).toHaveAttribute(
+    "href",
+    "mailto:admin@ufopuff.com",
+  );
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await footer.screenshot({ path: "temp/presentation/footer-trust-360.png" });
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await footer.screenshot({ path: "temp/presentation/footer-trust-1440.png" });
+});
+
 test("generic frames preserve geometry for square, portrait and landscape media", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");

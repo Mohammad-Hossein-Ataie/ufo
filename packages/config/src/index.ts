@@ -68,6 +68,7 @@ export const defaultStoreSettings: StoreSettings = {
   brandName: "UFO Puff",
   ownerName: "امیر محمودی",
   phone: "09362157181",
+  email: "admin@ufopuff.com",
   address: "تهران، بازار مولوی، پاساژ صفویه",
   telegramUrl: "https://t.me/vapeufostoree",
   workingHours: "شنبه تا پنجشنبه، ۱۰ تا ۲۰",

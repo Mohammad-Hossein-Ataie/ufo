@@ -211,6 +211,7 @@ function brandFromName(nameFa, nameEn = "") {
     ["vozol", "وزول", "Vozol"],
     ["smok", "اسموک", "SMOK"],
     ["waka", "واکا", "Waka"],
+    ["ripe-vapes", "رایپ ویپ", "Ripe Vapes", "ripe vape"],
     ["nasty", "نستی", "Nasty"],
     ["ivg", "آی وی جی", "IVG"],
     ["primobar", "پریموبار", "Primobar"],

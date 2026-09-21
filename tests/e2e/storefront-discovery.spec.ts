@@ -3,15 +3,20 @@ import { expect, test } from "@playwright/test";
 test("partner brand links open the catalog with that brand selected", async ({ page }) => {
   await page.goto("/");
   const brandList = page.getByRole("list", { name: "فیلتر محصولات بر اساس برند" });
-  const brandLink = brandList.getByRole("link", { name: "UFO Selection", exact: true });
+  const brandLink = brandList.getByRole("link", {
+    name: "مشاهده محصولات برند Al Fakher",
+    exact: true,
+  });
 
-  await expect(brandLink).toHaveAttribute("href", "/products?brand=brand-ufo");
+  await expect(brandList.getByRole("link")).toHaveCount(17);
+  await expect(brandList.locator("img")).toHaveCount(17);
+  await expect(brandLink).toHaveAttribute("href", "/products?brand=brand-al-fakher");
   await brandLink.click();
 
-  await expect(page).toHaveURL(/\/products\?brand=brand-ufo$/, { timeout: 20000 });
-  await expect(page.locator('input[name="brand"]')).toHaveValue("brand-ufo");
+  await expect(page).toHaveURL(/\/products\?brand=brand-al-fakher$/, { timeout: 20000 });
+  await expect(page.locator('input[name="brand"]')).toHaveValue("brand-al-fakher");
   await expect(
-    page.locator(".showcase-grid").getByText("UFO Selection", { exact: true }),
+    page.locator(".showcase-grid").getByText("Al Fakher", { exact: true }),
   ).toBeVisible();
 });
 

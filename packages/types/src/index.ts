@@ -67,6 +67,7 @@ export interface StoreSettings {
   brandName: string;
   ownerName: string;
   phone: string;
+  email: string;
   address: string;
   telegramUrl: string;
   legalNotice: string;

@@ -19,6 +19,21 @@ export const importedBrands: Brand[] = [
     nameFa: "Waka",
   },
   {
+    id: "brand-nexa",
+    slug: "nexa",
+    nameFa: "Nexa",
+  },
+  {
+    id: "brand-oxbar",
+    slug: "oxbar",
+    nameFa: "OXBAR",
+  },
+  {
+    id: "brand-ripe-vapes",
+    slug: "ripe-vapes",
+    nameFa: "Ripe Vapes",
+  },
+  {
     id: "brand-nasty",
     slug: "nasty",
     nameFa: "Nasty",
@@ -1386,7 +1401,7 @@ export const importedProducts: Product[] = [
     slug: "ripe-vapes-40000",
     nameFa: "رایپ ویپ ۴۰ هزار",
     nameEn: "Ripe Vapes 40000",
-    brandId: "brand-ufo",
+    brandId: "brand-ripe-vapes",
     categoryId: "cat-disposable",
     productKind: "disposable",
     salesChannels: ["retail"],

@@ -105,6 +105,7 @@ export function organizationJsonLd() {
     name: defaultStoreSettings.brandName,
     url: canonical("/"),
     logo: absoluteUrl("/logos/logo.png"),
+    email: defaultStoreSettings.email,
     contactPoint: {
       "@type": "ContactPoint",
       telephone: defaultStoreSettings.phone,
@@ -122,6 +123,7 @@ export function localBusinessJsonLd() {
     "@id": canonical("/store/tehran-molavi#localbusiness"),
     name: defaultStoreSettings.brandName,
     telephone: defaultStoreSettings.phone,
+    email: defaultStoreSettings.email,
     address: {
       "@type": "PostalAddress",
       streetAddress: defaultStoreSettings.address,
