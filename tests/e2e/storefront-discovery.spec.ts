@@ -1,5 +1,20 @@
 import { expect, test } from "@playwright/test";
 
+test("partner brand links open the catalog with that brand selected", async ({ page }) => {
+  await page.goto("/");
+  const brandList = page.getByRole("list", { name: "فیلتر محصولات بر اساس برند" });
+  const brandLink = brandList.getByRole("link", { name: "UFO Selection", exact: true });
+
+  await expect(brandLink).toHaveAttribute("href", "/products?brand=brand-ufo");
+  await brandLink.click();
+
+  await expect(page).toHaveURL(/\/products\?brand=brand-ufo$/, { timeout: 20000 });
+  await expect(page.locator('input[name="brand"]')).toHaveValue("brand-ufo");
+  await expect(
+    page.locator(".showcase-grid").getByText("UFO Selection", { exact: true }),
+  ).toBeVisible();
+});
+
 for (const width of [390, 1440]) {
   test(`homepage discovery stays stable and accessible at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });

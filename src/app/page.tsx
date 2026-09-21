@@ -278,13 +278,18 @@ export default async function HomePage() {
               <Users size={16} aria-hidden="true" />
               <span>برندهای همکار</span>
             </div>
-            <ul className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <ul
+              className="mt-6 flex flex-wrap items-center justify-center gap-3"
+              aria-label="فیلتر محصولات بر اساس برند"
+            >
               {brands.map((brand) => (
-                <li
-                  key={brand.id}
-                  className="rounded-full border border-retail-border bg-retail-surface px-5 py-2 text-sm font-bold text-[#D9E2EC]"
-                >
-                  {brand.nameFa}
+                <li key={brand.id}>
+                  <Link
+                    href={`/products?brand=${encodeURIComponent(brand.id)}`}
+                    className="inline-flex min-h-11 items-center rounded-full border border-retail-border bg-retail-surface px-5 py-2 text-sm font-bold text-[#D9E2EC] transition hover:-translate-y-0.5 hover:border-retail-accent/70 hover:text-retail-accent hover:shadow-retail focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
+                  >
+                    {brand.nameFa}
+                  </Link>
                 </li>
               ))}
             </ul>
