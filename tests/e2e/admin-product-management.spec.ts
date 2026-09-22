@@ -20,10 +20,24 @@ test("searchable brands stay in the viewport and prices show three-digit groups"
   await brand.click();
   const list = page.getByRole("listbox", { name: "برند" });
   await expect(list).toBeVisible();
+  await expect.poll(() => list.getByRole("option").count()).toBeGreaterThan(10);
   const bounds = await list.boundingBox();
   expect(bounds).not.toBeNull();
   expect(bounds!.y).toBeGreaterThanOrEqual(0);
   expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(650);
+  expect(await list.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
+  await page.mouse.move(bounds!.x + bounds!.width / 2, bounds!.y + bounds!.height / 2);
+  expect(
+    await page.evaluate(
+      ({ x, y }) =>
+        document.elementFromPoint(x, y)?.closest('[role="listbox"]')?.getAttribute("aria-label"),
+      { x: bounds!.x + bounds!.width / 2, y: bounds!.y + bounds!.height / 2 },
+    ),
+  ).toBe("برند");
+  await page.mouse.wheel(0, 280);
+  await expect.poll(() => list.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+  await page.mouse.wheel(0, -280);
+  await expect.poll(() => list.evaluate((element) => element.scrollTop)).toBe(0);
   await page.getByRole("textbox", { name: "جست‌وجوی برند" }).fill("vapor10");
   await expect(list.getByRole("option")).toHaveCount(1);
   await list.getByRole("option", { name: "Vapor10" }).click();

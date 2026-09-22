@@ -2,7 +2,7 @@
 
 import * as Popover from "@radix-ui/react-popover";
 import { Check, ChevronDown, Search } from "lucide-react";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 export interface SelectOption {
   value: string;
@@ -29,11 +29,32 @@ export function SearchableSelect({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const normalizedQuery = query.trim().toLocaleLowerCase("fa-IR");
   const filtered = options.filter((option) =>
     option.label.toLocaleLowerCase("fa-IR").includes(normalizedQuery),
   );
   const selected = options.find((option) => option.value === value);
+
+  const onWheel = useCallback((event: WheelEvent) => {
+    const list = event.currentTarget as HTMLDivElement;
+    // Dialog scroll locking can cancel wheel events in a portaled popover.
+    // Scroll the hovered options directly for mice and two-finger trackpads.
+    if (list.scrollHeight <= list.clientHeight || !event.deltaY) return;
+    const multiplier = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? list.clientHeight : 1;
+    list.scrollTop += event.deltaY * multiplier;
+    event.preventDefault();
+    event.stopPropagation();
+  }, []);
+
+  const setListRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      listRef.current?.removeEventListener("wheel", onWheel);
+      listRef.current = node;
+      node?.addEventListener("wheel", onWheel, { passive: false });
+    },
+    [onWheel],
+  );
 
   return (
     <Popover.Root
@@ -91,6 +112,7 @@ export function SearchableSelect({
             />
           </div>
           <div
+            ref={setListRef}
             role="listbox"
             aria-label={label}
             className="min-h-0 max-h-64 overflow-y-auto overscroll-contain"
