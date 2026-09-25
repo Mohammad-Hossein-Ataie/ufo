@@ -19,6 +19,7 @@ import {
   jsonLdScriptProps,
 } from "@ufo/seo";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { ProductNavigationLink } from "@/components/product-navigation-link";
 
 export const dynamic = "force-dynamic";
 
@@ -122,14 +123,18 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               }
               badge={<StockStatus available={available} />}
               price={<Price valueRial={variant.retailPriceRial} />}
-              variantSummary={<ProductVariantSummary key={`variants-${product.id}`} options={variantOptions} />}
+              variantSummary={
+                <ProductVariantSummary key={`variants-${product.id}`} options={variantOptions} />
+              }
               actions={
                 <div className="grid w-full gap-3">
-                  <Link href={`/products/${product.slug}`}>
-                    <Button size="sm" variant="ghost" className="w-full">
-                      جزئیات
-                    </Button>
-                  </Link>
+                  <ProductNavigationLink
+                    href={`/products/${product.slug}`}
+                    action="details"
+                    className="w-full border border-transparent text-current hover:bg-white/10"
+                  >
+                    جزئیات
+                  </ProductNavigationLink>
                   {variantOptions.length === 0 ? (
                     <AddToCartButton
                       variantId={variant.id}

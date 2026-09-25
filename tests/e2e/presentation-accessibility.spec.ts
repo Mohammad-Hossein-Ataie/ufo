@@ -62,7 +62,11 @@ test("content remains visible without JavaScript", async ({ browser }) => {
   await context.close();
 });
 
-test("footer exposes the official trust seal and contact email responsively", async ({ page }) => {
+test("footer keeps contact values right-aligned and confirms copying responsively", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto("/");
 
@@ -82,32 +86,63 @@ test("footer exposes the official trust seal and contact email responsively", as
     "src",
     "https://trustseal.enamad.ir/logo.aspx?id=7628595&Code=9H4ALixgxYdhUO3XrI7dMMNT5ULunNIC",
   );
-  await expect(footer.getByRole("link", { name: "admin@ufopuff.com", exact: true })).toHaveAttribute(
-    "href",
-    "mailto:admin@ufopuff.com",
-  );
+  const email = footer.getByRole("button", {
+    name: "کپی ایمیل: admin@ufopuff.com",
+    exact: true,
+  });
+  const phone = footer.getByRole("button", {
+    name: "کپی شماره تماس: 09362157181",
+    exact: true,
+  });
+  await expect(email).toBeVisible();
+  await expect(phone).toBeVisible();
+  const expectRightAligned = async () => {
+    const geometry = await email.evaluate((button) => {
+      const icon = button.querySelector("svg")!.getBoundingClientRect();
+      const value = button.querySelector("span")!.getBoundingClientRect();
+      return { iconLeft: icon.left, valueRight: value.right };
+    });
+    expect(geometry.iconLeft).toBeGreaterThanOrEqual(geometry.valueRight);
+  };
+  await expectRightAligned();
+  await email.click();
+  await expect(email.getByRole("status")).toHaveText("کپی شد!");
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("admin@ufopuff.com");
+  await phone.click();
+  await expect(phone.getByRole("status")).toHaveText("کپی شد!");
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("09362157181");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await footer.screenshot({ path: "temp/presentation/footer-trust-360.png" });
 
   await page.setViewportSize({ width: 1440, height: 900 });
+  await expectRightAligned();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await footer.screenshot({ path: "temp/presentation/footer-trust-1440.png" });
 });
 
-test("generic frames preserve geometry for square, portrait and landscape media", async ({ page }) => {
+test("generic frames preserve geometry for square, portrait and landscape media", async ({
+  page,
+}) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const frame = page.locator(".media-frame").first();
   await frame.scrollIntoViewIfNeeded();
   const initial = await frame.boundingBox();
   // Exercise the frame with deterministic, transparent sources, independent of catalog data.
-  for (const [width, height] of [[200, 200], [100, 400], [400, 100]]) {
-    await frame.evaluate(async (node, dimensions) => {
-      const image = node.querySelector("img")!;
-      image.removeAttribute("srcset");
-      image.src = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${dimensions[0]}" height="${dimensions[1]}"><rect x="5" y="5" width="${dimensions[0] - 10}" height="${dimensions[1] - 10}" fill="teal"/></svg>`)}`;
-      await image.decode();
-    }, [width, height]);
+  for (const [width, height] of [
+    [200, 200],
+    [100, 400],
+    [400, 100],
+  ]) {
+    await frame.evaluate(
+      async (node, dimensions) => {
+        const image = node.querySelector("img")!;
+        image.removeAttribute("srcset");
+        image.src = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${dimensions[0]}" height="${dimensions[1]}"><rect x="5" y="5" width="${dimensions[0] - 10}" height="${dimensions[1] - 10}" fill="teal"/></svg>`)}`;
+        await image.decode();
+      },
+      [width, height],
+    );
     const box = await frame.boundingBox();
     expect(box!.width).toBeCloseTo(initial!.width, 1);
     expect(box!.height).toBeCloseTo(initial!.height, 1);

@@ -10,6 +10,7 @@ import { CatalogPagination } from "@/components/catalog-pagination";
 import { CatalogPriceRangeFilter } from "@/components/catalog-price-range-filter";
 import { CatalogSearchableSelect } from "@/components/catalog-searchable-select";
 import { ProductVariantSummary } from "@/components/product-variant-visuals";
+import { ProductNavigationLink } from "@/components/product-navigation-link";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { getCatalogRowStock, listCatalogRows, searchCatalogRows } from "@/lib/catalog-data";
 import { listAdminColors } from "@/lib/admin-colors";
@@ -26,7 +27,7 @@ import {
 } from "@/lib/storefront-variants";
 import type { AdminProductRecord } from "@/lib/admin-products";
 import { canonical, itemListJsonLd, jsonLdScriptProps } from "@ufo/seo";
-import { Badge, Button, EmptyState, Price, ProductCard, StockStatus } from "@ufo/ui";
+import { Badge, EmptyState, Price, ProductCard, StockStatus } from "@ufo/ui";
 import { categories } from "@ufo/domain";
 import type { ProductFlavor, ProductKind } from "@ufo/types";
 
@@ -528,19 +529,28 @@ export default async function ProductsPage({
                         <Price valueRial={variant.retailPriceRial} />
                       </div>
                     }
-                    variantSummary={<div key={`variants-${product.id}`} className="hidden sm:block"><ProductVariantSummary options={variantOptions} /></div>}
+                    variantSummary={
+                      <div key={`variants-${product.id}`} className="hidden sm:block">
+                        <ProductVariantSummary options={variantOptions} />
+                      </div>
+                    }
                     actions={
                       <div key={`actions-${product.id}`} className="grid w-full gap-3">
-                        <Link href={`/products/${product.slug}`} className="w-full">
-                          <Button
-                            size="sm"
-                            variant={variantOptions.length > 0 ? "primary" : "ghost"}
-                            className="w-full px-2"
-                          >
-                            {variantOptions.length > 0 ? "انتخاب و خرید" : "جزئیات"}
-                            <ArrowLeft size={16} aria-hidden="true" />
-                          </Button>
-                        </Link>
+                        <ProductNavigationLink
+                          href={`/products/${product.slug}`}
+                          action={variantOptions.length > 0 ? "select" : "details"}
+                          pendingLabel={
+                            variantOptions.length > 0 ? "در حال آماده‌سازی…" : "در حال باز کردن…"
+                          }
+                          className={`w-full px-2 ${
+                            variantOptions.length > 0
+                              ? "border border-cyan-300 bg-cyan-300 text-slate-950 hover:bg-cyan-200"
+                              : "border border-transparent text-current hover:bg-white/10"
+                          }`}
+                        >
+                          {variantOptions.length > 0 ? "انتخاب و خرید" : "جزئیات"}
+                          <ArrowLeft size={16} aria-hidden="true" />
+                        </ProductNavigationLink>
                         {variantOptions.length === 0 ? (
                           <AddToCartButton
                             variantId={variant.id}

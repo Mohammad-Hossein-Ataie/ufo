@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { ArrowLeft, BadgeCheck, Box, Film, ListChecks, ShieldCheck } from "lucide-react";
 import { ProductDetailClient } from "@/components/product-detail-client";
 import { ProtectedProductImage } from "@/components/protected-product-image";
 import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
-import { findCatalogRowBySlug, getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
+import { getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
 import { listAdminColors } from "@/lib/admin-colors";
-import { listAdminBrands } from "@/lib/admin-brands";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import {
   getCategoryImage,
@@ -30,6 +30,8 @@ import { breadcrumbJsonLd, jsonLdScriptProps, productJsonLd } from "@ufo/seo";
 import { Button, Price, ProductCard, StockStatus } from "@ufo/ui";
 
 export const dynamic = "force-dynamic";
+
+const getProductCatalog = cache(listCatalogRows);
 
 const imageBlockPattern = /^!\[(?<alt>.*)]\((?<url>.+)\)$/;
 const videoBlockPattern = /^\[ویدیو.*]\((?<url>.+)\)$/;
@@ -109,7 +111,7 @@ function renderRichDescription(product: { id: string; descriptionFa: string }) {
 }
 
 export async function generateStaticParams() {
-  return (await listCatalogRows())
+  return (await getProductCatalog())
     .filter((row) => row.product.isActive)
     .map((row) => ({ slug: row.product.slug }));
 }
@@ -120,7 +122,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const row = await findCatalogRowBySlug(slug);
+  const row = (await getProductCatalog()).find(
+    (item) => item.product.slug === slug && item.product.isActive,
+  );
   const product = row?.product;
   if (!product) return {};
   const images = getProductImages(product);
@@ -139,21 +143,23 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const row = await findCatalogRowBySlug(slug);
+  const [catalogRows, flavors, colors] = await Promise.all([
+    getProductCatalog(),
+    listAdminFlavors(),
+    listAdminColors(),
+  ]);
+  const row = catalogRows.find((item) => item.product.slug === slug && item.product.isActive);
   if (!row) notFound();
 
   const product = row.product;
   const variant = row.variant;
   const available = getCatalogRowStock(row);
-  const brand = (await listAdminBrands()).find((item) => item.id === product.brandId);
   const category = categories.find((item) => item.id === product.categoryId);
   const galleryImages = getProductImages(product);
   const variantImages = getProductVariantImages(product);
   const variantType = getProductVariantType(product);
-  const flavors = await listAdminFlavors();
-  const colors = await listAdminColors();
   const variantOptions = getStorefrontVariantOptions(product, flavors, colors);
-  const relatedRows = (await listCatalogRows())
+  const relatedRows = catalogRows
     .filter(
       (item) =>
         item.product.isActive &&
@@ -161,7 +167,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         item.product.categoryId === product.categoryId,
     )
     .slice(0, 4);
-  const jsonLd = productJsonLd(product, variant, available > 0, brand?.nameFa, galleryImages);
+  const brandName = row.brandNameFa || undefined;
+  const jsonLd = productJsonLd(product, variant, available > 0, brandName, galleryImages);
   const breadcrumb = breadcrumbJsonLd([
     { name: "خانه", path: "/" },
     { name: "محصولات", path: "/products" },
@@ -201,7 +208,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           }}
           variant={variant}
           available={available}
-          brandName={brand?.nameFa}
+          brandName={brandName}
           galleryImages={galleryImages}
           variantType={variantType}
           variantImages={variantImages}
@@ -350,7 +357,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     }
                     badge={<StockStatus available={relatedAvailable} />}
                     price={<Price valueRial={relatedVariant.retailPriceRial} />}
-                    variantSummary={<div key={`variants-${related.id}`} className="hidden sm:block"><ProductVariantSummary options={relatedVariantOptions} /></div>}
+                    variantSummary={
+                      <div key={`variants-${related.id}`} className="hidden sm:block">
+                        <ProductVariantSummary options={relatedVariantOptions} />
+                      </div>
+                    }
                     actions={
                       <div className="grid gap-2 sm:gap-3">
                         <Link href={`/products/${related.slug}`}>

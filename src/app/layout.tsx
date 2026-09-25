@@ -30,7 +30,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "یوفوپاف | UFO Puff",
-    description: "خرید پاد، ویپ و جویس با قیمت به‌صرفه، موجودی به‌روز، ضمانت اصالت و ارسال سریع از یوفوپاف.",
+    description:
+      "خرید پاد، ویپ و جویس با قیمت به‌صرفه، موجودی به‌روز، ضمانت اصالت و ارسال سریع از یوفوپاف.",
     url: canonical("/"),
     siteName: "یوفوپاف | UFO Puff",
     images: [{ url: "/logos/logo.png", width: 500, height: 500, alt: "لوگوی یوفوپاف UFO Puff" }],
@@ -52,7 +53,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fa-IR" dir="rtl">
+    <html lang="fa-IR" dir="rtl" data-scroll-behavior="smooth">
       <body suppressHydrationWarning>
         <AppShell>{children}</AppShell>
       </body>

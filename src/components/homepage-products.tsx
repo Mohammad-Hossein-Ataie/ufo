@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Price, ProductCard, StockStatus } from "@ufo/ui";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { ProductNavigationLink } from "@/components/product-navigation-link";
 import { HomepageProductDeck } from "@/components/homepage-product-deck";
 import { HomepageProductSlot } from "@/components/homepage-product-slot";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
@@ -57,16 +58,22 @@ export function HomepageProducts({ slots }: { slots: Slot[] }) {
                   {getProductVariantType(row.product) === "none" ? (
                     <AddToCartButton variantId={row.variant.id} />
                   ) : (
-                    <Link href={`/products/${row.product.slug}`} className="inline-flex min-h-11 items-center justify-center rounded-md bg-retail-accent px-3 text-sm font-bold text-retail-bg">
+                    <ProductNavigationLink
+                      href={`/products/${row.product.slug}`}
+                      action="select"
+                      pendingLabel="در حال آماده‌سازی…"
+                      className="bg-retail-accent text-retail-bg hover:bg-retail-accent-hover"
+                    >
                       انتخاب تنوع و خرید
-                    </Link>
+                    </ProductNavigationLink>
                   )}
-                  <Link
+                  <ProductNavigationLink
                     href={`/products/${row.product.slug}`}
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md text-sm font-bold text-retail-accent hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-retail-accent"
+                    action="details"
+                    className="text-retail-accent hover:bg-white/5"
                   >
                     جزئیات <ArrowLeft size={16} aria-hidden="true" />
-                  </Link>
+                  </ProductNavigationLink>
                 </div>
               }
             />

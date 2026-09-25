@@ -141,14 +141,18 @@ export function ProductDetailClient({
 
   return (
     <section className="retail-glass grid gap-6 rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(0,217,255,0.10),transparent_34%),#0D1117] p-3 shadow-retail-lg sm:p-5 lg:grid-cols-[minmax(0,1.03fr)_minmax(24rem,0.97fr)] lg:gap-7 lg:p-6">
-      <div className="grid min-w-0 content-start gap-3 lg:order-2">
-        <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#0A0F15]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] content-start gap-3 lg:order-2">
+        <div
+          data-testid="product-gallery-surface"
+          className="relative min-w-0 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0A0F15]"
+        >
           <button
             type="button"
+            data-testid="product-gallery-frame"
             onClick={() => setImageOpen(true)}
             aria-label="بزرگ‌نمایی تصویر"
             aria-haspopup="dialog"
-            className="relative mx-auto block aspect-[3/4] w-[min(68vw,15rem)] cursor-zoom-in overflow-hidden bg-[#0B1118] shadow-inner focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-300 sm:w-full"
+            className="relative block aspect-[3/4] w-full cursor-zoom-in overflow-hidden bg-[#0B1118] shadow-inner focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-300"
           >
             <ProductImageCrossfade
               src={selectedImage}
