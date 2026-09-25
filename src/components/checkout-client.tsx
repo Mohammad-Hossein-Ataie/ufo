@@ -96,8 +96,10 @@ export function CheckoutClient({
     gatewayEnabled ? "zibal" : "card_to_card",
   );
   const [error, setError] = useState("");
+  const [paymentOrderId, setPaymentOrderId] = useState("");
   const [addressError, setAddressError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isStartingPayment, setIsStartingPayment] = useState(false);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -299,26 +301,37 @@ export function CheckoutClient({
         ),
       );
       if (paymentMethod === "zibal") {
+        setIsStartingPayment(true);
         try {
           const paymentResponse = await fetch(`/api/payments/zibal/${payload.order.id}`, {
             method: "POST",
             headers: authHeaders(channel),
           });
-          const payment = (await paymentResponse.json()) as { paymentUrl?: string };
+          const payment = (await paymentResponse.json().catch(() => ({}))) as {
+            paymentUrl?: string;
+            error?: string;
+          };
           if (paymentResponse.ok && payment.paymentUrl) {
             window.location.assign(payment.paymentUrl);
             return;
           }
+          setPaymentOrderId(payload.order.id);
+          setError(
+            `${payment.error ?? "اتصال به درگاه زیبال انجام نشد."} سفارش شما ثبت شده و از صفحه سفارش می‌توانید دوباره تلاش کنید.`,
+          );
         } catch {
-          // The order is saved; let the customer retry payment from its detail page.
+          setPaymentOrderId(payload.order.id);
+          setError(
+            "ارتباط با درگاه برقرار نشد. سفارش شما ثبت شده و از صفحه سفارش می‌توانید دوباره تلاش کنید.",
+          );
         }
-        window.location.href = `${base}/orders/${payload.order.id}?payment=unknown`;
         return;
       }
       window.location.href = `${base}/orders/${payload.order.id}`;
     } catch (error) {
       setError(error instanceof Error ? error.message : "ارتباط برقرار نشد؛ دوباره تلاش کنید.");
     } finally {
+      setIsStartingPayment(false);
       setIsSubmitting(false);
     }
   }
@@ -355,8 +368,19 @@ export function CheckoutClient({
 
       {error ? (
         <div className="mb-5">
-          <Alert title="خطا در ثبت سفارش" tone="danger">
-            {error}
+          <Alert
+            title={paymentOrderId ? "سفارش ثبت شد؛ اتصال به درگاه انجام نشد" : "خطا در ثبت سفارش"}
+            tone="danger"
+          >
+            <p>{error}</p>
+            {paymentOrderId ? (
+              <Link
+                href={`${base}/orders/${encodeURIComponent(paymentOrderId)}`}
+                className="mt-3 inline-flex rounded-xl border border-current/30 px-3 py-2 text-sm font-bold"
+              >
+                مشاهده سفارش و تلاش دوباره
+              </Link>
+            ) : null}
           </Alert>
         </div>
       ) : null}
@@ -816,7 +840,11 @@ export function CheckoutClient({
             type="submit"
             className="mt-5 hidden min-h-14 w-full rounded-xl text-base font-black lg:inline-flex"
             disabled={
-              isSubmitting || isLoadingShipping || (!isPickup && !address) || !shipping?.available
+              isSubmitting ||
+              Boolean(paymentOrderId) ||
+              isLoadingShipping ||
+              (!isPickup && !address) ||
+              !shipping?.available
             }
           >
             {isSubmitting ? (
@@ -825,7 +853,9 @@ export function CheckoutClient({
               <Send size={19} />
             )}
             {isSubmitting
-              ? "در حال ثبت سفارش..."
+              ? isStartingPayment
+                ? "در حال اتصال به درگاه..."
+                : "در حال ثبت سفارش..."
               : paymentMethod === "zibal"
                 ? "ثبت سفارش و پرداخت آنلاین"
                 : "تأیید و ثبت سفارش"}
@@ -847,7 +877,11 @@ export function CheckoutClient({
             type="submit"
             className="mr-auto min-h-[52px] flex-1 rounded-xl font-black"
             disabled={
-              isSubmitting || isLoadingShipping || (!isPickup && !address) || !shipping?.available
+              isSubmitting ||
+              Boolean(paymentOrderId) ||
+              isLoadingShipping ||
+              (!isPickup && !address) ||
+              !shipping?.available
             }
           >
             {isSubmitting ? (
@@ -856,7 +890,9 @@ export function CheckoutClient({
               <Send size={18} />
             )}
             {isSubmitting
-              ? "در حال ثبت..."
+              ? isStartingPayment
+                ? "اتصال به درگاه..."
+                : "در حال ثبت..."
               : paymentMethod === "zibal"
                 ? "ثبت و پرداخت"
                 : "تأیید سفارش"}

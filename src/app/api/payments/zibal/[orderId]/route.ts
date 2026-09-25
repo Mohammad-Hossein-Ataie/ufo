@@ -7,7 +7,7 @@ import {
 import { requireCustomerSession, checkRateLimit } from "@/lib/customer-session";
 import { getConfiguredOrigin } from "@/lib/request-origin";
 import { reconcileZibalOrder } from "@/lib/zibal-order";
-import { requestZibalPayment, zibalPaymentUrl } from "@/lib/zibal";
+import { requestZibalPayment, ZibalGatewayError, zibalPaymentUrl } from "@/lib/zibal";
 
 export const runtime = "nodejs";
 
@@ -51,7 +51,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ ord
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "شروع پرداخت انجام نشد." },
-      { status: 400 },
+      { status: error instanceof ZibalGatewayError ? error.status : 400 },
     );
   }
 }

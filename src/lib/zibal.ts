@@ -1,5 +1,33 @@
 const gatewayOrigin = "https://gateway.zibal.ir";
 
+export class ZibalGatewayError extends Error {
+  readonly status = 502;
+}
+
+function requestError(result: unknown): ZibalGatewayError {
+  switch (Number(result)) {
+    case 102:
+    case 104:
+      return new ZibalGatewayError(
+        "شناسه پذیرنده درگاه زیبال معتبر نیست. کد merchant درگاه پرداخت را بررسی کنید؛ API Token بخش توسعه‌دهندگان قابل استفاده نیست.",
+      );
+    case 103:
+      return new ZibalGatewayError(
+        "درگاه زیبال غیرفعال است یا قرارداد آن کامل نشده؛ وضعیت درگاه را در پنل زیبال بررسی کنید.",
+      );
+    case 105:
+      return new ZibalGatewayError("مبلغ سفارش از حداقل مبلغ مجاز زیبال کمتر است.");
+    case 106:
+      return new ZibalGatewayError(
+        "آدرس بازگشت پرداخت از طرف زیبال پذیرفته نشد. APP_BASE_URL باید نشانی عمومی و HTTPS سایت باشد.",
+      );
+    case 113:
+      return new ZibalGatewayError("مبلغ سفارش از سقف مجاز این درگاه بیشتر است.");
+    default:
+      return new ZibalGatewayError("درخواست پرداخت توسط زیبال پذیرفته نشد؛ دوباره تلاش کنید.");
+  }
+}
+
 function merchant(): string {
   const value = process.env.ZIBAL_MERCHANT?.trim();
   if (!value) throw new Error("درگاه زیبال هنوز پیکربندی نشده است.");
@@ -17,15 +45,16 @@ async function callZibal(path: "/v1/request" | "/v1/verify" | "/v1/inquiry", bod
       signal: AbortSignal.timeout(12_000),
     });
   } catch {
-    throw new Error("ارتباط با درگاه زیبال برقرار نشد؛ دوباره تلاش کنید.");
+    throw new ZibalGatewayError("ارتباط با درگاه زیبال برقرار نشد؛ دوباره تلاش کنید.");
   }
-  if (!response.ok) throw new Error("درگاه زیبال موقتاً پاسخگو نیست؛ دوباره تلاش کنید.");
+  if (!response.ok)
+    throw new ZibalGatewayError("درگاه زیبال موقتاً پاسخگو نیست؛ دوباره تلاش کنید.");
   try {
     const payload: unknown = await response.json();
     if (!payload || typeof payload !== "object" || Array.isArray(payload)) throw new Error();
     return payload as Record<string, unknown>;
   } catch {
-    throw new Error("پاسخ درگاه زیبال معتبر نیست.");
+    throw new ZibalGatewayError("پاسخ درگاه زیبال معتبر نیست.");
   }
 }
 
@@ -58,8 +87,7 @@ export async function requestZibalPayment(args: {
     mobile: args.mobile,
     description: `سفارش ${args.orderId}`,
   });
-  if (result.result !== 100)
-    throw new Error("درخواست پرداخت توسط زیبال پذیرفته نشد؛ دوباره تلاش کنید.");
+  if (result.result !== 100) throw requestError(result.result);
   return trackId(result.trackId);
 }
 

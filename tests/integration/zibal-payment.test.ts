@@ -219,4 +219,28 @@ describe("Zibal payment", () => {
     expect(response.status).toBe(404);
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it("returns a useful, redacted error when an API token is used instead of an IPG merchant", async () => {
+    const { order, token } = fixture();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        gatewayResponse({
+          result: 104,
+          message: "provider response that must not be exposed",
+        }),
+      ),
+    );
+
+    const response = await startPayment(paymentRequest(order.id, token), {
+      params: Promise.resolve({ orderId: order.id }),
+    });
+    const payload = (await response.json()) as { error?: string };
+
+    expect(response.status).toBe(502);
+    expect(payload.error).toContain("کد merchant درگاه پرداخت");
+    expect(payload.error).toContain("API Token");
+    expect(payload.error).not.toContain("provider response");
+    expect(getSubmittedOrder(order.id)?.gatewayPayments).toBeUndefined();
+  });
 });
