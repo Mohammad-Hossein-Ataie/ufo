@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { removeCartItem, updateCartItem } from "@ufo/orders";
 import { checkRateLimit, requireCustomerSession } from "@/lib/customer-session";
+import { hydrateOrderCatalog } from "@/lib/order-catalog";
 
 export const runtime = "nodejs";
 
@@ -15,6 +16,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ it
       );
     }
     const { itemId } = await params;
+    await hydrateOrderCatalog();
     const payload = (await request.json()) as Record<string, unknown>;
     const cart = updateCartItem(
       session.customerId,
@@ -39,6 +41,7 @@ export async function DELETE(
   try {
     const session = requireCustomerSession(request);
     const { itemId } = await params;
+    await hydrateOrderCatalog();
     const cart = removeCartItem(session.customerId, session.customerType, itemId);
     return NextResponse.json(cart);
   } catch (error) {

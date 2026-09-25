@@ -122,9 +122,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               }
               badge={<StockStatus available={available} />}
               price={<Price valueRial={variant.retailPriceRial} />}
+              variantSummary={<ProductVariantSummary key={`variants-${product.id}`} options={variantOptions} />}
               actions={
                 <div className="grid w-full gap-3">
-                  <ProductVariantSummary options={variantOptions} />
                   <Link href={`/products/${product.slug}`}>
                     <Button size="sm" variant="ghost" className="w-full">
                       جزئیات

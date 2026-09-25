@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { checkoutCustomerCart, listSubmittedOrders, parseLocation } from "@ufo/orders";
 import type { ShippingMethodCode } from "@ufo/types";
 import { requireCustomerSession } from "@/lib/customer-session";
+import { hydrateOrderCatalog } from "@/lib/order-catalog";
 
 export const runtime = "nodejs";
 
@@ -64,6 +65,7 @@ export async function POST(request: Request) {
   try {
     const session = requireCustomerSession(request, "retail");
     const payload = (await request.json()) as Record<string, unknown>;
+    await hydrateOrderCatalog();
     const customerName = bounded(payload.customerName || payload.receiverName, 100, "نام گیرنده");
     const phone = bounded(payload.phone || payload.receiverPhone, 20, "شماره موبایل");
     const city = bounded(payload.city, 80, "شهر", "تهران");

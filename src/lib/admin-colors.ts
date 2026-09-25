@@ -4,6 +4,12 @@ import { productColorPalette, type ProductColorOption } from "@ufo/domain";
 
 const memoryColors: ProductColorOption[] = [...productColorPalette];
 
+function correctColorName(color: ProductColorOption): ProductColorOption {
+  return color.labelFa.includes("ذرشکی")
+    ? { ...color, labelFa: color.labelFa.replaceAll("ذرشکی", "زرشکی") }
+    : color;
+}
+
 function withoutMongoId<T extends { id: string }>(item: T): T {
   const { _id: _ignored, ...plainItem } = item as T & { _id?: unknown };
   return plainItem as T;
@@ -45,7 +51,7 @@ function upsertColor(colors: ProductColorOption[], color: ProductColorOption): P
 }
 
 export async function listAdminColors(): Promise<ProductColorOption[]> {
-  if (!hasUsableMongoUri()) return memoryColors;
+  if (!hasUsableMongoUri()) return memoryColors.map(correctColorName);
 
   try {
     const db = await getDb();
@@ -55,13 +61,13 @@ export async function listAdminColors(): Promise<ProductColorOption[]> {
       .find({})
       .sort({ labelFa: 1 })
       .toArray();
-    if (mongoColors.length === 0) return memoryColors;
+    if (mongoColors.length === 0) return memoryColors.map(correctColorName);
     const overrides = mongoColors.map(withoutMongoId);
     const overrideIds = new Set(overrides.map((item) => item.id));
-    return [...overrides, ...productColorPalette.filter((item) => !overrideIds.has(item.id))];
+    return [...overrides, ...productColorPalette.filter((item) => !overrideIds.has(item.id))].map(correctColorName);
   } catch (error) {
     console.error("Admin colors read failed; using bundled palette fallback", error);
-    return memoryColors;
+    return memoryColors.map(correctColorName);
   }
 }
 
@@ -70,7 +76,7 @@ export async function saveAdminColor(input: {
   id?: string;
   hex: string;
 }): Promise<ProductColorOption> {
-  const labelFa = input.labelFa.trim();
+  const labelFa = input.labelFa.trim().replaceAll("ذرشکی", "زرشکی");
   if (!labelFa) throw new Error("نام فارسی رنگ الزامی است.");
 
   const color: ProductColorOption = {

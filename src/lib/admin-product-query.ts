@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { brands, categories } from "@ufo/domain";
+import type { Brand } from "@ufo/types";
 import { getDb, hasUsableMongoUri } from "@ufo/database";
 import type { Document } from "mongodb";
 import { getMemoryAdminProducts, type AdminProductRecord } from "./admin-products";
@@ -128,7 +129,7 @@ export function paginateMemoryProducts(
   };
 }
 
-export function productPipeline(query: ProductQuery): Document[] {
+export function productPipeline(query: ProductQuery, brandList: Brand[] = brands): Document[] {
   const match: Document = { deletedAt: { $exists: false } };
   if (query.category) match.categoryId = query.category;
   if (query.brand) match.brandId = query.brand;
@@ -156,7 +157,7 @@ export function productPipeline(query: ProductQuery): Document[] {
     {
       $set: {
         variant: { $first: "$variants" },
-        brandNameFa: lookupName(brands, "brandId"),
+        brandNameFa: lookupName(brandList, "brandId"),
         categoryNameFa: lookupName(categories, "categoryId"),
       },
     },
@@ -184,7 +185,7 @@ export function productPipeline(query: ProductQuery): Document[] {
   ];
   if (query.q) {
     const regex = query.q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const brandIds = brands
+    const brandIds = brandList
       .filter((b) => `${b.nameFa} ${b.slug}`.toLowerCase().includes(query.q.toLowerCase()))
       .map((b) => b.id);
     pipeline.push({
@@ -259,18 +260,24 @@ export function productPipeline(query: ProductQuery): Document[] {
   ];
 }
 
-export async function queryAdminProducts(query: ProductQuery): Promise<ProductPage> {
-  if (!hasUsableMongoUri()) return paginateMemoryProducts(getMemoryAdminProducts(), query);
+export async function queryAdminProducts(query: ProductQuery, brandList: Brand[] = brands): Promise<ProductPage> {
+  if (!hasUsableMongoUri()) {
+    const rows = getMemoryAdminProducts().map((row) => ({
+      ...row,
+      brandNameFa: brandList.find((brand) => brand.id === row.product.brandId)?.nameFa ?? row.brandNameFa,
+    }));
+    return paginateMemoryProducts(rows, query);
+  }
   const db = await getDb();
   const [result] = await db
     .collection("products")
     .aggregate<{
       rows: ProductListRow[];
       count: Array<{ total: number }>;
-    }>(productPipeline(query), { maxTimeMS: 10000, allowDiskUse: true })
+    }>(productPipeline(query, brandList), { maxTimeMS: 10000, allowDiskUse: true })
     .toArray();
   const total = result?.count[0]?.total ?? 0;
   const page = Math.min(query.page, Math.max(1, Math.ceil(total / query.pageSize)));
-  if (page !== query.page) return queryAdminProducts({ ...query, page });
+  if (page !== query.page) return queryAdminProducts({ ...query, page }, brandList);
   return { rows: result?.rows ?? [], total, page, pageSize: query.pageSize };
 }

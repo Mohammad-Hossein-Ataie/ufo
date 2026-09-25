@@ -14,6 +14,7 @@ import {
   variants,
 } from "@ufo/domain";
 import { listAdminColors } from "@/lib/admin-colors";
+import { listAdminBrands } from "@/lib/admin-brands";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import type {
   InventoryItem,
@@ -411,8 +412,15 @@ export function mergeCatalogRecords<T extends { id: string }>(
 }
 
 export async function listAdminProducts(): Promise<AdminProductRecord[]> {
+  const activeBrands = await listAdminBrands();
+  function withBrandNames(rows: AdminProductRecord[]) {
+    return rows.map((row) => ({
+      ...row,
+      brandNameFa: activeBrands.find((brand) => brand.id === row.product.brandId)?.nameFa ?? row.brandNameFa,
+    }));
+  }
   if (!hasUsableMongoUri()) {
-    return combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems);
+    return withBrandNames(combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems));
   }
   let productList: Product[];
   let variantList: ProductVariant[];
@@ -431,21 +439,24 @@ export async function listAdminProducts(): Promise<AdminProductRecord[]> {
     inventoryList = mongoInventoryItems.map(withoutMongoId);
   } catch (error) {
     console.error("Admin products read failed; using bundled catalog fallback", error);
-    return combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems);
+    return withBrandNames(combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems));
   }
 
   if (productList.length === 0 && variantList.length === 0 && inventoryList.length === 0) {
-    return combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems);
+    return withBrandNames(combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems));
   }
 
-  return combineRows(
+  return withBrandNames(combineRows(
     mergeCatalogRecords(products, productList),
     mergeCatalogRecords(variants, variantList),
     mergeCatalogRecords(inventoryItems, inventoryList),
-  );
+  ));
 }
 
 export async function saveAdminProduct(input: AdminProductInput): Promise<AdminProductRecord> {
+  if (input.brandId && !(await listAdminBrands()).some((brand) => brand.id === input.brandId)) {
+    throw new Error("برند انتخاب‌شده معتبر نیست.");
+  }
   const current = input.id ? await getAdminProduct(input.id) : undefined;
   if (input.id && !current) throw new Error("محصول پیدا نشد.");
   const allowedFlavorIds = (await listAdminFlavors()).map((flavor) => flavor.id);
@@ -456,7 +467,7 @@ export async function saveAdminProduct(input: AdminProductInput): Promise<AdminP
     memoryState.products = upsertMemory(memoryState.products, row.product);
     memoryState.variants = upsertMemory(memoryState.variants, row.variant);
     memoryState.inventoryItems = upsertMemory(memoryState.inventoryItems, row.inventory);
-    return row;
+    return { ...row, brandNameFa: (await listAdminBrands()).find((brand) => brand.id === row.product.brandId)?.nameFa ?? row.brandNameFa };
   }
 
   const db = await getDb();
@@ -472,7 +483,7 @@ export async function saveAdminProduct(input: AdminProductInput): Promise<AdminP
       .collection<InventoryItem>("inventoryItems")
       .updateOne({ id: row.inventory.id }, { $set: row.inventory }, { upsert: true }),
   ]);
-  return row;
+  return { ...row, brandNameFa: (await listAdminBrands()).find((brand) => brand.id === row.product.brandId)?.nameFa ?? row.brandNameFa };
 }
 
 export function getMemoryAdminProducts() {

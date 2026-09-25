@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { reorderSubmittedOrder } from "@ufo/orders";
 import { checkRateLimit, requireCustomerSession } from "@/lib/customer-session";
+import { hydrateOrderCatalog } from "@/lib/order-catalog";
 
 export const runtime = "nodejs";
 
@@ -15,6 +16,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ ord
       );
     }
     const { orderId } = await params;
+    await hydrateOrderCatalog();
     const cart = reorderSubmittedOrder({
       orderId,
       customerId: session.customerId,

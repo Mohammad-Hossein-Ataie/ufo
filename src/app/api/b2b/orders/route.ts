@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { checkoutCustomerCart, listSubmittedOrders, parseLocation } from "@ufo/orders";
+import { hydrateOrderCatalog } from "@/lib/order-catalog";
 import type { ShippingMethodCode } from "@ufo/types";
 import { requireCustomerSession } from "@/lib/customer-session";
 
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
     const city = stringValue(payload.city, "تهران");
     const addressLine = stringValue(payload.address || payload.line1).trim();
     const province = stringValue(payload.province, city === "تهران" ? "تهران" : "");
+    await hydrateOrderCatalog();
     const order = checkoutCustomerCart({
       channel: "wholesale",
       customerId: session.customerId,

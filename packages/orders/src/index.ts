@@ -21,10 +21,13 @@ import type {
   CustomerAddress,
   CustomerType,
   ProductVariantType,
+  Product,
+  ProductVariant,
   SalesChannel,
   ShippingAddress,
   ShippingMethodCode,
 } from "@ufo/types";
+
 import { normalizeIranPhone } from "@ufo/validation";
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -39,6 +42,26 @@ export { parseLocation } from "./location";
 export * from "./shipping-settings";
 
 export { createOrder, createOrderItemSnapshot, createOrderNumber } from "@ufo/domain";
+
+const liveProducts = new Map<string, Product>();
+const liveVariants = new Map<string, ProductVariant>();
+
+export function registerOrderCatalog(rows: Array<{ product: Product; variant: ProductVariant }>) {
+  liveProducts.clear();
+  liveVariants.clear();
+  for (const row of rows) {
+    liveProducts.set(row.product.id, row.product);
+    liveVariants.set(row.variant.id, row.variant);
+  }
+}
+
+function findProduct(id: string) {
+  return liveProducts.get(id) ?? products.find((item) => item.id === id);
+}
+
+function findVariant(id: string) {
+  return liveVariants.get(id) ?? variants.find((item) => item.id === id);
+}
 
 export type PaymentReviewStatus = "awaiting_receipt" | "pending_review" | "approved" | "rejected";
 export interface OrderReceipt {
@@ -313,10 +336,10 @@ export interface CustomerCartView {
 }
 
 function priceCartLine(line: CartLineInput, channel: SalesChannel): CartItem {
-  const variant = variants.find((item) => item.id === line.variantId && item.isActive);
-  if (!variant) throw new Error("واریانت محصول پیدا نشد.");
-  const product = products.find((item) => item.id === variant.productId && item.isActive);
-  if (!product) throw new Error("محصول پیدا نشد.");
+  const variant = findVariant(line.variantId);
+  if (!variant?.isActive) throw new Error("واریانت محصول پیدا نشد.");
+  const product = findProduct(variant.productId);
+  if (!product?.isActive) throw new Error("محصول پیدا نشد.");
   if (product.salesChannels && !product.salesChannels.includes(channel)) {
     throw new Error("این محصول برای این پلتفرم فعال نیست.");
   }
@@ -355,12 +378,12 @@ function enrichCart(cart: Cart): CustomerCartView {
   const items = cart.items
     .map((item) => {
       const variant = item.variantId
-        ? variants.find((entry) => entry.id === item.variantId && entry.isActive)
+        ? findVariant(item.variantId)
         : undefined;
       const product = variant
-        ? products.find((entry) => entry.id === variant.productId && entry.isActive)
+        ? findProduct(variant.productId)
         : undefined;
-      if (!variant || !product) return null;
+      if (!variant?.isActive || !product?.isActive) return null;
       const unitPriceSnapshot = getUnitPriceRial(variant, cart.platformType);
       const refreshed: EnrichedCartItem = {
         ...item,
@@ -766,9 +789,9 @@ function createItemSnapshots(
   if (lines.length === 0) throw new Error("سبد خرید خالی است.");
 
   return lines.map((line) => {
-    const variant = variants.find((item) => item.id === line.variantId);
+    const variant = findVariant(line.variantId);
     if (!variant) throw new Error("واریانت محصول پیدا نشد.");
-    const product = products.find((item) => item.id === variant.productId);
+    const product = findProduct(variant.productId);
     if (!product) throw new Error("محصول پیدا نشد.");
 
     const option =
@@ -973,7 +996,7 @@ export function reorderSubmittedOrder(args: {
   if (!order) throw new Error("سفارش پیدا نشد یا متعلق به این حساب نیست.");
   let view = getCustomerCart(args.customerId, args.channel);
   for (const item of order.items) {
-    const variant = variants.find((entry) => entry.sku === item.sku && entry.isActive);
+    const variant = [...liveVariants.values(), ...variants].find((entry) => entry.sku === item.sku && entry.isActive);
     if (!variant) continue;
     view = addCartItem(args.customerId, args.channel, {
       variantId: variant.id,

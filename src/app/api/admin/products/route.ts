@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { categories, brands } from "@ufo/domain";
+import { categories } from "@ufo/domain";
+import { listAdminBrands } from "@/lib/admin-brands";
 import { saveAdminProduct, type AdminProductInput } from "@/lib/admin-products";
 import { productQuerySchema, queryAdminProducts } from "@/lib/admin-product-query";
 import type { ProductVariantType } from "@ufo/types";
@@ -78,7 +79,8 @@ export async function GET(request: Request) {
   if (!query.success)
     return NextResponse.json({ error: "پارامترهای جست‌وجو معتبر نیست." }, { status: 400 });
   try {
-    return NextResponse.json({ ...(await queryAdminProducts(query.data)), categories, brands });
+    const brands = await listAdminBrands();
+    return NextResponse.json({ ...(await queryAdminProducts(query.data, brands)), categories, brands });
   } catch {
     return NextResponse.json(
       { error: "دریافت محصولات ناموفق بود؛ دوباره تلاش کنید." },

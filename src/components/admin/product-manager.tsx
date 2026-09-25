@@ -407,6 +407,9 @@ export function ProductManager() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isFlavorDialogOpen, setIsFlavorDialogOpen] = useState(false);
   const [isColorDialogOpen, setIsColorDialogOpen] = useState(false);
+  const [isBrandDialogOpen, setIsBrandDialogOpen] = useState(false);
+  const [newBrand, setNewBrand] = useState({ nameFa: "", slug: "" });
+  const [brandError, setBrandError] = useState("");
   const [newFlavor, setNewFlavor] = useState({ nameFa: "", nameEn: "", slug: "", iconKey: "" });
   const [newColor, setNewColor] = useState({ labelFa: "", id: "", hex: "#168BFF" });
 
@@ -1019,6 +1022,33 @@ export function ProductManager() {
     setLoading(false);
   }
 
+  async function createBrand() {
+    if (!newBrand.nameFa.trim()) {
+      setBrandError("نام برند را وارد کنید.");
+      return;
+    }
+    setLoading(true);
+    setBrandError("");
+    try {
+      const response = await fetch("/api/admin/brands", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newBrand),
+      });
+      const data = (await response.json()) as { brand?: Brand; error?: string };
+      if (!response.ok || !data.brand) throw new Error(data.error || "ثبت برند ناموفق بود.");
+      setBrands((current) => [...current, data.brand!]);
+      update("brandId", data.brand.id);
+      setNewBrand({ nameFa: "", slug: "" });
+      setIsBrandDialogOpen(false);
+      setStatus("برند اضافه و برای این محصول انتخاب شد.");
+    } catch (error) {
+      setBrandError(error instanceof Error ? error.message : "ثبت برند ناموفق بود.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const wholesaleCartonToman = form.wholesalePriceToman * Math.max(1, form.cartonSize);
   const minimumWholesaleToman = wholesaleCartonToman * Math.max(1, form.minWholesaleCartonCount);
   const variantValueOptions =
@@ -1289,7 +1319,12 @@ export function ProductManager() {
                         />
                       </div>
                       <div className="grid gap-1 text-sm">
-                        <span>برند</span>
+                        <div className="flex items-center justify-between gap-2">
+                          <span>برند</span>
+                          <button type="button" onClick={() => { setBrandError(""); setIsBrandDialogOpen(true); }} className="inline-flex items-center gap-1 text-xs font-bold text-blue-700 hover:underline">
+                            <Plus size={14} aria-hidden="true" /> افزودن برند
+                          </button>
+                        </div>
                         <SearchableSelect
                           label="برند"
                           value={form.brandId}
@@ -1822,6 +1857,38 @@ export function ProductManager() {
                   ذخیره محصول
                 </Button>
               </div>
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+
+      <DialogPrimitive.Root open={isBrandDialogOpen} onOpenChange={setIsBrandDialogOpen}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-[90] bg-slate-950/45 backdrop-blur-sm" />
+          <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-[100] grid w-[min(92vw,30rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-md border border-[#D7DDE4] bg-white p-5 text-[#17202A] shadow-2xl">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <DialogPrimitive.Title className="text-lg font-black">افزودن برند</DialogPrimitive.Title>
+                <DialogPrimitive.Description className="mt-1 text-sm leading-6 text-[#5F6C79]">
+                  برند پس از ذخیره به فهرست اضافه و برای همین محصول انتخاب می‌شود.
+                </DialogPrimitive.Description>
+              </div>
+              <DialogPrimitive.Close asChild>
+                <IconButton label="بستن" className="h-9 w-9 border-[#D7DDE4] bg-white text-[#17202A]"><X size={16} aria-hidden="true" /></IconButton>
+              </DialogPrimitive.Close>
+            </div>
+            <label className="grid gap-1 text-sm font-bold">
+              نام برند
+              <Input autoFocus value={newBrand.nameFa} onChange={(event) => setNewBrand((current) => ({ ...current, nameFa: event.target.value }))} placeholder="نام برند" />
+            </label>
+            <label className="grid gap-1 text-sm font-bold">
+              شناسه انگلیسی (اختیاری)
+              <Input dir="ltr" value={newBrand.slug} onChange={(event) => setNewBrand((current) => ({ ...current, slug: event.target.value }))} placeholder="brand-name" />
+            </label>
+            {brandError ? <p role="alert" className="text-sm text-red-700">{brandError}</p> : null}
+            <div className="flex justify-end gap-2 border-t border-[#D7DDE4] pt-4">
+              <DialogPrimitive.Close asChild><Button type="button" variant="secondary">انصراف</Button></DialogPrimitive.Close>
+              <Button type="button" onClick={createBrand} disabled={loading}><Plus size={17} aria-hidden="true" />ذخیره برند</Button>
             </div>
           </DialogPrimitive.Content>
         </DialogPrimitive.Portal>

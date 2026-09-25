@@ -33,7 +33,8 @@ import {
 import type { AdminProductRecord } from "@/lib/admin-products";
 import { canonical } from "@ufo/seo";
 import { Button, EmptyState, Price, ProductCard } from "@ufo/ui";
-import { brands, categories } from "@ufo/domain";
+import { categories } from "@ufo/domain";
+import { listAdminBrands } from "@/lib/admin-brands";
 import type { ProductKind, ProductVariant } from "@ufo/types";
 
 export const dynamic = "force-dynamic";
@@ -189,6 +190,7 @@ export default async function B2BCatalogPage({
 }) {
   const rawParams = (await searchParams) ?? {};
   const rows = await listCatalogRows();
+  const brands = await listAdminBrands();
   const flavors = await listAdminFlavors();
   const colors = await listAdminColors();
   const activeCategory = categories.find((item) => item.slug === rawParams.category);
@@ -532,13 +534,13 @@ export default async function B2BCatalogPage({
                       price={
                         <Price key={`price-${product.id}`} valueRial={variant.wholesalePriceRial} />
                       }
+                      variantSummary={<ProductVariantSummary key={`variants-${product.id}`} options={variantOptions} tone="light" />}
                       actions={
                         <div key={`quick-${product.id}`} className="grid w-full gap-2">
                           <div className="flex min-h-6 items-center gap-2 text-xs text-[#596B61]">
                             <BadgeCheck size={15} className="text-[#1F8A5B]" aria-hidden="true" />
                             SKU: <span dir="ltr">{variant.sku}</span>
                           </div>
-                          <ProductVariantSummary options={variantOptions} tone="light" />
                           <Link href="/b2b/quick-order">
                             <Button
                               size="sm"

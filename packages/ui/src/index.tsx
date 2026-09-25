@@ -172,6 +172,7 @@ export function ProductCard({
   description,
   media,
   price,
+  variantSummary,
   badge,
   actions,
   mediaClassName,
@@ -182,6 +183,7 @@ export function ProductCard({
   description: string;
   media: ReactNode;
   price: ReactNode;
+  variantSummary?: ReactNode;
   badge?: ReactNode;
   actions?: ReactNode;
   mediaClassName?: string;
@@ -244,6 +246,7 @@ export function ProductCard({
             compactOnMobile && "mobile-product-footer",
           )}
         >
+          {variantSummary}
           <div className={cn("text-lg font-black", compactOnMobile && "mobile-product-price")}>
             {price}
           </div>

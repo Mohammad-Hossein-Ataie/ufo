@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { addCartItem, type CartLineInput } from "@ufo/orders";
 import type { ProductVariantType } from "@ufo/types";
 import { checkRateLimit, requireCustomerSession } from "@/lib/customer-session";
+import { hydrateOrderCatalog } from "@/lib/order-catalog";
 
 export const runtime = "nodejs";
 
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
       );
     }
     const payload = (await request.json()) as Record<string, unknown>;
+    await hydrateOrderCatalog();
     const cart = addCartItem(session.customerId, session.customerType, cartLine(payload));
     return NextResponse.json(cart, { status: 201 });
   } catch (error) {

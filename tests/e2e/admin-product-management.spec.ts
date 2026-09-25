@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
 import sharp from "sharp";
-test.beforeEach(async ({ page }) => {
+import { getProductColorOptions, getProductVariantType, products } from "@ufo/domain";
+test.beforeEach(async ({ page }, testInfo) => {
+  if (testInfo.title === "color product can be added on mobile and desktop" ||
+      testInfo.title === "catalog starts at zero to three million with a blurred hero backdrop") return;
   const response = await page.request.post("/api/admin/login", {
     headers: { origin: "http://127.0.0.1:3106" },
     data: { username: "local-catalog-test", password: "local-only-catalog-test-password" },
@@ -55,6 +58,56 @@ test("searchable brands stay in the viewport and prices show three-digit groups"
   await expect(retail).toHaveValue("2,450,000");
   await expect(wholesale).toHaveValue("2,254,000");
   await page.screenshot({ path: "test-results/admin-product-searchable-brand-price.png" });
+});
+
+test("admin can add a brand while creating a product", async ({ page }) => {
+  const slug = `new-brand-${Date.now()}`;
+  const name = `برند آزمایشی ${Date.now()}`;
+  await page.getByRole("button", { name: "افزودن محصول", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "ایجاد محصول", exact: true });
+  await editor.getByRole("button", { name: "افزودن برند" }).click();
+  const dialog = page.getByRole("dialog", { name: "افزودن برند" });
+  await dialog.getByRole("textbox", { name: "نام برند", exact: true }).fill(name);
+  await dialog.getByRole("textbox", { name: "شناسه انگلیسی (اختیاری)" }).fill(slug);
+  await dialog.getByRole("button", { name: "ذخیره برند" }).click();
+  await expect(dialog).toBeHidden();
+  await expect(editor.getByRole("button", { name: "برند", exact: true })).toContainText(name);
+});
+
+test("color product can be added on mobile and desktop", async ({ page }) => {
+  const product = products.find((item) => item.isActive && getProductVariantType(item) === "color" && getProductColorOptions(item).length > 0);
+  expect(product).toBeDefined();
+  const firstColor = getProductColorOptions(product!)[0]!;
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto(`/products/${product!.slug}`);
+    const image = page.getByRole("button", { name: "بزرگ‌نمایی تصویر" });
+    const selector = page.getByRole("radiogroup", { name: "انتخاب رنگ محصول" });
+    await expect(selector).toBeVisible();
+    if (width === 390) {
+      expect((await image.boundingBox())!.width).toBeLessThanOrEqual(240);
+      const selectorBounds = (await selector.boundingBox())!;
+      expect(selectorBounds.y).toBeLessThan((await page.getByText("قیمت فروش").boundingBox())!.y);
+      expect(selectorBounds.y + selectorBounds.height).toBeLessThanOrEqual(844);
+    }
+    await selector.getByRole("radio", { name: firstColor.labelFa }).click();
+    await page.getByRole("button", { name: /افزودن به سبد خرید|ثبت پیش‌سفارش/ }).click();
+  }
+  await page.goto("/cart");
+  await expect(page.getByText(product!.nameFa)).toBeVisible();
+});
+
+test("catalog starts at zero to three million with a blurred hero backdrop", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 844 });
+  await page.goto("/products");
+  await expect(page.locator('input[name="maxPrice"]')).toHaveValue(new Intl.NumberFormat("fa-IR").format(3_000_000));
+  const backdrop = await page.locator(".catalog-showcase").evaluate((element) => {
+    const style = window.getComputedStyle(element, "::before");
+    return { image: style.backgroundImage, blur: style.filter, opacity: style.opacity };
+  });
+  expect(backdrop.image).toContain("ufo-hero.webp");
+  expect(backdrop.blur).toBe("blur(56px)");
+  expect(backdrop.opacity).toBe("0.55");
 });
 
 test("server pagination, filtering, selection and sorting", async ({ page }) => {

@@ -51,9 +51,15 @@ function getSelectedVariantLabel(type: SelectedVariant["type"]) {
   return "ظرفیت";
 }
 
-function guestToLine(line: GuestCartLine): RetailLine | null {
-  const variant = variants.find((item) => item.id === line.variantId);
-  const product = variant ? products.find((item) => item.id === variant.productId) : undefined;
+interface GuestCatalogRow {
+  product: { id: string; nameFa: string };
+  variant: { id: string; productId: string; nameFa: string; sku: string; retailPriceRial: number };
+}
+
+function guestToLine(line: GuestCartLine, catalog: GuestCatalogRow[]): RetailLine | null {
+  const row = catalog.find((item) => item.variant.id === line.variantId);
+  const variant = row?.variant ?? variants.find((item) => item.id === line.variantId);
+  const product = row?.product ?? (variant ? products.find((item) => item.id === variant.productId) : undefined);
   if (!variant || !product || line.channel !== "retail") return null;
   const selectedVariant =
     line.selectedVariant ??
@@ -91,6 +97,7 @@ function serverToLine(item: EnrichedCartItem): RetailLine {
 export function CartClient() {
   const [cartView, setCartView] = useState<CustomerCartView | null>(null);
   const [guestCart, setGuestCart] = useState<GuestCartLine[]>([]);
+  const [guestCatalog, setGuestCatalog] = useState<GuestCatalogRow[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -119,7 +126,17 @@ export function CartClient() {
         setCartView(cart);
         return;
       }
-      setGuestCart(readGuestCart("retail"));
+      const lines = readGuestCart("retail");
+      const response = await fetch("/api/cart/catalog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ variantIds: lines.map((line) => line.variantId) }),
+        cache: "no-store",
+      });
+      if (!response.ok) throw new Error("دریافت محصولات سبد خرید انجام نشد.");
+      const catalog = (await response.json()) as { rows: GuestCatalogRow[] };
+      setGuestCatalog(catalog.rows);
+      setGuestCart(lines);
     } catch {
       setLoadError("دریافت سبد خرید انجام نشد. دوباره تلاش کنید.");
     } finally {
@@ -143,8 +160,8 @@ export function CartClient() {
     () =>
       isLoggedIn
         ? (cartView?.items.map(serverToLine) ?? [])
-        : guestCart.map(guestToLine).filter((line): line is RetailLine => line !== null),
-    [cartView, guestCart, isLoggedIn],
+        : guestCart.map((line) => guestToLine(line, guestCatalog)).filter((line): line is RetailLine => line !== null),
+    [cartView, guestCart, guestCatalog, isLoggedIn],
   );
 
   const subtotalRial = isLoggedIn

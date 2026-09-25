@@ -105,6 +105,40 @@ export function ProductDetailClient({
     setSelectedVariantValueId(imageVariantValueMap.get(image) ?? null);
   }
 
+  const variantSelector = hasVariantOptions ? (
+    <section aria-label={`انتخاب ${variantTypeLabel} محصول`}>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="inline-flex items-center gap-2 text-base font-black text-white">
+          {variantType === "flavor" ? <Sparkles size={18} className="text-cyan-300" aria-hidden="true" />
+            : variantType === "color" ? <Palette size={18} className="text-cyan-300" aria-hidden="true" />
+            : <Gauge size={18} className="text-cyan-300" aria-hidden="true" />}
+          {selectorTitle}
+        </h2>
+        {selectedVariantOption ? <span className="text-xs font-bold text-retail-accent">{selectedVariantOption.labelFa}</span> : null}
+      </div>
+      <div className={variantType === "flavor" ? "grid gap-2 sm:grid-cols-2" : "flex gap-2 overflow-x-auto pb-2 sm:flex-wrap sm:overflow-visible sm:pb-0"} role="radiogroup" aria-label={`انتخاب ${variantTypeLabel} محصول`}>
+        {variantOptions.map((option) => {
+          const active = selectedVariantValueId === option.id;
+          const optionImage = variantImageMap.get(option.id);
+          return option.type === "flavor" ? (
+            <button key={option.id} type="button" onClick={() => selectVariantValue(option.id)}
+              className={`flex min-h-12 select-none items-center justify-between gap-3 rounded-md border px-3 text-sm font-black transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 motion-reduce:transition-none ${active ? "border-cyan-300 bg-cyan-300 text-slate-950 shadow-[0_10px_24px_rgba(0,217,255,0.20)]" : "border-white/10 bg-white/[0.04] text-white hover:border-cyan-300/60 hover:bg-white/[0.07]"}`}
+              role="radio" aria-checked={active}>
+              <span className="inline-flex min-w-0 items-center gap-2"><FlavorVisual option={option} /><span className="truncate">{option.labelFa}</span></span>
+              <span className="inline-flex shrink-0 items-center gap-1">{optionImage ? <PackageCheck size={14} aria-hidden="true" /> : null}{active ? <SelectedCheck /> : null}</span>
+            </button>
+          ) : (
+            <button key={option.id} type="button" onClick={() => selectVariantValue(option.id)}
+              className={`inline-flex min-h-11 shrink-0 select-none items-center gap-2 rounded-md border px-3 text-sm font-bold transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 motion-reduce:transition-none ${active ? "border-cyan-300 bg-white text-slate-950" : "border-white/10 bg-white/[0.04] text-white hover:border-cyan-300/60"}`}
+              role="radio" aria-checked={active}>
+              <VariantOptionVisual option={option} /><span>{option.labelFa}</span>{active ? <Check size={15} aria-hidden="true" /> : null}
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  ) : null;
+
   return (
     <section className="retail-glass grid gap-6 rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(0,217,255,0.10),transparent_34%),#0D1117] p-3 shadow-retail-lg sm:p-5 lg:grid-cols-[minmax(0,1.03fr)_minmax(24rem,0.97fr)] lg:gap-7 lg:p-6">
       <div className="grid min-w-0 content-start gap-3 lg:order-2">
@@ -114,7 +148,7 @@ export function ProductDetailClient({
             onClick={() => setImageOpen(true)}
             aria-label="بزرگ‌نمایی تصویر"
             aria-haspopup="dialog"
-            className="relative mx-auto block aspect-[3/4] w-full cursor-zoom-in overflow-hidden bg-[#0B1118] shadow-inner focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-300"
+            className="relative mx-auto block aspect-[3/4] w-[min(68vw,15rem)] cursor-zoom-in overflow-hidden bg-[#0B1118] shadow-inner focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-300 sm:w-full"
           >
             <ProductImageCrossfade
               src={selectedImage}
@@ -177,6 +211,7 @@ export function ProductDetailClient({
             );
           })}
         </div>
+        <div className="mt-2 lg:hidden">{variantSelector}</div>
         <ImageLightbox
           open={imageOpen}
           onClose={() => setImageOpen(false)}
@@ -208,6 +243,8 @@ export function ProductDetailClient({
           <p className="mt-4 max-w-2xl leading-8 text-[#D9E2EC]">{product.shortDescriptionFa}</p>
         </div>
 
+        <div className="product-purchase-zone mt-6 hidden lg:block">{variantSelector}</div>
+
         <div className="mt-6 flex flex-wrap items-end justify-between gap-3 border-y border-white/10 py-4">
           <div>
             <p className="text-xs font-bold text-retail-secondary">قیمت فروش</p>
@@ -233,89 +270,6 @@ export function ProductDetailClient({
         </div>
 
         <div className="product-purchase-zone mt-6 grid gap-4">
-          {hasVariantOptions ? (
-            <section>
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 className="inline-flex items-center gap-2 text-base font-black text-white">
-                  {variantType === "flavor" ? (
-                    <Sparkles size={18} className="text-cyan-300" aria-hidden="true" />
-                  ) : variantType === "color" ? (
-                    <Palette size={18} className="text-cyan-300" aria-hidden="true" />
-                  ) : (
-                    <Gauge size={18} className="text-cyan-300" aria-hidden="true" />
-                  )}
-                  {selectorTitle}
-                </h2>
-                {selectedVariantOption ? (
-                  <span className="text-xs font-bold text-retail-accent">
-                    {selectedVariantOption.labelFa}
-                  </span>
-                ) : null}
-              </div>
-
-              <div
-                className={
-                  variantType === "flavor" ? "grid gap-2 sm:grid-cols-2" : "flex flex-wrap gap-2"
-                }
-                role="radiogroup"
-                aria-label={`انتخاب ${variantTypeLabel} محصول`}
-              >
-                {variantOptions.map((option) => {
-                  const active = selectedVariantValueId === option.id;
-                  const optionImage = variantImageMap.get(option.id);
-                  const unavailable = available <= 0;
-
-                  if (option.type === "flavor") {
-                    return (
-                      <button
-                        key={option.id}
-                        type="button"
-                        onClick={() => selectVariantValue(option.id)}
-                        disabled={unavailable}
-                        className={`flex min-h-12 select-none items-center justify-between gap-3 rounded-md border px-3 text-sm font-black transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none ${
-                          active
-                            ? "border-cyan-300 bg-cyan-300 text-slate-950 shadow-[0_10px_24px_rgba(0,217,255,0.20)]"
-                            : "border-white/10 bg-white/[0.04] text-white hover:border-cyan-300/60 hover:bg-white/[0.07]"
-                        }`}
-                        role="radio"
-                        aria-checked={active}
-                      >
-                        <span className="inline-flex min-w-0 items-center gap-2">
-                          <FlavorVisual option={option} />
-                          <span className="truncate">{option.labelFa}</span>
-                        </span>
-                        <span className="inline-flex shrink-0 items-center gap-1">
-                          {optionImage ? <PackageCheck size={14} aria-hidden="true" /> : null}
-                          {active ? <SelectedCheck /> : null}
-                        </span>
-                      </button>
-                    );
-                  }
-
-                  return (
-                    <button
-                      key={option.id}
-                      type="button"
-                      onClick={() => selectVariantValue(option.id)}
-                      disabled={unavailable}
-                      className={`inline-flex min-h-11 select-none items-center gap-2 rounded-md border px-3 text-sm font-bold transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none ${
-                        active
-                          ? "border-cyan-300 bg-white text-slate-950"
-                          : "border-white/10 bg-white/[0.04] text-white hover:border-cyan-300/60"
-                      }`}
-                      role="radio"
-                      aria-checked={active}
-                    >
-                      <VariantOptionVisual option={option} />
-                      <span>{option.labelFa}</span>
-                      {active ? <Check size={15} aria-hidden="true" /> : null}
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-          ) : null}
-
           {needsVariantSelection ? (
             <Button type="button" disabled className="w-full min-h-12 text-base">
               ابتدا {variantTypeLabel} را انتخاب کنید

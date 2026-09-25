@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { mergeGuestCart, upsertCustomerAccount, type CartLineInput } from "@ufo/orders";
+import { hydrateOrderCatalog } from "@/lib/order-catalog";
 import type { CustomerType, ProductVariantType, UserRole } from "@ufo/types";
 import { checkRateLimit, createCustomerSessionToken } from "@/lib/customer-session";
 import { verifyStoredOtp } from "@/lib/verify-stored-otp";
@@ -82,6 +83,7 @@ export async function POST(request: Request) {
       customerType: customer.customerType,
       roles,
     });
+    await hydrateOrderCatalog();
     const cart = mergeGuestCart(customer.id, type, guestCartLines(payload.guestCart));
 
     return NextResponse.json({

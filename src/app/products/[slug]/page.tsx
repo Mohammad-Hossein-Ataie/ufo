@@ -8,6 +8,7 @@ import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { findCatalogRowBySlug, getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
 import { listAdminColors } from "@/lib/admin-colors";
+import { listAdminBrands } from "@/lib/admin-brands";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import {
   getCategoryImage,
@@ -18,7 +19,6 @@ import {
 import { getStorefrontVariantOptions } from "@/lib/storefront-variants";
 import { productCatalogImageUrl, productDetailImageVersion } from "@/lib/product-image-protection";
 import {
-  brands,
   categories,
   getProductVariantType,
   productColorAttributeTechnicalValue,
@@ -145,7 +145,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const product = row.product;
   const variant = row.variant;
   const available = getCatalogRowStock(row);
-  const brand = brands.find((item) => item.id === product.brandId);
+  const brand = (await listAdminBrands()).find((item) => item.id === product.brandId);
   const category = categories.find((item) => item.id === product.categoryId);
   const galleryImages = getProductImages(product);
   const variantImages = getProductVariantImages(product);
@@ -350,11 +350,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     }
                     badge={<StockStatus available={relatedAvailable} />}
                     price={<Price valueRial={relatedVariant.retailPriceRial} />}
+                    variantSummary={<div key={`variants-${related.id}`} className="hidden sm:block"><ProductVariantSummary options={relatedVariantOptions} /></div>}
                     actions={
                       <div className="grid gap-2 sm:gap-3">
-                        <div className="hidden sm:block">
-                          <ProductVariantSummary options={relatedVariantOptions} />
-                        </div>
                         <Link href={`/products/${related.slug}`}>
                           <Button size="sm" className="w-full px-2">
                             مشاهده محصول

@@ -13,6 +13,7 @@ import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { getCatalogRowStock, listCatalogRows, searchCatalogRows } from "@/lib/catalog-data";
 import { listAdminColors } from "@/lib/admin-colors";
+import { listAdminBrands } from "@/lib/admin-brands";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import {
   aggregateProductResistanceOptions,
@@ -26,7 +27,7 @@ import {
 import type { AdminProductRecord } from "@/lib/admin-products";
 import { canonical, itemListJsonLd, jsonLdScriptProps } from "@ufo/seo";
 import { Badge, Button, EmptyState, Price, ProductCard, StockStatus } from "@ufo/ui";
-import { brands, categories } from "@ufo/domain";
+import { categories } from "@ufo/domain";
 import type { ProductFlavor, ProductKind } from "@ufo/types";
 
 export const dynamic = "force-dynamic";
@@ -109,11 +110,8 @@ function getPriceBoundsToman(items: AdminProductRecord[]) {
   const prices = items.map((row) => Math.round(getRetailPrice(row) / 10));
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
-  if (!Number.isFinite(minPrice) || !Number.isFinite(maxPrice)) {
-    return { min: 0, max: 25_000_000 };
-  }
-  if (minPrice === maxPrice) return { min: Math.max(0, minPrice - 50_000), max: maxPrice + 50_000 };
-  return { min: Math.max(0, minPrice), max: maxPrice };
+  if (!Number.isFinite(minPrice) || !Number.isFinite(maxPrice)) return { min: 0, max: 3_000_000 };
+  return { min: 0, max: Math.max(3_000_000, maxPrice) };
 }
 
 function filterProducts(
@@ -124,7 +122,7 @@ function filterProducts(
   includePriceFilter = true,
 ) {
   const minPrice = parseToman(params.minPrice);
-  const maxPrice = parseToman(params.maxPrice);
+  const maxPrice = parseToman(params.maxPrice ?? "3000000");
 
   return searchCatalogRows(rows, params.q ?? "")
     .filter((row) => row.product.isActive)
@@ -186,6 +184,7 @@ export default async function ProductsPage({
   const rows = await listCatalogRows();
   const flavors = await listAdminFlavors();
   const colors = await listAdminColors();
+  const brands = await listAdminBrands();
   const activeCategory = categories.find((item) => item.slug === rawParams.category);
   const specialFilterScope = activeCategory
     ? rows.filter((row) => row.product.isActive && row.product.categoryId === activeCategory.id)
@@ -228,8 +227,8 @@ export default async function ProductsPage({
     <main id="main-content" className="retail-storefront bg-retail-bg text-retail-primary">
       <script {...jsonLdScriptProps(jsonLd)} />
 
-      <section className="showcase-grid border-b border-retail-border bg-retail-surface">
-        <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:gap-8 sm:py-10 lg:grid-cols-[1fr_22rem] lg:py-14">
+      <section className="showcase-grid catalog-showcase relative isolate overflow-hidden border-b border-retail-border bg-retail-surface">
+        <div className="relative z-10 mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:gap-8 sm:py-10 lg:grid-cols-[1fr_22rem] lg:py-14">
           <div className="reveal-up">
             <span className="inline-flex select-none items-center gap-2 rounded-full border border-retail-border bg-white/5 px-3 py-1 text-xs font-medium text-retail-secondary">
               <Sparkles size={14} className="text-retail-accent-2" aria-hidden="true" />
@@ -421,7 +420,7 @@ export default async function ProductsPage({
 
             <CatalogPriceRangeFilter
               defaultMin={params.minPrice}
-              defaultMax={params.maxPrice}
+              defaultMax={params.maxPrice ?? "3000000"}
               min={priceBounds.min}
               max={priceBounds.max}
               tone="dark"
@@ -529,11 +528,9 @@ export default async function ProductsPage({
                         <Price valueRial={variant.retailPriceRial} />
                       </div>
                     }
+                    variantSummary={<div key={`variants-${product.id}`} className="hidden sm:block"><ProductVariantSummary options={variantOptions} /></div>}
                     actions={
                       <div key={`actions-${product.id}`} className="grid w-full gap-3">
-                        <div className="hidden sm:block">
-                          <ProductVariantSummary options={variantOptions} />
-                        </div>
                         <Link href={`/products/${product.slug}`} className="w-full">
                           <Button
                             size="sm"

@@ -8,6 +8,7 @@ import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { getCatalogRowStock } from "@/lib/catalog-data";
 import { getCategoryImage, getProductImage } from "@/lib/product-images";
 import type { HomepageProductSlot as Slot } from "@/lib/homepage-products";
+import { getProductVariantType } from "@ufo/domain";
 
 export function HomepageProducts({ slots }: { slots: Slot[] }) {
   return (
@@ -53,7 +54,13 @@ export function HomepageProducts({ slots }: { slots: Slot[] }) {
               price={<Price valueRial={row.variant.retailPriceRial} />}
               actions={
                 <div className="grid gap-2">
-                  <AddToCartButton variantId={row.variant.id} />
+                  {getProductVariantType(row.product) === "none" ? (
+                    <AddToCartButton variantId={row.variant.id} />
+                  ) : (
+                    <Link href={`/products/${row.product.slug}`} className="inline-flex min-h-11 items-center justify-center rounded-md bg-retail-accent px-3 text-sm font-bold text-retail-bg">
+                      انتخاب تنوع و خرید
+                    </Link>
+                  )}
                   <Link
                     href={`/products/${row.product.slug}`}
                     className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md text-sm font-bold text-retail-accent hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-retail-accent"

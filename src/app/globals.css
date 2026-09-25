@@ -499,6 +499,26 @@
   background-size: 40px 40px;
 }
 
+.catalog-showcase::before {
+  content: "";
+  position: absolute;
+  inset: -70px;
+  z-index: 0;
+  background: url("/images/ufo-hero.webp") center 45% / cover no-repeat;
+  filter: blur(56px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.catalog-showcase::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: rgba(13, 17, 23, 0.54);
+  pointer-events: none;
+}
+
 .reveal-up {
   animation: reveal-up var(--motion-entrance) var(--motion-ease) both;
 }

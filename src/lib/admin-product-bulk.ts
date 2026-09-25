@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { brands, categories, getDefaultProductVariantType } from "@ufo/domain";
+import { categories, getDefaultProductVariantType } from "@ufo/domain";
 import { getDb, hasUsableMongoUri } from "@ufo/database";
 import type { Product, ProductVariant } from "@ufo/types";
 import { getAdminProduct, mutateMemoryAdminProduct } from "./admin-products";
+import { listAdminBrands } from "./admin-brands";
 
 const ids = z
   .array(z.string().min(1).max(150))
@@ -21,7 +22,7 @@ export const bulkProductSchema = z.discriminatedUnion("action", [
   z.object({
     ids,
     action: z.literal("brand"),
-    value: z.string().refine((id) => brands.some((b) => b.id === id)),
+    value: z.string().regex(/^brand-[a-z0-9-]{1,100}$/),
   }),
   z.object({
     ids,
@@ -32,6 +33,9 @@ export const bulkProductSchema = z.discriminatedUnion("action", [
 ]);
 export type BulkProductInput = z.infer<typeof bulkProductSchema>;
 export async function bulkUpdateProducts(input: BulkProductInput) {
+  if (input.action === "brand" && !(await listAdminBrands()).some((brand) => brand.id === input.value)) {
+    throw new Error("برند انتخاب‌شده معتبر نیست.");
+  }
   if (
     input.action === "prices" &&
     input.retailPriceRial === undefined &&

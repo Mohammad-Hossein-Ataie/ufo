@@ -6,6 +6,7 @@ import { Button } from "@ufo/ui";
 import type { ProductVariantType, SalesChannel } from "@ufo/types";
 import {
   authHeaders,
+  fetchCustomerCart,
   readCustomerSession,
   readGuestCart,
   saveGuestCart,
@@ -38,6 +39,7 @@ export function AddToCartButton({
 }) {
   const [added, setAdded] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const [selectedQuantity, setSelectedQuantity] = useState(0);
   const formatter = new Intl.NumberFormat("fa-IR");
   const firstQuantity = Math.max(1, Math.floor(quantity));
@@ -73,13 +75,16 @@ export function AddToCartButton({
 
   async function syncServerCart(line: GuestCartLine) {
     const session = readCustomerSession(channel);
-    if (!session) return false;
+    if (!session) throw new Error("ابتدا وارد حساب کاربری شوید.");
     const response = await fetch("/api/cart/items", {
       method: "POST",
       headers: { "Content-Type": "application/json", ...authHeaders(channel) },
       body: JSON.stringify(line),
     });
-    if (!response.ok) return false;
+    if (!response.ok) {
+      const data = (await response.json().catch(() => ({}))) as { error?: string };
+      throw new Error(data.error || "افزودن به سبد خرید انجام نشد.");
+    }
     window.dispatchEvent(
       new CustomEvent(`${channel === "retail" ? "ufo-retail-cart" : "ufo-b2b-cart"}-updated`),
     );
@@ -90,16 +95,19 @@ export function AddToCartButton({
   async function addToCart(addQuantity = quantity) {
     if (busy) return;
     setBusy(true);
+    setError("");
     const cart = readGuestCart(channel);
     const quantityToAdd = Math.max(1, Math.floor(addQuantity));
     const session = readCustomerSession(channel);
     if (session) {
       try {
-        await Promise.all(
-          selectedVariants.map((option) => syncServerCart(linePayload(option, quantityToAdd))),
-        );
+        for (const option of selectedVariants) {
+          await syncServerCart(linePayload(option, quantityToAdd));
+        }
         setAdded(true);
         window.setTimeout(() => setAdded(false), 1800);
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : "افزودن به سبد خرید انجام نشد.");
       } finally {
         setBusy(false);
       }
@@ -125,20 +133,39 @@ export function AddToCartButton({
   async function setRetailQuantity(nextQuantity: number) {
     if (busy) return;
     setBusy(true);
+    setError("");
     try {
       const safeQuantity = Math.max(0, Math.floor(nextQuantity));
       const session = readCustomerSession(channel);
-      if (session && safeQuantity > 0) {
+      if (session) {
         const delta = safeQuantity - selectedQuantity;
-        if (delta <= 0) {
-          setSelectedQuantity(safeQuantity);
-          return;
+        if (delta > 0) {
+          for (const option of selectedVariants) {
+            await syncServerCart(linePayload(option, delta));
+          }
+        } else if (delta < 0) {
+          const cart = await fetchCustomerCart(channel);
+          if (!cart) throw new Error("دریافت سبد خرید انجام نشد.");
+          for (const option of selectedVariants) {
+            const item = cart.items.find((line) => variantMatches({
+              variantId: line.variantId ?? "",
+              quantity: line.quantity,
+              channel,
+              ...(line.selectedVariant ? { selectedVariant: line.selectedVariant } : {}),
+            }, option));
+            if (!item) continue;
+            const next = Math.max(0, item.quantity + delta);
+            const response = await fetch(`/api/cart/items/${encodeURIComponent(item.id)}`, {
+              method: next === 0 ? "DELETE" : "PATCH",
+              headers: { "Content-Type": "application/json", ...authHeaders(channel) },
+              ...(next > 0 ? { body: JSON.stringify({ quantity: next }) } : {}),
+            });
+            if (!response.ok) throw new Error("تغییر تعداد در سبد خرید انجام نشد.");
+          }
+          window.dispatchEvent(new CustomEvent("ufo-cart-updated"));
         }
-        await Promise.all(
-          selectedVariants.map((option) => syncServerCart(linePayload(option, delta))),
-        );
         setSelectedQuantity(safeQuantity);
-        setAdded(true);
+        setAdded(safeQuantity > 0);
         window.setTimeout(() => setAdded(false), 1800);
         return;
       }
@@ -161,6 +188,8 @@ export function AddToCartButton({
       setSelectedQuantity(safeQuantity);
       setAdded(safeQuantity > 0);
       window.setTimeout(() => setAdded(false), 1800);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "تغییر سبد خرید انجام نشد.");
     } finally {
       setBusy(false);
     }
@@ -169,6 +198,7 @@ export function AddToCartButton({
   if (enableQuantity) {
     if (selectedQuantity === 0) {
       return (
+        <div className="grid gap-1">
         <Button
           type="button"
           size="sm"
@@ -183,11 +213,14 @@ export function AddToCartButton({
           )}
           {busy ? "در حال افزودن" : label}
         </Button>
+        {error ? <p role="alert" className="text-xs text-rose-400">{error}</p> : null}
+        </div>
       );
     }
 
     return (
       <div className="grid w-full gap-2" aria-label="انتخاب تعداد">
+        {error ? <p role="alert" className="text-xs text-rose-400">{error}</p> : null}
         <div className="inline-flex min-h-10 w-full items-center justify-between overflow-hidden rounded-md border border-current/20 bg-current/[0.04]">
           <button
             type="button"
@@ -237,6 +270,7 @@ export function AddToCartButton({
   }
 
   return (
+    <div className="grid gap-1">
     <Button
       type="button"
       size="sm"
@@ -253,5 +287,7 @@ export function AddToCartButton({
       )}
       {busy ? "در حال افزودن" : added ? "به سبد اضافه شد" : label}
     </Button>
+    {error ? <p role="alert" className="text-xs text-rose-400">{error}</p> : null}
+    </div>
   );
 }
