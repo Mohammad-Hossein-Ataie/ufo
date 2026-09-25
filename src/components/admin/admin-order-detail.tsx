@@ -199,7 +199,43 @@ export function AdminOrderDetail({
               ))}
             </div>
           </section>
-          <AdminPaymentReview key={order.updatedAt} initialOrder={order} />
+          {order.paymentMethod === "zibal" ? (
+            <section className={`${panel} p-5`}>
+              <h2 className="flex items-center gap-2 font-extrabold">
+                <CreditCard size={19} className="text-cyan-700" /> پرداخت آنلاین زیبال
+              </h2>
+              <p className="mt-2 text-sm text-slate-600">
+                {order.paymentStatus === "approved"
+                  ? "پرداخت توسط درگاه تأیید شده است."
+                  : "این سفارش هنوز پرداخت تأییدشده‌ای ندارد."}
+              </p>
+              {(order.gatewayPayments ?? []).map((attempt) => (
+                <div
+                  key={attempt.trackId}
+                  className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm"
+                >
+                  <p>
+                    شناسه تراکنش: <bdi dir="ltr">{attempt.trackId}</bdi>
+                  </p>
+                  <p className="mt-1">
+                    وضعیت:{" "}
+                    {attempt.state === "verified"
+                      ? "تأییدشده"
+                      : attempt.state === "failed"
+                        ? "ناموفق"
+                        : "در انتظار"}
+                  </p>
+                  {attempt.refNumber ? (
+                    <p className="mt-1">
+                      شماره پیگیری: <bdi dir="ltr">{attempt.refNumber}</bdi>
+                    </p>
+                  ) : null}
+                </div>
+              ))}
+            </section>
+          ) : (
+            <AdminPaymentReview key={order.updatedAt} initialOrder={order} />
+          )}
           <AdminOrderFulfillment key={`delivery-${order.updatedAt}`} initialOrder={order} />
           <details className={`${panel} group overflow-hidden`}>
             <summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 px-5">
@@ -298,7 +334,9 @@ export function AdminOrderDetail({
               </p>
               {order.estimatedDispatchAt
                 ? date(order.estimatedDispatchAt)
-                : "هنگام تأیید پرداخت تعیین می‌شود."}
+                : order.paymentMethod === "zibal"
+                  ? "هنوز زمان تقریبی ثبت نشده است."
+                  : "هنگام تأیید پرداخت تعیین می‌شود."}
               <p className="mt-1">مدت حمل: {order.etaFa}</p>
             </div>
             {order.receiptNote && (

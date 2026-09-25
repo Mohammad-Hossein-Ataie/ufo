@@ -63,7 +63,20 @@ function findVariant(id: string) {
   return liveVariants.get(id) ?? variants.find((item) => item.id === id);
 }
 
-export type PaymentReviewStatus = "awaiting_receipt" | "pending_review" | "approved" | "rejected";
+export type PaymentReviewStatus =
+  | "awaiting_receipt"
+  | "awaiting_gateway"
+  | "pending_review"
+  | "approved"
+  | "rejected";
+export interface GatewayPaymentAttempt {
+  trackId: string;
+  amountRial: number;
+  createdAt: string;
+  state: "pending" | "failed" | "verified";
+  refNumber?: string;
+  paidAt?: string;
+}
 export interface OrderReceipt {
   id: string;
   note: string;
@@ -141,6 +154,7 @@ export interface SubmittedOrder extends Order {
   shippingTitleFa: string;
   etaFa: string;
   paymentStatus: PaymentReviewStatus;
+  gatewayPayments?: GatewayPaymentAttempt[];
   receiptNote: string;
   timeline: OrderTimelineEvent[];
   chat: ChatMessageRecord[];
@@ -189,6 +203,7 @@ export const orderStatusLabelsFa: Record<OrderStatus, string> = {
 
 export const paymentStatusLabelsFa: Record<PaymentReviewStatus, string> = {
   awaiting_receipt: "در انتظار ارسال رسید",
+  awaiting_gateway: "در انتظار پرداخت در درگاه",
   pending_review: "در انتظار بررسی رسید",
   approved: "پرداخت تایید شد",
   rejected: "پرداخت رد شد",
@@ -377,12 +392,8 @@ function priceCartLine(line: CartLineInput, channel: SalesChannel): CartItem {
 function enrichCart(cart: Cart): CustomerCartView {
   const items = cart.items
     .map((item) => {
-      const variant = item.variantId
-        ? findVariant(item.variantId)
-        : undefined;
-      const product = variant
-        ? findProduct(variant.productId)
-        : undefined;
+      const variant = item.variantId ? findVariant(item.variantId) : undefined;
+      const product = variant ? findProduct(variant.productId) : undefined;
       if (!variant?.isActive || !product?.isActive) return null;
       const unitPriceSnapshot = getUnitPriceRial(variant, cart.platformType);
       const refreshed: EnrichedCartItem = {
@@ -879,6 +890,12 @@ export function getSubmittedOrderForCustomer(
   return order;
 }
 
+export function getSubmittedOrderByGatewayTrackId(trackId: string): SubmittedOrder | undefined {
+  return readStore().orders.find((order) =>
+    order.gatewayPayments?.some((attempt) => attempt.trackId === trackId),
+  );
+}
+
 export function createSubmittedOrder(input: CreateSubmittedOrderInput): SubmittedOrder {
   const method = listShippingMethods({ activeOnly: true }).find(
     (entry) => entry.code === input.shippingMethod,
@@ -929,7 +946,7 @@ export function createSubmittedOrder(input: CreateSubmittedOrderInput): Submitte
   const totals = calculateOrderTotals(items, quote.costRial);
   const submitted: SubmittedOrder = {
     ...order,
-    status: "awaiting_receipt",
+    status: input.paymentMethod === "zibal" ? "awaiting_payment" : "awaiting_receipt",
     subtotalRial: totals.subtotalRial,
     discountRial: totals.discountRial,
     totalRial: totals.totalRial,
@@ -947,14 +964,16 @@ export function createSubmittedOrder(input: CreateSubmittedOrderInput): Submitte
     shippingTitleFa: quote.titleFa,
     ...(method ? { shippingScope: method.scope } : {}),
     etaFa: quote.etaFa,
-    paymentStatus: "awaiting_receipt",
+    paymentStatus: input.paymentMethod === "zibal" ? "awaiting_gateway" : "awaiting_receipt",
     receiptNote: input.receiptNote?.trim() ?? "",
     timeline: [
       createEvent(
         id,
-        "awaiting_receipt",
+        input.paymentMethod === "zibal" ? "awaiting_payment" : "awaiting_receipt",
         "customer",
-        "سفارش ثبت شد؛ منتظر ارسال رسید پرداخت هستیم.",
+        input.paymentMethod === "zibal"
+          ? "سفارش ثبت شد؛ منتظر پرداخت آنلاین هستیم."
+          : "سفارش ثبت شد؛ منتظر ارسال رسید پرداخت هستیم.",
       ),
     ],
     chat: [],
@@ -996,7 +1015,9 @@ export function reorderSubmittedOrder(args: {
   if (!order) throw new Error("سفارش پیدا نشد یا متعلق به این حساب نیست.");
   let view = getCustomerCart(args.customerId, args.channel);
   for (const item of order.items) {
-    const variant = [...liveVariants.values(), ...variants].find((entry) => entry.sku === item.sku && entry.isActive);
+    const variant = [...liveVariants.values(), ...variants].find(
+      (entry) => entry.sku === item.sku && entry.isActive,
+    );
     if (!variant) continue;
     view = addCartItem(args.customerId, args.channel, {
       variantId: variant.id,
@@ -1079,6 +1100,91 @@ function mutatePaymentOrder(
   store.orders[index] = next;
   writeStore(store);
   return next;
+}
+
+export function registerGatewayPaymentAttempt(
+  orderId: string,
+  customerId: string,
+  channel: SalesChannel,
+  trackId: string,
+  amountRial: number,
+): SubmittedOrder {
+  if (!/^\d{1,30}$/.test(trackId) || !Number.isSafeInteger(amountRial) || amountRial < 1_000)
+    throw new Error("شناسه یا مبلغ تراکنش معتبر نیست.");
+  if (getSubmittedOrderByGatewayTrackId(trackId)) throw new Error("شناسه تراکنش تکراری است.");
+  return mutatePaymentOrder(orderId, (order) => {
+    if (order.userId !== customerId || order.channel !== channel || order.paymentMethod !== "zibal")
+      throw new Error("دسترسی به پرداخت این سفارش مجاز نیست.");
+    if (order.status !== "awaiting_payment" || order.paymentStatus !== "awaiting_gateway")
+      throw new Error("این سفارش امکان پرداخت آنلاین ندارد.");
+    if (order.totalRial !== amountRial) throw new Error("مبلغ تراکنش با سفارش برابر نیست.");
+    if (order.gatewayPayments?.some((attempt) => attempt.state === "pending"))
+      throw new Error("تراکنش فعالی برای این سفارش وجود دارد.");
+    const now = new Date().toISOString();
+    return {
+      ...order,
+      gatewayPayments: [
+        ...(order.gatewayPayments ?? []),
+        { trackId, amountRial, createdAt: now, state: "pending" },
+      ],
+      updatedAt: now,
+    };
+  });
+}
+
+export function markGatewayPaymentFailed(orderId: string, trackId: string): SubmittedOrder {
+  return mutatePaymentOrder(orderId, (order) => {
+    if (order.paymentMethod !== "zibal") throw new Error("روش پرداخت سفارش معتبر نیست.");
+    if (!order.gatewayPayments?.some((attempt) => attempt.trackId === trackId))
+      throw new Error("تراکنش برای این سفارش ثبت نشده است.");
+    if (order.paymentStatus === "approved") return order;
+    return {
+      ...order,
+      gatewayPayments: order.gatewayPayments.map((attempt) =>
+        attempt.trackId === trackId ? { ...attempt, state: "failed" } : attempt,
+      ),
+      updatedAt: new Date().toISOString(),
+    };
+  });
+}
+
+export function confirmGatewayPayment(args: {
+  orderId: string;
+  trackId: string;
+  amountRial: number;
+  refNumber: string;
+  paidAt?: string;
+}): SubmittedOrder {
+  return mutatePaymentOrder(args.orderId, (order) => {
+    if (order.paymentMethod !== "zibal") throw new Error("روش پرداخت سفارش معتبر نیست.");
+    const attempt = order.gatewayPayments?.find((item) => item.trackId === args.trackId);
+    if (!attempt) throw new Error("تراکنش برای این سفارش ثبت نشده است.");
+    if (order.totalRial !== args.amountRial || attempt.amountRial !== args.amountRial)
+      throw new Error("مبلغ پرداخت با سفارش برابر نیست.");
+    if (!/^\d{1,40}$/.test(args.refNumber)) throw new Error("شماره پیگیری معتبر نیست.");
+    if (attempt.state === "verified") return order;
+    if (order.status === "cancelled" || order.status === "returned")
+      throw new Error("سفارش لغو یا مرجوع شده است؛ پرداخت نیاز به بررسی دارد.");
+    const now = new Date().toISOString();
+    const alreadyApproved = order.paymentStatus === "approved";
+    return {
+      ...order,
+      status: alreadyApproved ? order.status : "confirmed",
+      paymentStatus: "approved",
+      gatewayPayments: (order.gatewayPayments ?? []).map((item) =>
+        item.trackId === args.trackId
+          ? { ...item, state: "verified", refNumber: args.refNumber, paidAt: args.paidAt ?? now }
+          : item,
+      ),
+      updatedAt: now,
+      timeline: alreadyApproved
+        ? order.timeline
+        : [
+            createEvent(order.id, "confirmed", "system", "پرداخت آنلاین توسط زیبال تأیید شد."),
+            ...order.timeline,
+          ],
+    };
+  });
 }
 
 export function submitOrderReceipt(

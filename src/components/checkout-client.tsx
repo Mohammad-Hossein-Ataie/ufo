@@ -63,7 +63,13 @@ function Step({ number, label, active }: { number: string; label: string; active
   );
 }
 
-export function CheckoutClient({ channel = "retail" }: { channel?: SalesChannel }) {
+export function CheckoutClient({
+  channel = "retail",
+  gatewayEnabled = false,
+}: {
+  channel?: SalesChannel;
+  gatewayEnabled?: boolean;
+}) {
   const base = channel === "wholesale" ? "/b2b" : "";
   const [location, setLocation] = useState<ShippingAddress["location"]>();
   const [cartView, setCartView] = useState<CustomerCartView | null>(null);
@@ -86,6 +92,9 @@ export function CheckoutClient({ channel = "retail" }: { channel?: SalesChannel 
   });
   const [isLoadingShipping, setIsLoadingShipping] = useState(false);
   const [receiptNote, setReceiptNote] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"zibal" | "card_to_card">(
+    gatewayEnabled ? "zibal" : "card_to_card",
+  );
   const [error, setError] = useState("");
   const [addressError, setAddressError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -273,6 +282,7 @@ export function CheckoutClient({ channel = "retail" }: { channel?: SalesChannel 
           businessName: readCustomerSession(channel)?.customer.companyName,
           shippingMethod,
           receiptNote,
+          paymentMethod,
         }),
       });
       const payload = (await response.json().catch(() => ({}))) as {
@@ -288,6 +298,23 @@ export function CheckoutClient({ channel = "retail" }: { channel?: SalesChannel 
           channel === "wholesale" ? "ufo-b2b-cart-updated" : "ufo-retail-cart-updated",
         ),
       );
+      if (paymentMethod === "zibal") {
+        try {
+          const paymentResponse = await fetch(`/api/payments/zibal/${payload.order.id}`, {
+            method: "POST",
+            headers: authHeaders(channel),
+          });
+          const payment = (await paymentResponse.json()) as { paymentUrl?: string };
+          if (paymentResponse.ok && payment.paymentUrl) {
+            window.location.assign(payment.paymentUrl);
+            return;
+          }
+        } catch {
+          // The order is saved; let the customer retry payment from its detail page.
+        }
+        window.location.href = `${base}/orders/${payload.order.id}?payment=unknown`;
+        return;
+      }
       window.location.href = `${base}/orders/${payload.order.id}`;
     } catch (error) {
       setError(error instanceof Error ? error.message : "ارتباط برقرار نشد؛ دوباره تلاش کنید.");
@@ -661,17 +688,46 @@ export function CheckoutClient({ channel = "retail" }: { channel?: SalesChannel 
                 <p className="mt-1 text-xs text-retail-secondary">پرداخت امن و قابل پیگیری</p>
               </div>
             </div>
-            <div className="mt-4 flex items-center gap-3 rounded-2xl border border-retail-accent/40 bg-retail-accent/[0.06] p-4">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-retail-accent text-retail-bg">
-                <Check size={14} strokeWidth={3} />
-              </span>
-              <div>
-                <p className="font-black text-white">کارت به کارت</p>
-                <p className="mt-1 text-xs text-retail-secondary">
-                  اطلاعات پرداخت پس از ثبت سفارش نمایش داده می‌شود.
-                </p>
-              </div>
-              <ShieldCheck className="mr-auto text-retail-accent-2" size={21} />
+            <div className="mt-4 grid gap-3">
+              {gatewayEnabled ? (
+                <label
+                  className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 ${paymentMethod === "zibal" ? "border-retail-accent/60 bg-retail-accent/[0.08]" : "border-retail-border bg-black/15"}`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="zibal"
+                    checked={paymentMethod === "zibal"}
+                    onChange={() => setPaymentMethod("zibal")}
+                    className="h-5 w-5 accent-cyan-300"
+                  />
+                  <div>
+                    <p className="font-black text-white">پرداخت آنلاین با زیبال</p>
+                    <p className="mt-1 text-xs text-retail-secondary">
+                      انتقال امن به درگاه و تأیید خودکار پرداخت
+                    </p>
+                  </div>
+                  <ShieldCheck className="mr-auto shrink-0 text-retail-accent-2" size={21} />
+                </label>
+              ) : null}
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 ${paymentMethod === "card_to_card" ? "border-retail-accent/60 bg-retail-accent/[0.08]" : "border-retail-border bg-black/15"}`}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="card_to_card"
+                  checked={paymentMethod === "card_to_card"}
+                  onChange={() => setPaymentMethod("card_to_card")}
+                  className="h-5 w-5 accent-cyan-300"
+                />
+                <div>
+                  <p className="font-black text-white">کارت به کارت</p>
+                  <p className="mt-1 text-xs text-retail-secondary">
+                    اطلاعات پرداخت پس از ثبت سفارش نمایش داده می‌شود.
+                  </p>
+                </div>
+              </label>
             </div>
             <details className="group mt-3 rounded-2xl border border-retail-border bg-black/15">
               <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 px-4 text-sm font-bold text-retail-secondary">
@@ -768,7 +824,11 @@ export function CheckoutClient({ channel = "retail" }: { channel?: SalesChannel 
             ) : (
               <Send size={19} />
             )}
-            {isSubmitting ? "در حال ثبت سفارش..." : "تأیید و ثبت سفارش"}
+            {isSubmitting
+              ? "در حال ثبت سفارش..."
+              : paymentMethod === "zibal"
+                ? "ثبت سفارش و پرداخت آنلاین"
+                : "تأیید و ثبت سفارش"}
           </Button>
           <p className="mt-3 hidden items-center justify-center gap-1.5 text-[11px] text-retail-muted lg:flex">
             <ShieldCheck size={14} className="text-retail-accent-2" />
@@ -795,7 +855,11 @@ export function CheckoutClient({ channel = "retail" }: { channel?: SalesChannel 
             ) : (
               <Send size={18} />
             )}
-            {isSubmitting ? "در حال ثبت..." : "تأیید سفارش"}
+            {isSubmitting
+              ? "در حال ثبت..."
+              : paymentMethod === "zibal"
+                ? "ثبت و پرداخت"
+                : "تأیید سفارش"}
           </Button>
         </div>
       </div>

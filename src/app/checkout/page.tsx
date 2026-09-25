@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "تسویه حساب",
   robots: { index: false, follow: false },
 };
+export const dynamic = "force-dynamic";
 
 export default function CheckoutPage() {
   return (
@@ -42,7 +43,7 @@ export default function CheckoutPage() {
         </span>
       </div>
       <div className="mt-7">
-        <CheckoutClient />
+        <CheckoutClient gatewayEnabled={Boolean(process.env.ZIBAL_MERCHANT?.trim())} />
       </div>
     </main>
   );

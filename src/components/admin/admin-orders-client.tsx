@@ -41,12 +41,14 @@ const orderStatusLabelsFa: Record<OrderStatus, string> = {
 
 const paymentStatusLabelsFa: Record<PaymentReviewStatus, string> = {
   awaiting_receipt: "در انتظار ارسال رسید",
+  awaiting_gateway: "در انتظار پرداخت آنلاین",
   pending_review: "در انتظار بررسی رسید",
   approved: "پرداخت تایید شد",
   rejected: "پرداخت رد شد",
 };
 
 const activeStatuses: OrderStatus[] = [
+  "awaiting_payment",
   "awaiting_receipt",
   "payment_under_review",
   "confirmed",

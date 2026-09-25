@@ -508,7 +508,7 @@ export function createOrder(args: {
   sequence: number;
   userId?: string;
   shippingRial?: number;
-  paymentMethod?: "card_to_card" | "manual_receipt";
+  paymentMethod?: "card_to_card" | "manual_receipt" | "zibal";
   shippingMethod?: ShippingMethodCode;
   now?: Date;
 }): Order {

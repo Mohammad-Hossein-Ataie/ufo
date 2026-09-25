@@ -3,6 +3,7 @@ import { checkoutCustomerCart, listSubmittedOrders, parseLocation } from "@ufo/o
 import type { ShippingMethodCode } from "@ufo/types";
 import { requireCustomerSession } from "@/lib/customer-session";
 import { hydrateOrderCatalog } from "@/lib/order-catalog";
+import { getConfiguredOrigin } from "@/lib/request-origin";
 
 export const runtime = "nodejs";
 
@@ -74,6 +75,15 @@ export async function POST(request: Request) {
     const postalCode = stringValue(payload.postalCode).replace(/\D/g, "");
     if (postalCode && postalCode.length !== 10) throw new Error("کد پستی باید ۱۰ رقم باشد.");
     const receiptNote = bounded(payload.receiptNote, 1_000, "توضیحات سفارش");
+    if (payload.paymentMethod === "zibal") {
+      const origin = getConfiguredOrigin();
+      if (
+        !process.env.ZIBAL_MERCHANT?.trim() ||
+        !origin ||
+        (process.env.NODE_ENV === "production" && !origin.startsWith("https://"))
+      )
+        throw new Error("پرداخت آنلاین در حال حاضر پیکربندی نشده است.");
+    }
     const order = checkoutCustomerCart({
       channel: "retail",
       customerId: session.customerId,
@@ -89,7 +99,7 @@ export async function POST(request: Request) {
         receiverPhone: phone || session.phone,
       },
       shippingMethod: shippingMethod(payload.shippingMethod),
-      paymentMethod: "card_to_card",
+      paymentMethod: payload.paymentMethod === "zibal" ? "zibal" : "card_to_card",
       receiptNote,
     });
     return NextResponse.json({ order }, { status: 201 });

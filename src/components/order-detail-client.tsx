@@ -8,6 +8,7 @@ import type { SubmittedOrder } from "@ufo/orders";
 import type { OrderStatus, SalesChannel } from "@ufo/types";
 import { authHeaders, readCustomerSession } from "@/lib/customer-client";
 import { ManualPayment } from "@/components/manual-payment";
+import { ZibalPayment } from "@/components/zibal-payment";
 import { CommerceSkeleton } from "@/components/commerce-skeleton";
 
 const orderStatusLabelsFa: Record<OrderStatus, string> = {
@@ -26,6 +27,7 @@ const orderStatusLabelsFa: Record<OrderStatus, string> = {
 
 const paymentStatusLabelsFa = {
   awaiting_receipt: "در انتظار ارسال رسید",
+  awaiting_gateway: "در انتظار پرداخت آنلاین",
   pending_review: "در انتظار بررسی رسید",
   approved: "پرداخت تایید شد",
   rejected: "پرداخت رد شد",
@@ -173,7 +175,11 @@ export function OrderDetailClient({
             ))}
           </div>
         </section>
-        <ManualPayment order={order} channel={channel} onUpdate={setOrder} />
+        {order.paymentMethod === "zibal" ? (
+          <ZibalPayment order={order} channel={channel} />
+        ) : (
+          <ManualPayment order={order} channel={channel} onUpdate={setOrder} />
+        )}
         {order.status === "delivered" && (
           <section className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5">
             <h2 className="font-bold">سفارش به شما تحویل داده شد</h2>
