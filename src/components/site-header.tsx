@@ -52,11 +52,13 @@ function readRetailCartCount() {
   }
 }
 
-function CountBadge({ count }: { count: number }) {
+function CountBadge({ count, inHeader = false }: { count: number; inHeader?: boolean }) {
   if (count <= 0) return null;
   return (
-    <span className="cart-count-pop absolute -left-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-retail-accent-2 px-1 text-[10px] font-black tabular-nums text-retail-bg ring-2 ring-retail-bg">
-      {new Intl.NumberFormat("fa-IR").format(count)}
+    <span
+      className={`cart-count-pop absolute inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-retail-accent-2 px-1 text-[10px] font-black tabular-nums text-retail-bg ring-2 ring-retail-bg ${inHeader ? "right-0 top-0" : "-left-1 -top-1"}`}
+    >
+      {count > 99 ? "۹۹+" : new Intl.NumberFormat("fa-IR").format(count)}
     </span>
   );
 }
@@ -141,7 +143,9 @@ export function SiteHeader() {
   useEffect(() => {
     if (!menuOpen) return;
     const desktop = window.matchMedia("(min-width: 1024px)");
-    const closeOnDesktop = () => { if (desktop.matches) setMenuOpen(false); };
+    const closeOnDesktop = () => {
+      if (desktop.matches) setMenuOpen(false);
+    };
     closeOnDesktop();
     desktop.addEventListener("change", closeOnDesktop);
     return () => desktop.removeEventListener("change", closeOnDesktop);
@@ -195,15 +199,17 @@ export function SiteHeader() {
               </span>
             </Link>
             <span className="hidden h-6 w-px bg-white/10 lg:block" aria-hidden="true" />
-            <button
-              type="button"
-              onClick={openCart}
-              aria-label="سبد خرید"
-              className="header-icon header-cart relative"
-            >
-              <ShoppingBag size={21} aria-hidden="true" />
-              <CountBadge count={cartCount} />
-            </button>
+            <span className="header-cart-slot flex w-16 shrink-0 justify-start lg:w-[72px]">
+              <button
+                type="button"
+                onClick={openCart}
+                aria-label="سبد خرید"
+                className="header-icon header-cart relative translate-x-1"
+              >
+                <ShoppingBag size={21} aria-hidden="true" />
+                <CountBadge count={cartCount} inHeader />
+              </button>
+            </span>
           </div>
         </div>
         <div className="hidden border-t border-white/[0.06] lg:block">

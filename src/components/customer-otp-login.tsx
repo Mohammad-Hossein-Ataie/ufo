@@ -12,9 +12,11 @@ import { customerLoginDestination, needsProfileCompletion } from "@/lib/customer
 export function CustomerOtpLogin({
   channel,
   nextPath,
+  onComplete,
 }: {
   channel: SalesChannel;
   nextPath?: string;
+  onComplete?: () => void;
 }) {
   const searchParams = useSearchParams();
   const [step, setStep] = useState<"phone" | "code" | "profile">("phone");
@@ -122,6 +124,7 @@ export function CustomerOtpLogin({
         setStep("profile");
         return;
       }
+      onComplete?.();
       window.location.assign(
         customerLoginDestination(nextPath ?? searchParams.get("next"), channel),
       );

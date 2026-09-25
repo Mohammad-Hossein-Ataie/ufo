@@ -59,7 +59,8 @@ interface GuestCatalogRow {
 function guestToLine(line: GuestCartLine, catalog: GuestCatalogRow[]): RetailLine | null {
   const row = catalog.find((item) => item.variant.id === line.variantId);
   const variant = row?.variant ?? variants.find((item) => item.id === line.variantId);
-  const product = row?.product ?? (variant ? products.find((item) => item.id === variant.productId) : undefined);
+  const product =
+    row?.product ?? (variant ? products.find((item) => item.id === variant.productId) : undefined);
   if (!variant || !product || line.channel !== "retail") return null;
   const selectedVariant =
     line.selectedVariant ??
@@ -119,13 +120,14 @@ export function CartClient() {
     try {
       setLoadError("");
       const session = readCustomerSession("retail");
-      setIsLoggedIn(Boolean(session));
       if (session) {
         const cart = await fetchCustomerCart("retail");
         if (!cart) throw new Error("دریافت سبد خرید انجام نشد.");
         setCartView(cart);
+        setIsLoggedIn(true);
         return;
       }
+      setIsLoggedIn(false);
       const lines = readGuestCart("retail");
       const response = await fetch("/api/cart/catalog", {
         method: "POST",
@@ -160,7 +162,9 @@ export function CartClient() {
     () =>
       isLoggedIn
         ? (cartView?.items.map(serverToLine) ?? [])
-        : guestCart.map((line) => guestToLine(line, guestCatalog)).filter((line): line is RetailLine => line !== null),
+        : guestCart
+            .map((line) => guestToLine(line, guestCatalog))
+            .filter((line): line is RetailLine => line !== null),
     [cartView, guestCart, guestCatalog, isLoggedIn],
   );
 
@@ -216,7 +220,7 @@ export function CartClient() {
   }
 
   if (isLoading) return <CommerceSkeleton kind="cart" />;
-  if (loadError)
+  if (loadError && !loginOpen)
     return (
       <div role="alert" className="rounded-2xl border border-retail-border p-6 text-center">
         <p>{loadError}</p>
@@ -232,7 +236,7 @@ export function CartClient() {
       </div>
     );
 
-  if (lines.length === 0) {
+  if (lines.length === 0 && !loginOpen) {
     return (
       <div className="rounded-[24px] border border-dashed border-retail-border bg-white/[0.025] px-5 py-10 text-center">
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-retail-accent/10 text-retail-accent">
@@ -366,46 +370,49 @@ export function CartClient() {
           </Button>
         </div>
       </aside>
-      <div
-        className={`fixed inset-0 z-[70] ${loginOpen ? "pointer-events-auto" : "pointer-events-none"}`}
-        aria-hidden={!loginOpen}
-      >
-        <button
-          type="button"
-          aria-label="بستن ورود"
-          onClick={() => setLoginOpen(false)}
-          className={`absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ease-mobile ${loginOpen ? "opacity-100" : "opacity-0"}`}
-        />
-        <section
-          role="dialog"
-          aria-modal="true"
-          aria-label="ورود برای ادامه پرداخت"
-          className={`absolute inset-x-0 bottom-0 mx-auto max-h-[92svh] max-w-xl overflow-y-auto rounded-t-[28px] border border-retail-border bg-[#090e14] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-24px_80px_rgba(0,0,0,.7)] transition-transform duration-300 ease-mobile sm:bottom-1/2 sm:rounded-[28px] sm:p-6 sm:translate-y-1/2 ${loginOpen ? "translate-y-0 sm:translate-y-1/2" : "translate-y-full sm:translate-y-[calc(50%+100vh)]"}`}
-        >
-          <div className="mb-4 flex items-center justify-between px-1">
-            <div>
-              <h2 className="font-black text-white">ورود امن برای پرداخت</h2>
-              <p className="mt-1 text-xs text-retail-secondary">سبد شما بعد از ورود حفظ می‌شود</p>
-            </div>
-            <button
-              type="button"
-              aria-label="بستن"
-              onClick={() => setLoginOpen(false)}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-retail-secondary hover:bg-white/10 hover:text-white"
-            >
-              <X size={20} />
-            </button>
-          </div>
-          <CustomerOtpLogin channel="retail" nextPath="/checkout" />
+      {loginOpen ? (
+        <div className="fixed inset-0 z-[70]">
           <button
             type="button"
+            aria-label="بستن ورود"
             onClick={() => setLoginOpen(false)}
-            className="mt-3 min-h-11 w-full text-sm font-bold text-retail-secondary hover:text-white"
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+          />
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-label="ورود برای ادامه پرداخت"
+            className="absolute inset-x-0 bottom-0 mx-auto max-h-[92svh] max-w-xl overflow-y-auto rounded-t-[28px] border border-retail-border bg-[#090e14] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-24px_80px_rgba(0,0,.7)] sm:bottom-1/2 sm:rounded-[28px] sm:p-6 sm:translate-y-1/2"
           >
-            فعلاً به خرید ادامه می‌دهم
-          </button>
-        </section>
-      </div>
+            <div className="mb-4 flex items-center justify-between px-1">
+              <div>
+                <h2 className="font-black text-white">ورود امن برای پرداخت</h2>
+                <p className="mt-1 text-xs text-retail-secondary">سبد شما بعد از ورود حفظ می‌شود</p>
+              </div>
+              <button
+                type="button"
+                aria-label="بستن"
+                onClick={() => setLoginOpen(false)}
+                className="flex h-11 w-11 items-center justify-center rounded-full text-retail-secondary hover:bg-white/10 hover:text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <CustomerOtpLogin
+              channel="retail"
+              nextPath="/checkout"
+              onComplete={() => setLoginOpen(false)}
+            />
+            <button
+              type="button"
+              onClick={() => setLoginOpen(false)}
+              className="mt-3 min-h-11 w-full text-sm font-bold text-retail-secondary hover:text-white"
+            >
+              فعلاً به خرید ادامه می‌دهم
+            </button>
+          </section>
+        </div>
+      ) : null}
     </div>
   );
 }

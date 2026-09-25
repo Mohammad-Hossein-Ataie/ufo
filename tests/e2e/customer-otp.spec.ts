@@ -60,7 +60,11 @@ for (const channel of ["retail", "wholesale"] as const) {
       await page.goto(`${base}${prefix}/login`);
       await expect(page.getByLabel("شماره موبایل", { exact: true })).toBeVisible();
       await expect(page.getByLabel("نام", { exact: true })).toHaveCount(0);
-      await page.screenshot({ path: testInfo.outputPath("phone.png"), fullPage: true, caret: "initial" });
+      await page.screenshot({
+        path: testInfo.outputPath("phone.png"),
+        fullPage: true,
+        caret: "initial",
+      });
       await page.getByLabel("شماره موبایل", { exact: true }).fill("۰۹۱۲۳۴۵۶۷۸۹");
       await page.getByRole("button", { name: "دریافت کد ورود", exact: true }).click();
       await expect(page.getByLabel("کد پیامکی", { exact: true })).toBeVisible();
@@ -77,7 +81,11 @@ for (const channel of ["retail", "wholesale"] as const) {
         expect(
           await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
         ).toBe(true);
-        await page.screenshot({ path: testInfo.outputPath("profile.png"), fullPage: true, caret: "initial" });
+        await page.screenshot({
+          path: testInfo.outputPath("profile.png"),
+          fullPage: true,
+          caret: "initial",
+        });
         await page.getByRole("button", { name: "ثبت اطلاعات و ادامه", exact: true }).click();
       }
       await expect(page).toHaveURL(`${base}${prefix}/account`);
@@ -97,5 +105,96 @@ for (const channel of ["retail", "wholesale"] as const) {
     await page.getByRole("button", { name: "دریافت کد ورود", exact: true }).click();
     await page.getByRole("button", { name: "تغییر شماره موبایل", exact: true }).click();
     await expect(page.getByLabel("شماره موبایل", { exact: true })).toBeVisible();
+  });
+}
+
+for (const needsProfile of [false, true]) {
+  test(`cart OTP dialog closes after ${needsProfile ? "profile completion" : "verification"}`, async ({
+    page,
+  }) => {
+    const customer = {
+      id: "test-cart-customer",
+      mobileNumber: "09123456789",
+      firstName: "Ali",
+      lastName: "Test",
+      customerType: "retail",
+      status: "active",
+    };
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        "ufo-retail-cart",
+        JSON.stringify([{ channel: "retail", variantId: "test-variant", quantity: 1 }]),
+      );
+    });
+    await page.route("**/api/cart/catalog", (route) =>
+      route.fulfill({
+        json: {
+          rows: [
+            {
+              product: { id: "test-product", nameFa: "محصول آزمایشی" },
+              variant: {
+                id: "test-variant",
+                productId: "test-product",
+                nameFa: "آبی",
+                sku: "TEST-001",
+                retailPriceRial: 1_000_000,
+              },
+            },
+          ],
+        },
+      }),
+    );
+    await page.route("**/api/cart", (route) =>
+      route.fulfill({
+        json: {
+          items: [
+            {
+              id: "test-cart-line",
+              variantId: "test-variant",
+              quantity: 1,
+              productName: "محصول آزمایشی",
+              variantName: "آبی",
+              sku: "TEST-001",
+              unitPriceSnapshot: 1_000_000,
+              discountAmount: 0,
+              totalPrice: 1_000_000,
+            },
+          ],
+          summary: { subtotalRial: 1_000_000, discountRial: 0, totalRial: 1_000_000 },
+        },
+      }),
+    );
+    await page.route("**/api/auth/send-otp", (route) =>
+      route.fulfill({ json: { challengeId: "cart-challenge" } }),
+    );
+    await page.route("**/api/auth/verify-otp", (route) =>
+      route.fulfill({
+        json: {
+          token: "cart-test-token",
+          customer: needsProfile ? { ...customer, firstName: "", lastName: "" } : customer,
+        },
+      }),
+    );
+    await page.route("**/api/customer/profile", (route) => route.fulfill({ json: { customer } }));
+    await page.goto("/cart");
+    const dialog = page.getByRole("dialog", { name: "ورود برای ادامه پرداخت" });
+    await expect(dialog).toHaveCount(0);
+    await page.getByRole("button", { name: "ورود و ادامه پرداخت" }).click();
+    await expect(dialog).toBeVisible();
+    await page.getByLabel("شماره موبایل", { exact: true }).fill("09123456789");
+    await page.getByRole("button", { name: "دریافت کد ورود" }).click();
+    await page.getByLabel("کد پیامکی", { exact: true }).fill("123456");
+    await page.getByRole("button", { name: "تأیید و ورود" }).click();
+    if (needsProfile) {
+      await expect(dialog).toBeVisible();
+      await page.getByLabel("نام", { exact: true }).fill("Ali");
+      await page.getByLabel("نام خانوادگی", { exact: true }).fill("Test");
+      await page.getByRole("button", { name: "ثبت اطلاعات و ادامه" }).click();
+    }
+    await expect(page.getByRole("heading", { name: "تکمیل سفارش" })).toBeVisible();
+    await expect(dialog).toHaveCount(0);
+    await page.goto("/cart");
+    await expect(page.getByRole("link", { name: "ادامه خرید" })).toBeVisible();
+    await expect(dialog).toHaveCount(0);
   });
 }

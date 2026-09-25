@@ -165,18 +165,20 @@ export function B2BHeader() {
           >
             <ClipboardList size={18} aria-hidden="true" />
           </Link>
-          <Link
-            href={cartHref}
-            aria-label={loggedIn ? "سبد خرید عمده" : "ورود برای مشاهده سبد عمده"}
-            className={`relative ${iconLinkClass}`}
-          >
-            <ShoppingCart size={18} aria-hidden="true" />
-            {cartCount > 0 ? (
-              <span className="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#20F28B] px-1 text-[11px] font-black tabular-nums text-[#14201B] ring-2 ring-[#F7F7F2]">
-                {formattedCount}
-              </span>
-            ) : null}
-          </Link>
+          <span className="header-cart-slot flex w-16 shrink-0 justify-start">
+            <Link
+              href={cartHref}
+              aria-label={loggedIn ? "سبد خرید عمده" : "ورود برای مشاهده سبد عمده"}
+              className={`relative translate-x-1 ${iconLinkClass}`}
+            >
+              <ShoppingCart size={18} aria-hidden="true" />
+              {cartCount > 0 ? (
+                <span className="absolute -left-5 top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#20F28B] px-1 text-[11px] font-black tabular-nums text-[#14201B] ring-2 ring-[#F7F7F2]">
+                  {cartCount > 99 ? "۹۹+" : formattedCount}
+                </span>
+              ) : null}
+            </Link>
+          </span>
           <Link href={accountHref} aria-label={accountLabel} className={iconLinkClass}>
             <UserRound size={18} aria-hidden="true" />
           </Link>
