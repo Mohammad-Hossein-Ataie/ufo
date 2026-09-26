@@ -505,7 +505,7 @@
   inset: -70px;
   z-index: 0;
   background: url("/images/ufo-hero.webp") center 45% / cover no-repeat;
-  filter: blur(56px);
+  filter: blur(4px);
   opacity: 0.55;
   pointer-events: none;
 }
