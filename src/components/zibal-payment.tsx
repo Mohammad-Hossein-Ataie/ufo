@@ -6,6 +6,7 @@ import { Button, Price } from "@ufo/ui";
 import type { SubmittedOrder } from "@ufo/orders";
 import type { SalesChannel } from "@ufo/types";
 import { authHeaders } from "@/lib/customer-client";
+import { trackSiteEvent } from "@/lib/site-analytics-client";
 
 export function ZibalPayment({ order, channel }: { order: SubmittedOrder; channel: SalesChannel }) {
   const [busy, setBusy] = useState(false);
@@ -32,6 +33,7 @@ export function ZibalPayment({ order, channel }: { order: SubmittedOrder; channe
         return;
       }
       if (!payload.paymentUrl) throw new Error("نشانی درگاه دریافت نشد.");
+      trackSiteEvent("payment_started", { channel, context: "zibal-retry" });
       window.location.assign(payload.paymentUrl);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "ارتباط با درگاه برقرار نشد.");

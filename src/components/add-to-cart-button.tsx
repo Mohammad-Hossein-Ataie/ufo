@@ -12,6 +12,7 @@ import {
   saveGuestCart,
   type GuestCartLine,
 } from "@/lib/customer-client";
+import { trackSiteEvent } from "@/lib/site-analytics-client";
 
 interface SelectedVariant {
   type: Exclude<ProductVariantType, "none">;
@@ -105,6 +106,7 @@ export function AddToCartButton({
           await syncServerCart(linePayload(option, quantityToAdd));
         }
         setAdded(true);
+        trackSiteEvent("add_to_cart", { channel });
         window.setTimeout(() => setAdded(false), 1800);
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : "افزودن به سبد خرید انجام نشد.");
@@ -126,6 +128,7 @@ export function AddToCartButton({
     }
     saveGuestCart(channel, nextCart);
     setAdded(true);
+    trackSiteEvent("add_to_cart", { channel });
     window.setTimeout(() => setAdded(false), 1800);
     setBusy(false);
   }
@@ -166,6 +169,7 @@ export function AddToCartButton({
         }
         setSelectedQuantity(safeQuantity);
         setAdded(safeQuantity > 0);
+        if (selectedQuantity === 0 && safeQuantity > 0) trackSiteEvent("add_to_cart", { channel });
         window.setTimeout(() => setAdded(false), 1800);
         return;
       }
@@ -187,6 +191,7 @@ export function AddToCartButton({
       saveGuestCart(channel, nextCart);
       setSelectedQuantity(safeQuantity);
       setAdded(safeQuantity > 0);
+      if (selectedQuantity === 0 && safeQuantity > 0) trackSiteEvent("add_to_cart", { channel });
       window.setTimeout(() => setAdded(false), 1800);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "تغییر سبد خرید انجام نشد.");

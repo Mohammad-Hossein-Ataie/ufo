@@ -25,6 +25,7 @@ import type {
   SalesChannel,
 } from "@ufo/types";
 import type { CustomerCartView } from "@ufo/orders";
+import { trackSiteEvent } from "@/lib/site-analytics-client";
 import { authHeaders, fetchCustomerCart, readCustomerSession } from "@/lib/customer-client";
 import { IranProvinceCitySelect } from "@/components/iran-location-select";
 import { LocationPicker } from "@/components/location-picker";
@@ -295,6 +296,7 @@ export function CheckoutClient({
         setError(payload.error ?? "ثبت سفارش انجام نشد.");
         return;
       }
+      trackSiteEvent("order_created", { channel, context: paymentMethod });
       window.dispatchEvent(
         new CustomEvent(
           channel === "wholesale" ? "ufo-b2b-cart-updated" : "ufo-retail-cart-updated",
@@ -312,6 +314,7 @@ export function CheckoutClient({
             error?: string;
           };
           if (paymentResponse.ok && payment.paymentUrl) {
+            trackSiteEvent("payment_started", { channel, context: "zibal" });
             window.location.assign(payment.paymentUrl);
             return;
           }

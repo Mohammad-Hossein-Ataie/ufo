@@ -165,4 +165,32 @@ describe("content management", () => {
     const metadata = await sharp(Buffer.from(await image.arrayBuffer())).metadata();
     expect(metadata).toMatchObject({ width: 1600, height: 900, format: "webp" });
   });
+
+  it("keeps inline article images uncropped and returns intrinsic dimensions", async () => {
+    const source = await sharp({
+      create: { width: 320, height: 500, channels: 3, background: "#10b981" },
+    })
+      .png()
+      .toBuffer();
+    const formData = new FormData();
+    formData.set("file", new File([source], "inline.png", { type: "image/png" }));
+    formData.set("purpose", "body");
+    const headers = await adminHeaders();
+    const uploaded = await uploadCover(
+      new Request("http://localhost:3000/api/admin/content/upload", {
+        method: "POST",
+        headers: { ...headers, origin: "http://localhost:3000" },
+        body: formData,
+      }),
+    );
+    expect(uploaded.status).toBe(200);
+    const payload = (await uploaded.json()) as { url: string; width: number; height: number };
+    expect(payload).toMatchObject({ width: 320, height: 500 });
+    const assetId = payload.url.split("/").at(-1)!;
+    const image = await readCover(new Request(`http://localhost:3000${payload.url}`), {
+      params: Promise.resolve({ assetId }),
+    });
+    const metadata = await sharp(Buffer.from(await image.arrayBuffer())).metadata();
+    expect(metadata).toMatchObject({ width: 320, height: 500, format: "webp" });
+  });
 });

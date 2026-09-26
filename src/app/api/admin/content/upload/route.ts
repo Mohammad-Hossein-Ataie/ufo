@@ -18,19 +18,27 @@ export async function POST(request: Request) {
     const contentLength = Number(request.headers.get("content-length") ?? 0);
     if (contentLength > maxBytes + 1024 * 1024)
       return NextResponse.json({ error: "حجم درخواست بیش از حد مجاز است." }, { status: 413 });
-    const file = (await request.formData()).get("file");
+    const formData = await request.formData();
+    const file = formData.get("file");
+    const purpose = formData.get("purpose") === "body" ? "body" : "cover";
     if (!(file instanceof File) || file.size === 0)
       return NextResponse.json({ error: "تصویر معتبر انتخاب کنید." }, { status: 400 });
     if (file.size > maxBytes)
       return NextResponse.json({ error: "حداکثر حجم تصویر ۸ مگابایت است." }, { status: 413 });
     const input = new Uint8Array(await file.arrayBuffer());
     let output: Buffer;
+    let width = 1600;
+    let height = 900;
     try {
-      output = await sharp(input, { failOn: "error", limitInputPixels: maxPixels })
-        .rotate()
-        .resize(1600, 900, { fit: "cover", position: "attention" })
+      const pipeline = sharp(input, { failOn: "error", limitInputPixels: maxPixels }).rotate();
+      output = await (purpose === "body"
+        ? pipeline.resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
+        : pipeline.resize(1600, 900, { fit: "cover", position: "attention" }))
         .webp({ quality: 84, effort: 5 })
         .toBuffer();
+      const metadata = await sharp(output).metadata();
+      width = metadata.width ?? width;
+      height = metadata.height ?? height;
     } catch {
       return NextResponse.json(
         { error: "فقط تصویر معتبر JPEG، PNG، WebP یا AVIF مجاز است." },
@@ -46,7 +54,9 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({
       url: `/api/content-images/${assetId}`,
-      message: "تصویر شاخص با نسبت ۱۶:۹ آماده شد.",
+      width,
+      height,
+      message: purpose === "body" ? "تصویر بهینه شد و داخل متن قرار گرفت." : "تصویر شاخص با نسبت ۱۶:۹ آماده شد.",
     });
   } catch (error) {
     return NextResponse.json(

@@ -1,38 +1,57 @@
+import Image from "next/image";
 import type { ReactNode } from "react";
+import { contentBodyToDocument, type RichTextInline } from "@/lib/content-rich-text";
 
 function anchor(value: string) {
   return value.normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "");
 }
 
+function renderInlines(inlines: RichTextInline[], keyPrefix: string): ReactNode[] {
+  return inlines.map((inline, index) => {
+    let content: ReactNode = inline.text;
+    if (inline.bold) content = <strong>{content}</strong>;
+    if (inline.italic) content = <em>{content}</em>;
+    if (inline.href) {
+      const external = inline.href.startsWith("https://");
+      content = <a href={inline.href} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{content}</a>;
+    }
+    return <span key={`${keyPrefix}-${index}`}>{content}</span>;
+  });
+}
+
 export function ContentPostBody({ body, tone = "retail" }: { body: string; tone?: "retail" | "wholesale" }) {
-  const content: ReactNode[] = [];
-  let paragraph: string[] = [];
-  let bullets: string[] = [];
-  const flushParagraph = () => {
-    if (!paragraph.length) return;
-    content.push(<p key={`p-${content.length}`}>{paragraph.join(" ")}</p>);
-    paragraph = [];
-  };
-  const flushBullets = () => {
-    if (!bullets.length) return;
-    content.push(<ul key={`ul-${content.length}`}>{bullets.map((item, index) => <li key={`${index}-${item}`}>{item}</li>)}</ul>);
-    bullets = [];
-  };
-  for (const rawLine of body.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line) { flushParagraph(); flushBullets(); continue; }
-    if (line.startsWith("### ")) {
-      flushParagraph(); flushBullets();
-      const value = line.slice(4).trim();
-      content.push(<h3 id={anchor(value)} key={`h3-${content.length}`}>{value}</h3>);
-    } else if (line.startsWith("## ")) {
-      flushParagraph(); flushBullets();
-      const value = line.slice(3).trim();
-      content.push(<h2 id={anchor(value)} key={`h2-${content.length}`}>{value}</h2>);
-    } else if (/^[-*]\s+/.test(line)) {
-      flushParagraph(); bullets.push(line.replace(/^[-*]\s+/, ""));
-    } else { flushBullets(); paragraph.push(line); }
-  }
-  flushParagraph(); flushBullets();
-  return <div className={`content-prose ${tone === "wholesale" ? "content-prose-wholesale" : ""}`}>{content}</div>;
+  const document = contentBodyToDocument(body);
+  return (
+    <div className={`content-prose ${tone === "wholesale" ? "content-prose-wholesale" : ""}`}>
+      {document.blocks.map((block, index) => {
+        const key = `${block.type}-${index}`;
+        if (block.type === "image") {
+          return (
+            <figure key={key} className="content-prose-image">
+              <Image
+                src={block.src}
+                alt={block.alt}
+                width={block.width}
+                height={block.height}
+                unoptimized
+                loading="lazy"
+                sizes="(min-width: 1024px) 62rem, calc(100vw - 3rem)"
+              />
+              {block.caption ? <figcaption>{block.caption}</figcaption> : null}
+            </figure>
+          );
+        }
+        if ("items" in block) {
+          const items = block.items.map((item, itemIndex) => <li key={`${key}-${itemIndex}`}>{renderInlines(item, `${key}-${itemIndex}`)}</li>);
+          return block.type === "orderedList" ? <ol key={key}>{items}</ol> : <ul key={key}>{items}</ul>;
+        }
+        const inlines = renderInlines(block.content, key);
+        const text = block.content.map((inline) => inline.text).join("");
+        if (block.type === "heading2") return <h2 id={anchor(text)} key={key}>{inlines}</h2>;
+        if (block.type === "heading3") return <h3 id={anchor(text)} key={key}>{inlines}</h3>;
+        if (block.type === "quote") return <blockquote key={key}>{inlines}</blockquote>;
+        return <p key={key}>{inlines}</p>;
+      })}
+    </div>
+  );
 }

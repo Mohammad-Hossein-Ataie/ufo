@@ -54,9 +54,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   if (pathname === "/admin/login") return <>{children}</>;
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-slate-100 text-slate-950 lg:grid lg:grid-cols-[16rem_1fr]">
-      <aside className="border-b border-slate-200 bg-white lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-l">
-        <div className="flex min-h-16 items-center gap-3 border-b border-slate-100 px-4">
+    <div className="min-h-screen overflow-x-clip bg-slate-100 text-slate-950">
+      <aside data-testid="admin-sidebar" className="border-b border-slate-200 bg-white lg:fixed lg:inset-y-0 lg:right-0 lg:z-30 lg:flex lg:h-dvh lg:w-64 lg:flex-col lg:overflow-hidden lg:border-b-0 lg:border-l">
+        <div className="flex min-h-16 shrink-0 items-center gap-3 border-b border-slate-100 bg-white px-4">
           <span className="relative h-10 w-10 shrink-0">
             <Image
               src="/logos/logo.png"
@@ -76,7 +76,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </span>
         </div>
 
-        <nav className="flex gap-2 overflow-x-auto p-3 lg:grid lg:gap-5" aria-label="ناوبری مدیریت">
+        <nav className="flex gap-2 overflow-x-auto p-3 lg:min-h-0 lg:flex-1 lg:grid lg:auto-rows-max lg:content-start lg:gap-5 lg:overflow-x-hidden lg:overflow-y-auto" aria-label="ناوبری مدیریت">
           {groups.map((group) => (
             <div key={group.title} className="flex shrink-0 gap-1 lg:grid">
               <p className="hidden px-3 py-1 text-[11px] font-black uppercase tracking-normal text-slate-400 lg:block">
@@ -108,7 +108,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </nav>
       </aside>
 
-      <div className="min-w-0">
+      <div className="min-w-0 lg:mr-64">
         <header className="sticky top-0 z-20 flex min-h-14 items-center justify-between border-b border-slate-200 bg-slate-100/95 px-4 backdrop-blur">
           <div className="min-w-0">
             <p className="truncate text-sm font-black">پنل مدیریت یوفوپاف</p>

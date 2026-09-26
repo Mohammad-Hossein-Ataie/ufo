@@ -53,6 +53,7 @@ export const collectionNames = [
   "redirects",
   "notifications",
   "auditLogs",
+  "analyticsEvents",
   "settings",
 ] as const;
 
@@ -142,6 +143,12 @@ export const databaseIndexes: Record<CollectionName, IndexDescription[]> = {
   redirects: [{ key: { source: 1 }, unique: true }],
   notifications: [{ key: { userId: 1, readAt: 1 } }],
   auditLogs: [{ key: { actorId: 1, createdAt: -1 } }, { key: { entityType: 1, entityId: 1 } }],
+  analyticsEvents: [
+    { key: { occurredAt: -1 } },
+    { key: { name: 1, occurredAt: -1 } },
+    { key: { path: 1, occurredAt: -1 } },
+    { key: { occurredAt: 1 }, expireAfterSeconds: 180 * 24 * 60 * 60 },
+  ],
   settings: [{ key: { id: 1 }, unique: true }],
 };
 

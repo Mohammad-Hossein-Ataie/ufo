@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { getDb, hasUsableMongoUri } from "@ufo/database";
 import type { Db } from "mongodb";
+import { normalizeContentBody } from "@/lib/content-rich-text";
 
 export type ContentPostType = "article" | "news";
 export type ContentPostStatus = "draft" | "scheduled" | "published";
@@ -199,8 +200,8 @@ export function contentSlug(value: string): string {
     .slice(0, 100);
 }
 
-function readingMinutes(body: string): number {
-  const words = body.split(/\s+/).filter(Boolean).length;
+function readingMinutes(plainText: string): number {
+  const words = plainText.split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));
 }
 
@@ -208,7 +209,7 @@ function parseInput(input: ContentPostInput, current?: ContentPost): Omit<Conten
   const title = text(input.title, 140);
   const slug = contentSlug(text(input.slug, 120) || title);
   const excerpt = text(input.excerpt, 320);
-  const body = text(input.body, 50_000);
+  const { body, plainText } = normalizeContentBody(input.body);
   const type: ContentPostType = input.type === "news" ? "news" : "article";
   const audience: ContentAudience = input.audience === "wholesale" ? "wholesale" : "retail";
   const status: ContentPostStatus =
@@ -218,7 +219,7 @@ function parseInput(input: ContentPostInput, current?: ContentPost): Omit<Conten
   if (title.length < 10) throw new Error("عنوان باید حداقل ۱۰ کاراکتر باشد.");
   if (!slug) throw new Error("اسلاگ معتبر الزامی است.");
   if (excerpt.length < 30) throw new Error("خلاصه باید حداقل ۳۰ کاراکتر باشد.");
-  if (body.length < 80) throw new Error("متن محتوا باید حداقل ۸۰ کاراکتر باشد.");
+  if (plainText.length < 80) throw new Error("متن محتوا باید حداقل ۸۰ کاراکتر باشد.");
   if (status === "scheduled") {
     const date = new Date(scheduledAt);
     if (!scheduledAt || Number.isNaN(date.getTime()) || date.getTime() <= Date.now())
@@ -253,7 +254,7 @@ function parseInput(input: ContentPostInput, current?: ContentPost): Omit<Conten
     }),
     seoTitle,
     seoDescription,
-    readingMinutes: readingMinutes(body),
+    readingMinutes: readingMinutes(plainText),
     ...(status === "scheduled" ? { scheduledAt: new Date(scheduledAt).toISOString() } : {}),
   };
 }

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   Clock3,
   Mail,
@@ -32,6 +33,11 @@ const enamadVerificationUrl =
 const enamadLogoUrl =
   "https://trustseal.enamad.ir/logo.aspx?id=7628595&Code=9H4ALixgxYdhUO3XrI7dMMNT5ULunNIC";
 
+const SiteAnalytics = dynamic(
+  () => import("@/components/site-analytics").then((module) => module.SiteAnalytics),
+  { ssr: false },
+);
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
@@ -46,6 +52,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (pathname.startsWith("/b2b")) {
     return (
       <div className="b2b-shell min-h-screen bg-[#F7F7F2] text-[#14201B]">
+        <SiteAnalytics />
         <a href="#main-content" className="skip-link">
           پرش به محتوای اصلی
         </a>
@@ -57,6 +64,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <SiteAnalytics />
       <a href="#main-content" className="skip-link">
         پرش به محتوای اصلی
       </a>

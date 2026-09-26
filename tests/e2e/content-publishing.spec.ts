@@ -55,9 +55,39 @@ test("admin can create a SEO-ready draft with immediate feedback", async ({ page
   });
   expect(login.ok()).toBeTruthy();
 
+  await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto("/admin/content");
   await expect(page.getByRole("heading", { name: "اخبار و مقالات", exact: true })).toBeVisible();
+  const adminSidebar = page.getByTestId("admin-sidebar");
+  await expect(adminSidebar).toBeVisible();
+  expect(await adminSidebar.evaluate((element) => getComputedStyle(element).position)).toBe("fixed");
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect.poll(() => adminSidebar.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return { top: Math.round(rect.top), bottom: Math.round(rect.bottom), right: Math.round(rect.right) };
+  })).toEqual({ top: 0, bottom: 1080, right: 1920 });
+  await page.screenshot({ path: "temp/content-admin-sidebar-scrolled.png", fullPage: false });
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.getByRole("button", { name: "مطلب جدید", exact: true }).click();
+  const editor = page.getByRole("textbox", { name: "متن اصلی", exact: true });
+  const toolbar = page.getByRole("toolbar", { name: "ابزارهای ویرایش متن" });
+  await expect(toolbar).toBeVisible();
+  await expect.poll(() => editor.evaluate((element) => Math.round(element.getBoundingClientRect().width))).toBeGreaterThanOrEqual(850);
+  await expect.poll(() => toolbar.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+  await page.getByRole("button", { name: "افزودن تصویر به متن", exact: true }).click();
+  await expect(page.getByText("افزودن تصویر میان متن", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "بستن افزودن تصویر", exact: true }).click();
+  await page.getByLabel("وضعیت انتشار", { exact: false }).selectOption("scheduled");
+  await page.getByRole("button", { name: "زمان انتشار", exact: true }).click();
+  const calendar = page.getByRole("dialog", { name: "انتخاب تاریخ جلالی انتشار" });
+  await expect(calendar).toBeVisible();
+  await expect(page.getByText("ساعت ایران", { exact: true })).toBeVisible();
+  await expect.poll(async () => {
+    const box = await calendar.boundingBox();
+    return Boolean(box && box.x >= 0 && box.y >= 0 && box.x + box.width <= 1920 && box.y + box.height <= 1080);
+  }).toBe(true);
+  await page.screenshot({ path: "temp/content-admin-jalali-picker.png", fullPage: false });
+  await page.getByLabel("وضعیت انتشار", { exact: false }).selectOption("draft");
   await page.getByRole("radio", { name: /عمده‌فروشی/ }).check();
   await page.getByLabel("عنوان مطلب", { exact: false }).fill("راهنمای کامل آزمایشی برای انتخاب بهتر محصول مناسب");
   await page.getByLabel("اسلاگ URL", { exact: false }).fill("playwright-content-guide");
@@ -74,4 +104,32 @@ test("admin can create a SEO-ready draft with immediate feedback", async ({ page
   await page.setViewportSize({ width: 390, height: 844 });
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: "temp/content-admin-mobile.png", fullPage: true });
+});
+
+test("SEO dashboard exposes lightweight analytics and Search Console setup", async ({ page }) => {
+  const login = await page.request.post("/api/admin/login", {
+    headers: { origin: "http://127.0.0.1:3106" },
+    data: { username: "local-catalog-test", password: "local-only-catalog-test-password" },
+  });
+  expect(login.ok()).toBeTruthy();
+
+  const analytics = await page.request.post("/api/analytics", {
+    headers: { "sec-fetch-site": "same-origin", "user-agent": "UFO analytics browser test" },
+    data: { name: "page_view", path: "/products?ignored=yes", channel: "retail", device: "desktop" },
+  });
+  expect(analytics.status()).toBe(204);
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/admin/seo");
+  await expect(page.getByRole("heading", { name: "مرکز تحلیل SEO", exact: true })).toBeVisible();
+  await expect(page.getByText("بدون اسکریپت ثالث", { exact: true })).toBeVisible();
+  await expect(page.getByText("اتصال امن Google Search Console", { exact: true })).toBeVisible();
+  await expect(page.getByText("/products", { exact: true })).toBeVisible();
+  await page.screenshot({ path: "temp/seo-dashboard-desktop.png", fullPage: true });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "مرکز تحلیل SEO", exact: true })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+  await page.screenshot({ path: "temp/seo-dashboard-mobile.png", fullPage: true });
 });
