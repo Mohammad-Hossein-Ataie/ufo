@@ -11,7 +11,7 @@ import {
   Sparkles,
   ZoomIn,
 } from "lucide-react";
-import { ImageLightbox } from "@/components/image-lightbox";
+import { ImageLightbox, type ImageLightboxItem } from "@/components/image-lightbox";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { ProductImageCrossfade } from "@/components/product-image-crossfade";
 import { ProtectedProductImage } from "@/components/protected-product-image";
@@ -79,6 +79,20 @@ export function ProductDetailClient({
     );
     return new Map<string, string>(entries);
   }, [variantImageMap]);
+  const lightboxImages = useMemo<ImageLightboxItem[]>(
+    () =>
+      imagePreloadSources.map((image, index) => {
+        const optionId = imageVariantValueMap.get(image);
+        const option = variantOptions.find((item) => item.id === optionId);
+        return {
+          src: image,
+          alt: option
+            ? `${product.nameFa} - ${option.labelFa}`
+            : `${product.nameFa} - تصویر ${new Intl.NumberFormat("fa-IR").format(index + 1)}`,
+        };
+      }),
+    [imagePreloadSources, imageVariantValueMap, product.nameFa, variantOptions],
+  );
   const [selectedImage, setSelectedImage] = useState(firstImage);
   const [imageOpen, setImageOpen] = useState(false);
   const [selectedVariantValueId, setSelectedVariantValueId] = useState<string | null>(null);
@@ -220,6 +234,7 @@ export function ProductDetailClient({
           open={imageOpen}
           onClose={() => setImageOpen(false)}
           src={selectedImage}
+          images={lightboxImages}
           alt={
             selectedVariantOption
               ? `${product.nameFa} - ${selectedVariantOption.labelFa}`

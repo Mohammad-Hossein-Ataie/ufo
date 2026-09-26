@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests/e2e",
-  testMatch: "content-publishing.spec.ts",
+  testMatch: ["content-publishing.spec.ts", "product-image-lightbox.spec.ts"],
   timeout: 60_000,
   workers: 1,
   use: {
