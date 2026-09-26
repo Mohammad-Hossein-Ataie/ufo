@@ -3,7 +3,26 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@ufo/auth": ["./packages/auth/src/index.ts"],
+      "@ufo/chat": ["./packages/chat/src/index.ts"],
+      "@ufo/config": ["./packages/config/src/index.ts"],
+      "@ufo/database": ["./packages/database/src/index.ts"],
+      "@ufo/domain": ["./packages/domain/src/index.ts"],
+      "@ufo/inventory": ["./packages/inventory/src/index.ts"],
+      "@ufo/invoices": ["./packages/invoices/src/index.ts"],
+      "@ufo/notifications": ["./packages/notifications/src/index.ts"],
+      "@ufo/orders": ["./packages/orders/src/index.ts"],
+      "@ufo/payments": ["./packages/payments/src/index.ts"],
+      "@ufo/pricing": ["./packages/pricing/src/index.ts"],
+      "@ufo/search": ["./packages/search/src/index.ts"],
+      "@ufo/seo": ["./packages/seo/src/index.ts"],
+      "@ufo/shipping": ["./packages/shipping/src/index.ts"],
+      "@ufo/storage": ["./packages/storage/src/index.ts"],
+      "@ufo/testing": ["./packages/testing/src/index.ts"],
+      "@ufo/types": ["./packages/types/src/index.ts"],
+      "@ufo/ui": ["./packages/ui/src/index.tsx"],
+      "@ufo/validation": ["./packages/validation/src/index.ts"]
     },
     "plugins": [
       {
