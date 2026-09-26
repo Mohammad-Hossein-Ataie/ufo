@@ -21,11 +21,13 @@ import {
 import { Button } from "@ufo/ui";
 import { brands, categories } from "@ufo/domain";
 import { HomepageProducts } from "@/components/homepage-products";
+import { ContentPostCard } from "@/components/content-post-card";
 import { getLatestHomepageProducts } from "@/lib/homepage-products";
 import { listCatalogRows } from "@/lib/catalog-data";
 import { categoryImageBySlug } from "@/lib/product-images";
 import { partnerBrandLogoById } from "@/lib/partner-brand-logos";
 import { faqPageJsonLd, jsonLdScriptProps, organizationJsonLd, websiteJsonLd } from "@ufo/seo";
+import { listPublishedPosts } from "@/lib/content-posts";
 
 export const dynamic = "force-dynamic";
 
@@ -100,6 +102,7 @@ const categoryAccent: Record<string, string> = {
 
 export default async function HomePage() {
   const homepageSlots = getLatestHomepageProducts(await listCatalogRows());
+  const latestPosts = await listPublishedPosts({ audience: "retail", limit: 3 });
   const partnerBrands = brands.flatMap((brand) => {
     const logo = partnerBrandLogoById[brand.id];
     return logo ? [{ brand, logo }] : [];
@@ -199,6 +202,26 @@ export default async function HomePage() {
             </Link>
           </div>
           <HomepageProducts slots={homepageSlots} />
+        </div>
+      </section>
+
+      <section className="section-surface-alt border-y border-retail-border">
+        <div className="mx-auto max-w-7xl px-4 py-16">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <span className="text-sm font-bold text-retail-accent">مجله یوفوپاف</span>
+              <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">آخرین اخبار و مقالات</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-7 text-retail-secondary">
+                راهنماهای کاربردی خرید و تازه‌ترین خبرهای فروشگاه را یک‌جا دنبال کنید.
+              </p>
+            </div>
+            <Link href="/blog" className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-bold text-retail-accent transition hover:text-retail-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent">
+              مشاهده همه مطالب <ArrowLeft size={16} aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {latestPosts.map((post) => <ContentPostCard key={post.id} post={post} />)}
+          </div>
         </div>
       </section>
 

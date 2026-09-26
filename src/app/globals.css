@@ -889,3 +889,24 @@ a {
   max-height: calc(100dvh - 2rem);
 }
 .image-viewer-panel:dir(ltr) { transform: translate(-50%, -50%); }
+
+.content-prose {
+  color: #d9e2ec;
+  font-size: 1.05rem;
+  line-height: 2.15;
+}
+.content-prose > * + * { margin-top: 1.25rem; }
+.content-prose h2,
+.content-prose h3 {
+  scroll-margin-top: 7rem;
+  color: #fff;
+  font-weight: 900;
+  line-height: 1.7;
+}
+.content-prose h2 { margin-top: 2.5rem; font-size: 1.55rem; }
+.content-prose h3 { margin-top: 2rem; font-size: 1.25rem; }
+.content-prose ul { list-style: disc; padding-inline-start: 1.5rem; }
+.content-prose li + li { margin-top: 0.45rem; }
+.content-prose-wholesale { color: #405148; }
+.content-prose-wholesale h2,
+.content-prose-wholesale h3 { color: #14201b; }

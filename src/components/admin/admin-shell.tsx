@@ -9,6 +9,7 @@ import {
   FileText,
   Gauge,
   MessageSquare,
+  Newspaper,
   Package,
   Search,
   Settings,
@@ -29,7 +30,10 @@ const groups = [
   },
   {
     title: "کاتالوگ",
-    items: [{ href: "/admin/products", label: "محصولات", icon: Package }],
+    items: [
+      { href: "/admin/products", label: "محصولات", icon: Package },
+      { href: "/admin/content", label: "اخبار و مقالات", icon: Newspaper },
+    ],
   },
   {
     title: "زیرساخت",

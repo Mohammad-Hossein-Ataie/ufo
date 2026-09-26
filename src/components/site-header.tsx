@@ -31,7 +31,7 @@ const navItems = [
   { href: "/", label: "خانه", icon: Home },
   { href: "/products", label: "محصولات", icon: PackageSearch },
   { href: "/store/tehran-molavi", label: "درباره ما", icon: Info },
-  { href: "/blog", label: "راهنمای خرید", icon: BookOpenText },
+  { href: "/blog", label: "اخبار و مقالات", icon: BookOpenText },
 ];
 
 function readRetailCartCount() {

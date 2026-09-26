@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  BookOpenText,
   ClipboardList,
   Home,
   Info,
@@ -28,6 +29,7 @@ const navItems = [
   { href: "/b2b", label: "خانه" },
   { href: "/b2b/catalog", label: "کاتالوگ" },
   { href: "/b2b/quick-order", label: "سفارش سریع" },
+  { href: "/b2b/blog", label: "اخبار و مقالات" },
   { href: "/b2b/about", label: "درباره همکاری" },
 ];
 
@@ -230,6 +232,7 @@ export function B2BHeader() {
                 {item.href === "/b2b/quick-order" ? (
                   <ClipboardList size={18} aria-hidden="true" />
                 ) : null}
+                {item.href === "/b2b/blog" ? <BookOpenText size={18} aria-hidden="true" /> : null}
                 {item.href === "/b2b/about" ? <Info size={18} aria-hidden="true" /> : null}
                 {item.label}
               </Link>

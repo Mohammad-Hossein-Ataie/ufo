@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   BadgeCheck,
   BarChart3,
+  BookOpenText,
   CheckCircle2,
   ClipboardList,
   PackageCheck,
@@ -16,6 +17,10 @@ import {
 import { Button, MediaFrame } from "@ufo/ui";
 import { brands } from "@ufo/domain";
 import { canonical, faqPageJsonLd, jsonLdScriptProps } from "@ufo/seo";
+import { ContentPostCard } from "@/components/content-post-card";
+import { listPublishedPosts } from "@/lib/content-posts";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "خرید عمده پاد و ویپ از یوفوپاف",
@@ -67,8 +72,9 @@ const workflow = [
   },
 ];
 
-export default function B2BHomePage() {
+export default async function B2BHomePage() {
   const partnerBrands = brands.slice(0, 6);
+  const latestPosts = await listPublishedPosts({ audience: "wholesale", limit: 3 });
 
   return (
     <main id="main-content" className="header-overlay-home bg-[#F7F7F2] text-[#14201B]">
@@ -165,6 +171,20 @@ export default function B2BHomePage() {
               </ul>
             </div>
           </aside>
+        </div>
+      </section>
+
+      <section className="border-y border-[#D5D9C9] bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-14">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <span className="inline-flex items-center gap-2 text-sm font-bold text-[#1F8A5B]"><BookOpenText size={17} aria-hidden="true" /> دانشنامه همکاری</span>
+              <h2 className="mt-2 text-2xl font-black sm:text-3xl">آخرین اخبار و مقالات عمده</h2>
+              <p className="mt-2 max-w-2xl leading-7 text-[#596B61]">راهنمای سفارش کارتنی، انتخاب موجودی و خبرهایی که مستقیماً به کار همکاران فروش می‌آید.</p>
+            </div>
+            <Link href="/b2b/blog" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-[#C8D6C7] bg-[#F7F7F2] px-4 text-sm font-black text-[#176D48] transition hover:border-[#1F8A5B] hover:bg-[#EEF0E5]">مشاهده مرکز محتوای عمده <ArrowLeft size={16} /></Link>
+          </div>
+          {latestPosts.length ? <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{latestPosts.map((post) => <ContentPostCard key={post.id} post={post} />)}</div> : <div className="mt-8 rounded-md border border-dashed border-[#C8D6C7] bg-[#F7F7F2] p-8 text-center"><p className="font-bold">اولین مطالب ویژه همکاران به‌زودی منتشر می‌شود.</p><Link href="/b2b/catalog" className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-black text-[#1F8A5B]">فعلاً کاتالوگ عمده را ببینید <ArrowLeft size={16} /></Link></div>}
         </div>
       </section>
 

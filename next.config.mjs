@@ -5,6 +5,7 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig = {
   reactStrictMode: true,
+  distDir: process.env.NEXT_DIST_DIR?.trim() || ".next",
   async redirects() {
     return [
       {

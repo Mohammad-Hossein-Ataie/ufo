@@ -12,6 +12,7 @@ Object.assign(process.env, {
   ADMIN_PASSWORD: "local-only-catalog-test-password",
   ORIGIN_DEBUG: "false",
   TRUST_PROXY_HEADERS: "false",
+  NEXT_DIST_DIR: ".next-content-test",
 });
 process.argv = [process.execPath, "next", "dev", "-p", "3106", "-H", "127.0.0.1"];
 await import(pathToFileURL(createRequire(import.meta.url).resolve("next/dist/bin/next")).href);
