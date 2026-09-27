@@ -89,7 +89,7 @@ export function CatalogFlavorFilter({
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="جستجوی طعم"
                 aria-label="جستجوی طعم"
-                className={`min-h-10 w-full rounded-md border pe-9 ps-3 text-sm outline-none ${isDark ? "border-white/10 bg-white/[0.05] text-white focus:border-retail-accent" : "border-[#D5D9C9] bg-[#F7F7F2] text-[#14201B] focus:border-[#1F8A5B]"}`}
+                className={`min-h-10 w-full rounded-md border pl-3 pr-9 text-sm outline-none ${isDark ? "border-white/10 bg-white/[0.05] text-white focus:border-retail-accent" : "border-[#D5D9C9] bg-[#F7F7F2] text-[#14201B] focus:border-[#1F8A5B]"}`}
               />
             </span>
           </div>

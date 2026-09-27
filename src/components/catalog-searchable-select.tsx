@@ -146,7 +146,7 @@ export function CatalogSearchableSelect({
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={searchPlaceholder}
                 aria-label={searchPlaceholder}
-                className={`min-h-10 w-full rounded-md border pe-9 ps-3 text-sm outline-none transition placeholder:text-current/45 ${
+                className={`min-h-10 w-full rounded-md border pl-3 pr-9 text-sm outline-none transition placeholder:text-current/45 ${
                   isDark
                     ? "border-white/10 bg-white/[0.05] text-white focus:border-retail-accent focus:ring-2 focus:ring-retail-accent/20"
                     : "border-[#D5D9C9] bg-[#F7F7F2] text-[#14201B] focus:border-[#1F8A5B] focus:ring-2 focus:ring-[#1F8A5B]/20"

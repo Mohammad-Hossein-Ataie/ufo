@@ -337,7 +337,7 @@ export default async function B2BCatalogPage({
                     id="b2b-catalog-search"
                     name="q"
                     defaultValue={params.q}
-                    className="min-h-11 w-full rounded-md border border-[#C8D6C7] bg-[#F7F7F2] px-3 pe-9 outline-none transition placeholder:text-[#7A8A80] focus:border-[#1F8A5B] focus:ring-2 focus:ring-[#1F8A5B]/20"
+                    className="min-h-11 w-full rounded-md border border-[#C8D6C7] bg-[#F7F7F2] pl-3 pr-9 outline-none transition placeholder:text-[#7A8A80] focus:border-[#1F8A5B] focus:ring-2 focus:ring-[#1F8A5B]/20"
                     placeholder="نام محصول، برند یا SKU"
                   />
                 </span>
