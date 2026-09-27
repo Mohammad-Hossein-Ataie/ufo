@@ -6,6 +6,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Discourage casual copying on storefront pages without breaking text entry or admin editing. */
+body {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+:where(input, textarea, select, [contenteditable="true"], [contenteditable=""], [role="textbox"], .admin-shell, .select-text) {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
 /*
  * Retail (dark) design tokens — single source of truth for the customer-facing
  * storefront. Mirrors DESIGN_SYSTEM.md. Reuse these on the product page and

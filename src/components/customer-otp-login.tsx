@@ -23,7 +23,6 @@ export function CustomerOtpLogin({
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [challengeId, setChallengeId] = useState("");
-  const [mockCode, setMockCode] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -89,7 +88,6 @@ export function CustomerOtpLogin({
       const payload = (await response.json().catch(() => ({}))) as {
         error?: string;
         challengeId?: string;
-        code?: string;
         customer?: Customer;
         token?: string;
       };
@@ -105,7 +103,6 @@ export function CustomerOtpLogin({
         setPhone(normalizedPhone);
         setChallengeId(payload.challengeId);
         setCode("");
-        setMockCode(payload.code ?? "");
         setResendAt(Date.now() + 60000);
         setStep("code");
         return;
@@ -247,7 +244,6 @@ export function CustomerOtpLogin({
               }
             />
           </label>
-          {mockCode ? <span className="text-xs">کد تست: {mockCode}</span> : null}
           <button
             type="button"
             className="flex min-h-10 items-center justify-center gap-2 text-sm disabled:opacity-50"

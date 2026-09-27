@@ -56,7 +56,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   if (pathname === "/admin/login") return <>{children}</>;
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-slate-100 text-slate-950">
+    <div className="admin-shell min-h-screen overflow-x-clip bg-slate-100 text-slate-950">
       <aside data-testid="admin-sidebar" className="border-b border-slate-200 bg-white lg:fixed lg:inset-y-0 lg:right-0 lg:z-30 lg:flex lg:h-dvh lg:w-64 lg:flex-col lg:overflow-hidden lg:border-b-0 lg:border-l">
         <div className="flex min-h-16 shrink-0 items-center gap-3 border-b border-slate-100 bg-white px-4">
           <span className="relative h-10 w-10 shrink-0">

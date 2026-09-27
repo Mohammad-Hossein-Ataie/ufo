@@ -40,14 +40,13 @@ export async function POST(request: Request) {
       phone,
       secret: otpSecret(),
     });
-    const delivery = await sendOtpSms(phone, code);
+    await sendOtpSms(phone, code);
     saveOtpChallenge(challenge);
     return NextResponse.json({
       challengeId: challenge.id,
       phone,
       customerType: type,
       expiresAt: challenge.expiresAt,
-      ...(delivery.mock ? { code } : {}),
     });
   } catch (error) {
     return NextResponse.json(
