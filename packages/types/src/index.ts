@@ -78,6 +78,7 @@ export interface Brand {
   id: string;
   nameFa: string;
   slug: string;
+  logoUrl?: string;
 }
 
 export interface Category {

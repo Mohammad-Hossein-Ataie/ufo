@@ -13,6 +13,7 @@ import {
   Package,
   Search,
   Settings,
+  Tags,
   UploadCloud,
 } from "lucide-react";
 import { cn } from "@ufo/ui";
@@ -32,6 +33,7 @@ const groups = [
     title: "کاتالوگ",
     items: [
       { href: "/admin/products", label: "محصولات", icon: Package },
+      { href: "/admin/brands", label: "برندها", icon: Tags },
       { href: "/admin/content", label: "اخبار و مقالات", icon: Newspaper },
     ],
   },

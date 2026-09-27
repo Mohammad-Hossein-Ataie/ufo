@@ -12,13 +12,14 @@ import {
   Users,
 } from "lucide-react";
 import { Button } from "@ufo/ui";
-import { brands, categories } from "@ufo/domain";
+import { categories } from "@ufo/domain";
 import { HomepageProducts } from "@/components/homepage-products";
 import { ContentPostCard } from "@/components/content-post-card";
 import { getLatestHomepageProducts } from "@/lib/homepage-products";
 import { listCatalogRows } from "@/lib/catalog-data";
 import { categoryImageBySlug } from "@/lib/product-images";
-import { partnerBrandLogoById } from "@/lib/partner-brand-logos";
+import { listAdminBrands } from "@/lib/admin-brands";
+import { getHomepagePartnerBrands } from "@/lib/homepage-brand-logos";
 import { faqPageJsonLd, jsonLdScriptProps, organizationJsonLd, websiteJsonLd } from "@ufo/seo";
 import { listPublishedPosts } from "@/lib/content-posts";
 
@@ -83,12 +84,13 @@ const categoryAccent: Record<string, string> = {
 };
 
 export default async function HomePage() {
-  const homepageSlots = getLatestHomepageProducts(await listCatalogRows());
-  const latestPosts = await listPublishedPosts({ audience: "retail", limit: 3 });
-  const partnerBrands = brands.flatMap((brand) => {
-    const logo = partnerBrandLogoById[brand.id];
-    return logo ? [{ brand, logo }] : [];
-  });
+  const [catalogRows, latestPosts, savedBrands] = await Promise.all([
+    listCatalogRows(),
+    listPublishedPosts({ audience: "retail", limit: 3 }),
+    listAdminBrands(),
+  ]);
+  const homepageSlots = getLatestHomepageProducts(catalogRows);
+  const partnerBrands = getHomepagePartnerBrands(savedBrands);
 
   return (
     <main id="main-content" className="retail-storefront header-overlay-home">
@@ -316,6 +318,7 @@ export default async function HomePage() {
                         src={logo}
                         alt=""
                         fill
+                        unoptimized={logo.startsWith("/api/brand-images/")}
                         sizes="(min-width: 1024px) 12rem, (min-width: 640px) 28vw, 42vw"
                         loading="lazy"
                         className="object-contain opacity-90 drop-shadow-[0_0_18px_rgba(255,255,255,0.04)] transition duration-300 group-hover:scale-105 group-hover:opacity-100 group-hover:drop-shadow-[0_0_20px_rgba(0,229,255,0.14)] motion-reduce:transform-none motion-reduce:transition-none"

@@ -4,7 +4,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { clsx, type ClassValue } from "clsx";
-import type { ComponentPropsWithoutRef, ReactNode } from "react";
+import { Fragment, type ComponentPropsWithoutRef, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { MediaFrame } from "./media-frame";
 export { MediaFrame } from "./media-frame";
@@ -230,7 +230,7 @@ export function ProductCard({
               {subtitle}
             </p>
           ) : null}
-          {badge}
+          {badge == null ? null : <Fragment key="badge">{badge}</Fragment>}
         </div>
         <p
           className={cn(
@@ -246,11 +246,11 @@ export function ProductCard({
             compactOnMobile && "mobile-product-footer",
           )}
         >
-          {variantSummary}
+          {variantSummary == null ? null : <Fragment key="variants">{variantSummary}</Fragment>}
           <div className={cn("text-lg font-black", compactOnMobile && "mobile-product-price")}>
             {price}
           </div>
-          {actions}
+          {actions == null ? null : <Fragment key="actions">{actions}</Fragment>}
         </div>
       </div>
     </article>

@@ -1,3 +1,5 @@
+import type { Brand } from "@ufo/types";
+
 export const partnerBrandLogoById: Record<string, string> = {
   "brand-al-fakher": "/logos/brands/al-fakher.webp",
   "brand-dr-vapes": "/logos/brands/dr-vapes.webp",
@@ -17,3 +19,7 @@ export const partnerBrandLogoById: Record<string, string> = {
   "brand-vozol": "/logos/brands/vozol.webp",
   "brand-waka": "/logos/brands/waka.webp",
 };
+
+export function getBrandLogoUrl(brand: Brand): string | undefined {
+  return brand.logoUrl || partnerBrandLogoById[brand.id];
+}

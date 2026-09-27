@@ -74,6 +74,25 @@ test("admin can add a brand while creating a product", async ({ page }) => {
   await expect(editor.getByRole("button", { name: "برند", exact: true })).toContainText(name);
 });
 
+test("admin can replace a brand logo in the brand manager", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/admin/brands");
+  await expect(page.getByRole("heading", { name: "تصاویر برندها" })).toBeVisible();
+  await expect(page.getByText(/لوگوی بدون پس‌زمینه/)).toBeVisible();
+
+  const brand = page.getByRole("listitem").filter({ has: page.getByRole("heading", { name: "Uwell", exact: true }) });
+  await expect(brand.getByText("تصویر پیش‌فرض")).toBeVisible();
+  const logo = await sharp({ create: { width: 800, height: 300, channels: 4, background: "#00000000" } })
+    .png()
+    .toBuffer();
+  await brand.getByLabel("آپلود تصویر برند Uwell").setInputFiles({ name: "uwell.png", mimeType: "image/png", buffer: logo });
+  await expect(brand.getByText("آپلود شده")).toBeVisible();
+  const preview = brand.getByRole("img", { name: "پیش‌نمایش لوگوی Uwell" });
+  const uploadedUrl = await preview.getAttribute("src");
+  expect(uploadedUrl).toMatch(/^\/api\/brand-images\/[0-9a-f-]{36}$/);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
 test("color product can be added on mobile and desktop", async ({ page }) => {
   const product = products.find((item) => item.isActive && getProductVariantType(item) === "color" && getProductColorOptions(item).length > 0);
   expect(product).toBeDefined();
