@@ -4,6 +4,8 @@ import { hydrateOrderCatalog } from "@/lib/order-catalog";
 import type { ShippingMethodCode } from "@ufo/types";
 import { requireCustomerSession } from "@/lib/customer-session";
 import { getConfiguredOrigin } from "@/lib/request-origin";
+import { getZibalMerchant } from "@/lib/zibal-config";
+import { paymentDiagnostic } from "@/lib/payment-diagnostics";
 
 export const runtime = "nodejs";
 
@@ -44,6 +46,7 @@ export async function POST(request: Request) {
     const addressLine = stringValue(payload.address || payload.line1).trim();
     const province = stringValue(payload.province, city === "تهران" ? "تهران" : "");
     if (payload.paymentMethod === "zibal") {
+      getZibalMerchant();
       const origin = getConfiguredOrigin();
       if (
         !process.env.ZIBAL_MERCHANT?.trim() ||
@@ -71,6 +74,12 @@ export async function POST(request: Request) {
       paymentMethod: payload.paymentMethod === "zibal" ? "zibal" : "card_to_card",
       receiptNote: stringValue(payload.receiptNote),
     });
+    if (order.paymentMethod === "zibal")
+      paymentDiagnostic("PAYMENT", "order-created", {
+        orderId: order.id,
+        channel: order.channel,
+        amount: order.totalRial,
+      });
     return NextResponse.json({ order }, { status: 201 });
   } catch (error) {
     return NextResponse.json(

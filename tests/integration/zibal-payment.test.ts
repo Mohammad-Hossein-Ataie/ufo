@@ -85,6 +85,36 @@ function gatewayResponse(value: object) {
 }
 
 describe("Zibal payment", () => {
+  it("uses the configured HTTPS callback behind a proxy, not internal request or forwarded hosts", async () => {
+    const { order, token } = fixture();
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("APP_BASE_URL", "https://ufopuff.com");
+    vi.stubEnv("TRUST_PROXY_HEADERS", "true");
+    const fetchMock = vi.fn(async (_input: string | URL | Request, init?: RequestInit) => {
+      expect(JSON.parse(String(init?.body)).callbackUrl).toBe(
+        "https://ufopuff.com/api/payments/zibal/callback",
+      );
+      return gatewayResponse({ result: 100, trackId: 15966442233311 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const response = await startPayment(
+      new Request(`http://172.18.0.2:3000/api/payments/zibal/${order.id}`, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${token}`,
+          "x-forwarded-host": "untrusted.example",
+          "x-forwarded-proto": "http",
+        },
+      }),
+      { params: Promise.resolve({ orderId: order.id }) },
+    );
+    expect(response.status).toBe(200);
+    expect((await response.json()).paymentUrl).toBe(
+      "https://gateway.zibal.ir/start/15966442233311",
+    );
+    expect(getSubmittedOrder(order.id)?.gatewayPayments?.[0]?.trackId).toBe("15966442233311");
+  });
+
   it("requests the saved rial amount and only approves after server-side verification", async () => {
     const { order, token } = fixture();
     let result = "unpaid";
@@ -220,7 +250,7 @@ describe("Zibal payment", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("returns a useful, redacted error when an API token is used instead of an IPG merchant", async () => {
+  it("maps result 104 without claiming which credential was supplied or exposing provider text", async () => {
     const { order, token } = fixture();
     vi.stubGlobal(
       "fetch",
@@ -238,8 +268,8 @@ describe("Zibal payment", () => {
     const payload = (await response.json()) as { error?: string };
 
     expect(response.status).toBe(502);
-    expect(payload.error).toContain("کد merchant درگاه پرداخت");
-    expect(payload.error).toContain("API Token");
+    expect(payload.error).toContain("شناسه پذیرنده درگاه زیبال معتبر نیست");
+    expect(payload.error).not.toContain("API Token");
     expect(payload.error).not.toContain("provider response");
     expect(getSubmittedOrder(order.id)?.gatewayPayments).toBeUndefined();
   });

@@ -1,5 +1,53 @@
 # پرداخت آنلاین زیبال
 
+## عیب‌یابی استقرار و قرارداد رسمی
+
+منبع اصلی: [مستندات IPG زیبال](https://help.zibal.ir/ipg/) و
+[فایل OpenAPI بارگذاری‌شده توسط همان صفحه](https://api.zibal.ir/static/helpdocs/ipg.json).
+`POST https://gateway.zibal.ir/v1/request` با JSON شامل `merchant`، `amount` به ریال
+و `callbackUrl` انجام می‌شود. `orderId`، `description` و `mobile` اختیاری‌اند و برنامه
+آن‌ها را می‌فرستد. نتیجهٔ عددی `100` به همراه `trackId` معتبر، لینک
+`https://gateway.zibal.ir/start/{trackId}` می‌سازد. مرورگر باید Referer دامنه ثبت‌شدهٔ
+درگاه را ارسال کند؛ هدایت فعلی از داخل سایت این رفتار را حفظ می‌کند.
+
+کد `102` یعنی merchant پیدا نشده، `104` یعنی merchant نامعتبر، `103` یعنی غیرفعال یا
+قرارداد تکمیل نشده و `115` یعنی IP در پنل ثبت نشده است. هیچ‌کدام به‌تنهایی اثبات
+نمی‌کند کاربر به جای merchant یک API Token وارد کرده است. پیام فارسی از نگاشت محلی
+در `src/lib/zibal.ts` می‌آید؛ متن خام پاسخ زیبال نمایش یا ثبت نمی‌شود.
+
+فقط `ZIBAL_MERCHANT` خوانده می‌شود؛ متغیرهای `ZIBAL_TOKEN` و `ZIBAL_MERCHANT_ID`
+استفاده نمی‌شوند. این مسیر از `@ufo/payments` (کارت‌به‌کارت) یا schema در `@ufo/config`
+عبور نمی‌کند. مقدار در هر درخواست از محیط سرور خوانده و trim می‌شود. کوتیشن‌های
+literal و فاصله داخلی خطای پیکربندی هستند. مقدار پیش‌فرض یا fallback وجود ندارد.
+فایل‌های `.env*` طبق `.liaraignore` وارد استقرار نمی‌شوند؛ در Liara مقادیر را در محیط
+اجرای برنامه تنظیم کنید، بدون کوتیشن literal. `APP_BASE_URL=https://ufopuff.com`
+مسیر `https://ufopuff.com/api/payments/zibal/callback` را ایجاد می‌کند.
+`TRUST_PROXY_HEADERS` و `ORIGIN_DEBUG` در ساخت این callback دخالت ندارند.
+
+توالی لاگ درخواست جدید: `[PAYMENT] order-created` → `[PAYMENT] startup` →
+`[ZIBAL_CONFIG] checked` → `[ZIBAL_REQUEST] sending` → `[ZIBAL_RESPONSE] received` →
+`[ZIBAL_REDIRECT] ready`. `orderId` لاگ ساخت سفارش را به تلاش پرداخت وصل می‌کند؛ هر
+تلاش پرداخت و callback یک `correlationId` مستقل دارد. خطا با `[PAYMENT_ERROR]`
+ثبت می‌شود. فقط وجود/طول merchant، URL عمومی callback، مبلغ، HTTP status، کد نتیجه
+و وجود trackId ثبت می‌شوند. پاسخ خام، شماره موبایل و credential ثبت نمی‌شوند.
+`ready` یعنی لینک تولید و تلاش ذخیره شده؛ موفقیت انتقال مرورگر یا پرداخت را اثبات نمی‌کند.
+
+اجرای عملیاتی همچنان `npm run build` و `npm run start` است. wrapper فرمان Next را
+در همان فرایند import می‌کند؛ stderr، سیگنال‌ها و exit را با child process نمی‌پوشاند.
+instrumentation مخصوص Node، هشدارها و uncaughtExceptionMonitor را ثبت می‌کند و
+رفتار پیش‌فرض crash را عوض نمی‌کند. در خطاهای عمومی، stack frame حفظ می‌شود اما
+پیام دلخواه exception یا اطلاعات درخواست ثبت نمی‌شود.
+
+نماد زیبال از روش HTML رسمی در بخش «نشان اعتماد زیبال» همان مستندات استفاده می‌کند:
+تصویر `https://zibal.ir/trust/assets/2.png` و لینک
+`https://gateway.zibal.ir/trustMe/ufopuff.com`. این لینک وضعیت دامنه را نزد زیبال
+نمایش می‌دهد؛ برنامه وضعیت پذیرنده را جعل نمی‌کند. برای این روش snippet مخصوص پنل
+لازم نیست؛ دامنه و درگاه باید در حساب زیبال درست ثبت و فعال باشند.
+
+تست‌های متمرکز: `npx vitest run tests/unit/zibal.test.ts tests/integration/zibal-payment.test.ts`.
+پس از build: `npx playwright test --config playwright.zibal.config.ts`، با `next start`
+روی پورت 3100، دادهٔ آزمایشی و mock شبکه؛ هیچ پرداخت واقعی انجام نمی‌شود.
+
 در محیط سرور، `ZIBAL_MERCHANT` را با کلید پذیرنده و `APP_BASE_URL` را با نشانی عمومی HTTPS فروشگاه (برای مثال `https://ufopuff.com`) تنظیم کنید. کلید را در متغیر عمومی `NEXT_PUBLIC_*` یا مخزن Git قرار ندهید. در توسعهٔ محلی، `.env.local` نادیده گرفته‌شده توسط Git قابل استفاده است؛ اما callback با نشانی `localhost` برای پرداخت واقعی از اینترنت در دسترس نیست.
 
 مسیر بازگشت درگاه `${APP_BASE_URL}/api/payments/zibal/callback` است. درخواست پرداخت و تأیید آن روی سرور انجام می‌شود. وضعیت سفارش فقط زمانی «تأیید شده» می‌شود که پاسخ `verify` (یا برای پرداختی که قبلاً تأیید شده، `inquiry`) وضعیت پرداخت‌شده، مبلغ دقیق و شناسهٔ سفارش یکسان داشته باشد. پارامتر `success` در callback به‌تنهایی تأیید پرداخت نیست. کارت‌به‌کارت همچنان یک روش جداگانه است و در نبود کلید زیبال تنها روش قابل انتخاب می‌ماند.

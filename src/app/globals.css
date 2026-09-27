@@ -699,6 +699,39 @@ body {
   font-family: Vazirmatn, Tahoma, Arial, sans-serif;
 }
 
+.search-match {
+  background: transparent;
+  color: color-mix(in srgb, var(--ui-focus) 75%, currentColor);
+  padding: 0;
+}
+
+/* One native CTA link covers the card; cart controls remain independent siblings. */
+.catalog-linked-card {
+  position: relative;
+}
+
+.catalog-linked-card [data-product-navigation]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+.catalog-linked-card:has([data-product-navigation]:focus-visible) {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: 3px;
+}
+
+.catalog-linked-card:has([data-product-navigation]:active) {
+  border-color: var(--ui-focus);
+}
+
+.catalog-card-secondary-action {
+  position: relative;
+  z-index: 2;
+}
+
 .mobile-bottom-nav {
   min-height: calc(4rem + env(safe-area-inset-bottom));
   padding-bottom: max(0.3rem, env(safe-area-inset-bottom));

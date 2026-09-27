@@ -13,7 +13,7 @@ export default function CheckoutPage() {
   return (
     <main
       id="main-content"
-      className="relative isolate mx-auto max-w-6xl overflow-hidden px-4 pb-36 pt-6 sm:pt-10 lg:pb-14"
+      className="relative isolate mx-auto max-w-6xl overflow-hidden px-4 pb-8 pt-6 sm:pt-10 lg:pb-14"
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(circle_at_50%_0%,rgba(0,217,255,.09),transparent_65%)]" />
       <div className="flex flex-wrap items-start justify-between gap-4">

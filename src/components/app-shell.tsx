@@ -70,8 +70,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </a>
       <SiteHeader />
       {children}
-      <footer className="border-t border-[#22303D] bg-[#0D1117] pb-[calc(5rem+env(safe-area-inset-bottom))] text-[#D9E2EC] lg:pb-0">
-        <MotionReveal className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-2 lg:grid-cols-[1.35fr_0.8fr_1fr_0.8fr]">
+      <footer className="border-t border-[#22303D] bg-[#0D1117] pb-[calc(5rem+env(safe-area-inset-bottom)+var(--checkout-cta-height,0px))] text-[#D9E2EC] lg:pb-0">
+        <MotionReveal className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-2 lg:grid-cols-[1.35fr_0.8fr_1fr_1.25fr]">
           <section aria-label="UFO Puff">
             <Link href="/" className="inline-flex items-center gap-3">
               <span className="relative h-12 w-12 shrink-0">
@@ -129,41 +129,56 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <section aria-label="اعتماد و اعتبار" className="grid content-start gap-3">
             <h2 className="text-sm font-bold text-white">اعتماد و اعتبار</h2>
-            <a
-              href={enamadVerificationUrl}
-              target="_blank"
-              rel="noopener"
-              referrerPolicy="origin"
-              aria-label="اعتبارسنجی نماد اعتماد الکترونیکی یوفوپاف"
-              className="group mx-auto inline-flex w-full max-w-40 flex-col items-center gap-3 rounded-2xl border border-[#2A3845] bg-[#111923] p-3 transition duration-200 hover:-translate-y-1 hover:border-cyan-300/50 hover:bg-[#141E29] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-300 md:mx-0"
-            >
-              <span className="relative flex size-28 items-center justify-center overflow-hidden rounded-xl bg-white p-2 shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
-                <span
-                  aria-hidden="true"
-                  className="flex flex-col items-center gap-1 text-center text-[11px] font-bold leading-5 text-slate-600"
-                >
-                  <ShieldCheck size={30} className="text-cyan-700" />
-                  نماد اعتماد الکترونیکی
+            <div className="flex flex-wrap items-start justify-center gap-3 md:justify-start">
+              <a
+                href={enamadVerificationUrl}
+                target="_blank"
+                rel="noopener"
+                referrerPolicy="origin"
+                aria-label="اعتبارسنجی نماد اعتماد الکترونیکی یوفوپاف"
+                className="group inline-flex w-36 max-w-full flex-col items-center gap-3 rounded-2xl border border-[#2A3845] bg-[#111923] p-3 transition-colors hover:border-cyan-300/50 hover:bg-[#141E29] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-300"
+              >
+                <span className="flex size-28 items-center justify-center rounded-xl bg-white p-2">
+                  {/* The official seal must load directly so Enamad receives the origin referrer. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={enamadLogoUrl}
+                    alt="نماد اعتماد الکترونیکی یوفوپاف"
+                    width={104}
+                    height={104}
+                    loading="lazy"
+                    referrerPolicy="origin"
+                    className="block size-24 bg-white object-contain"
+                  />
                 </span>
-                {/* The official seal must load directly so Enamad receives the origin referrer. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={enamadLogoUrl}
-                  alt="نماد اعتماد الکترونیکی یوفوپاف"
-                  width={104}
-                  height={104}
-                  loading="lazy"
-                  referrerPolicy="origin"
-                  className="absolute inset-2 size-24 bg-white object-contain"
-                  onError={(event) => {
-                    event.currentTarget.hidden = true;
-                  }}
-                />
-              </span>
-              <span className="text-xs font-bold text-[#D9E2EC] transition group-hover:text-cyan-200">
-                استعلام اعتبار نماد
-              </span>
-            </a>
+                <span className="text-xs font-bold text-[#D9E2EC] transition group-hover:text-cyan-200">
+                  استعلام اعتبار نماد
+                </span>
+              </a>
+              {/* Official script-free integration: help.zibal.ir/ipg, «نشان اعتماد زیبال». */}
+              <a
+                href="https://gateway.zibal.ir/trustMe/ufopuff.com"
+                target="_blank"
+                rel="noopener"
+                aria-label="اعتبارسنجی درگاه پرداخت زیبال یوفوپاف"
+                className="group inline-flex w-36 max-w-full flex-col items-center gap-3 rounded-2xl border border-[#2A3845] bg-[#111923] p-3 transition-colors hover:border-cyan-300/50 hover:bg-[#141E29] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-300"
+              >
+                <span className="flex size-28 items-center justify-center rounded-xl bg-white p-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="https://zibal.ir/trust/assets/2.png"
+                    alt="درگاه پرداخت زیبال"
+                    width={96}
+                    height={96}
+                    loading="lazy"
+                    className="block size-24 object-contain"
+                  />
+                </span>
+                <span className="text-xs font-bold text-[#D9E2EC] transition group-hover:text-cyan-200">
+                  درگاه پرداخت زیبال
+                </span>
+              </a>
+            </div>
             <p className="mx-auto max-w-40 text-center text-xs leading-6 text-[#7F8B98] md:mx-0 md:text-start">
               برای مشاهده جزئیات مجوز، روی نماد بزنید.
             </p>

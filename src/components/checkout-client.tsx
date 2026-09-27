@@ -30,6 +30,7 @@ import { authHeaders, fetchCustomerCart, readCustomerSession } from "@/lib/custo
 import { IranProvinceCitySelect } from "@/components/iran-location-select";
 import { LocationPicker } from "@/components/location-picker";
 import { CommerceSkeleton } from "@/components/commerce-skeleton";
+import { CheckoutMobileBar } from "@/components/checkout-mobile-bar";
 
 interface CheckoutShippingMethod {
   scope?: "nationwide" | "tehran" | "pickup";
@@ -360,7 +361,11 @@ export function CheckoutClient({
   }
 
   return (
-    <form id="retail-checkout" onSubmit={submit} className="pb-24 lg:pb-0">
+    <form
+      id="retail-checkout"
+      onSubmit={submit}
+      className={channel === "wholesale" ? "pb-24 lg:pb-0" : undefined}
+    >
       <div className="mb-5 flex items-center justify-between rounded-2xl border border-retail-border bg-retail-surface/70 px-4 py-3">
         <Step number="۱" label="روش تحویل" active />
         <span className="h-px flex-1 bg-retail-border mx-2" />
@@ -870,7 +875,7 @@ export function CheckoutClient({
         </aside>
       </div>
 
-      <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-40 border-t border-white/10 bg-[#090d13]/96 p-3 backdrop-blur-xl lg:hidden">
+      <CheckoutMobileBar>
         <div className="mx-auto flex max-w-xl items-center gap-3">
           <div className="min-w-0">
             <span className="block text-[10px] text-retail-secondary">مبلغ نهایی</span>
@@ -878,6 +883,7 @@ export function CheckoutClient({
           </div>
           <Button
             type="submit"
+            form="retail-checkout"
             className="mr-auto min-h-[52px] flex-1 rounded-xl font-black"
             disabled={
               isSubmitting ||
@@ -901,7 +907,7 @@ export function CheckoutClient({
                 : "تأیید سفارش"}
           </Button>
         </div>
-      </div>
+      </CheckoutMobileBar>
     </form>
   );
 }

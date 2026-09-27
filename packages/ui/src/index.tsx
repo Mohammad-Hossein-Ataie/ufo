@@ -167,6 +167,7 @@ export function ErrorState({ title, children }: { title: string; children: React
 }
 
 export function ProductCard({
+  className,
   title,
   subtitle,
   description,
@@ -178,6 +179,7 @@ export function ProductCard({
   mediaClassName,
   compactOnMobile = false,
 }: {
+  className?: string;
   title: string;
   subtitle?: string | undefined;
   description: string;
@@ -194,6 +196,7 @@ export function ProductCard({
       className={cn(
         "storefront-product-card group grid min-w-0 h-full grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-current/10 bg-current/[0.028] shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-current/20 hover:bg-current/[0.045] hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0",
         compactOnMobile && "mobile-product-card",
+        className,
       )}
     >
       <MediaFrame

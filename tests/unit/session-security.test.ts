@@ -50,6 +50,7 @@ describe("production session configuration", () => {
     expect(verifyCustomerSessionToken(customer)).toBeNull();
   });
   it("fails startup for invalid production secrets", async () => {
+    vi.stubEnv("NEXT_RUNTIME", "nodejs");
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("SESSION_SECRET", "");
     vi.stubEnv("NEXT_PHASE", "phase-production-server");

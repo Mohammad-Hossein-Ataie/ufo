@@ -80,7 +80,7 @@ function highlightText(value: string, query: string) {
   const pattern = new RegExp(`(${tokens.map(escapeRegExp).join("|")})`, "gi");
   return value.split(pattern).map((part, index) =>
     tokens.includes(part.toLowerCase()) ? (
-      <mark key={`${part}-${index}`} className="rounded-sm bg-cyan-300/25 px-0.5 text-inherit">
+      <mark key={`${part}-${index}`} className="search-match">
         {part}
       </mark>
     ) : (
@@ -131,7 +131,10 @@ export function SmartSearch({
     results.products.length > 0 || results.categories.length > 0 || results.brands.length > 0;
 
   useEffect(() => {
-    if (focusOnMount) inputRef.current?.focus();
+    if (!focusOnMount) return;
+    // Let the enclosing modal capture its return-focus target before focusing the input.
+    const frame = window.requestAnimationFrame(() => inputRef.current?.focus());
+    return () => window.cancelAnimationFrame(frame);
   }, [focusOnMount]);
 
   useEffect(() => {
@@ -306,7 +309,7 @@ export function SmartSearch({
             <div className="grid gap-2 p-2" aria-live="polite">
               {[0, 1, 2].map((item) => (
                 <div key={item} className="flex min-h-20 items-center gap-3 rounded-md px-2">
-                  <div className="h-14 w-14 shrink-0 animate-pulse rounded-md bg-current/10" />
+                  <div className="aspect-[3/4] w-[72px] shrink-0 animate-pulse rounded-md bg-current/10" />
                   <div className="grid flex-1 gap-2">
                     <div className="h-4 w-2/3 animate-pulse rounded bg-current/10" />
                     <div className="h-3 w-full animate-pulse rounded bg-current/10" />
@@ -349,7 +352,7 @@ export function SmartSearch({
                     >
                       <span
                         className={cn(
-                          "relative h-16 w-16 shrink-0 overflow-hidden rounded-md border bg-white",
+                          "relative aspect-[3/4] w-[72px] shrink-0 overflow-hidden rounded-md border bg-white",
                           theme === "dark" ? "border-retail-border" : "border-[#D5D9C9]",
                         )}
                       >
@@ -357,8 +360,8 @@ export function SmartSearch({
                           src={product.image}
                           fallbackSrc={product.fallbackImage}
                           alt={product.title}
-                          sizes="64px"
-                          className="h-full w-full object-contain p-1.5"
+                          sizes="72px"
+                          className="h-full w-full object-contain"
                         />
                       </span>
                       <span className="grid min-w-0 flex-1 gap-1">

@@ -1,6 +1,14 @@
 # Project Conventions
 
 - One Next.js app in `src`; shared TypeScript packages in `packages/*`.
+- Zibal IPG uses server-only `ZIBAL_MERCHANT` at runtime and the callback origin from
+  `APP_BASE_URL`; never derive payment callbacks from proxy/request hosts. Follow
+  `https://help.zibal.ir/ipg/` (its linked OpenAPI schema includes result codes and badges).
+  Only server verification with matching order/amount can approve payment. Payment logs
+  must use allowlisted metadata; never log merchant values or raw provider responses.
+- Footer trust badges use official clickable verification links in normal-flow wrappers.
+  The mobile checkout bar is portaled outside the isolated checkout main, explicitly
+  targets its form, measures bottom navigation height, and reserves footer clearance.
 - OTP transport lives in `src/lib/otp-sms.ts`; both storefronts use the same route.
 - Both login pages share `CustomerOtpLogin`. Verify phone before collecting profile;
   never update names from the OTP verification payload. Completion is defined in
@@ -64,3 +72,6 @@
 - Shared product cards show `subtitle` (English name, LTR) below the Persian title and above
   status. Read-only variant summaries must label resistance with Ω, capacity with its actual
   value, and reserve color swatches for color data.
+- Products-list cards extend the existing CTA link across the card with a CSS pseudo-element;
+  keep one navigation link and place independent cart controls above its click area. Never
+  wrap cards containing buttons in an anchor. Search matches use text color only.
