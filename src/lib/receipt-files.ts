@@ -4,13 +4,24 @@ import sharp from "sharp";
 import { getOrderStorePath } from "@ufo/orders";
 
 function receiptPath(key: string) {
-  if (!/^[a-f0-9-]{36}\.webp$/.test(key)) throw new Error("رسید معتبر نیست.");
+  if (!/^[a-f0-9-]{36}\.(webp|pdf)$/.test(key)) throw new Error("رسید معتبر نیست.");
   return join(dirname(getOrderStorePath()), "private-receipts", key);
 }
 export async function storeReceiptImage(file: File): Promise<string> {
-  if (file.size > 5 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(file.type))
-    throw new Error("رسید باید تصویر JPG، PNG یا WebP و حداکثر ۵ مگابایت باشد.");
+  if (
+    !file.size ||
+    file.size > 5 * 1024 * 1024 ||
+    !["image/jpeg", "image/png", "image/webp", "application/pdf"].includes(file.type)
+  )
+    throw new Error("رسید باید JPG، PNG، WebP یا PDF و حداکثر ۵ مگابایت باشد.");
   const bytes = Buffer.from(await file.arrayBuffer());
+  if (file.type === "application/pdf") {
+    if (bytes.subarray(0, 5).toString() !== "%PDF-") throw new Error("فایل PDF معتبر نیست.");
+    const key = `${crypto.randomUUID()}.pdf`;
+    await mkdir(dirname(receiptPath(key)), { recursive: true });
+    await writeFile(receiptPath(key), bytes, { mode: 0o600, flag: "wx" });
+    return key;
+  }
   const source = sharp(bytes, { limitInputPixels: 20_000_000, animated: false });
   const metadata = await source.metadata();
   if (!["jpeg", "png", "webp"].includes(metadata.format ?? "") || (metadata.pages ?? 1) > 1)

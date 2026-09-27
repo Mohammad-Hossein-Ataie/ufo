@@ -710,6 +710,17 @@ body {
   position: relative;
 }
 
+/* Listing cards size to their content; homepage carousel geometry stays separate. */
+.catalog-linked-card .mobile-product-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.catalog-linked-card .mobile-product-title-row,
+.catalog-linked-card .mobile-product-description {
+  min-height: 0;
+}
+
 .catalog-linked-card [data-product-navigation]::after {
   content: "";
   position: absolute;

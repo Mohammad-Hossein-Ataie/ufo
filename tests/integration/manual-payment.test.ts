@@ -15,6 +15,8 @@ import {
   createCustomerAddress,
   listCustomerAddresses,
   parseLocation,
+  registerGatewayPaymentAttempt,
+  chooseManualPayment,
   type SubmittedOrder,
 } from "@ufo/orders";
 import { variants } from "@ufo/domain";
@@ -24,8 +26,14 @@ import { PATCH as statusPatch } from "@/app/api/admin/orders/[orderId]/status/ro
 import { createCustomerSessionToken } from "@/lib/customer-session";
 import { createAdminSessionToken } from "@/lib/admin-session";
 import { dispatchOrderNotifications, sendOrderSms } from "@/lib/order-sms";
-import { demoBankAccounts, validateBankAccounts } from "@/lib/payment-settings";
+import {
+  demoBankAccounts,
+  defaultBankAccounts,
+  getBankAccounts,
+  validateBankAccounts,
+} from "@/lib/payment-settings";
 import type { SalesChannel } from "@ufo/types";
+import { POST as changePaymentMethod } from "@/app/api/orders/[orderId]/payment-method/route";
 
 let directory: string;
 const address = {
@@ -417,5 +425,105 @@ describe("manual payment and shipping", () => {
     expect(() =>
       validateBankAccounts(demoBankAccounts.map((a) => ({ ...a, enabled: true }))),
     ).toThrow();
+  });
+});
+
+describe("configured receiving accounts", () => {
+  it("switches an owned unpaid gateway order to manual, never a pending/verified attempt", async () => {
+    const { order, token, customer } = fixture();
+    const gateway = {
+      ...order,
+      status: "awaiting_payment",
+      paymentMethod: "zibal",
+      paymentStatus: "awaiting_gateway",
+    };
+    const reset = (gatewayPayments: unknown[] = []) =>
+      writeFileSync(
+        getOrderStorePath(),
+        JSON.stringify({ orders: [{ ...gateway, gatewayPayments }] }),
+      );
+    reset();
+    const url = "http://localhost:3000/api/orders/ord_test/payment-method";
+    expect(
+      (await changePaymentMethod(new Request(url, { method: "POST" }), context())).status,
+    ).toBe(401);
+    expect(() => chooseManualPayment(order.id, "other", "retail")).toThrow();
+    expect(() => chooseManualPayment(order.id, customer.id, "wholesale")).toThrow();
+    for (const state of ["pending", "verified"]) {
+      reset([{ trackId: "123", amountRial: order.totalRial, createdAt: order.createdAt, state }]);
+      expect(() => chooseManualPayment(order.id, customer.id, "retail")).toThrow();
+    }
+    reset();
+    const response = await changePaymentMethod(
+      new Request(url, { method: "POST", headers: { authorization: `Bearer ${token}` } }),
+      context(),
+    );
+    expect(response.status).toBe(200);
+    expect((await response.json()).order).toMatchObject({
+      id: order.id,
+      status: "awaiting_receipt",
+      paymentMethod: "card_to_card",
+    });
+    // A gateway request that finishes after the switch cannot register or redirect.
+    expect(() =>
+      registerGatewayPaymentAttempt(order.id, customer.id, "retail", "567", order.totalRial),
+    ).toThrow();
+    reset([
+      { trackId: "123", amountRial: order.totalRial, createdAt: order.createdAt, state: "failed" },
+    ]);
+    expect(chooseManualPayment(order.id, customer.id, "retail").status).toBe("awaiting_receipt");
+  });
+  it("uses the merchant accounts by default and upgrades only untouched demo settings", () => {
+    expect(validateBankAccounts(defaultBankAccounts)).toEqual(defaultBankAccounts);
+    expect(getBankAccounts()).toEqual(defaultBankAccounts);
+    writeFileSync(join(directory, "payment-accounts.json"), JSON.stringify(demoBankAccounts));
+    expect(getBankAccounts()).toEqual(defaultBankAccounts);
+    const disabled = defaultBankAccounts.map((account) => ({ ...account, enabled: false }));
+    writeFileSync(join(directory, "payment-accounts.json"), JSON.stringify(disabled));
+    expect(getBankAccounts()).toEqual(disabled);
+  });
+  it("normalizes the IR prefix without changing the bank digits", () => {
+    const accounts = defaultBankAccounts.map((account) => ({
+      ...account,
+      iban: account.iban.slice(2),
+    }));
+    expect(validateBankAccounts(accounts)).toEqual(defaultBankAccounts);
+  });
+  it("accepts a PDF receipt without text, keeps it private and waits for admin approval", async () => {
+    const { token } = fixture();
+    const form = new FormData();
+    form.set(
+      "image",
+      new File(["%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\n%%EOF"], "receipt.pdf", {
+        type: "application/pdf",
+      }),
+    );
+    const result = await POST(
+      new Request("http://localhost:3000/api/orders/ord_test/receipt", {
+        method: "POST",
+        headers: { authorization: `Bearer ${token}` },
+        body: form,
+      }),
+      context(),
+    );
+    expect(result.status).toBe(200);
+    const { order } = await result.json();
+    expect(order.paymentStatus).toBe("pending_review");
+    const url = `http://localhost:3000/api/orders/ord_test/receipt?id=${order.receipts[0].id}`;
+    expect((await GET(new Request(url), context())).status).toBe(401);
+    const file = await GET(
+      new Request(url, { headers: { authorization: `Bearer ${token}` } }),
+      context(),
+    );
+    expect(file.headers.get("content-type")).toBe("application/pdf");
+    expect(file.headers.get("content-disposition")).toContain("attachment");
+    const approved = await PATCH(
+      await adminRequest("approve", {
+        estimatedDispatchAt: new Date(Date.now() + 86400000).toISOString(),
+        sendSms: false,
+      }),
+      context(),
+    );
+    expect((await approved.json()).order.paymentStatus).toBe("approved");
   });
 });

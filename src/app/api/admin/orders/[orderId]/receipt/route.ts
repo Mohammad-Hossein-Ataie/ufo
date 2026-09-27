@@ -19,7 +19,9 @@ export async function GET(request: Request, { params }: Context) {
     if (!receipt?.imageKey) return new NextResponse(null, { status: 404 });
     return new NextResponse(new Uint8Array(await readReceiptImage(receipt.imageKey)), {
       headers: {
-        "Content-Type": "image/webp",
+        "Content-Type": receipt.imageKey.endsWith(".pdf") ? "application/pdf" : "image/webp",
+        "Content-Disposition": receipt.imageKey.endsWith(".pdf") ? 'attachment; filename="receipt.pdf"' : "inline",
+        "Content-Security-Policy": "sandbox",
         "Cache-Control": "private, no-store",
         "X-Content-Type-Options": "nosniff",
       },

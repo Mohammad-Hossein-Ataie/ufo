@@ -506,7 +506,7 @@ export default async function ProductsPage({
               بازه قیمت، برند، طعم، رنگ یا دسته‌بندی را تغییر دهید تا نتایج بیشتری ببینید.
             </EmptyState>
           ) : (
-            <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
               {pagedProducts.map((row) => {
                 const product = row.product;
                 const variant = row.variant;

@@ -10,6 +10,8 @@ import { authHeaders, readCustomerSession } from "@/lib/customer-client";
 import { ManualPayment } from "@/components/manual-payment";
 import { ZibalPayment } from "@/components/zibal-payment";
 import { CommerceSkeleton } from "@/components/commerce-skeleton";
+import { OrderChatClient } from "@/components/order-chat-client";
+import { B2BOrderChatClient } from "@/components/b2b/b2b-order-chat-client";
 
 const orderStatusLabelsFa: Record<OrderStatus, string> = {
   draft: "پیش‌نویس",
@@ -129,6 +131,12 @@ export function OrderDetailClient({
     <main className="mx-auto grid max-w-6xl gap-6 px-4 py-10 lg:grid-cols-[1fr_22rem]">
       <section className="grid min-w-0 gap-5">
         <div>
+          <Link
+            href={isWholesale ? "/b2b/account" : "/account"}
+            className="mb-4 inline-flex min-h-11 items-center text-sm underline underline-offset-4"
+          >
+            حساب من و تاریخچه خرید
+          </Link>
           <h1 className="text-3xl font-black">سفارش {order.orderNumber}</h1>
           <div className="mt-3 flex flex-wrap gap-2">
             <StatusPill tone="info">{orderStatusLabelsFa[order.status]}</StatusPill>
@@ -175,11 +183,28 @@ export function OrderDetailClient({
             ))}
           </div>
         </section>
-        {order.paymentMethod === "zibal" ? (
-          <ZibalPayment order={order} channel={channel} />
-        ) : (
-          <ManualPayment order={order} channel={channel} onUpdate={setOrder} />
-        )}
+        <nav aria-label="پیگیری سفارش" className="flex flex-wrap gap-3 text-sm">
+          <a href="#order-payment" className="rounded-xl border border-current/20 px-4 py-3">
+            پرداخت و رسید
+          </a>
+          <a href="#order-support" className="rounded-xl border border-current/20 px-4 py-3">
+            گفتگو با پشتیبانی
+          </a>
+        </nav>
+        <div id="order-payment" className="min-w-0 scroll-mt-28">
+          {order.paymentMethod === "zibal" ? (
+            <ZibalPayment order={order} channel={channel} onUpdate={setOrder} />
+          ) : (
+            <ManualPayment order={order} channel={channel} onUpdate={setOrder} />
+          )}
+        </div>
+        <div id="order-support" className="min-w-0 scroll-mt-28">
+          {isWholesale ? (
+            <B2BOrderChatClient orderId={order.id} />
+          ) : (
+            <OrderChatClient orderId={order.id} />
+          )}
+        </div>
         {order.status === "delivered" && (
           <section className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5">
             <h2 className="font-bold">سفارش به شما تحویل داده شد</h2>

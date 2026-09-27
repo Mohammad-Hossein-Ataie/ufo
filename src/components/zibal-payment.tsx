@@ -8,11 +8,39 @@ import type { SalesChannel } from "@ufo/types";
 import { authHeaders } from "@/lib/customer-client";
 import { trackSiteEvent } from "@/lib/site-analytics-client";
 
-export function ZibalPayment({ order, channel }: { order: SubmittedOrder; channel: SalesChannel }) {
+export function ZibalPayment({
+  order,
+  channel,
+  onUpdate,
+}: {
+  order: SubmittedOrder;
+  channel: SalesChannel;
+  onUpdate: (order: SubmittedOrder) => void;
+}) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const verified = order.gatewayPayments?.find((attempt) => attempt.state === "verified");
   const failed = order.gatewayPayments?.at(-1)?.state === "failed";
+  const canChooseManual = !order.gatewayPayments?.some((attempt) => attempt.state !== "failed");
+
+  async function chooseManual() {
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch(`/api/orders/${encodeURIComponent(order.id)}/payment-method`, {
+        method: "POST",
+        headers: authHeaders(channel),
+      });
+      const payload = await response.json();
+      if (!response.ok || !payload.order)
+        throw new Error(payload.error ?? "تغییر روش پرداخت انجام نشد.");
+      onUpdate(payload.order);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "ارتباط برقرار نشد؛ دوباره تلاش کنید.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function pay() {
     setBusy(true);
@@ -82,6 +110,17 @@ export function ZibalPayment({ order, channel }: { order: SubmittedOrder; channe
             {busy ? <LoaderCircle size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
             {busy ? "در حال اتصال..." : "پرداخت امن با زیبال"}
           </Button>
+          {canChooseManual && (
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={busy}
+              onClick={() => void chooseManual()}
+              className="mt-3 min-h-12 w-full sm:mr-3 sm:w-auto"
+            >
+              پرداخت کارت‌به‌کارت
+            </Button>
+          )}
         </>
       ) : (
         <p className="mt-3 text-sm text-slate-300">

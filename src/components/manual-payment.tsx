@@ -6,6 +6,7 @@ import { Button, Price } from "@ufo/ui";
 import type { SubmittedOrder } from "@ufo/orders";
 import type { SalesChannel } from "@ufo/types";
 import type { BankAccount } from "@/lib/payment-settings";
+import { PrivateAttachment } from "@/components/private-attachment";
 import { CopyValue } from "@/components/copy-value";
 import { PaymentBankAccounts } from "@/components/payment-bank-accounts";
 import { authHeaders } from "@/lib/customer-client";
@@ -39,7 +40,7 @@ export function ManualPayment({
       .catch(() => setMessage("دریافت اطلاعات حساب انجام نشد؛ صفحه را تازه کنید."));
   }, []);
   useEffect(() => {
-    if (!file) {
+    if (!file || file.type === "application/pdf") {
       setPreview("");
       return;
     }
@@ -132,7 +133,7 @@ export function ManualPayment({
             </p>
             <div className="min-w-0">
               <p id={`${uploadId}-label`} className="mb-2 text-sm">
-                تصویر رسید
+                تصویر یا فایل PDF رسید
               </p>
               <label
                 className={`relative flex min-h-28 min-w-0 items-center gap-3 rounded-2xl border border-dashed p-4 transition focus-within:ring-2 focus-within:ring-cyan-300 ${busy || !accounts.length ? "cursor-not-allowed border-white/10 opacity-40" : "cursor-pointer border-cyan-300/30 bg-cyan-300/[.035] hover:border-cyan-300/60 hover:bg-cyan-300/[.07]"}`}
@@ -142,16 +143,18 @@ export function ManualPayment({
                   type="file"
                   aria-labelledby={`${uploadId}-label`}
                   aria-describedby={`${uploadId}-hint`}
-                  accept="image/jpeg,image/png,image/webp"
+                  accept="image/jpeg,image/png,image/webp,application/pdf"
                   disabled={busy || !accounts.length}
                   onChange={(e) => {
                     const selected = e.target.files?.[0];
                     if (
                       selected &&
                       (selected.size > 5 * 1024 * 1024 ||
-                        !["image/jpeg", "image/png", "image/webp"].includes(selected.type))
+                        !["image/jpeg", "image/png", "image/webp", "application/pdf"].includes(
+                          selected.type,
+                        ))
                     ) {
-                      setMessage("تصویر معتبر با حجم حداکثر ۵ مگابایت انتخاب کنید.");
+                      setMessage("تصویر یا PDF معتبر با حجم حداکثر ۵ مگابایت انتخاب کنید.");
                       e.target.value = "";
                       setFile(null);
                       return;
@@ -169,7 +172,7 @@ export function ManualPayment({
                 </span>
                 <span className="grid min-w-0 gap-1.5">
                   <span className="text-sm font-bold text-cyan-100">
-                    {file ? "تغییر تصویر رسید" : "انتخاب تصویر رسید"}
+                    {file ? "تغییر فایل رسید" : "انتخاب تصویر یا PDF رسید"}
                   </span>
                   <span className="break-all text-xs leading-6 text-slate-300" aria-live="polite">
                     {file ? file.name : "از گالری یا فایل‌های دستگاه انتخاب کنید"}
@@ -183,19 +186,21 @@ export function ManualPayment({
                 </span>
               </label>
               <p id={`${uploadId}-hint`} className="mt-2 text-[11px] leading-6 text-slate-400">
-                فرمت JPG، PNG یا WebP · حداکثر ۵ مگابایت
+                فرمت JPG، PNG، WebP یا PDF · حداکثر ۵ مگابایت
               </p>
             </div>
-            {preview && (
+            {file && (
               <div>
-                <Image
-                  src={preview}
-                  alt="پیش‌نمایش رسید انتخاب‌شده"
-                  width={480}
-                  height={256}
-                  unoptimized
-                  className="h-auto max-h-64 w-auto max-w-full rounded-xl object-contain"
-                />
+                {preview && (
+                  <Image
+                    src={preview}
+                    alt="پیش‌نمایش رسید انتخاب‌شده"
+                    width={480}
+                    height={256}
+                    unoptimized
+                    className="h-auto max-h-64 w-auto max-w-full rounded-xl object-contain"
+                  />
+                )}
                 <button
                   type="button"
                   disabled={busy}
@@ -205,7 +210,7 @@ export function ManualPayment({
                   }}
                   className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-xs text-rose-200 hover:bg-rose-300/10 disabled:opacity-40"
                 >
-                  <X size={15} /> حذف تصویر انتخاب‌شده
+                  <X size={15} /> حذف فایل انتخاب‌شده
                 </button>
               </div>
             )}
@@ -216,6 +221,7 @@ export function ManualPayment({
                 onChange={(e) => setNote(e.target.value)}
                 maxLength={2000}
                 rows={4}
+                placeholder="مثلاً: مبلغ واریزی، تاریخ و ساعت واریز و شماره پیگیری بانک؛ ارسال تصویر الزامی نیست."
                 disabled={busy || !accounts.length}
                 className="min-w-0 w-full rounded-xl border border-white/15 bg-black/20 p-3 text-white"
               />
@@ -259,9 +265,33 @@ export function ManualPayment({
         </div>
       )}
       {!!order.receipts?.length && (
-        <p className="text-xs text-slate-300">
-          آخرین رسید ثبت‌شده: {new Date(order.receipts.at(-1)!.submittedAt).toLocaleString("fa-IR")}
-        </p>
+        <details className="rounded-2xl border border-white/10 p-4">
+          <summary className="min-h-11 cursor-pointer font-bold">
+            رسیدهای ارسال‌شده ({order.receipts.length.toLocaleString("fa-IR")})
+          </summary>
+          <div className="mt-3 grid gap-4">
+            {[...order.receipts].reverse().map((receipt) => (
+              <article key={receipt.id} className="min-w-0 rounded-xl bg-white/5 p-3">
+                <p className="mb-2 text-xs text-slate-400">
+                  {new Date(receipt.submittedAt).toLocaleString("fa-IR")}
+                </p>
+                {receipt.note && (
+                  <p className="mb-3 whitespace-pre-wrap break-words text-sm leading-7">
+                    {receipt.note}
+                  </p>
+                )}
+                {receipt.imageKey && (
+                  <PrivateAttachment
+                    url={`/api/orders/${encodeURIComponent(order.id)}/receipt?id=${encodeURIComponent(receipt.id)}`}
+                    name={receipt.imageKey.endsWith(".pdf") ? "receipt.pdf" : "رسید پرداخت"}
+                    pdf={receipt.imageKey.endsWith(".pdf")}
+                    audience={channel}
+                  />
+                )}
+              </article>
+            ))}
+          </div>
+        </details>
       )}
       {message && (
         <p role="status" className="text-sm leading-7">

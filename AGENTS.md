@@ -75,3 +75,11 @@
 - Products-list cards extend the existing CTA link across the card with a CSS pseudo-element;
   keep one navigation link and place independent cart controls above its click area. Never
   wrap cards containing buttons in an anchor. Search matches use text color only.
+- Receiving accounts default to merchant-provided values in `payment-settings.ts`; preserve
+  admin overrides and upgrade only untouched demo entries. Card-to-card approval belongs
+  to the admin receipt-review flow, never chat messages or receipt upload alone.
+- Order chat must authenticate the customer and verify order ownership/channel, or authenticate
+  the admin. Receipts and chat attachments are private; fetch with session headers into blob
+  URLs, never put tokens in URLs or expose storage keys through an unauthenticated downloader.
+  JPG/PNG/WebP images are decoded/re-encoded; PDFs are served as downloads. Persistent storage
+  for the order data directory must include `private-receipts` and `private-chat`.

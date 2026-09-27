@@ -195,6 +195,12 @@ export function B2BAccountClient() {
                 </div>
                 <Price valueRial={order.totalRial} />
                 <StatusPill tone="info">{order.status}</StatusPill>
+                <Link
+                  href={`/b2b/orders/${encodeURIComponent(order.id)}`}
+                  className="inline-flex min-h-11 items-center text-sm font-bold text-[#176D48] underline underline-offset-4"
+                >
+                  پیگیری و پشتیبانی
+                </Link>
               </div>
             ))}
             {orders.length === 0 ? (

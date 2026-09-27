@@ -1187,6 +1187,43 @@ export function confirmGatewayPayment(args: {
   });
 }
 
+export function chooseManualPayment(
+  orderId: string,
+  customerId: string,
+  channel: SalesChannel,
+): SubmittedOrder {
+  return mutatePaymentOrder(orderId, (order) => {
+    if (order.userId !== customerId || order.channel !== channel)
+      throw new Error("دسترسی به سفارش مجاز نیست.");
+    if (
+      order.status !== "awaiting_payment" ||
+      order.paymentMethod !== "zibal" ||
+      order.paymentStatus === "approved"
+    )
+      throw new Error("تغییر روش پرداخت برای این سفارش ممکن نیست.");
+    if (order.gatewayPayments?.some((attempt) => attempt.state !== "failed"))
+      throw new Error(
+        "یک پرداخت درگاه هنوز تعیین تکلیف نشده است؛ پیش از واریز با پشتیبانی هماهنگ کنید.",
+      );
+    return {
+      ...order,
+      paymentMethod: "card_to_card",
+      status: "awaiting_receipt",
+      paymentStatus: "awaiting_receipt",
+      updatedAt: new Date().toISOString(),
+      timeline: [
+        createEvent(
+          order.id,
+          "awaiting_receipt",
+          "customer",
+          "روش پرداخت به کارت‌به‌کارت تغییر کرد.",
+        ),
+        ...order.timeline,
+      ],
+    };
+  });
+}
+
 export function submitOrderReceipt(
   orderId: string,
   customerId: string,

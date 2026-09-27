@@ -2,11 +2,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Price } from "@ufo/ui";
-import Image from "next/image";
+import { PrivateAttachment } from "@/components/private-attachment";
 import {
   CheckCircle2,
   ChevronDown,
-  ExternalLink,
   ReceiptText,
   ShieldCheck,
   Truck,
@@ -110,24 +109,12 @@ export function AdminPaymentReview({ initialOrder }: { initialOrder: SubmittedOr
                   </p>
                 )}
                 {r.imageKey && (
-                  <a
-                    href={`/api/admin/orders/${order.id}/receipt?id=${r.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group"
-                  >
-                    <Image
-                      unoptimized
-                      width={600}
-                      height={800}
-                      src={`/api/admin/orders/${order.id}/receipt?id=${r.id}`}
-                      alt={`تصویر رسید ${i + 1}`}
-                      className="max-h-72 w-full rounded-lg bg-slate-50 object-contain"
-                    />
-                    <span className="mt-3 flex items-center justify-center gap-2 text-xs font-bold text-cyan-700">
-                      <ExternalLink size={14} /> مشاهده تصویر کامل
-                    </span>
-                  </a>
+                  <PrivateAttachment
+                    url={`/api/admin/orders/${order.id}/receipt?id=${r.id}`}
+                    name={r.imageKey.endsWith(".pdf") ? "receipt.pdf" : "رسید پرداخت"}
+                    pdf={r.imageKey.endsWith(".pdf")}
+                    audience="admin"
+                  />
                 )}
               </div>
             </article>

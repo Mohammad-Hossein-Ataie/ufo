@@ -373,7 +373,7 @@ export function AccountClient() {
                     aria-label={`جزئیات سفارش ${order.orderNumber}`}
                     className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-lg border border-cyan-300/40 px-3 text-sm font-medium text-cyan-300 hover:bg-cyan-300/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
                   >
-                    جزئیات <ArrowUpLeft size={15} />
+                    پیگیری و پشتیبانی <ArrowUpLeft size={15} />
                   </Link>
                 </div>
               </article>

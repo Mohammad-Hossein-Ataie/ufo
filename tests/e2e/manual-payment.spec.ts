@@ -34,7 +34,7 @@ test("cart: skeleton waits for data and failed loading can be retried", async ({
     }
     return route.fulfill({ json: {} });
   });
-  await page.goto("/cart");
+  await page.goto("/cart", { waitUntil: "domcontentloaded" });
   await expect(page.getByTestId("loading-cart")).toHaveCount(1);
   await expect(page.getByTestId("loading-cart")).toBeVisible();
   await expect(
@@ -207,7 +207,7 @@ for (const channel of ["retail", "wholesale"] as const) {
         };
       await route.fulfill({ json: payload });
     });
-    await page.goto(`${base}/checkout`);
+    await page.goto(`${base}/checkout`, { waitUntil: "domcontentloaded" });
     await expect(page.getByTestId("loading-checkout")).toHaveCount(1);
     await expect(page.getByTestId("loading-checkout")).toBeVisible();
     await expect(page.getByText("برای پرداخت وارد شوید", { exact: true })).toHaveCount(0);
@@ -216,8 +216,8 @@ for (const channel of ["retail", "wholesale"] as const) {
       .screenshot({ path: `temp/checkout-${channel}-skeleton.png` });
     releaseCheckout();
     await expect(page.getByTestId("loading-checkout")).toHaveCount(0);
-    await expect(page.getByRole("radio")).toHaveCount(3);
-    const radios = page.getByRole("radio");
+    await expect(page.locator('input[name="shipping"]')).toHaveCount(3);
+    const radios = page.locator('input[name="shipping"]');
     await expect(radios.nth(0)).toBeChecked();
     await page.locator("label").filter({ hasText: "پیک تهران" }).click();
     await expect(radios.nth(1)).toBeChecked();
@@ -243,6 +243,7 @@ for (const channel of ["retail", "wholesale"] as const) {
       window.scrollTo(0, 0);
     });
     await page.screenshot({ path: `temp/payment-${channel}-checkout.png`, fullPage: true });
+    await page.locator('input[name="paymentMethod"][value="card_to_card"]').check();
     await page.getByRole("button", { name: "تأیید و ثبت سفارش", exact: true }).click();
     await page.waitForURL(`**${base}/orders/ui-test-order`);
     await expect(page.getByTestId("loading-order")).toHaveCount(1);
@@ -275,7 +276,7 @@ for (const channel of ["retail", "wholesale"] as const) {
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: `temp/payment-${channel}-mobile.png` });
     activeAccounts = true;
-    await page.reload();
+    await page.reload({ waitUntil: "domcontentloaded" });
     const bankAccounts = page.getByTestId("payment-bank-accounts");
     const bankChoices = bankAccounts.getByRole("group", { name: "انتخاب حساب بانکی" });
     await expect(bankChoices.getByRole("button")).toHaveCount(3);
@@ -341,7 +342,7 @@ for (const channel of ["retail", "wholesale"] as const) {
       )
       .toBe(true);
     await bankAccounts.screenshot({ path: `temp/bank-${channel}-desktop.png` });
-    const upload = page.getByLabel("تصویر رسید", { exact: true });
+    const upload = page.getByLabel("تصویر یا فایل PDF رسید", { exact: true });
     const testImage = {
       name: "رسید-آزمایشی.png",
       mimeType: "image/png",
@@ -350,17 +351,17 @@ for (const channel of ["retail", "wholesale"] as const) {
         "base64",
       ),
     };
-    await expect(page.getByText("انتخاب تصویر رسید", { exact: true })).toBeVisible();
+    await expect(page.getByText("انتخاب تصویر یا PDF رسید", { exact: true })).toBeVisible();
     await upload.setInputFiles(testImage);
     await expect(page.getByText(testImage.name, { exact: true })).toBeVisible();
     await expect(page.getByRole("img", { name: "پیش‌نمایش رسید انتخاب‌شده" })).toBeVisible();
-    await page.getByRole("button", { name: "حذف تصویر انتخاب‌شده" }).click();
+    await page.getByRole("button", { name: "حذف فایل انتخاب‌شده" }).click();
     await expect(upload).toHaveValue("");
     await upload.setInputFiles(testImage);
     await expect(page.getByRole("img", { name: "پیش‌نمایش رسید انتخاب‌شده" })).toBeVisible();
     await page.setViewportSize({ width: 390, height: 844 });
     await upload.locator("..").screenshot({ path: `temp/upload-${channel}-mobile.png` });
-    await page.getByRole("button", { name: "حذف تصویر انتخاب‌شده" }).click();
+    await page.getByRole("button", { name: "حذف فایل انتخاب‌شده" }).click();
     await page
       .getByRole("textbox", { name: "متن رسید یا شماره پیگیری" })
       .fill("رسید آزمایشی؛ پیگیری TEST-123");
@@ -372,11 +373,11 @@ for (const channel of ["retail", "wholesale"] as const) {
     await expect(page.getByRole("button", { name: "خرید مجدد", exact: true })).toHaveCount(0);
     order.status = "confirmed";
     order.paymentStatus = "approved";
-    await page.reload();
+    await page.reload({ waitUntil: "domcontentloaded" });
     await expect(page.getByText("زمان تقریبی ارسال:", { exact: false })).toBeVisible();
     await expect(page.getByRole("button", { name: "خرید مجدد", exact: true })).toHaveCount(0);
     order.status = "delivered";
-    await page.reload();
+    await page.reload({ waitUntil: "domcontentloaded" });
     await expect(page.getByRole("button", { name: "خرید مجدد", exact: true })).toBeVisible();
     expect(errors).toEqual([]);
   });

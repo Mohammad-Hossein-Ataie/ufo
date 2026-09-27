@@ -1,6 +1,7 @@
 "use client";
 
-import Image from "next/image";
+import { PrivateAttachment } from "@/components/private-attachment";
+import { authHeaders } from "@/lib/customer-client";
 import { DragEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckCheck,
@@ -78,6 +79,8 @@ export function ChatThreadClient({
   tone,
 }: ChatThreadClientProps) {
   const styles = toneClass[tone];
+  const audience = tone === "admin" ? "admin" : tone === "b2b" ? "wholesale" : "retail";
+  const requestHeaders = () => (audience === "admin" ? {} : authHeaders(audience));
   const [messages, setMessages] = useState<ChatMessageRecord[]>([]);
   const [body, setBody] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -102,18 +105,25 @@ export function ChatThreadClient({
   const editingMessage = editingId ? messageMap.get(editingId) : undefined;
 
   async function loadMessages() {
-    const response = await fetch(`${endpoint}?orderId=${encodeURIComponent(orderId)}`, {
-      cache: "no-store",
-    });
-    if (!response.ok) return;
-    const payload = (await response.json()) as { messages?: ChatMessageRecord[] };
-    setMessages(payload.messages ?? []);
-    setStatus("گفتگو به‌روز است.");
+    try {
+      const response = await fetch(`${endpoint}?orderId=${encodeURIComponent(orderId)}`, {
+        cache: "no-store",
+        headers: requestHeaders(),
+      });
+      if (!response.ok) throw new Error();
+      const payload = (await response.json()) as { messages?: ChatMessageRecord[] };
+      setMessages(payload.messages ?? []);
+      setStatus("گفتگو به‌روز است.");
+    } catch {
+      setStatus("دریافت گفتگو انجام نشد؛ اتصال یا ورود به حساب را بررسی کنید.");
+    }
   }
 
   useEffect(() => {
     void loadMessages();
-    const timer = window.setInterval(() => void loadMessages(), 3500);
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "visible") void loadMessages();
+    }, 10000);
     return () => window.clearInterval(timer);
   }, [orderId, endpoint]);
 
@@ -122,25 +132,38 @@ export function ChatThreadClient({
   }, [messages.length]);
 
   async function uploadImages(files: FileList | null) {
-    if (!files?.length) return;
+    if (!files?.length || isSending) return;
+    if (files.length + attachments.length > 3) {
+      setStatus("حداکثر سه فایل در هر پیام مجاز است.");
+      return;
+    }
     setIsSending(true);
-    const uploaded: Attachment[] = [];
-    for (const file of Array.from(files).filter((item) => item.type.startsWith("image/"))) {
-      const formData = new FormData();
-      formData.append("file", file);
-      const response = await fetch("/api/chat/upload", { method: "POST", body: formData });
-      const payload = (await response.json().catch(() => ({}))) as {
-        file?: Attachment;
-        error?: string;
-      };
-      if (payload.file?.url) uploaded.push(payload.file);
-      if (!response.ok) setStatus(payload.error ?? "آپلود تصویر ناموفق بود.");
+    try {
+      for (const file of Array.from(files)) {
+        if (
+          file.size > 5 * 1024 * 1024 ||
+          !["image/jpeg", "image/png", "image/webp", "application/pdf"].includes(file.type)
+        )
+          throw new Error("فایل JPG، PNG، WebP یا PDF با حجم حداکثر ۵ مگابایت انتخاب کنید.");
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await fetch(
+          `/api/chat/upload?orderId=${encodeURIComponent(orderId)}&audience=${audience}`,
+          { method: "POST", headers: requestHeaders(), body: formData },
+        );
+        const payload = (await response.json()) as { file?: Attachment; error?: string };
+        if (!response.ok || !payload.file)
+          throw new Error(payload.error ?? "آپلود فایل انجام نشد.");
+        const uploaded = payload.file;
+        setAttachments((current) => [...current, uploaded]);
+      }
+      setStatus("فایل آماده است؛ برای ثبت در گفتگو دکمه ارسال پیام را بزنید.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "ارتباط برقرار نشد؛ دوباره تلاش کنید.");
+    } finally {
+      setIsSending(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
-    if (uploaded.length > 0) {
-      setAttachments((current) => [...current, ...uploaded]);
-      setStatus(`${new Intl.NumberFormat("fa-IR").format(uploaded.length)} تصویر آماده ارسال است.`);
-    }
-    setIsSending(false);
   }
 
   function dropImages(event: DragEvent<HTMLFormElement>) {
@@ -153,29 +176,36 @@ export function ChatThreadClient({
     event.preventDefault();
     const trimmed = body.trim();
     if (!trimmed && attachments.length === 0) return;
+    if (isSending) return;
     setIsSending(true);
-    const response = await fetch(endpoint, {
-      method: editingId ? "PATCH" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        orderId,
-        body: trimmed,
-        ...(editingId ? { messageId: editingId } : {}),
-        ...(replyToId && !editingId ? { replyToId } : {}),
-        ...(!editingId && attachments.length > 0 ? { attachments } : {}),
-      }),
-    });
-    const payload = (await response.json().catch(() => ({}))) as { error?: string };
-    setIsSending(false);
-    if (!response.ok) {
-      setStatus(payload.error ?? "ارسال پیام انجام نشد.");
-      return;
+    try {
+      const response = await fetch(endpoint, {
+        method: editingId ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json", ...requestHeaders() },
+        body: JSON.stringify({
+          orderId,
+          body: trimmed,
+          ...(editingId ? { messageId: editingId } : {}),
+          ...(replyToId && !editingId ? { replyToId } : {}),
+          ...(!editingId && attachments.length > 0 ? { attachments } : {}),
+        }),
+      });
+      const payload = (await response.json().catch(() => ({}))) as { error?: string };
+      setIsSending(false);
+      if (!response.ok) {
+        setStatus(payload.error ?? "ارسال پیام انجام نشد.");
+        return;
+      }
+      setBody("");
+      setAttachments([]);
+      setReplyToId(undefined);
+      setEditingId(undefined);
+      await loadMessages();
+    } catch {
+      setStatus("ارتباط برقرار نشد؛ پیام شما حفظ شده است. دوباره تلاش کنید.");
+    } finally {
+      setIsSending(false);
     }
-    setBody("");
-    setAttachments([]);
-    setReplyToId(undefined);
-    setEditingId(undefined);
-    await loadMessages();
   }
 
   function startEdit(message: ChatMessageRecord) {
@@ -189,10 +219,11 @@ export function ChatThreadClient({
     setReplyToId(undefined);
     setEditingId(undefined);
     setBody("");
+    setAttachments([]);
   }
 
   return (
-    <section className={`rounded-md border p-4 shadow-sm ${styles.shell}`}>
+    <section className={`min-w-0 rounded-2xl border p-4 shadow-sm ${styles.shell}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-black">
@@ -234,7 +265,7 @@ export function ChatThreadClient({
           return (
             <article
               key={message.id}
-              className={`grid max-w-[88%] gap-2 rounded-md border p-3 text-sm ${
+              className={`grid min-w-0 max-w-[88%] gap-2 rounded-md border p-3 text-sm ${
                 mine ? `justify-self-end ${styles.mine}` : `justify-self-start ${styles.theirs}`
               }`}
             >
@@ -251,26 +282,20 @@ export function ChatThreadClient({
                 </div>
               ) : null}
               {message.body ? (
-                <p className="whitespace-pre-wrap leading-7">{message.body}</p>
+                <p className="whitespace-pre-wrap break-words leading-7 [overflow-wrap:anywhere]">
+                  {message.body}
+                </p>
               ) : null}
               {message.attachments?.length ? (
                 <div className="grid gap-2 sm:grid-cols-2">
                   {message.attachments.map((file) => (
-                    <a
+                    <PrivateAttachment
                       key={file.url}
-                      href={file.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="relative block aspect-[4/3] overflow-hidden rounded-md border border-current/15 bg-black/10"
-                    >
-                      <Image
-                        src={file.url}
-                        alt={file.name ?? "تصویر چت"}
-                        fill
-                        sizes="(min-width: 640px) 320px, calc(100vw - 64px)"
-                        className="object-contain"
-                      />
-                    </a>
+                      url={`/api/chat/upload?orderId=${encodeURIComponent(orderId)}&audience=${audience}&key=${encodeURIComponent(file.key ?? "")}`}
+                      name={file.name ?? "پیوست گفتگو"}
+                      pdf={file.contentType === "application/pdf"}
+                      audience={audience}
+                    />
                   ))}
                 </div>
               ) : null}
@@ -323,7 +348,7 @@ export function ChatThreadClient({
               ) : null}
               {attachments.length > 0 ? (
                 <p className="font-bold">
-                  {new Intl.NumberFormat("fa-IR").format(attachments.length)} تصویر آماده ارسال
+                  {new Intl.NumberFormat("fa-IR").format(attachments.length)} فایل آماده ارسال
                 </p>
               ) : null}
             </div>
@@ -338,6 +363,10 @@ export function ChatThreadClient({
         </div>
       )}
 
+      <p className={`mt-3 text-xs leading-6 ${styles.muted}`}>
+        برای بررسی پرداخت، رسید را در بخش «پرداخت و رسید» ثبت کنید. پیوست گفتگو: JPG، PNG، WebP یا
+        PDF، حداکثر ۵ مگابایت.
+      </p>
       <form
         onSubmit={submit}
         onDragOver={(event) => {
@@ -351,7 +380,10 @@ export function ChatThreadClient({
         } ${styles.composer}`}
       >
         <Textarea
-          className="min-h-24"
+          aria-label="متن پیام پشتیبانی"
+          maxLength={2000}
+          disabled={isSending}
+          className="min-h-24 !border-current/20 !bg-transparent !text-inherit"
           value={body}
           onChange={(event) => setBody(event.target.value)}
           placeholder={placeholder}
@@ -362,7 +394,9 @@ export function ChatThreadClient({
               ref={fileInputRef}
               className="sr-only"
               type="file"
-              accept="image/*"
+              aria-label="فایل پیوست گفتگو"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
+              disabled={isSending || Boolean(editingId)}
               multiple
               onChange={(event) => void uploadImages(event.target.files)}
             />
@@ -370,10 +404,11 @@ export function ChatThreadClient({
               type="button"
               variant="secondary"
               size="sm"
+              disabled={isSending || Boolean(editingId)}
               onClick={() => fileInputRef.current?.click()}
             >
               <ImagePlus size={16} aria-hidden="true" />
-              تصویر
+              تصویر یا PDF
             </Button>
             {attachments.length > 0 ? (
               <span
@@ -390,7 +425,7 @@ export function ChatThreadClient({
           </Button>
         </div>
         <p className={`text-xs ${styles.muted}`} role="status">
-          {isDragging ? "تصویر را همین‌جا رها کنید." : status}
+          {isDragging ? "فایل را همین‌جا رها کنید." : status}
         </p>
       </form>
     </section>

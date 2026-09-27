@@ -1,52 +1,76 @@
 import { NextResponse } from "next/server";
-import { getPublicObjectUrl, getStorageProvider } from "@ufo/storage";
-
+import { boundedBody, chatErrorStatus, requireChatOrder } from "@/lib/chat-access";
+import { readChatFile, storeChatFile } from "@/lib/chat-files";
+import { getStorageProvider } from "@ufo/storage";
+import sharp from "sharp";
 export const runtime = "nodejs";
 
-export async function GET(req: Request) {
-  try {
-    const url = new URL(req.url);
-    const key = url.searchParams.get("key");
-    if (!key) return NextResponse.json({ error: "کلید فایل الزامی است." }, { status: 400 });
-    const signedUrl = await getStorageProvider().presignGet(key, 3600);
-    return NextResponse.redirect(signedUrl);
-  } catch {
-    return NextResponse.json({ error: "دریافت تصویر چت ناموفق بود." }, { status: 500 });
-  }
+async function access(request: Request) {
+  const query = new URL(request.url).searchParams;
+  const audience =
+    query.get("audience") === "admin"
+      ? "admin"
+      : query.get("audience") === "wholesale"
+        ? "wholesale"
+        : "retail";
+  return requireChatOrder(request, query.get("orderId") ?? "", audience);
 }
-
-export async function POST(req: Request) {
+export async function GET(request: Request) {
   try {
-    const formData = await req.formData();
-    const file = formData.get("file");
-    if (!(file instanceof File)) {
-      return NextResponse.json({ error: "فایل معتبر نیست." }, { status: 400 });
+    const order = await access(request);
+    const key = new URL(request.url).searchParams.get("key") ?? "";
+    // Older conversations stored images in object storage. Only an attachment
+    // already linked to this authorized order may use that legacy location.
+    const legacy =
+      key.startsWith("chat/") &&
+      order.chat.some((message) => message.attachments?.some((file) => file.key === key));
+    let bytes: Uint8Array;
+    if (legacy) {
+      const stored = await getStorageProvider().read(key);
+      if (stored.body.byteLength > 6 * 1024 * 1024) throw new Error("فایل بزرگ است.");
+      bytes = await sharp(stored.body, { limitInputPixels: 20_000_000, animated: false })
+        .rotate()
+        .webp()
+        .toBuffer();
+    } else {
+      bytes = await readChatFile(order.id, key);
     }
-    if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ error: "فقط تصویر برای چت قابل ارسال است." }, { status: 400 });
-    }
-    if (file.size > 6 * 1024 * 1024) {
-      return NextResponse.json({ error: "حداکثر حجم تصویر ۶ مگابایت است." }, { status: 413 });
-    }
-
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const safeName = file.name.replace(/[^\w.-]+/g, "-");
-    const key = `chat/${new Date().toISOString().slice(0, 10)}/${Date.now()}-${safeName}`;
-    const stored = await getStorageProvider().upload({
-      key,
-      body: bytes,
-      contentType: file.type,
-    });
-    const publicUrl = getPublicObjectUrl(key);
-    return NextResponse.json({
-      message: "تصویر چت آپلود شد.",
-      file: {
-        ...stored,
-        name: file.name,
-        url: publicUrl ?? `/api/chat/upload?key=${encodeURIComponent(key)}`,
+    const pdf = !legacy && key.endsWith(".pdf");
+    return new NextResponse(new Uint8Array(bytes), {
+      headers: {
+        "Content-Type": pdf ? "application/pdf" : "image/webp",
+        "Content-Disposition": `${pdf ? "attachment" : "inline"}; filename="attachment.${pdf ? "pdf" : "webp"}"`,
+        "Cache-Control": "private, no-store",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "sandbox",
       },
     });
-  } catch {
-    return NextResponse.json({ error: "آپلود تصویر چت ناموفق بود." }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "دسترسی به فایل ممکن نیست." },
+      { status: chatErrorStatus(error) },
+    );
+  }
+}
+export async function POST(request: Request) {
+  try {
+    const order = await access(request);
+    const bytes = await boundedBody(request, 5 * 1024 * 1024 + 16000);
+    const bounded = new Request(request.url, {
+      method: "POST",
+      headers: { "Content-Type": request.headers.get("content-type") ?? "" },
+      body: bytes,
+    });
+    const file = (await bounded.formData()).get("file");
+    if (!(file instanceof File)) throw new Error("فایل معتبر نیست.");
+    return NextResponse.json({ file: await storeChatFile(order.id, file) });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error && !("code" in error) ? error.message : "آپلود فایل انجام نشد.",
+      },
+      { status: chatErrorStatus(error) },
+    );
   }
 }

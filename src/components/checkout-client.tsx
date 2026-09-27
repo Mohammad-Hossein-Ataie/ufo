@@ -48,6 +48,9 @@ const fieldClass =
 const textareaClass =
   "rounded-xl !border-white/10 !bg-[#090d13] px-4 py-3 !text-white caret-retail-accent !shadow-none placeholder:!text-retail-muted focus:!border-retail-accent focus:!ring-retail-accent/20";
 
+// Temporarily pause new gateway selections; the gateway integration stays available.
+const zibalComingSoon = true;
+
 function Step({ number, label, active }: { number: string; label: string; active: boolean }) {
   return (
     <div className={`flex items-center gap-2 ${active ? "text-white" : "text-retail-muted"}`}>
@@ -73,6 +76,7 @@ export function CheckoutClient({
   gatewayEnabled?: boolean;
 }) {
   const base = channel === "wholesale" ? "/b2b" : "";
+  const canSelectGateway = gatewayEnabled && !zibalComingSoon;
   const [location, setLocation] = useState<ShippingAddress["location"]>();
   const [cartView, setCartView] = useState<CustomerCartView | null>(null);
   const [addresses, setAddresses] = useState<CustomerAddress[]>([]);
@@ -95,7 +99,7 @@ export function CheckoutClient({
   const [isLoadingShipping, setIsLoadingShipping] = useState(false);
   const [receiptNote, setReceiptNote] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"zibal" | "card_to_card">(
-    gatewayEnabled ? "zibal" : "card_to_card",
+    canSelectGateway ? "zibal" : "card_to_card",
   );
   const [error, setError] = useState("");
   const [paymentOrderId, setPaymentOrderId] = useState("");
@@ -721,20 +725,23 @@ export function CheckoutClient({
               </div>
             </div>
             <div className="mt-4 grid gap-3">
-              {gatewayEnabled ? (
+              {gatewayEnabled || zibalComingSoon ? (
                 <label
-                  className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 ${paymentMethod === "zibal" ? "border-retail-accent/60 bg-retail-accent/[0.08]" : "border-retail-border bg-black/15"}`}
+                  className={`flex items-center gap-3 rounded-2xl border p-4 ${canSelectGateway ? "cursor-pointer" : "cursor-not-allowed opacity-60"} ${paymentMethod === "zibal" ? "border-retail-accent/60 bg-retail-accent/[0.08]" : "border-retail-border bg-black/15"}`}
                 >
                   <input
                     type="radio"
                     name="paymentMethod"
                     value="zibal"
                     checked={paymentMethod === "zibal"}
+                    disabled={!canSelectGateway}
                     onChange={() => setPaymentMethod("zibal")}
                     className="h-5 w-5 accent-cyan-300"
                   />
                   <div>
-                    <p className="font-black text-white">پرداخت آنلاین با زیبال</p>
+                    <p className="flex flex-wrap items-center gap-2 font-black text-white">پرداخت آنلاین با زیبال
+                      {zibalComingSoon && <span className="rounded-full border border-current/20 px-2 py-1 text-xs font-bold text-retail-secondary">به‌زودی</span>}
+                    </p>
                     <p className="mt-1 text-xs text-retail-secondary">
                       انتقال امن به درگاه و تأیید خودکار پرداخت
                     </p>

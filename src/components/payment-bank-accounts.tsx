@@ -40,76 +40,99 @@ function BankLogo({ name, className = "" }: { name: string; className?: string }
 function CardArtwork({ account }: { account: BankAccount }) {
   const { kind } = bankStyle(account.bankName);
   const vertical = kind === "blu";
+  const number = account.cardNumber.replace(/(.{4})/g, "$1 ").trim();
+  const iban = account.iban.replace(/(.{4})/g, "$1 ").trim();
   return (
     <div
       aria-hidden="true"
       data-bank-artwork={kind}
-      className={`relative isolate shrink-0 overflow-hidden rounded-xl shadow-[0_12px_24px_-12px_rgba(0,0,0,.65)] ring-1 ring-black/10 ${vertical ? "h-[140px] w-[88px] bg-gradient-to-br from-[#18b5ff] via-[#0086ef] to-[#0664d5] sm:h-[164px] sm:w-[103px]" : "h-[64px] w-[100px] sm:h-[116px] sm:w-[184px]"} ${kind === "mellat" ? "bg-gradient-to-br from-[#db3c3f] to-[#9a1024]" : kind === "saman" ? "bg-gradient-to-br from-white via-[#eaf5f9] to-[#c1dbe8]" : kind === "generic" ? "bg-gradient-to-br from-slate-600 to-slate-800" : ""}`}
+      className={`relative isolate w-full overflow-hidden rounded-2xl shadow-[0_16px_36px_-12px_rgba(0,0,0,.65)] ring-1 ring-white/15 ${vertical ? "aspect-[214/340] max-w-[214px] bg-[#c31c32]" : "aspect-[340/214] max-w-[340px] bg-slate-800"}`}
     >
-      {kind === "mellat" && (
-        <>
-          <div className="absolute inset-x-0 top-0 flex h-[30%] items-center justify-between bg-[#f6f3ef] px-2 sm:px-3">
-            <span className="text-[5px] font-bold text-slate-700 sm:text-[9px]">ملت کارت</span>
-            <BankLogo
-              name={account.bankName}
-              className="h-5 w-7 !bg-transparent !p-0 sm:h-8 sm:w-10"
-            />
-          </div>
-          <svg
-            viewBox="0 0 240 150"
-            fill="none"
-            className="absolute inset-0 h-full w-full text-amber-100/40"
-          >
-            <g stroke="currentColor" strokeWidth=".6">
-              {Array.from({ length: 13 }, (_, i) => (
-                <path key={i} d={`M-20 ${60 + i * 5} Q110 ${180 - i * 4} 270 ${38 + i * 8}`} />
-              ))}
-            </g>
-          </svg>
-        </>
-      )}
-      {kind === "saman" && (
-        <>
-          <Image
-            src="/images/bank-logos/saman-bank.png"
-            alt=""
-            width={180}
-            height={180}
-            className="absolute -bottom-7 -left-7 h-28 w-28 object-contain opacity-65 mix-blend-multiply sm:-bottom-12 sm:-left-12 sm:h-48 sm:w-48"
-          />
-          <BankLogo
-            name={account.bankName}
-            className="absolute right-2 top-1 h-6 w-7 !bg-transparent !p-0 mix-blend-multiply sm:right-3 sm:top-2 sm:h-9 sm:w-10"
-          />
-        </>
-      )}
       {vertical ? (
         <>
-          <div className="absolute left-4 top-5 h-5 w-4 rounded bg-gradient-to-br from-[#f1db91] to-[#b89d56] ring-1 ring-yellow-200/60">
-            <span className="absolute inset-x-0 top-1/2 border-t border-yellow-900/30" />
-            <span className="absolute inset-y-0 left-1/2 border-l border-yellow-900/30" />
-          </div>
-          <p
-            dir="ltr"
-            className="absolute left-3 top-[43%] text-[7px] tracking-tight text-white/95 sm:text-[8px]"
-          >
-            bank. but lovely
+          <div className="absolute -top-4 bottom-0 left-[40%] w-[19%] rotate-[9deg] bg-[#11131a]" />
+          <svg viewBox="0 0 214 340" className="absolute inset-0 h-full w-full" fill="none">
+            <rect x="27" y="32" width="27" height="35" rx="6" fill="#d8c78d" />
+            <path d="M27 44h27M27 55h27M40 32v35" stroke="#8e804f" strokeWidth="1" />
+            <g fill="white" fontFamily="monospace" fontSize="23" direction="ltr" textAnchor="start">
+              {account.cardNumber.match(/.{1,4}/g)?.map((part, i) => (
+                <text key={i} x="127" y={143 + i * 30}>
+                  {part}
+                </text>
+              ))}
+            </g>
+            <text data-bank-iban x="20" y="252" fill="white" fontFamily="monospace" fontSize="8.5" direction="ltr" textAnchor="start">{iban}</text>
+            <text x="25" y="271" fill="white" fontFamily="sans-serif" fontSize="11" direction="ltr">
+              bank. but lovely
+            </text>
+          </svg>
+          <p className="absolute right-5 top-9 text-[11px] font-bold leading-6 text-white">
+            {account.holderName}
           </p>
           <BankLogo
             name={account.bankName}
-            className="absolute bottom-1 left-2 h-16 w-16 !bg-transparent !p-0 [&_img]:brightness-0 [&_img]:invert sm:h-20 sm:w-20"
+            className="absolute bottom-3 left-4 h-11 w-14 !bg-transparent !p-0 [&_img]:brightness-0 [&_img]:invert"
           />
         </>
       ) : (
         <>
+          <svg viewBox="0 0 340 214" className="absolute inset-0 h-full w-full" fill="none">
+            <defs>
+              <linearGradient id={`card-${account.id}`} x1="0" y1="0" x2="1" y2="1">
+                <stop stopColor={kind === "saman" ? "#fff" : "#ea101d"} />
+                <stop offset="1" stopColor={kind === "saman" ? "#dcebf0" : "#a4081e"} />
+              </linearGradient>
+            </defs>
+            <rect width="340" height="214" fill={`url(#card-${account.id})`} />
+            {kind === "mellat" ? (
+              <>
+                <path d="M0 0h340v57Q170 32 0 64Z" fill="#faf9f5" />
+                <g stroke="#ffc5ac" strokeWidth=".5" opacity=".55">
+                  {Array.from({ length: 30 }, (_, i) => (
+                    <path key={i} d={`M-20 ${56 + i * 4} Q135 ${235 - i * 3} 360 ${56 + i * 5}`} />
+                  ))}
+                </g>
+                <text x="22" y="29" fill="#333" fontSize="12" direction="ltr">
+                  Mellat Card
+                </text>
+              </>
+            ) : (
+              <>
+                <g fill="#079eca" opacity=".32">
+                  {[-55, -28, 0, 28, 55].map((angle) => (
+                    <path
+                      key={angle}
+                      transform={`rotate(${angle} 72 201)`}
+                      d="M72 201Q-5 116 55 42Q119 95 72 201Z"
+                    />
+                  ))}
+                </g>
+                <path
+                  d="M72 206L30 193L57 194L50 172L68 191L72 163L80 191L97 174L90 195L115 193Z"
+                  fill="white"
+                />
+              </>
+            )}
+            <text data-bank-iban x="22" y="103" fill={kind === "saman" ? "#17415a" : "white"} fontFamily="monospace" fontSize="12" direction="ltr" textAnchor="start">{iban}</text>
+            <text
+              x="22"
+              y="140"
+              fill={kind === "saman" ? "#17415a" : "white"}
+              fontFamily="monospace"
+              fontSize="23"
+              fontWeight="600"
+              direction="ltr"
+              textAnchor="start"
+            >
+              {number}
+            </text>
+          </svg>
+          <BankLogo
+            name={account.bankName}
+            className="absolute right-4 top-3 h-9 w-14 !bg-transparent !p-0"
+          />
           <p
-            dir="ltr"
-            className={`absolute inset-x-2 bottom-[24%] select-none whitespace-nowrap font-mono text-[6px] font-bold tracking-[.05em] sm:inset-x-3 sm:text-[11px] ${kind === "saman" ? "text-[#123b52]" : "text-white"}`}
-          >
-            {account.cardNumber.replace(/(.{4})/g, "$1 ").trim()}
-          </p>
-          <p
-            className={`absolute bottom-2 right-2 text-[4px] sm:bottom-3 sm:right-3 sm:text-[7px] ${kind === "saman" ? "text-[#123b52]" : "text-white/90"}`}
+            className={`absolute bottom-5 right-5 text-xs font-bold ${kind === "saman" ? "text-[#17415a]" : "text-white"}`}
           >
             {account.holderName}
           </p>
@@ -161,9 +184,9 @@ export function PaymentBankAccounts({ accounts }: { accounts: BankAccount[] }) {
       <article
         id={`${id}-account`}
         aria-label={`اطلاعات حساب ${selected.bankName}`}
-        className="mt-3 grid min-w-0 grid-cols-[100px_minmax(0,1fr)] items-center gap-x-4 gap-y-3 rounded-2xl border border-white/10 bg-[#0c141f] p-3 sm:grid-cols-[184px_minmax(0,1fr)] sm:gap-x-5 sm:p-4"
+        className="mt-3 grid min-w-0 gap-4 rounded-2xl border border-white/10 bg-[#0c141f] p-3 sm:p-5"
       >
-        <div className="flex items-center justify-center sm:row-span-3">
+        <div className="flex items-center justify-center py-3">
           <CardArtwork account={selected} />
         </div>
         <div className="min-w-0">
@@ -174,7 +197,7 @@ export function PaymentBankAccounts({ accounts }: { accounts: BankAccount[] }) {
             <p className="mt-1 text-[10px] text-amber-200">آزمایشی · غیرقابل واریز</p>
           )}
         </div>
-        <div className="col-span-2 flex min-w-0 items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/[.025] px-3 py-1.5 sm:col-span-1">
+        <div className="flex min-w-0 items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/[.025] px-3 py-1.5">
           <div className="min-w-0">
             <p className="mb-1 text-[10px] text-slate-400">شماره کارت</p>
             <p
@@ -192,7 +215,7 @@ export function PaymentBankAccounts({ accounts }: { accounts: BankAccount[] }) {
             compact
           />
         </div>
-        <div className="col-span-2 flex min-w-0 items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/[.025] px-3 py-1.5 sm:col-span-1">
+        <div className="flex min-w-0 items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/[.025] px-3 py-1.5">
           <div className="min-w-0">
             <p className="mb-1 text-[10px] text-slate-400">شماره شبا</p>
             <p
