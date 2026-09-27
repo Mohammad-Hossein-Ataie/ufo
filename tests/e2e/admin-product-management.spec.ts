@@ -3,7 +3,7 @@ import sharp from "sharp";
 import { getProductColorOptions, getProductVariantType, products } from "@ufo/domain";
 test.beforeEach(async ({ page }, testInfo) => {
   if (testInfo.title === "color product can be added on mobile and desktop" ||
-      testInfo.title === "catalog starts at zero to three million with a blurred hero backdrop") return;
+      testInfo.title === "catalog starts without a hidden price ceiling and keeps its blurred hero backdrop") return;
   const response = await page.request.post("/api/admin/login", {
     headers: { origin: "http://127.0.0.1:3106" },
     data: { username: "local-catalog-test", password: "local-only-catalog-test-password" },
@@ -97,16 +97,18 @@ test("color product can be added on mobile and desktop", async ({ page }) => {
   await expect(page.getByText(product!.nameFa)).toBeVisible();
 });
 
-test("catalog starts at zero to three million with a blurred hero backdrop", async ({ page }) => {
+test("catalog starts without a hidden price ceiling and keeps its blurred hero backdrop", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 844 });
   await page.goto("/products");
-  await expect(page.locator('input[name="maxPrice"]')).toHaveValue(new Intl.NumberFormat("fa-IR").format(3_000_000));
+  const maxPrice = await page.locator('input[name="maxPrice"]').inputValue();
+  const maxToman = Number(maxPrice.replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit))).replace(/[^\d]/g, ""));
+  expect(maxToman).toBeGreaterThan(3_000_000);
   const backdrop = await page.locator(".catalog-showcase").evaluate((element) => {
     const style = window.getComputedStyle(element, "::before");
     return { image: style.backgroundImage, blur: style.filter, opacity: style.opacity };
   });
   expect(backdrop.image).toContain("ufo-hero.webp");
-  expect(backdrop.blur).toBe("blur(56px)");
+  expect(backdrop.blur).toBe("blur(4px)");
   expect(backdrop.opacity).toBe("0.55");
 });
 

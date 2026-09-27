@@ -39,7 +39,9 @@ export function CatalogColorFilter({
 
   function submitForm() {
     requestAnimationFrame(() => {
-      wrapperRef.current?.closest("form")?.requestSubmit();
+      const form = wrapperRef.current?.closest("form");
+      if (form?.dataset.mobileApply === "true" && window.matchMedia("(max-width: 1023px)").matches) return;
+      form?.requestSubmit();
     });
   }
 

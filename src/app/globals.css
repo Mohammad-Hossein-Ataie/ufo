@@ -471,6 +471,110 @@
     radial-gradient(120% 90% at 15% 20%, rgba(0, 217, 255, 0.16) 0%, transparent 60%);
 }
 
+/* The existing hero remains visible from the first paint; only compositor-friendly
+   transforms give its artwork and content a short entrance on load. */
+.home-hero-image {
+  animation: home-hero-image-enter 1200ms var(--motion-ease) both;
+}
+
+.home-hero-light {
+  pointer-events: none;
+  background: radial-gradient(ellipse 55% 60% at 12% 35%, rgba(0, 217, 255, 0.13), transparent 72%);
+  animation: home-hero-light-enter 1000ms var(--motion-ease) both;
+}
+
+.home-hero-copy {
+  animation: home-hero-rise 800ms var(--motion-ease) both;
+}
+
+.home-hero-categories {
+  animation: home-hero-rise 850ms 130ms var(--motion-ease) both;
+}
+
+.home-category-rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(150px, 44vw);
+  gap: 12px;
+  overflow-x: auto;
+  margin-inline: -1rem;
+  padding: 6px 1rem 12px;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-color: rgba(99, 230, 255, 0.45) transparent;
+  scrollbar-width: thin;
+}
+
+.home-category-card {
+  box-shadow: inset 0 0 0 1px rgba(99, 230, 255, 0.08), 0 10px 28px rgba(0, 0, 0, 0.28);
+  transition: transform var(--motion-normal) var(--motion-ease),
+    border-color var(--motion-normal) var(--motion-ease),
+    box-shadow var(--motion-normal) var(--motion-ease);
+}
+
+.home-category-card:focus-visible {
+  border-color: var(--retail-accent);
+  box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.16), 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+@media (hover: hover) {
+  .home-category-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(99, 230, 255, 0.8);
+    box-shadow: 0 0 22px rgba(0, 217, 255, 0.2), 0 16px 32px rgba(0, 0, 0, 0.36);
+  }
+}
+
+@media (min-width: 640px) {
+  .home-category-rail {
+    grid-auto-columns: minmax(170px, 29vw);
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .home-category-rail {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    overflow: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+    scroll-snap-type: none;
+  }
+}
+
+@keyframes home-hero-image-enter {
+  from { transform: scale(1.045); }
+  to { transform: scale(1); }
+}
+
+@keyframes home-hero-light-enter {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes home-hero-rise {
+  from { transform: translateY(16px); }
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-image,
+  .home-hero-light,
+  .home-hero-copy,
+  .home-hero-categories {
+    animation: none;
+  }
+
+  .home-category-card {
+    transition: none;
+  }
+
+  .home-category-card:hover {
+    transform: none;
+  }
+}
+
 /* Subtle accent halo used behind hero copy / feature groupings. */
 .accent-halo {
   background: radial-gradient(60% 60% at 50% 40%, rgba(0, 217, 255, 0.14) 0%, transparent 70%);

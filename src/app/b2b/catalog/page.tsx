@@ -324,22 +324,28 @@ export default async function B2BCatalogPage({
             <h2 className="font-black">فیلتر کاتالوگ عمده</h2>
           </div>
           <CatalogAutoSubmitForm action="/b2b/catalog" className="mt-4 grid gap-3 pb-2">
-            <label className="grid gap-2 text-sm font-bold text-[#405148]">
-              جستجو
-              <span className="relative">
-                <Search
-                  size={16}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7A8A80]"
-                  aria-hidden="true"
-                />
-                <input
-                  name="q"
-                  defaultValue={params.q}
-                  className="min-h-11 w-full rounded-md border border-[#C8D6C7] bg-[#F7F7F2] px-3 pe-9 outline-none transition placeholder:text-[#7A8A80] focus:border-[#1F8A5B] focus:ring-2 focus:ring-[#1F8A5B]/20"
-                  placeholder="نام محصول، برند یا SKU"
-                />
-              </span>
-            </label>
+            <div className="grid gap-2 text-sm font-bold text-[#405148]">
+              <label htmlFor="b2b-catalog-search">جستجو</label>
+              <div className="flex gap-2">
+                <span className="relative min-w-0 flex-1">
+                  <Search
+                    size={16}
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7A8A80]"
+                    aria-hidden="true"
+                  />
+                  <input
+                    id="b2b-catalog-search"
+                    name="q"
+                    defaultValue={params.q}
+                    className="min-h-11 w-full rounded-md border border-[#C8D6C7] bg-[#F7F7F2] px-3 pe-9 outline-none transition placeholder:text-[#7A8A80] focus:border-[#1F8A5B] focus:ring-2 focus:ring-[#1F8A5B]/20"
+                    placeholder="نام محصول، برند یا SKU"
+                  />
+                </span>
+                <button type="submit" className="min-h-11 rounded-md bg-[#176d48] px-3 text-sm font-bold text-white hover:bg-[#12583a]">
+                  جستجو
+                </button>
+              </div>
+            </div>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
               <label className="grid gap-2 text-sm font-bold text-[#405148]">

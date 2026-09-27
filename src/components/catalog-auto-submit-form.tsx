@@ -1,20 +1,26 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, type FormEvent, type ReactNode } from "react";
 
 interface CatalogAutoSubmitFormProps {
   action: string;
   children: ReactNode;
   className?: string;
+  mobileApply?: boolean;
+  clientNavigation?: boolean;
 }
 
-const debouncedNames = new Set(["q", "minPrice", "maxPrice"]);
+const debouncedNames = new Set(["minPrice", "maxPrice"]);
 
 export function CatalogAutoSubmitForm({
   action,
   children,
   className,
+  mobileApply = false,
+  clientNavigation = false,
 }: CatalogAutoSubmitFormProps) {
+  const router = useRouter();
   const formRef = useRef<HTMLFormElement | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -31,6 +37,11 @@ export function CatalogAutoSubmitForm({
     for (const [key, value] of formData.entries()) {
       const stringValue = String(value).trim();
       if (!stringValue) continue;
+      const input = form.elements.namedItem(key);
+      if (
+        input instanceof HTMLInputElement &&
+        input.dataset.unrestrictedValue === stringValue
+      ) continue;
       query.set(key, stringValue);
     }
 
@@ -55,6 +66,8 @@ export function CatalogAutoSubmitForm({
     const target = event.target;
     if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
     if (!target.name) return;
+    if (target.name === "q") return;
+    if (mobileApply && window.matchMedia("(max-width: 1023px)").matches) return;
     submit(
       target instanceof HTMLInputElement && target.type === "range"
         ? 850
@@ -66,15 +79,21 @@ export function CatalogAutoSubmitForm({
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = null;
     const nextUrl = buildTargetUrl(event.currentTarget);
     const currentUrl = `${window.location.pathname}${window.location.search}`;
-    if (nextUrl !== currentUrl) window.location.assign(nextUrl);
+    if (nextUrl !== currentUrl) {
+      if (clientNavigation) router.push(nextUrl, { scroll: false });
+      else window.location.assign(nextUrl);
+    }
   }
 
   return (
     <form
       ref={formRef}
       action={action}
+      data-mobile-apply={mobileApply ? "true" : undefined}
       className={className}
       onChange={handleChange}
       onSubmit={handleSubmit}

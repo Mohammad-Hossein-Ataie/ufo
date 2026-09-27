@@ -151,17 +151,17 @@ test("mobile menu, search, account and empty cart remain operable", async ({ pag
   await page.setViewportSize({ width: 360, height: 800 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const header = page.getByRole("banner");
+  const header = page.locator("header.retail-header");
   await header.getByRole("button", { name: "باز کردن منو" }).click();
   const menu = page.getByRole("dialog", { name: "منوی موبایل" });
   await expect(menu).toBeVisible();
-  await expect(header.getByRole("button", { name: "باز کردن منو" })).toHaveAttribute(
+  await expect(header.locator('button[aria-controls="retail-mobile-menu"]')).toHaveAttribute(
     "aria-expanded",
     "true",
   );
   await page.screenshot({ path: "temp/header-branding/menu-360.png" });
   await page.keyboard.press("Escape");
-  await expect(header.getByRole("button", { name: "باز کردن منو" })).toHaveAttribute(
+  await expect(header.locator('button[aria-controls="retail-mobile-menu"]')).toHaveAttribute(
     "aria-expanded",
     "false",
   );
@@ -169,8 +169,11 @@ test("mobile menu, search, account and empty cart remain operable", async ({ pag
   await expect(page.getByRole("dialog", { name: "سبد خرید شما خالی است" })).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog", { name: "سبد خرید شما خالی است" })).toHaveCount(0);
-  await header.getByRole("link", { name: "جستجو", exact: true }).click();
-  await expect(page).toHaveURL(/\/search$/);
+  await header.getByRole("button", { name: "باز کردن جستجو" }).click();
+  await expect(page.getByRole("dialog", { name: "جستجوی محصولات" })).toBeVisible();
+  await expect(page).toHaveURL(/\/$/);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "جستجوی محصولات" })).toHaveCount(0);
   await header.getByRole("link", { name: "ورود", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/, { timeout: 20_000 });
   await header.getByRole("button", { name: "باز کردن منو" }).click();

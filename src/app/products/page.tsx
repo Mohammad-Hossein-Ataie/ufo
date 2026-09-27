@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Search, ShieldCheck, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { ArrowLeft, ShieldCheck, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { CatalogAutoSubmitForm } from "@/components/catalog-auto-submit-form";
+import { CatalogFilterPanel } from "@/components/catalog-filter-panel";
+import { CatalogQuickSearch } from "@/components/catalog-quick-search";
 import { CatalogColorFilter } from "@/components/catalog-color-filter";
 import { CatalogFlavorFilter } from "@/components/catalog-flavor-filter";
 import { CatalogOptionFilter } from "@/components/catalog-option-filter";
@@ -123,7 +125,7 @@ function filterProducts(
   includePriceFilter = true,
 ) {
   const minPrice = parseToman(params.minPrice);
-  const maxPrice = parseToman(params.maxPrice ?? "3000000");
+  const maxPrice = parseToman(params.maxPrice);
 
   return searchCatalogRows(rows, params.q ?? "")
     .filter((row) => row.product.isActive)
@@ -217,6 +219,26 @@ export default async function ProductsPage({
   const currentPage = Math.min(Math.max(Number(params.page ?? 1) || 1, 1), totalPages);
   const pagedProducts = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
   const activeBrand = brands.find((item) => item.id === params.brand);
+  const appliedFilters = ([
+    ["q", params.q ? `جستجو: ${params.q}` : ""],
+    ["category", activeCategory?.nameFa ?? ""],
+    ["brand", activeBrand?.nameFa ?? ""],
+    ["kind", params.kind ? productKindLabels[params.kind] : ""],
+    ["flavor", flavorFilterOptions.find((item) => item.id === params.flavor)?.labelFa ?? ""],
+    ["color", colorFilterPalette.find((item) => item.id === params.color)?.labelFa ?? ""],
+    ["resistance", resistanceFilterOptions.find((item) => item.id === params.resistance)?.labelFa ?? ""],
+    ["stock", params.stock ? "موجودی انتخابی" : ""],
+    ["minPrice", params.minPrice ? `از ${params.minPrice} تومان` : ""],
+    ["maxPrice", params.maxPrice ? `تا ${params.maxPrice} تومان` : ""],
+    ["sort", params.sort && params.sort !== "featured" ? "مرتب‌سازی انتخابی" : ""],
+  ] as const)
+    .filter(([, label]) => Boolean(label))
+    .map(([key, label]) => ({
+      key,
+      label,
+      href: makeHref({ ...params, [key]: undefined }, 1),
+    }));
+  const activeFilterCount = appliedFilters.filter(({ key }) => key !== "q" && key !== "sort").length;
   const jsonLd = itemListJsonLd(
     filtered
       .slice(0, PAGE_SIZE)
@@ -229,7 +251,7 @@ export default async function ProductsPage({
       <script {...jsonLdScriptProps(jsonLd)} />
 
       <section className="showcase-grid catalog-showcase relative isolate overflow-hidden border-b border-retail-border bg-retail-surface">
-        <div className="relative z-10 mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:gap-8 sm:py-10 lg:grid-cols-[1fr_22rem] lg:py-14">
+        <div className="relative z-10 mx-auto grid max-w-7xl gap-3 px-4 py-5 sm:gap-8 sm:py-10 lg:grid-cols-[1fr_22rem] lg:py-14">
           <div className="reveal-up">
             <span className="inline-flex select-none items-center gap-2 rounded-full border border-retail-border bg-white/5 px-3 py-1 text-xs font-medium text-retail-secondary">
               <Sparkles size={14} className="text-retail-accent-2" aria-hidden="true" />
@@ -238,11 +260,15 @@ export default async function ProductsPage({
             <h1 className="mt-3 text-2xl font-black leading-[1.45] text-white sm:mt-4 sm:text-4xl sm:leading-[1.3]">
               انتخاب سریع پاد، ویپ و لوازم مصرفی با فیلتر دقیق
             </h1>
-            <p className="mt-3 max-w-3xl leading-8 text-retail-secondary">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-retail-secondary sm:mt-3 sm:text-base sm:leading-8">
               محصول را بر اساس برند، دسته، طعم، رنگ، موجودی و بازه قیمت محدود کنید.
             </p>
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-retail-accent/30 bg-retail-bg/70 px-3 py-1 text-sm font-bold text-white lg:hidden">
+              <ShieldCheck size={16} className="text-retail-accent" aria-hidden="true" />
+              {new Intl.NumberFormat("fa-IR").format(filtered.length)} محصول پیدا شد
+            </p>
           </div>
-          <div className="reveal-up-delay-1 grid gap-3 rounded-retail border border-retail-border bg-retail-bg/70 p-4 sm:p-5">
+          <div className="reveal-up-delay-1 hidden gap-3 rounded-retail border border-retail-border bg-retail-bg/70 p-4 sm:p-5 lg:grid">
             <div className="flex items-center gap-3">
               <span className="inline-flex h-11 w-11 select-none items-center justify-center rounded-full bg-retail-accent/10 text-retail-accent">
                 <ShieldCheck size={22} aria-hidden="true" />
@@ -274,60 +300,57 @@ export default async function ProductsPage({
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-7xl gap-5 px-4 py-8 lg:grid-cols-[20rem_1fr] lg:py-10">
+      <div className="mx-auto grid max-w-7xl gap-4 px-4 py-5 lg:grid-cols-[20rem_1fr] lg:gap-5 lg:py-10">
+        <CatalogQuickSearch key={`search:${makeHref(params, 1)}`} initialQuery={params.q ?? ""} />
         <nav
           aria-label="دسته‌بندی سریع"
           className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 lg:hidden"
         >
           <Link
-            href="/products"
+            href={makeHref({ ...params, category: "" }, 1)}
             className={`min-h-11 shrink-0 snap-start rounded-full border px-4 py-3 text-xs font-bold ${!params.category ? "border-retail-accent bg-retail-accent/10 text-retail-accent" : "border-retail-border bg-retail-surface text-retail-secondary"}`}
           >
-            همه محصولات
+            همه دسته‌ها
           </Link>
           {categories.map((item) => (
             <Link
               key={item.id}
-              href={`/products?category=${encodeURIComponent(item.slug)}`}
+              href={makeHref({ ...params, category: item.slug }, 1)}
               className={`min-h-11 shrink-0 snap-start rounded-full border px-4 py-3 text-xs font-bold ${params.category === item.slug ? "border-retail-accent bg-retail-accent/10 text-retail-accent" : "border-retail-border bg-retail-surface text-retail-secondary"}`}
             >
               {item.nameFa}
             </Link>
           ))}
         </nav>
-        <input id="mobile-filter-toggle" type="checkbox" className="peer sr-only lg:hidden" />
-        <label
-          htmlFor="mobile-filter-toggle"
-          className="flex min-h-12 cursor-pointer items-center justify-between rounded-xl border border-retail-border bg-retail-surface px-4 font-black text-white peer-checked:border-retail-accent/40 lg:hidden"
+        {appliedFilters.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-2 lg:col-span-2" aria-label="فیلترهای فعال">
+            {appliedFilters.map((filter) => (
+              <Link
+                key={filter.key}
+                href={filter.href}
+                aria-label={`حذف ${filter.label}`}
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-retail-accent/30 bg-retail-accent/10 px-3 text-xs font-bold text-retail-accent transition hover:border-retail-accent"
+              >
+                {filter.label}
+                <X size={13} aria-hidden="true" />
+              </Link>
+            ))}
+            <Link href="/products" className="inline-flex min-h-9 items-center px-2 text-xs font-bold text-retail-secondary hover:text-white">
+              پاک کردن همه
+            </Link>
+          </div>
+        ) : null}
+        <CatalogFilterPanel
+          key={`filters:${makeHref(params, 1)}`}
+          activeCount={activeFilterCount}
+          className="retail-glass catalog-filter-aside h-fit rounded-retail border border-retail-border bg-retail-surface p-4 shadow-retail-lg lg:sticky lg:top-[calc(var(--retail-header-height)+1rem)] lg:block lg:max-h-[calc(100vh-var(--retail-header-height)-2rem)] lg:overflow-y-auto lg:overscroll-contain"
         >
-          <span className="flex items-center gap-2">
-            <SlidersHorizontal size={19} className="text-retail-accent" />
-            فیلتر و مرتب‌سازی
-          </span>
-          <span className="text-xs font-medium text-retail-secondary">نمایش گزینه‌ها</span>
-        </label>
-        <aside className="retail-glass catalog-filter-aside hidden h-fit rounded-retail border border-retail-border bg-retail-surface p-4 shadow-retail-lg peer-checked:block lg:sticky lg:top-[calc(var(--retail-header-height)+1rem)] lg:block lg:max-h-[calc(100vh-var(--retail-header-height)-2rem)] lg:overflow-y-auto lg:overscroll-contain">
           <div className="flex items-center gap-2 border-b border-retail-border pb-4">
             <SlidersHorizontal size={18} className="text-retail-accent" aria-hidden="true" />
             <h2 className="font-black text-white">فیلتر محصولات</h2>
           </div>
-          <CatalogAutoSubmitForm action="/products" className="mt-4 grid gap-3 pb-2">
-            <label className="grid gap-2 text-sm text-retail-secondary">
-              جستجو
-              <span className="relative">
-                <Search
-                  size={16}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-retail-muted"
-                  aria-hidden="true"
-                />
-                <input
-                  name="q"
-                  defaultValue={params.q}
-                  className="min-h-11 w-full rounded-md border border-retail-border bg-retail-bg px-3 pe-9 text-white outline-none transition placeholder:text-retail-muted focus:border-retail-accent focus:ring-2 focus:ring-retail-accent/30"
-                  placeholder="نام محصول، برند یا SKU"
-                />
-              </span>
-            </label>
+          <CatalogAutoSubmitForm action="/products" className="mt-4 grid gap-3 pb-2" mobileApply clientNavigation>
+            <input type="hidden" name="q" value={params.q ?? ""} readOnly />
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
               <div className="grid gap-2 text-sm text-retail-secondary">
@@ -421,7 +444,7 @@ export default async function ProductsPage({
 
             <CatalogPriceRangeFilter
               defaultMin={params.minPrice}
-              defaultMax={params.maxPrice ?? "3000000"}
+              defaultMax={params.maxPrice}
               min={priceBounds.min}
               max={priceBounds.max}
               tone="dark"
@@ -446,6 +469,12 @@ export default async function ProductsPage({
             </div>
 
             <div className="grid gap-2">
+              <button
+                type="submit"
+                className="inline-flex min-h-12 items-center justify-center rounded-md bg-retail-accent px-4 text-sm font-black text-retail-bg transition hover:bg-retail-accent-hover lg:hidden"
+              >
+                اعمال فیلترها و نمایش محصولات
+              </button>
               <Link
                 href="/products"
                 className="inline-flex min-h-11 select-none items-center justify-center gap-2 rounded-md border border-retail-border px-4 text-sm font-bold text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
@@ -455,7 +484,7 @@ export default async function ProductsPage({
               </Link>
             </div>
           </CatalogAutoSubmitForm>
-        </aside>
+        </CatalogFilterPanel>
 
         <section>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">

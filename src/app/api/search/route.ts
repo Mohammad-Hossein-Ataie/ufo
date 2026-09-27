@@ -2,54 +2,14 @@ import { NextResponse } from "next/server";
 import { brands, categories } from "@ufo/domain";
 import type { SalesChannel } from "@ufo/types";
 import { listAdminProducts, type AdminProductRecord } from "@/lib/admin-products";
-import { getCatalogRowStock } from "@/lib/catalog-data";
+import { getCatalogRowStock, searchCatalogRows } from "@/lib/catalog-data";
+import { expandCatalogSearchTokens, normalizeCatalogSearchText } from "@/lib/catalog-search-text";
 import { getCategoryImage, getProductImage } from "@/lib/product-images";
 
 type SearchChannel = Extract<SalesChannel, "retail" | "wholesale">;
 
-const commonAliases: Record<string, string[]> = {
-  پاد: ["pod"],
-  ویپ: ["vape"],
-  کویل: ["coil"],
-  کارتریج: ["cartridge"],
-  جویس: ["juice", "liquid"],
-  سالت: ["salt"],
-  ویپو: ["voopoo"],
-  آرگاس: ["argus"],
-  ارگاس: ["argus"],
-  جی: ["g"],
-};
-
-function normalizeText(value: string): string {
-  return value
-    .normalize("NFKC")
-    .replace(/[ي]/g, "ی")
-    .replace(/[ك]/g, "ک")
-    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
-    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
-    .replace(/[\u064B-\u065F\u0670]/g, "")
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .trim()
-    .toLowerCase();
-}
-
-function tokenize(value: string): string[] {
-  return normalizeText(value).split(/\s+/).filter(Boolean);
-}
-
-function expandTokens(query: string): string[] {
-  const tokens = tokenize(query);
-  return [
-    ...new Set(
-      tokens
-        .flatMap((token) => [token, ...(commonAliases[token] ?? [])])
-        .filter((token) => token.length > 0),
-    ),
-  ];
-}
-
 function fieldScore(field: string, tokens: string[], exactWeight: number, containsWeight: number) {
-  const normalized = normalizeText(field);
+  const normalized = normalizeCatalogSearchText(field);
   if (!normalized) return 0;
   return tokens.reduce((score, token) => {
     if (normalized === token) return score + exactWeight;
@@ -98,16 +58,15 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const rawQuery = url.searchParams.get("q") ?? "";
   const channel = url.searchParams.get("channel") === "wholesale" ? "wholesale" : "retail";
-  const tokens = expandTokens(rawQuery);
+  const tokens = expandCatalogSearchTokens(rawQuery);
   const rows = await listAdminProducts();
   const channelRows = rows.filter((row) => rowMatchesChannel(row, channel));
 
-  const rankedRows = channelRows
+  const rankedRows = searchCatalogRows(channelRows, rawQuery)
     .map((row) => ({
       row,
       score: tokens.length > 0 ? scoreRow(row, tokens) : getCatalogRowStock(row),
     }))
-    .filter((item) => tokens.length === 0 || item.score > 0)
     .sort((left, right) => right.score - left.score)
     .slice(0, 8);
 

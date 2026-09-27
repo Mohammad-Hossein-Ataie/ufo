@@ -110,6 +110,7 @@ export function SiteHeader() {
   const [cartCount, setCartCount] = useState(0);
   const [loggedIn, setLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [emptyCartOpen, setEmptyCartOpen] = useState(false);
   const headerDocked = useHeaderDocked();
 
@@ -137,6 +138,7 @@ export function SiteHeader() {
 
   useEffect(() => {
     setMenuOpen(false);
+    setSearchOpen(false);
     setEmptyCartOpen(false);
   }, [pathname]);
 
@@ -160,7 +162,7 @@ export function SiteHeader() {
   return (
     <>
       <header data-docked={headerDocked} className="storefront-header retail-header z-40">
-        <div className="mx-auto grid h-[60px] max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-3 sm:px-4 lg:h-[72px] lg:grid-cols-[232px_minmax(0,1fr)_auto] lg:gap-8">
+        <div className="mx-auto grid h-[60px] max-w-7xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center px-3 sm:px-4 lg:h-[72px] lg:grid-cols-[232px_minmax(0,1fr)_auto] lg:gap-8">
           <div className="flex items-center gap-1 lg:hidden">
             <IconButton
               label="باز کردن منو"
@@ -171,9 +173,16 @@ export function SiteHeader() {
             >
               <Menu size={22} aria-hidden="true" />
             </IconButton>
-            <Link href="/search" aria-label="جستجو" className="header-icon">
+            <button
+              type="button"
+              aria-label="باز کردن جستجو"
+              aria-expanded={searchOpen}
+              aria-controls="retail-mobile-search"
+              className="header-icon"
+              onClick={() => setSearchOpen(true)}
+            >
               <Search size={21} aria-hidden="true" />
-            </Link>
+            </button>
           </div>
           <Link
             href="/"
@@ -199,7 +208,7 @@ export function SiteHeader() {
               </span>
             </Link>
             <span className="hidden h-6 w-px bg-white/10 lg:block" aria-hidden="true" />
-            <span className="header-cart-slot flex w-16 shrink-0 justify-start lg:w-[72px]">
+            <span className="header-cart-slot flex w-11 shrink-0 justify-start lg:w-[72px]">
               <button
                 type="button"
                 onClick={openCart}
@@ -237,6 +246,35 @@ export function SiteHeader() {
           </div>
         </div>
       </header>
+
+      <ModalSurface open={searchOpen} onClose={() => setSearchOpen(false)} title="جستجوی محصولات">
+        <section
+          id="retail-mobile-search"
+          role="dialog"
+          aria-modal="true"
+          aria-label="جستجوی محصولات"
+          className="fixed inset-0 z-[70] flex flex-col overflow-y-auto bg-[#080d14] px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-[calc(1rem+env(safe-area-inset-top))] lg:hidden"
+        >
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <h2 className="text-lg font-black text-white">جستجوی محصولات</h2>
+            <IconButton label="بستن جستجو" onClick={() => setSearchOpen(false)} className="header-icon">
+              <X size={21} aria-hidden="true" />
+            </IconButton>
+          </div>
+          <SmartSearch
+            channel="retail"
+            className="max-w-none"
+            focusOnMount
+            mobileFullscreen={false}
+            documentNavigation
+            onNavigate={() => setSearchOpen(false)}
+            onEscape={() => setSearchOpen(false)}
+          />
+          <p className="mt-4 text-sm leading-6 text-retail-secondary">
+            نام محصول، برند یا کد SKU را بنویسید و نتیجه را انتخاب کنید.
+          </p>
+        </section>
+      </ModalSurface>
 
       <ModalSurface open={menuOpen} onClose={() => setMenuOpen(false)} title="منوی موبایل">
         <aside

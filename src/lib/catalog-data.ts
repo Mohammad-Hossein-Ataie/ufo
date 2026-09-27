@@ -1,9 +1,10 @@
 import { listAdminProducts, type AdminProductRecord } from "@/lib/admin-products";
+import { catalogSearchTokenGroups, normalizeCatalogSearchText } from "@/lib/catalog-search-text";
 
 function matchesQuery(row: AdminProductRecord, query: string): boolean {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) return true;
-  return [
+  const tokenGroups = catalogSearchTokenGroups(query);
+  if (tokenGroups.length === 0) return true;
+  const searchable = normalizeCatalogSearchText([
     row.product.nameFa,
     row.product.nameEn,
     row.product.slug,
@@ -11,11 +12,11 @@ function matchesQuery(row: AdminProductRecord, query: string): boolean {
     row.brandNameFa,
     row.categoryNameFa,
     ...row.product.tags,
+    ...row.variant.attributes.map((attribute) => `${attribute.valueFa} ${attribute.technicalValue ?? ""}`),
   ]
     .filter(Boolean)
-    .join(" ")
-    .toLowerCase()
-    .includes(normalized);
+    .join(" "));
+  return tokenGroups.every((group) => group.some((token) => searchable.includes(token)));
 }
 
 export async function listCatalogRows(): Promise<AdminProductRecord[]> {

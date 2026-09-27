@@ -90,6 +90,7 @@ export function CatalogPriceRangeFilter({
           <span className="relative block">
             <input
               name={maxName}
+              data-unrestricted-value={formatter.format(max)}
               inputMode="numeric"
               dir="ltr"
               value={upper ? formatter.format(upper) : ""}

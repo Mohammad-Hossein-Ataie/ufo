@@ -52,6 +52,11 @@ interface SmartSearchProps {
   channel: SearchChannel;
   className?: string;
   inputClassName?: string;
+  focusOnMount?: boolean;
+  mobileFullscreen?: boolean;
+  documentNavigation?: boolean;
+  onNavigate?: () => void;
+  onEscape?: () => void;
 }
 
 const emptyResponse: SearchResponse = {
@@ -94,9 +99,19 @@ function getSearchPath(channel: SearchChannel, query: string) {
   return trimmed ? `${path}?q=${encodeURIComponent(trimmed)}` : path;
 }
 
-export function SmartSearch({ channel, className, inputClassName }: SmartSearchProps) {
+export function SmartSearch({
+  channel,
+  className,
+  inputClassName,
+  focusOnMount = false,
+  mobileFullscreen = true,
+  documentNavigation = false,
+  onNavigate,
+  onEscape,
+}: SmartSearchProps) {
   const router = useRouter();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResponse>(emptyResponse);
   const [open, setOpen] = useState(false);
@@ -116,7 +131,11 @@ export function SmartSearch({ channel, className, inputClassName }: SmartSearchP
     results.products.length > 0 || results.categories.length > 0 || results.brands.length > 0;
 
   useEffect(() => {
-    if (!open) return;
+    if (focusOnMount) inputRef.current?.focus();
+  }, [focusOnMount]);
+
+  useEffect(() => {
+    if (!open || !query.trim()) return;
     const controller = new AbortController();
     const timeoutId = window.setTimeout(async () => {
       setLoading(true);
@@ -154,8 +173,11 @@ export function SmartSearch({ channel, className, inputClassName }: SmartSearchP
 
   function submitSearch(event?: FormEvent<HTMLFormElement>) {
     event?.preventDefault();
-    router.push(getSearchPath(channel, query));
+    const path = getSearchPath(channel, inputRef.current?.value ?? query);
+    if (documentNavigation) window.location.assign(path);
+    else router.push(path);
     setOpen(false);
+    onNavigate?.();
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -174,10 +196,12 @@ export function SmartSearch({ channel, className, inputClassName }: SmartSearchP
       event.preventDefault();
       router.push(allLinks[activeIndex]);
       setOpen(false);
+      onNavigate?.();
       return;
     }
     if (event.key === "Escape") {
       setOpen(false);
+      onEscape?.();
     }
   }
 
@@ -185,8 +209,10 @@ export function SmartSearch({ channel, className, inputClassName }: SmartSearchP
     <div
       ref={wrapperRef}
       className={cn(
-        "relative z-40 w-full max-w-2xl focus-within:max-md:fixed focus-within:max-md:inset-0 focus-within:max-md:max-w-none focus-within:max-md:bg-retail-bg focus-within:max-md:p-4",
-        theme === "light" && "focus-within:max-md:bg-[#F7F7F2]",
+        "relative z-40 w-full max-w-2xl",
+        mobileFullscreen &&
+          "focus-within:max-md:fixed focus-within:max-md:inset-0 focus-within:max-md:max-w-none focus-within:max-md:bg-retail-bg focus-within:max-md:p-4",
+        mobileFullscreen && theme === "light" && "focus-within:max-md:bg-[#F7F7F2]",
         className,
       )}
       dir="rtl"
@@ -201,11 +227,18 @@ export function SmartSearch({ channel, className, inputClassName }: SmartSearchP
           aria-hidden="true"
         />
         <input
+          ref={inputRef}
           aria-label={channel === "wholesale" ? "جستجوی کاتالوگ عمده" : undefined}
           value={query}
           onChange={(event) => {
-            setQuery(event.target.value);
+            const nextQuery = event.target.value;
+            setQuery(nextQuery);
+            if (!nextQuery.trim()) {
+              setResults(emptyResponse);
+              setLoading(false);
+            }
             setOpen(true);
+            setActiveIndex(-1);
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
@@ -269,7 +302,7 @@ export function SmartSearch({ channel, className, inputClassName }: SmartSearchP
             <ArrowLeft size={16} aria-hidden="true" />
           </button>
 
-          {loading ? (
+          {!query.trim() ? null : loading ? (
             <div className="grid gap-2 p-2" aria-live="polite">
               {[0, 1, 2].map((item) => (
                 <div key={item} className="flex min-h-20 items-center gap-3 rounded-md px-2">
@@ -299,7 +332,10 @@ export function SmartSearch({ channel, className, inputClassName }: SmartSearchP
                       data-has-wholesale-meta={
                         channel === "wholesale" && product.moq && product.cartonSize ? "true" : "false"
                       }
-                      onClick={() => setOpen(false)}
+                      onClick={() => {
+                        setOpen(false);
+                        onNavigate?.();
+                      }}
                       className={cn(
                         "flex min-h-24 items-center gap-3 rounded-md p-2 transition",
                         activeIndex === index
@@ -376,7 +412,10 @@ export function SmartSearch({ channel, className, inputClassName }: SmartSearchP
                 startIndex={results.products.length}
                 activeIndex={activeIndex}
                 theme={theme}
-                onSelect={() => setOpen(false)}
+                onSelect={() => {
+                  setOpen(false);
+                  onNavigate?.();
+                }}
               />
               <FacetSection
                 title="برندها"
@@ -385,7 +424,10 @@ export function SmartSearch({ channel, className, inputClassName }: SmartSearchP
                 startIndex={results.products.length + results.categories.length}
                 activeIndex={activeIndex}
                 theme={theme}
-                onSelect={() => setOpen(false)}
+                onSelect={() => {
+                  setOpen(false);
+                  onNavigate?.();
+                }}
               />
             </div>
           ) : (
