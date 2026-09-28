@@ -39,6 +39,19 @@ export const defaultShippingMethods: ShippingMethodConfig[] = [
     updatedAt: initialDate,
   },
   {
+    id: "shipping_snapbox",
+    code: "snapbox",
+    titleFa: "اسنپ‌باکس",
+    descriptionFa: "فقط شهر تهران؛ هزینه ارسال بر عهده مشتری و هنگام تحویل پرداخت می‌شود",
+    costRial: 0,
+    etaFa: "با هماهنگی پس از آماده‌سازی سفارش",
+    scope: "tehran",
+    isActive: true,
+    sortOrder: 25,
+    createdAt: initialDate,
+    updatedAt: initialDate,
+  },
+  {
     id: "shipping_pickup",
     code: "pickup",
     titleFa: "تحویل حضوری",
@@ -59,7 +72,7 @@ export const defaultShippingMethods: ShippingMethodConfig[] = [
     costRial: 1_200_000,
     etaFa: "۳ تا ۷ روز کاری",
     scope: "nationwide",
-    isActive: false,
+    isActive: true,
     sortOrder: 40,
     createdAt: initialDate,
     updatedAt: initialDate,
@@ -127,6 +140,8 @@ function validateShippingMethod(input: ShippingMethodInput): ShippingMethodInput
     throw new Error("ترتیب نمایش معتبر نیست.");
   if (!(["nationwide", "tehran", "pickup"] as const).includes(input.scope))
     throw new Error("محدوده روش ارسال معتبر نیست.");
+  if (code === "snapbox" && (input.scope !== "tehran" || input.costRial !== 0))
+    throw new Error("اسنپ‌باکس فقط برای شهر تهران است و هزینه آن هنگام تحویل با مشتری است.");
   return { ...input, code, titleFa, descriptionFa, etaFa };
 }
 
@@ -187,7 +202,7 @@ export function quoteConfiguredShipping(
     throw new Error("استان یا شهر انتخاب‌شده معتبر نیست.");
   }
   const available =
-    method.scope !== "tehran" ||
+    (method.code !== "snapbox" && method.scope !== "tehran") ||
     (address.province.trim() === "تهران" && address.city.trim() === "تهران");
   return {
     method: method.code,

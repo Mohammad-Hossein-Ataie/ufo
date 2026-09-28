@@ -232,7 +232,11 @@ export function OrderDetailClient({
           </div>
           <div className="flex justify-between gap-3">
             <span>{order.shippingTitleFa}</span>
-            <Price valueRial={order.shippingRial} />
+            {order.shippingMethod === "snapbox" ? (
+              <span>کرایه با مشتری هنگام تحویل</span>
+            ) : (
+              <Price valueRial={order.shippingRial} />
+            )}
           </div>
           <div className="mt-3 flex justify-between gap-3 border-t border-current/20 pt-3 text-lg font-black">
             <span>مبلغ نهایی</span>

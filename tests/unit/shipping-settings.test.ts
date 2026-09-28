@@ -31,9 +31,12 @@ describe("secure shipping settings", () => {
   });
 
   it("returns only active methods and calculates their price on the server", () => {
-    expect(listShippingMethods()).toHaveLength(4);
-    expect(listAvailableShippingQuotes(tehranAddress).map((item) => item.method)).not.toContain(
+    expect(listShippingMethods()).toHaveLength(5);
+    expect(listAvailableShippingQuotes(tehranAddress).map((item) => item.method)).toContain(
       "iran_post",
+    );
+    expect(listAvailableShippingQuotes(tehranAddress).map((item) => item.method)).toContain(
+      "snapbox",
     );
 
     const post = listShippingMethods().find((item) => item.code === "iran_post")!;
@@ -44,7 +47,7 @@ describe("secure shipping settings", () => {
   });
 
   it("rejects inactive, invalid and out-of-scope methods", () => {
-    expect(() => quoteConfiguredShipping(tehranAddress, "iran_post")).toThrow("فعال نیست");
+    expect(() => quoteConfiguredShipping(tehranAddress, "missing_method")).toThrow("فعال نیست");
     expect(() =>
       saveShippingMethod({
         code: "<script>",
@@ -63,5 +66,19 @@ describe("secure shipping settings", () => {
         "tehran_courier",
       ),
     ).toMatchObject({ available: false, costRial: 0 });
+    expect(
+      quoteConfiguredShipping(
+        { ...tehranAddress, province: "فارس", city: "شیراز" },
+        "snapbox",
+      ),
+    ).toMatchObject({ available: false, costRial: 0 });
+    expect(quoteConfiguredShipping(tehranAddress, "snapbox")).toMatchObject({
+      available: true,
+      costRial: 0,
+      titleFa: "اسنپ‌باکس",
+    });
+    const snapbox = listShippingMethods().find((item) => item.code === "snapbox")!;
+    expect(() => saveShippingMethod({ ...snapbox, scope: "nationwide" }, snapbox.id)).toThrow();
+    expect(() => saveShippingMethod({ ...snapbox, costRial: 1000 }, snapbox.id)).toThrow();
   });
 });

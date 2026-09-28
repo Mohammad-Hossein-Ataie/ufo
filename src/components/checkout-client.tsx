@@ -118,7 +118,7 @@ export function CheckoutClient({
     setPostalCode(item.postalCode ?? "");
     setLocation(item.location);
     setShowAddressForm(false);
-    if (item.city.trim() !== "تهران" && shippingMethod === "tehran_courier") {
+    if (item.city.trim() !== "تهران" && (shippingMethod === "tehran_courier" || shippingMethod === "snapbox")) {
       setShippingMethod("tipax");
     }
   }
@@ -478,7 +478,11 @@ export function CheckoutClient({
                       </span>
                     </span>
                     <span className="mr-auto shrink-0 text-sm font-black text-white">
-                      {method.costRial === 0 ? "رایگان" : <Price valueRial={method.costRial} />}
+                      {method.code === "snapbox"
+                        ? "پرداخت کرایه با مشتری"
+                        : method.costRial === 0
+                          ? "رایگان"
+                          : <Price valueRial={method.costRial} />}
                     </span>
                   </label>
                 );
@@ -855,7 +859,9 @@ export function CheckoutClient({
             ) : null}
             <div className="flex justify-between gap-3 text-retail-secondary">
               <span>هزینه ارسال</span>
-              {(shipping?.costRial ?? 0) === 0 ? (
+              {shipping?.code === "snapbox" ? (
+                <span>پرداخت کرایه توسط مشتری</span>
+              ) : (shipping?.costRial ?? 0) === 0 ? (
                 <span>رایگان</span>
               ) : (
                 <Price valueRial={shipping?.costRial ?? 0} />

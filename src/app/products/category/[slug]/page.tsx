@@ -230,6 +230,7 @@ export default async function CategoryPage({
           return (
             <ProductCard
               key={product.id}
+              className="catalog-linked-card"
               title={product.nameFa}
               subtitle={product.nameEn}
               description={product.shortDescriptionFa}
@@ -257,12 +258,14 @@ export default async function CategoryPage({
                     جزئیات
                   </ProductNavigationLink>
                   {variantOptions.length === 0 ? (
-                    <AddToCartButton
-                      variantId={variant.id}
-                      label="افزودن به سبد خرید"
-                      enableQuantity
-                      maxQuantity={available > 0 ? available : undefined}
-                    />
+                    <div className="catalog-card-secondary-action">
+                      <AddToCartButton
+                        variantId={variant.id}
+                        label="افزودن به سبد خرید"
+                        enableQuantity
+                        maxQuantity={available > 0 ? available : undefined}
+                      />
+                    </div>
                   ) : null}
                 </div>
               }
