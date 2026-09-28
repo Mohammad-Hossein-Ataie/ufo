@@ -3,11 +3,13 @@ import sharp from "sharp";
 export const productImagePresets = {
   card: { width: 600, height: 800, quality: 80 },
   detail: { width: 1200, height: 1600, quality: 84 },
+  thumbnail: { width: 180, height: 240, quality: 70 },
 } as const;
 
 export type ProductImagePreset = keyof typeof productImagePresets;
 export const productCardImageVersion = "5";
 export const productDetailImageVersion = "5";
+export const productSearchImageVersion = "1";
 
 export const productOriginalPrefix = "storage/products/original/";
 export const productGeneratedPrefix = "storage/products/generated/";
@@ -17,7 +19,7 @@ export const maxProductImagePixels = 40_000_000;
 const assetUrlPattern = /^\/api\/product-images\/asset\/([0-9a-f-]{36})\/(card|detail)$/i;
 
 export function isProductImagePreset(value: string): value is ProductImagePreset {
-  return value === "card" || value === "detail";
+  return value === "card" || value === "detail" || value === "thumbnail";
 }
 
 export function productAssetUrl(assetId: string, preset: ProductImagePreset): string {
@@ -47,7 +49,11 @@ export function originalProductKey(assetId: string): string {
 
 export function generatedProductKey(cacheId: string, preset: ProductImagePreset): string {
   const version =
-    preset === "card" ? `-v${productCardImageVersion}` : `-v${productDetailImageVersion}`;
+    preset === "card"
+      ? `-v${productCardImageVersion}`
+      : preset === "detail"
+        ? `-v${productDetailImageVersion}`
+        : `-v${productSearchImageVersion}`;
   return `${productGeneratedPrefix}${cacheId}-${preset}${version}.webp`;
 }
 

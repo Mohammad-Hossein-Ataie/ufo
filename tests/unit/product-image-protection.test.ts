@@ -8,7 +8,9 @@ import {
   productImageAssetId,
   validateProductImage,
   generatedProductKey,
+  isProductImagePreset,
 } from "@/lib/product-image-protection";
+import { getProductSearchImage } from "@/lib/product-images";
 
 describe("product image protection", () => {
   it.each([
@@ -135,6 +137,30 @@ describe("product image protection", () => {
     expect(cardMetadata).toMatchObject({ format: "webp", width: 600, height: 800 });
     expect(detailMetadata).toMatchObject({ format: "webp", width: 1200, height: 1600 });
     expect(cardStats.channels.some((channel) => channel.min < 245)).toBe(true);
+  });
+
+  it("serves compact protected thumbnails for search results", async () => {
+    const assetId = "123e4567-e89b-42d3-a456-426614174000";
+    const product = {
+      id: "search-product",
+      categoryId: "cat-vape",
+      image: productAssetUrl(assetId, "card"),
+    };
+    const imageUrl = getProductSearchImage(product);
+    expect(imageUrl).toContain(`/asset/${assetId}/thumbnail?v=1`);
+    expect(isProductImagePreset("thumbnail")).toBe(true);
+    expect(generatedProductKey(assetId, "thumbnail")).toContain("thumbnail-v1.webp");
+    const original = await sharp({
+      create: { width: 400, height: 400, channels: 3, background: "#113355" },
+    })
+      .png()
+      .toBuffer();
+    const thumbnail = await generateProtectedProductImage(original, "thumbnail");
+    expect(await sharp(thumbnail).metadata()).toMatchObject({
+      format: "webp",
+      width: 180,
+      height: 240,
+    });
   });
 
   it("rejects active SVG input even when the declared MIME type could be forged", async () => {

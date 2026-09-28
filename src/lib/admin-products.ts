@@ -367,12 +367,21 @@ function combineRows(
   variantList: ProductVariant[],
   inventoryList: InventoryItem[],
 ): AdminProductRecord[] {
+  const variantByProductId = new Map<string, ProductVariant>();
+  for (const variant of variantList) {
+    if (!variantByProductId.has(variant.productId))
+      variantByProductId.set(variant.productId, variant);
+  }
+  const inventoryByVariantId = new Map<string, InventoryItem>();
+  for (const item of inventoryList) {
+    if (!inventoryByVariantId.has(item.variantId)) inventoryByVariantId.set(item.variantId, item);
+  }
   return productList
     .filter((product) => !product.deletedAt)
     .map((product) => {
-      const variant = variantList.find((item) => item.productId === product.id);
+      const variant = variantByProductId.get(product.id);
       if (!variant) return undefined;
-      const inventory = inventoryList.find((item) => item.variantId === variant.id) ?? {
+      const inventory = inventoryByVariantId.get(variant.id) ?? {
         id: `inv-missing-${variant.id}`,
         variantId: variant.id,
         onHand: 0,
@@ -412,45 +421,63 @@ export function mergeCatalogRecords<T extends { id: string }>(
 }
 
 export async function listAdminProducts(): Promise<AdminProductRecord[]> {
-  const activeBrands = await listAdminBrands();
-  function withBrandNames(rows: AdminProductRecord[]) {
+  const activeBrandsPromise = listAdminBrands();
+  function withBrandNames(
+    rows: AdminProductRecord[],
+    activeBrands: Awaited<ReturnType<typeof listAdminBrands>>,
+  ) {
+    const brandNameById = new Map(activeBrands.map((brand) => [brand.id, brand.nameFa]));
     return rows.map((row) => ({
       ...row,
-      brandNameFa: activeBrands.find((brand) => brand.id === row.product.brandId)?.nameFa ?? row.brandNameFa,
+      brandNameFa: brandNameById.get(row.product.brandId) ?? row.brandNameFa,
     }));
   }
   if (!hasUsableMongoUri()) {
-    return withBrandNames(combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems));
+    return withBrandNames(
+      combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems),
+      await activeBrandsPromise,
+    );
   }
   let productList: Product[];
   let variantList: ProductVariant[];
   let inventoryList: InventoryItem[];
+  let activeBrands: Awaited<ReturnType<typeof listAdminBrands>>;
 
   try {
     const db = await getDb();
-    await ensureIndexes(db);
-    const [mongoProducts, mongoVariants, mongoInventoryItems] = await Promise.all([
+    const [mongoProducts, mongoVariants, mongoInventoryItems, brands] = await Promise.all([
       db.collection<Product>("products").find({}).sort({ updatedAt: -1 }).toArray(),
       db.collection<ProductVariant>("productVariants").find({}).toArray(),
       db.collection<InventoryItem>("inventoryItems").find({}).toArray(),
+      activeBrandsPromise,
     ]);
     productList = mongoProducts.map(withoutMongoId);
     variantList = mongoVariants.map(withoutMongoId);
     inventoryList = mongoInventoryItems.map(withoutMongoId);
+    activeBrands = brands;
   } catch (error) {
     console.error("Admin products read failed; using bundled catalog fallback", error);
-    return withBrandNames(combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems));
+    return withBrandNames(
+      combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems),
+      await activeBrandsPromise,
+    );
   }
 
   if (productList.length === 0 && variantList.length === 0 && inventoryList.length === 0) {
-    return withBrandNames(combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems));
+    return withBrandNames(
+      combineRows(memoryState.products, memoryState.variants, memoryState.inventoryItems),
+      activeBrands,
+    );
   }
 
-  return withBrandNames(combineRows(
-    mergeCatalogRecords(products, productList),
-    mergeCatalogRecords(variants, variantList),
-    mergeCatalogRecords(inventoryItems, inventoryList),
-  ));
+  return withBrandNames(
+    combineRows(
+      mergeCatalogRecords(products, productList),
+      mergeCatalogRecords(variants, variantList),
+      mergeCatalogRecords(inventoryItems, inventoryList),
+    ),
+    activeBrands,
+  );
 }
 
 export async function saveAdminProduct(input: AdminProductInput): Promise<AdminProductRecord> {
@@ -467,7 +494,12 @@ export async function saveAdminProduct(input: AdminProductInput): Promise<AdminP
     memoryState.products = upsertMemory(memoryState.products, row.product);
     memoryState.variants = upsertMemory(memoryState.variants, row.variant);
     memoryState.inventoryItems = upsertMemory(memoryState.inventoryItems, row.inventory);
-    return { ...row, brandNameFa: (await listAdminBrands()).find((brand) => brand.id === row.product.brandId)?.nameFa ?? row.brandNameFa };
+    return {
+      ...row,
+      brandNameFa:
+        (await listAdminBrands()).find((brand) => brand.id === row.product.brandId)?.nameFa ??
+        row.brandNameFa,
+    };
   }
 
   const db = await getDb();
@@ -483,7 +515,12 @@ export async function saveAdminProduct(input: AdminProductInput): Promise<AdminP
       .collection<InventoryItem>("inventoryItems")
       .updateOne({ id: row.inventory.id }, { $set: row.inventory }, { upsert: true }),
   ]);
-  return { ...row, brandNameFa: (await listAdminBrands()).find((brand) => brand.id === row.product.brandId)?.nameFa ?? row.brandNameFa };
+  return {
+    ...row,
+    brandNameFa:
+      (await listAdminBrands()).find((brand) => brand.id === row.product.brandId)?.nameFa ??
+      row.brandNameFa,
+  };
 }
 
 export function getMemoryAdminProducts() {

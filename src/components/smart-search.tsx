@@ -112,6 +112,7 @@ export function SmartSearch({
   const router = useRouter();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const responseCache = useRef(new Map<string, { data: SearchResponse; savedAt: number }>());
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResponse>(emptyResponse);
   const [open, setOpen] = useState(false);
@@ -139,16 +140,29 @@ export function SmartSearch({
 
   useEffect(() => {
     if (!open || !query.trim()) return;
+    const trimmedQuery = query.trim();
+    const cacheKey = `${channel}:${trimmedQuery.toLocaleLowerCase("fa")}`;
+    const cached = responseCache.current.get(cacheKey);
+    if (cached && Date.now() - cached.savedAt < 30_000) {
+      setResults(cached.data);
+      setLoading(false);
+      setActiveIndex(-1);
+      return;
+    }
     const controller = new AbortController();
+    setLoading(true);
     const timeoutId = window.setTimeout(async () => {
-      setLoading(true);
       try {
         const response = await fetch(
-          `/api/search?channel=${channel}&q=${encodeURIComponent(query.trim())}`,
+          `/api/search?channel=${channel}&q=${encodeURIComponent(trimmedQuery)}`,
           { signal: controller.signal },
         );
         if (!response.ok) throw new Error("Search failed");
         const payload = (await response.json()) as SearchResponse;
+        responseCache.current.set(cacheKey, { data: payload, savedAt: Date.now() });
+        if (responseCache.current.size > 25) {
+          responseCache.current.delete(responseCache.current.keys().next().value!);
+        }
         setResults(payload);
         setActiveIndex(-1);
       } catch {
@@ -158,7 +172,7 @@ export function SmartSearch({
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
-    }, query.trim() ? 140 : 0);
+    }, 220);
 
     return () => {
       window.clearTimeout(timeoutId);
@@ -245,7 +259,9 @@ export function SmartSearch({
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder={channel === "wholesale" ? "جستجوی کاتالوگ عمده" : "جستجوی محصول، برند یا SKU"}
+          placeholder={
+            channel === "wholesale" ? "جستجوی کاتالوگ عمده" : "جستجوی محصول، برند یا SKU"
+          }
           className={cn(
             "min-h-11 w-full rounded-md border px-10 py-2 text-sm outline-none transition",
             theme === "dark" &&
@@ -261,11 +277,15 @@ export function SmartSearch({
             aria-label="پاک کردن جستجو"
             onClick={() => {
               setQuery("");
+              setResults(emptyResponse);
+              setLoading(false);
               setOpen(true);
             }}
             className={cn(
               "absolute left-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md transition",
-              theme === "dark" ? "text-retail-secondary hover:bg-white/10" : "text-[#596B61] hover:bg-[#EEF0E5]",
+              theme === "dark"
+                ? "text-retail-secondary hover:bg-white/10"
+                : "text-[#596B61] hover:bg-[#EEF0E5]",
             )}
           >
             <X size={16} aria-hidden="true" />
@@ -333,7 +353,9 @@ export function SmartSearch({
                       data-search-channel={channel}
                       data-has-price={product.priceRial > 0 ? "true" : "false"}
                       data-has-wholesale-meta={
-                        channel === "wholesale" && product.moq && product.cartonSize ? "true" : "false"
+                        channel === "wholesale" && product.moq && product.cartonSize
+                          ? "true"
+                          : "false"
                       }
                       onClick={() => {
                         setOpen(false);
@@ -352,8 +374,9 @@ export function SmartSearch({
                     >
                       <span
                         className={cn(
-                          "relative aspect-[3/4] w-[72px] shrink-0 overflow-hidden rounded-md border bg-white",
+                          "relative aspect-[3/4] w-[72px] shrink-0 overflow-hidden rounded-md border",
                           theme === "dark" ? "border-retail-border" : "border-[#D5D9C9]",
+                          theme === "dark" ? "bg-retail-surface-alt" : "bg-[#EEF0E5]",
                         )}
                       >
                         <StorefrontProductImage
@@ -361,6 +384,7 @@ export function SmartSearch({
                           fallbackSrc={product.fallbackImage}
                           alt={product.title}
                           sizes="72px"
+                          loading="eager"
                           className="h-full w-full object-contain"
                         />
                       </span>
@@ -381,7 +405,8 @@ export function SmartSearch({
                           </span>
                         </span>
                         <span className="line-clamp-1 text-xs text-current/58">
-                          {product.brand} · {product.category} · <span dir="ltr">{product.sku}</span>
+                          {product.brand} · {product.category} ·{" "}
+                          <span dir="ltr">{product.sku}</span>
                         </span>
                         <span className="line-clamp-2 text-xs leading-5 text-current/52">
                           {highlightText(product.subtitle, query)}
@@ -438,7 +463,9 @@ export function SmartSearch({
               <div>
                 <Loader2 className="mx-auto mb-3 h-5 w-5 text-current/35" aria-hidden="true" />
                 <p className="font-bold">نتیجه ای پیدا نشد</p>
-                <p className="mt-1 text-sm text-current/58">نام برند، مدل یا SKU را کوتاه تر وارد کنید.</p>
+                <p className="mt-1 text-sm text-current/58">
+                  نام برند، مدل یا SKU را کوتاه تر وارد کنید.
+                </p>
               </div>
             </div>
           )}

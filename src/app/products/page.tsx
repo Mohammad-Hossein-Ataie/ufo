@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, ShieldCheck, SlidersHorizontal, Sparkles, X } from "lucide-react";
-import { AddToCartButton } from "@/components/add-to-cart-button";
+import { ShieldCheck, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { CatalogAutoSubmitForm } from "@/components/catalog-auto-submit-form";
 import { CatalogFilterPanel } from "@/components/catalog-filter-panel";
 import { CatalogQuickSearch } from "@/components/catalog-quick-search";
@@ -11,10 +10,12 @@ import { CatalogOptionFilter } from "@/components/catalog-option-filter";
 import { CatalogPagination } from "@/components/catalog-pagination";
 import { CatalogPriceRangeFilter } from "@/components/catalog-price-range-filter";
 import { CatalogSearchableSelect } from "@/components/catalog-searchable-select";
-import { ProductVariantSummary } from "@/components/product-variant-visuals";
-import { ProductNavigationLink } from "@/components/product-navigation-link";
-import { StorefrontProductImage } from "@/components/storefront-product-image";
-import { getCatalogRowStock, listCatalogRows, searchCatalogRows } from "@/lib/catalog-data";
+import { RetailCatalogProductCard } from "@/components/retail-catalog-product-card";
+import {
+  getCatalogRowStock,
+  listCatalogRowsForDiscovery,
+  searchCatalogRows,
+} from "@/lib/catalog-data";
 import { listAdminColors } from "@/lib/admin-colors";
 import { listAdminBrands } from "@/lib/admin-brands";
 import { listAdminFlavors } from "@/lib/admin-flavors";
@@ -22,14 +23,13 @@ import {
   aggregateProductResistanceOptions,
   getProductResistanceOptions,
 } from "@/lib/catalog-technical-filters";
-import { getCategoryImage, getProductImage } from "@/lib/product-images";
 import {
   aggregateStorefrontVariantOptions,
   getStorefrontVariantOptions,
 } from "@/lib/storefront-variants";
 import type { AdminProductRecord } from "@/lib/admin-products";
 import { canonical, itemListJsonLd, jsonLdScriptProps } from "@ufo/seo";
-import { Badge, EmptyState, Price, ProductCard, StockStatus } from "@ufo/ui";
+import { Badge, EmptyState } from "@ufo/ui";
 import { categories } from "@ufo/domain";
 import type { ProductFlavor, ProductKind } from "@ufo/types";
 
@@ -184,10 +184,12 @@ export default async function ProductsPage({
   searchParams?: Promise<ProductSearchParams>;
 }) {
   const rawParams = (await searchParams) ?? {};
-  const rows = await listCatalogRows();
-  const flavors = await listAdminFlavors();
-  const colors = await listAdminColors();
-  const brands = await listAdminBrands();
+  const [rows, flavors, colors, brands] = await Promise.all([
+    listCatalogRowsForDiscovery(),
+    listAdminFlavors(),
+    listAdminColors(),
+    listAdminBrands(),
+  ]);
   const activeCategory = categories.find((item) => item.slug === rawParams.category);
   const specialFilterScope = activeCategory
     ? rows.filter((row) => row.product.isActive && row.product.categoryId === activeCategory.id)
@@ -219,26 +221,33 @@ export default async function ProductsPage({
   const currentPage = Math.min(Math.max(Number(params.page ?? 1) || 1, 1), totalPages);
   const pagedProducts = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
   const activeBrand = brands.find((item) => item.id === params.brand);
-  const appliedFilters = ([
-    ["q", params.q ? `جستجو: ${params.q}` : ""],
-    ["category", activeCategory?.nameFa ?? ""],
-    ["brand", activeBrand?.nameFa ?? ""],
-    ["kind", params.kind ? productKindLabels[params.kind] : ""],
-    ["flavor", flavorFilterOptions.find((item) => item.id === params.flavor)?.labelFa ?? ""],
-    ["color", colorFilterPalette.find((item) => item.id === params.color)?.labelFa ?? ""],
-    ["resistance", resistanceFilterOptions.find((item) => item.id === params.resistance)?.labelFa ?? ""],
-    ["stock", params.stock ? "موجودی انتخابی" : ""],
-    ["minPrice", params.minPrice ? `از ${params.minPrice} تومان` : ""],
-    ["maxPrice", params.maxPrice ? `تا ${params.maxPrice} تومان` : ""],
-    ["sort", params.sort && params.sort !== "featured" ? "مرتب‌سازی انتخابی" : ""],
-  ] as const)
+  const appliedFilters = (
+    [
+      ["q", params.q ? `جستجو: ${params.q}` : ""],
+      ["category", activeCategory?.nameFa ?? ""],
+      ["brand", activeBrand?.nameFa ?? ""],
+      ["kind", params.kind ? productKindLabels[params.kind] : ""],
+      ["flavor", flavorFilterOptions.find((item) => item.id === params.flavor)?.labelFa ?? ""],
+      ["color", colorFilterPalette.find((item) => item.id === params.color)?.labelFa ?? ""],
+      [
+        "resistance",
+        resistanceFilterOptions.find((item) => item.id === params.resistance)?.labelFa ?? "",
+      ],
+      ["stock", params.stock ? "موجودی انتخابی" : ""],
+      ["minPrice", params.minPrice ? `از ${params.minPrice} تومان` : ""],
+      ["maxPrice", params.maxPrice ? `تا ${params.maxPrice} تومان` : ""],
+      ["sort", params.sort && params.sort !== "featured" ? "مرتب‌سازی انتخابی" : ""],
+    ] as const
+  )
     .filter(([, label]) => Boolean(label))
     .map(([key, label]) => ({
       key,
       label,
       href: makeHref({ ...params, [key]: undefined }, 1),
     }));
-  const activeFilterCount = appliedFilters.filter(({ key }) => key !== "q" && key !== "sort").length;
+  const activeFilterCount = appliedFilters.filter(
+    ({ key }) => key !== "q" && key !== "sort",
+  ).length;
   const jsonLd = itemListJsonLd(
     filtered
       .slice(0, PAGE_SIZE)
@@ -323,7 +332,10 @@ export default async function ProductsPage({
           ))}
         </nav>
         {appliedFilters.length > 0 ? (
-          <div className="flex flex-wrap items-center gap-2 lg:col-span-2" aria-label="فیلترهای فعال">
+          <div
+            className="flex flex-wrap items-center gap-2 lg:col-span-2"
+            aria-label="فیلترهای فعال"
+          >
             {appliedFilters.map((filter) => (
               <Link
                 key={filter.key}
@@ -335,7 +347,10 @@ export default async function ProductsPage({
                 <X size={13} aria-hidden="true" />
               </Link>
             ))}
-            <Link href="/products" className="inline-flex min-h-9 items-center px-2 text-xs font-bold text-retail-secondary hover:text-white">
+            <Link
+              href="/products"
+              className="inline-flex min-h-9 items-center px-2 text-xs font-bold text-retail-secondary hover:text-white"
+            >
               پاک کردن همه
             </Link>
           </div>
@@ -349,7 +364,12 @@ export default async function ProductsPage({
             <SlidersHorizontal size={18} className="text-retail-accent" aria-hidden="true" />
             <h2 className="font-black text-white">فیلتر محصولات</h2>
           </div>
-          <CatalogAutoSubmitForm action="/products" className="mt-4 grid gap-3 pb-2" mobileApply clientNavigation>
+          <CatalogAutoSubmitForm
+            action="/products"
+            className="mt-4 grid gap-3 pb-2"
+            mobileApply
+            clientNavigation
+          >
             <input type="hidden" name="q" value={params.q ?? ""} readOnly />
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
@@ -507,95 +527,14 @@ export default async function ProductsPage({
             </EmptyState>
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
-              {pagedProducts.map((row) => {
-                const product = row.product;
-                const variant = row.variant;
-                const available = getCatalogRowStock(row);
-                const variantOptions = getStorefrontVariantOptions(product, flavors, colors);
-                const compareAt = variant.compareAtPriceRial;
-                const discountPercent =
-                  compareAt && compareAt > variant.retailPriceRial
-                    ? Math.round(((compareAt - variant.retailPriceRial) / compareAt) * 100)
-                    : 0;
-                return (
-                  <ProductCard
-                    key={product.id}
-                    className="catalog-linked-card"
-                    title={product.nameFa}
-                    subtitle={product.nameEn}
-                    description={product.shortDescriptionFa}
-                    compactOnMobile
-                    media={
-                      <StorefrontProductImage
-                        key={`media-${product.id}`}
-                        src={getProductImage(product)}
-                        fallbackSrc={
-                          getCategoryImage(product.categoryId) ?? "/images/categories/lighter.webp"
-                        }
-                        alt={product.nameFa}
-                      />
-                    }
-                    badge={
-                      <div
-                        key={`badge-${product.id}`}
-                        className="flex shrink-0 flex-col items-end gap-1"
-                      >
-                        {discountPercent > 0 ? (
-                          <span className="rounded-full bg-rose-500 px-2 py-1 text-[10px] font-black text-white">
-                            ٪{new Intl.NumberFormat("fa-IR").format(discountPercent)}
-                          </span>
-                        ) : null}
-                        <StockStatus key={`stock-${product.id}`} available={available} />
-                      </div>
-                    }
-                    price={
-                      <div key={`price-${product.id}`} className="grid gap-0.5">
-                        {compareAt && compareAt > variant.retailPriceRial ? (
-                          <Price
-                            valueRial={compareAt}
-                            className="text-xs font-medium text-retail-muted line-through"
-                          />
-                        ) : null}
-                        <Price valueRial={variant.retailPriceRial} />
-                      </div>
-                    }
-                    variantSummary={
-                      <div key={`variants-${product.id}`} className="hidden sm:block">
-                        <ProductVariantSummary options={variantOptions} />
-                      </div>
-                    }
-                    actions={
-                      <div key={`actions-${product.id}`} className="grid w-full gap-3">
-                        <ProductNavigationLink
-                          href={`/products/${product.slug}`}
-                          action={variantOptions.length > 0 ? "select" : "details"}
-                          pendingLabel={
-                            variantOptions.length > 0 ? "در حال آماده‌سازی…" : "در حال باز کردن…"
-                          }
-                          className={`w-full px-2 ${
-                            variantOptions.length > 0
-                              ? "border border-cyan-300 bg-cyan-300 text-slate-950 hover:bg-cyan-200"
-                              : "border border-transparent text-current hover:bg-white/10"
-                          }`}
-                        >
-                          {variantOptions.length > 0 ? "انتخاب و خرید" : "جزئیات"}
-                          <ArrowLeft size={16} aria-hidden="true" />
-                        </ProductNavigationLink>
-                        {variantOptions.length === 0 ? (
-                          <div className="catalog-card-secondary-action">
-                            <AddToCartButton
-                              variantId={variant.id}
-                              label="افزودن به سبد خرید"
-                              enableQuantity
-                              maxQuantity={available > 0 ? available : undefined}
-                            />
-                          </div>
-                        ) : null}
-                      </div>
-                    }
-                  />
-                );
-              })}
+              {pagedProducts.map((row, index) => (
+                <RetailCatalogProductCard
+                  key={row.product.id}
+                  row={row}
+                  eagerImage={index < 2}
+                  variantOptions={getStorefrontVariantOptions(row.product, flavors, colors)}
+                />
+              ))}
             </div>
           )}
 

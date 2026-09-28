@@ -52,7 +52,7 @@ export function AdminShippingSettings() {
     );
   }
 
-  async function persist(method: ShippingMethodConfig) {
+  async function persist(method: ShippingMethodConfig, previous?: ShippingMethodConfig) {
     setBusyId(method.id);
     setError("");
     setMessage("");
@@ -69,6 +69,7 @@ export function AdminShippingSettings() {
       );
       setMessage(`روش «${payload.method.titleFa}» ذخیره شد.`);
     } catch (saveError) {
+      if (previous) updateLocal(method.id, { isActive: previous.isActive });
       setError(saveError instanceof Error ? saveError.message : "ذخیره انجام نشد.");
     } finally {
       setBusyId("");
@@ -139,7 +140,9 @@ export function AdminShippingSettings() {
             </span>
             <div>
               <h2 className="font-black text-slate-950">روش‌های ارسال</h2>
-              <p className="mt-1 text-xs text-slate-500">قیمت، محدوده و وضعیت نمایش در checkout</p>
+              <p className="mt-1 text-xs text-slate-500">
+                قیمت، محدوده و وضعیت نمایش در checkout؛ تغییر وضعیت فوراً ذخیره می‌شود.
+              </p>
             </div>
           </div>
           <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">
@@ -168,9 +171,12 @@ export function AdminShippingSettings() {
                     <input
                       type="checkbox"
                       checked={method.isActive}
-                      onChange={(event) =>
-                        updateLocal(method.id, { isActive: event.target.checked })
-                      }
+                      disabled={busyId === method.id}
+                      onChange={(event) => {
+                        const isActive = event.target.checked;
+                        updateLocal(method.id, { isActive });
+                        void persist({ ...method, isActive }, method);
+                      }}
                       className="h-5 w-5 accent-cyan-500"
                     />
                     {method.isActive ? "فعال" : "غیرفعال"}

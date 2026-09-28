@@ -44,7 +44,10 @@ function normalizeHex(value: string): string {
   return `#${longHex.toUpperCase()}`;
 }
 
-function upsertColor(colors: ProductColorOption[], color: ProductColorOption): ProductColorOption[] {
+function upsertColor(
+  colors: ProductColorOption[],
+  color: ProductColorOption,
+): ProductColorOption[] {
   const index = colors.findIndex((item) => item.id === color.id);
   if (index === -1) return [...colors, color];
   return colors.map((item) => (item.id === color.id ? color : item));
@@ -55,7 +58,6 @@ export async function listAdminColors(): Promise<ProductColorOption[]> {
 
   try {
     const db = await getDb();
-    await ensureIndexes(db);
     const mongoColors = await db
       .collection<ProductColorOption>("productColors")
       .find({})
@@ -64,7 +66,9 @@ export async function listAdminColors(): Promise<ProductColorOption[]> {
     if (mongoColors.length === 0) return memoryColors.map(correctColorName);
     const overrides = mongoColors.map(withoutMongoId);
     const overrideIds = new Set(overrides.map((item) => item.id));
-    return [...overrides, ...productColorPalette.filter((item) => !overrideIds.has(item.id))].map(correctColorName);
+    return [...overrides, ...productColorPalette.filter((item) => !overrideIds.has(item.id))].map(
+      correctColorName,
+    );
   } catch (error) {
     console.error("Admin colors read failed; using bundled palette fallback", error);
     return memoryColors.map(correctColorName);

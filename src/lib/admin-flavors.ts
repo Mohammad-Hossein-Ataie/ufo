@@ -35,7 +35,6 @@ export async function listAdminFlavors(): Promise<ProductFlavor[]> {
 
   try {
     const db = await getDb();
-    await ensureIndexes(db);
     const mongoFlavors = await db
       .collection<ProductFlavor>("productFlavors")
       .find({})

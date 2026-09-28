@@ -7,7 +7,7 @@ import { ProductDetailClient } from "@/components/product-detail-client";
 import { ProtectedProductImage } from "@/components/protected-product-image";
 import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
-import { getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
+import { getCatalogRowStock, listCatalogRowsForDiscovery } from "@/lib/catalog-data";
 import { listAdminColors } from "@/lib/admin-colors";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import {
@@ -31,7 +31,7 @@ import { Button, Price, ProductCard, StockStatus } from "@ufo/ui";
 
 export const dynamic = "force-dynamic";
 
-const getProductCatalog = cache(listCatalogRows);
+const getProductCatalog = cache(listCatalogRowsForDiscovery);
 
 const imageBlockPattern = /^!\[(?<alt>.*)]\((?<url>.+)\)$/;
 const videoBlockPattern = /^\[ویدیو.*]\((?<url>.+)\)$/;

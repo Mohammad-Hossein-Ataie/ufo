@@ -15,6 +15,7 @@ interface StorefrontProductImageProps {
   sizes?: string;
   zoomable?: boolean;
   viewerTone?: "dark" | "light";
+  loading?: "eager" | "lazy";
 }
 
 export function StorefrontProductImage({
@@ -25,6 +26,7 @@ export function StorefrontProductImage({
   sizes = "(min-width: 1024px) 28vw, 50vw",
   zoomable = false,
   viewerTone = "dark",
+  loading = "lazy",
 }: StorefrontProductImageProps) {
   const [failedSrc, setFailedSrc] = useState<string>();
   const [imageOpen, setImageOpen] = useState(false);
@@ -40,7 +42,7 @@ export function StorefrontProductImage({
         alt={alt}
         fill
         sizes={sizes}
-        loading="lazy"
+        loading={loading}
         unoptimized
         className={imageClassName}
         onError={() => setFailedSrc(src)}

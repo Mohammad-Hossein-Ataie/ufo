@@ -33,7 +33,7 @@ export const defaultShippingMethods: ShippingMethodConfig[] = [
     costRial: 950_000,
     etaFa: "همان روز یا روز کاری بعد",
     scope: "tehran",
-    isActive: true,
+    isActive: false,
     sortOrder: 20,
     createdAt: initialDate,
     updatedAt: initialDate,
@@ -100,8 +100,26 @@ function readShippingMethods(): ShippingMethodConfig[] {
   const path = getShippingSettingsPath();
   if (!existsSync(path)) return defaultShippingMethods.map((item) => ({ ...item }));
   try {
-    const parsed = JSON.parse(readFileSync(path, "utf8")) as { methods?: ShippingMethodConfig[] };
-    return Array.isArray(parsed.methods) ? parsed.methods : defaultShippingMethods;
+    const parsed = JSON.parse(readFileSync(path, "utf8")) as {
+      methods?: ShippingMethodConfig[];
+      schemaVersion?: number;
+    };
+    if (!Array.isArray(parsed.methods)) return defaultShippingMethods.map((item) => ({ ...item }));
+    if (parsed.schemaVersion === 2) return parsed.methods;
+    // Existing installations may have the old courier enabled. Apply this change
+    // once; subsequent admin toggles are preserved in the versioned file.
+    const migrated = parsed.methods.map((method) =>
+      method.code === "tehran_courier" ? { ...method, isActive: false } : method,
+    );
+    if (!migrated.some((method) => method.code === "snapbox")) {
+      migrated.push({ ...defaultShippingMethods.find((method) => method.code === "snapbox")! });
+    }
+    try {
+      writeShippingMethods(migrated);
+    } catch {
+      // Continue serving the disabled option even if the disk is temporarily unwritable.
+    }
+    return migrated;
   } catch {
     return defaultShippingMethods.map((item) => ({ ...item }));
   }
@@ -111,7 +129,7 @@ function writeShippingMethods(methods: ShippingMethodConfig[]): void {
   const path = getShippingSettingsPath();
   mkdirSync(dirname(path), { recursive: true });
   const tempPath = `${path}.${Date.now()}.tmp`;
-  writeFileSync(tempPath, `${JSON.stringify({ methods }, null, 2)}\n`, {
+  writeFileSync(tempPath, `${JSON.stringify({ schemaVersion: 2, methods }, null, 2)}\n`, {
     encoding: "utf8",
     mode: 0o600,
   });
@@ -214,9 +232,7 @@ export function quoteConfiguredShipping(
   };
 }
 
-export function listAvailableShippingQuotes(
-  address: ShippingAddress,
-): Array<
+export function listAvailableShippingQuotes(address: ShippingAddress): Array<
   ShippingQuote & {
     code: ShippingMethodCode;
     descriptionFa: string;

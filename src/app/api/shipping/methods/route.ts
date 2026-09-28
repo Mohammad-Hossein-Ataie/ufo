@@ -24,7 +24,7 @@ export async function GET(request: Request) {
           phone: process.env.STORE_PHONE?.trim() || "09362157181",
         },
       },
-      { headers: { "Cache-Control": "private, max-age=30, stale-while-revalidate=60" } },
+      { headers: { "Cache-Control": "private, no-store" } },
     );
   } catch (error) {
     return NextResponse.json(

@@ -44,7 +44,7 @@ export const categories: Category[] = [
     slug: "vape",
     descriptionFa: "ویپ و ماد برای کاربران باتجربه با مشخصات فنی شفاف.",
     seoTitle: "خرید ویپ در تهران | UFO Puff",
-    seoDescription: "ویپ، ماد و لوازم سازگار با ارسال تیپاکس و پیک تهران.",
+    seoDescription: "ویپ، ماد و لوازم سازگار با روش‌های ارسال فعال فروشگاه و دریافت حضوری.",
   },
   {
     id: "cat-disposable",

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { ensureIndexes, getDb, hasUsableMongoUri } from "@ufo/database";
+import { getDb, hasUsableMongoUri } from "@ufo/database";
 import { brands as bundledBrands } from "@ufo/domain";
 import type { Brand } from "@ufo/types";
 
@@ -19,7 +19,6 @@ function slugify(value: string) {
 export async function listAdminBrands(): Promise<Brand[]> {
   if (!hasUsableMongoUri()) return [...memoryBrands];
   const db = await getDb();
-  await ensureIndexes(db);
   const saved = await db.collection<Brand>("productBrands").find({}).sort({ nameFa: 1 }).toArray();
   const overrides = saved.map(({ _id: _ignored, ...brand }) => brand as Brand);
   const ids = new Set(overrides.map((brand) => brand.id));
@@ -56,7 +55,11 @@ export async function saveAdminBrand(input: { nameFa: string; slug?: string }): 
 export async function updateAdminBrandLogo(brandId: string, logoUrl: string): Promise<Brand> {
   const brand = (await listAdminBrands()).find((item) => item.id === brandId);
   if (!brand) throw new Error("برند پیدا نشد.");
-  if (!/^\/api\/brand-images\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(logoUrl)) {
+  if (
+    !/^\/api\/brand-images\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(
+      logoUrl,
+    )
+  ) {
     throw new Error("آدرس تصویر برند معتبر نیست.");
   }
   const updated = { ...brand, logoUrl };

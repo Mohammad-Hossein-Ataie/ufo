@@ -103,6 +103,48 @@ export function VariantOptionVisual({
   return <FlavorVisual option={option} className={size === "sm" ? "h-6 w-6" : ""} />;
 }
 
+export function ProductVariantDots({
+  options,
+  max = 5,
+}: {
+  options: StorefrontVariantOption[];
+  max?: number;
+}) {
+  const visible = options.filter((option) => option.type === "color" || option.type === "flavor");
+  if (visible.length === 0) return null;
+  const shown = visible.slice(0, max);
+  return (
+    <div
+      className="flex min-h-5 items-center gap-1.5"
+      role="group"
+      aria-label={visible[0]?.type === "color" ? "رنگ‌های محصول" : "طعم‌های محصول"}
+    >
+      {shown.map((option) => (
+        <span
+          key={option.id}
+          className="inline-block size-3 shrink-0 rounded-full border border-white/65 shadow-sm"
+          style={
+            option.type === "color" && option.swatch
+              ? swatchStyle(option.swatch)
+              : {
+                  backgroundColor:
+                    flavorThemes[flavorKey(option)]?.ring ?? flavorThemes.fallback!.ring,
+                }
+          }
+          title={option.labelFa}
+        >
+          <span className="sr-only">{option.labelFa}</span>
+        </span>
+      ))}
+      {visible.length > shown.length ? (
+        <span className="text-[10px] font-bold text-retail-secondary">
+          +{new Intl.NumberFormat("fa-IR").format(visible.length - shown.length)}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 export function ProductVariantSummary({
   options,
   tone = "dark",

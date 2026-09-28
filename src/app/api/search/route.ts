@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { brands, categories } from "@ufo/domain";
 import type { SalesChannel } from "@ufo/types";
-import { listAdminProducts, type AdminProductRecord } from "@/lib/admin-products";
-import { getCatalogRowStock, searchCatalogRows } from "@/lib/catalog-data";
+import type { AdminProductRecord } from "@/lib/admin-products";
+import {
+  getCatalogRowStock,
+  listCatalogRowsForDiscovery,
+  searchCatalogRows,
+} from "@/lib/catalog-data";
 import { expandCatalogSearchTokens, normalizeCatalogSearchText } from "@/lib/catalog-search-text";
-import { getCategoryImage, getProductImage } from "@/lib/product-images";
+import { getCategoryImage, getProductSearchImage } from "@/lib/product-images";
 
 type SearchChannel = Extract<SalesChannel, "retail" | "wholesale">;
 
@@ -59,7 +63,7 @@ export async function GET(request: Request) {
   const rawQuery = url.searchParams.get("q") ?? "";
   const channel = url.searchParams.get("channel") === "wholesale" ? "wholesale" : "retail";
   const tokens = expandCatalogSearchTokens(rawQuery);
-  const rows = await listAdminProducts();
+  const rows = await listCatalogRowsForDiscovery();
   const channelRows = rows.filter((row) => rowMatchesChannel(row, channel));
 
   const rankedRows = searchCatalogRows(channelRows, rawQuery)
@@ -68,7 +72,7 @@ export async function GET(request: Request) {
       score: tokens.length > 0 ? scoreRow(row, tokens) : getCatalogRowStock(row),
     }))
     .sort((left, right) => right.score - left.score)
-    .slice(0, 8);
+    .slice(0, 5);
 
   const categoryScores = categories
     .map((category) => {
@@ -118,7 +122,7 @@ export async function GET(request: Request) {
           channel === "wholesale"
             ? `/b2b/catalog?q=${encodeURIComponent(row.product.nameFa)}`
             : `/products/${row.product.slug}`,
-        image: getProductImage(row.product),
+        image: getProductSearchImage(row.product),
         fallbackImage,
         priceRial,
         compareAtPriceRial:

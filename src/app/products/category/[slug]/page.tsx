@@ -3,15 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { Button, Price, ProductCard, StockStatus } from "@ufo/ui";
+import { Button } from "@ufo/ui";
 import { categories } from "@ufo/domain";
-import { ProductVariantSummary } from "@/components/product-variant-visuals";
-import { StorefrontProductImage } from "@/components/storefront-product-image";
+import { CatalogPagination } from "@/components/catalog-pagination";
+import { RetailCatalogProductCard } from "@/components/retail-catalog-product-card";
 import { listAdminColors } from "@/lib/admin-colors";
 import { listAdminBrands } from "@/lib/admin-brands";
 import { listAdminFlavors } from "@/lib/admin-flavors";
-import { getCatalogRowStock, listCatalogRows } from "@/lib/catalog-data";
-import { getCategoryImage, getProductImage } from "@/lib/product-images";
+import { listCatalogRowsForDiscovery } from "@/lib/catalog-data";
 import { getStorefrontVariantOptions } from "@/lib/storefront-variants";
 import { getBrandLogoUrl } from "@/lib/partner-brand-logos";
 import {
@@ -21,13 +20,12 @@ import {
   itemListJsonLd,
   jsonLdScriptProps,
 } from "@ufo/seo";
-import { AddToCartButton } from "@/components/add-to-cart-button";
-import { ProductNavigationLink } from "@/components/product-navigation-link";
 
 export const dynamic = "force-dynamic";
+const PAGE_SIZE = 12;
 
 export async function generateStaticParams() {
-  const rows = await listCatalogRows();
+  const rows = await listCatalogRowsForDiscovery();
   const activeCategoryIds = new Set(
     rows
       .filter(
@@ -45,15 +43,15 @@ export async function generateMetadata({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ brand?: string }>;
+  searchParams?: Promise<{ brand?: string; page?: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
   const category = categories.find((item) => item.slug === slug);
   if (!category) return {};
-  const { brand } = (await searchParams) ?? {};
+  const { brand, page } = (await searchParams) ?? {};
   return {
     ...categoryMetadata(category),
-    ...(brand ? { robots: { index: false, follow: true } } : {}),
+    ...(brand || (page && page !== "1") ? { robots: { index: false, follow: true } } : {}),
   };
 }
 
@@ -62,13 +60,13 @@ export default async function CategoryPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ brand?: string }>;
+  searchParams?: Promise<{ brand?: string; page?: string }>;
 }) {
   const { slug } = await params;
   const category = categories.find((item) => item.slug === slug);
   if (!category) notFound();
   const [catalogRows, flavors, colors, adminBrands] = await Promise.all([
-    listCatalogRows(),
+    listCatalogRowsForDiscovery(),
     listAdminFlavors(),
     listAdminColors(),
     listAdminBrands(),
@@ -101,18 +99,31 @@ export default async function CategoryPage({
   const availableBrands = [...brandCounts.values()].sort(
     (left, right) => right.count - left.count || left.name.localeCompare(right.name, "fa"),
   );
-  const { brand: requestedBrand } = (await searchParams) ?? {};
+  const { brand: requestedBrand, page: requestedPage } = (await searchParams) ?? {};
   const selectedBrand = availableBrands.find((brand) => brand.id === requestedBrand);
   const visibleRows = selectedBrand
     ? categoryRows.filter((row) => row.product.brandId === selectedBrand.id)
     : categoryRows;
+  const totalPages = Math.max(1, Math.ceil(visibleRows.length / PAGE_SIZE));
+  const pageNumber = Number.parseInt(requestedPage ?? "1", 10);
+  const currentPage = Math.min(
+    Math.max(Number.isFinite(pageNumber) ? pageNumber : 1, 1),
+    totalPages,
+  );
+  const pagedRows = visibleRows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const categoryPageHref = (page: number) => {
+    const query = new URLSearchParams();
+    if (selectedBrand) query.set("brand", selectedBrand.id);
+    if (page > 1) query.set("page", String(page));
+    return `${categoryPath}${query.size ? `?${query}` : ""}`;
+  };
 
   const breadcrumb = breadcrumbJsonLd([
     { name: "خانه", path: "/" },
     { name: "محصولات", path: "/products" },
     { name: category.nameFa, path: categoryPath },
   ]);
-  const categoryProducts = visibleRows.map((row) => row.product);
+  const categoryProducts = pagedRows.map((row) => row.product);
   const itemList = itemListJsonLd(
     categoryProducts
       .slice(0, 24)
@@ -220,59 +231,22 @@ export default async function CategoryPage({
       </section>
       <section
         aria-label={`محصولات ${selectedBrand ? `${selectedBrand.name} در ` : ""}${category.nameFa}`}
-        className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+        className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3"
       >
-        {visibleRows.map((row) => {
-          const product = row.product;
-          const variant = row.variant;
-          const available = getCatalogRowStock(row);
-          const variantOptions = getStorefrontVariantOptions(product, flavors, colors);
-          return (
-            <ProductCard
-              key={product.id}
-              className="catalog-linked-card"
-              title={product.nameFa}
-              subtitle={product.nameEn}
-              description={product.shortDescriptionFa}
-              media={
-                <StorefrontProductImage
-                  src={getProductImage(product)}
-                  fallbackSrc={
-                    getCategoryImage(product.categoryId) ?? "/images/categories/lighter.webp"
-                  }
-                  alt={product.nameFa}
-                />
-              }
-              badge={<StockStatus available={available} />}
-              price={<Price valueRial={variant.retailPriceRial} />}
-              variantSummary={
-                <ProductVariantSummary key={`variants-${product.id}`} options={variantOptions} />
-              }
-              actions={
-                <div className="grid w-full gap-3">
-                  <ProductNavigationLink
-                    href={`/products/${product.slug}`}
-                    action="details"
-                    className="w-full border border-transparent text-current hover:bg-white/10"
-                  >
-                    جزئیات
-                  </ProductNavigationLink>
-                  {variantOptions.length === 0 ? (
-                    <div className="catalog-card-secondary-action">
-                      <AddToCartButton
-                        variantId={variant.id}
-                        label="افزودن به سبد خرید"
-                        enableQuantity
-                        maxQuantity={available > 0 ? available : undefined}
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              }
-            />
-          );
-        })}
+        {pagedRows.map((row, index) => (
+          <RetailCatalogProductCard
+            key={row.product.id}
+            row={row}
+            eagerImage={index < 2}
+            variantOptions={getStorefrontVariantOptions(row.product, flavors, colors)}
+          />
+        ))}
       </section>
+      <CatalogPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        makeHref={categoryPageHref}
+      />
     </main>
   );
 }

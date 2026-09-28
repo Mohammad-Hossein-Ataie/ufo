@@ -16,7 +16,7 @@ import { categories } from "@ufo/domain";
 import { HomepageProducts } from "@/components/homepage-products";
 import { ContentPostCard } from "@/components/content-post-card";
 import { getLatestHomepageProducts } from "@/lib/homepage-products";
-import { listCatalogRows } from "@/lib/catalog-data";
+import { listCatalogRowsForDiscovery } from "@/lib/catalog-data";
 import { categoryImageBySlug } from "@/lib/product-images";
 import { listAdminBrands } from "@/lib/admin-brands";
 import { getHomepagePartnerBrands } from "@/lib/homepage-brand-logos";
@@ -85,7 +85,7 @@ const categoryAccent: Record<string, string> = {
 
 export default async function HomePage() {
   const [catalogRows, latestPosts, savedBrands] = await Promise.all([
-    listCatalogRows(),
+    listCatalogRowsForDiscovery(),
     listPublishedPosts({ audience: "retail", limit: 3 }),
     listAdminBrands(),
   ]);
@@ -98,7 +98,10 @@ export default async function HomePage() {
       <script {...jsonLdScriptProps(websiteJsonLd())} />
       <script {...jsonLdScriptProps(faqPageJsonLd(homeFaq))} />
 
-      <section className="home-hero relative isolate overflow-hidden" aria-labelledby="home-hero-title">
+      <section
+        className="home-hero relative isolate overflow-hidden"
+        aria-labelledby="home-hero-title"
+      >
         <Image
           src="/images/ufo-hero.webp"
           alt="نمای فروشگاهی محصولات پاد و ویپ UFO Puff"
@@ -117,7 +120,10 @@ export default async function HomePage() {
               <Sparkles size={14} className="text-retail-accent-2" aria-hidden="true" />
               یوفوپاف؛ فروش تکی و عمده پاد و ویپ
             </span>
-            <h1 id="home-hero-title" className="mt-4 text-3xl font-black leading-[1.3] tracking-tight text-white sm:mt-5 sm:text-5xl md:text-6xl">
+            <h1
+              id="home-hero-title"
+              className="mt-4 text-3xl font-black leading-[1.3] tracking-tight text-white sm:mt-5 sm:text-5xl md:text-6xl"
+            >
               کاتالوگ شفاف یوفوپاف برای پاد و ویپ،
               <span className="bg-gradient-to-l from-retail-accent to-retail-accent-2 bg-clip-text text-transparent">
                 {" "}
@@ -130,7 +136,10 @@ export default async function HomePage() {
             </p>
             <div className="mt-5 flex flex-wrap gap-3 sm:mt-9 sm:gap-4">
               <Link href="/products">
-                <Button size="lg" className="glow-accent min-h-12 px-5 text-base font-black sm:min-h-14 sm:px-7 sm:text-lg">
+                <Button
+                  size="lg"
+                  className="glow-accent min-h-12 px-5 text-base font-black sm:min-h-14 sm:px-7 sm:text-lg"
+                >
                   مشاهده محصولات
                   <ArrowLeft size={18} aria-hidden="true" />
                 </Button>
@@ -147,11 +156,17 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="home-hero-categories mt-7 sm:mt-14" aria-labelledby="home-categories-title">
+          <div
+            className="home-hero-categories mt-7 sm:mt-14"
+            aria-labelledby="home-categories-title"
+          >
             <div className="mb-3 flex flex-wrap items-end justify-between gap-2 sm:mb-5">
               <div>
                 <span className="text-xs font-bold text-retail-accent">مسیر سریع خرید</span>
-                <h2 id="home-categories-title" className="mt-1 text-xl font-black text-white sm:text-2xl">
+                <h2
+                  id="home-categories-title"
+                  className="mt-1 text-xl font-black text-white sm:text-2xl"
+                >
                   خرید بر اساس دسته‌بندی
                 </h2>
               </div>
@@ -165,7 +180,8 @@ export default async function HomePage() {
             </div>
             <ul className="home-category-rail" aria-label="دسته‌بندی‌های محصولات">
               {categories.map((category) => {
-                const imageSrc = categoryImageBySlug[category.slug] ?? "/images/categories/default.png";
+                const imageSrc =
+                  categoryImageBySlug[category.slug] ?? "/images/categories/default.png";
                 const accent = categoryAccent[category.slug] ?? "from-cyan-300/25";
 
                 return (
@@ -187,17 +203,26 @@ export default async function HomePage() {
                         className={`absolute inset-0 -z-10 bg-gradient-to-t ${accent} via-black/15 to-black/5`}
                         aria-hidden="true"
                       />
-                      <span className="absolute inset-0 -z-10 bg-gradient-to-t from-black/90 via-black/15 to-transparent" aria-hidden="true" />
+                      <span
+                        className="absolute inset-0 -z-10 bg-gradient-to-t from-black/90 via-black/15 to-transparent"
+                        aria-hidden="true"
+                      />
                       <div className="mt-auto flex w-full items-end justify-between gap-1 p-3 text-sm font-black leading-5 text-white drop-shadow-md sm:text-base">
                         <h3>{category.nameFa}</h3>
-                        <ArrowLeft className="shrink-0 text-retail-accent" size={16} aria-hidden="true" />
+                        <ArrowLeft
+                          className="shrink-0 text-retail-accent"
+                          size={16}
+                          aria-hidden="true"
+                        />
                       </div>
                     </Link>
                   </li>
                 );
               })}
             </ul>
-            <p className="mt-3 text-xs text-retail-secondary lg:hidden">برای دیدن همه دسته‌ها، کارت‌ها را به چپ و راست بکشید.</p>
+            <p className="mt-3 text-xs text-retail-secondary lg:hidden">
+              برای دیدن همه دسته‌ها، کارت‌ها را به چپ و راست بکشید.
+            </p>
           </div>
         </div>
       </section>
@@ -247,17 +272,24 @@ export default async function HomePage() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <span className="text-sm font-bold text-retail-accent">مجله یوفوپاف</span>
-              <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">آخرین اخبار و مقالات</h2>
+              <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">
+                آخرین اخبار و مقالات
+              </h2>
               <p className="mt-2 max-w-2xl text-sm leading-7 text-retail-secondary">
                 راهنماهای کاربردی خرید و تازه‌ترین خبرهای فروشگاه را یک‌جا دنبال کنید.
               </p>
             </div>
-            <Link href="/blog" className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-bold text-retail-accent transition hover:text-retail-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent">
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-bold text-retail-accent transition hover:text-retail-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
+            >
               مشاهده همه مطالب <ArrowLeft size={16} aria-hidden="true" />
             </Link>
           </div>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {latestPosts.map((post) => <ContentPostCard key={post.id} post={post} />)}
+            {latestPosts.map((post) => (
+              <ContentPostCard key={post.id} post={post} />
+            ))}
           </div>
         </div>
       </section>

@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
-import { listCatalogRows } from "@/lib/catalog-data";
+import { listCatalogRowsForDiscovery } from "@/lib/catalog-data";
 import { checkRateLimit } from "@/lib/customer-session";
 import {
   generateProtectedProductImage,
@@ -161,7 +161,7 @@ async function serveCatalog(
   if (!safeIdPattern.test(productId) || !safeIdPattern.test(slot)) {
     return new NextResponse(null, { status: 404 });
   }
-  const row = (await listCatalogRows()).find((item) => item.product.id === productId);
+  const row = (await listCatalogRowsForDiscovery()).find((item) => item.product.id === productId);
   const source = row ? resolveCatalogSource(row.product, slot) : undefined;
   if (!source) return new NextResponse(null, { status: 404 });
 
@@ -192,7 +192,7 @@ async function serveCatalog(
 
 async function serveVariant(variantId: string, preset: ProductImagePreset): Promise<Response> {
   if (!safeIdPattern.test(variantId)) return new NextResponse(null, { status: 404 });
-  const row = (await listCatalogRows()).find((item) => item.variant.id === variantId);
+  const row = (await listCatalogRowsForDiscovery()).find((item) => item.variant.id === variantId);
   if (!row) return new NextResponse(null, { status: 404 });
   return serveCatalog(row.product.id, "primary", preset);
 }

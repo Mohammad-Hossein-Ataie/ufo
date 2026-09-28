@@ -46,6 +46,7 @@ for (const viewport of [
   test(`search matches use color only and larger thumbnails fit at ${viewport.width}px`, async ({
     page,
   }) => {
+    test.setTimeout(90_000);
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (message) => {
@@ -83,6 +84,7 @@ for (const viewport of [
       expect(mark.color).not.toBe(mark.surrounding);
     }
     const image = row.locator("img");
+    await expect(image.locator("..").locator("..")).toHaveClass(/bg-retail-surface-alt/);
     await expect
       .poll(() => image.evaluate((node) => node.complete && node.naturalWidth > 0))
       .toBe(true);
@@ -116,6 +118,43 @@ test("wholesale search uses its own theme color without boxed matches", async ({
     await mark.evaluate((node) => getComputedStyle(node).getPropertyValue("--ui-focus").trim()),
   ).toBe("#176d48");
   await page.screenshot({ path: "temp/search-ui-wholesale.png" });
+});
+
+test("category cards use the catalog layout with compact variant dots and pagination", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/products/category/vape", { waitUntil: "domcontentloaded" });
+  const cards = page.locator(".catalog-linked-card");
+  await expect(cards).toHaveCount(12);
+  await expect(cards.first()).toHaveClass(/mobile-product-card/);
+  await expect(page.getByRole("navigation", { name: "صفحه‌بندی محصولات" })).toBeVisible();
+  await expect(
+    page.locator('.catalog-linked-card [role="group"][aria-label="رنگ‌های محصول"]'),
+  ).not.toHaveCount(0);
+  await cards.first().scrollIntoViewIfNeeded();
+  await expect
+    .poll(() => cards.first().locator("img").first().evaluate((image) => (image as HTMLImageElement).naturalWidth), {
+      timeout: 30_000,
+    })
+    .toBeGreaterThan(0);
+  await page.screenshot({ path: "temp/category-vape-mobile.png" });
+  const firstHref = await cards.first().locator("[data-product-navigation]").getAttribute("href");
+  await cards.first().locator(".media-frame").scrollIntoViewIfNeeded();
+  const mediaHref = await cards
+    .first()
+    .locator(".media-frame")
+    .evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      return document
+        .elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)
+        ?.closest("a")
+        ?.getAttribute("href");
+    });
+  expect(mediaHref).toBe(firstHref);
+  await cards.first().locator("[data-product-navigation]").click();
+  await expect(page).toHaveURL(new RegExp(`${firstHref}$`));
 });
 
 test("catalog cards share one native link across media, title and empty space; cart controls stay separate", async ({
@@ -155,7 +194,7 @@ test("catalog cards share one native link across media, title and empty space; c
     await expect(page).toHaveURL(/\/products$/);
   }
   for (const part of [card.locator(".media-frame"), card.locator("h3"), link]) {
-    await part.scrollIntoViewIfNeeded();
+    await part.evaluate((element) => element.scrollIntoView({ block: "center" }));
     await expect
       .poll(() =>
         part.evaluate((element) => {

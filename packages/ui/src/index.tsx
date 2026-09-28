@@ -172,6 +172,7 @@ export function ProductCard({
   subtitle,
   description,
   media,
+  mediaFooter,
   price,
   variantSummary,
   badge,
@@ -184,6 +185,7 @@ export function ProductCard({
   subtitle?: string | undefined;
   description: string;
   media: ReactNode;
+  mediaFooter?: ReactNode;
   price: ReactNode;
   variantSummary?: ReactNode;
   badge?: ReactNode;
@@ -194,7 +196,8 @@ export function ProductCard({
   return (
     <article
       className={cn(
-        "storefront-product-card group grid min-w-0 h-full grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-current/10 bg-current/[0.028] shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-current/20 hover:bg-current/[0.045] hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+        "storefront-product-card group grid min-w-0 h-full overflow-hidden rounded-lg border border-current/10 bg-current/[0.028] shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-current/20 hover:bg-current/[0.045] hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+        mediaFooter != null ? "grid-rows-[auto_auto_1fr]" : "grid-rows-[auto_1fr]",
         compactOnMobile && "mobile-product-card",
         className,
       )}
@@ -205,6 +208,9 @@ export function ProductCard({
       >
         {media}
       </MediaFrame>
+      {mediaFooter == null ? null : (
+        <div className="flex min-h-7 items-center px-3 pt-1">{mediaFooter}</div>
+      )}
       <div
         className={cn(
           "grid h-full grid-rows-[auto_auto_1fr] gap-3 p-4 sm:p-5",
