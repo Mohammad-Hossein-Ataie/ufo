@@ -2,6 +2,12 @@
   "app": "ufopuff",
   "platform": "next",
   "port": 3000,
+  "disks": [
+    {
+      "name": "ufopuff-data",
+      "mountTo": "/app/mock-data"
+    }
+  ],
   "next": {
     "mirror": false
   }

@@ -233,56 +233,78 @@ export function getCustomerStorePath(): string {
   );
 }
 
+function requireMountedProductionData(storePath: string): void {
+  if (process.platform !== "linux" || process.env.NODE_ENV !== "production") return;
+  if (dirname(storePath) !== "/app/mock-data") return;
+  const mounted = readFileSync("/proc/self/mountinfo", "utf8")
+    .split("\n")
+    .some((line) => line.split(" - ")[0]?.split(" ")[4] === "/app/mock-data");
+  if (!mounted) throw new Error("دیسک داده‌های فروشگاه متصل نیست.");
+  if (!existsSync(storePath)) throw new Error("فایل داده‌های فروشگاه روی دیسک پیدا نشد.");
+}
+
 function readStore(): OrderStoreFile {
   const storePath = getOrderStorePath();
+  requireMountedProductionData(storePath);
   if (!existsSync(storePath)) return emptyStore;
-  try {
-    const parsed = JSON.parse(readFileSync(storePath, "utf8")) as OrderStoreFile;
-    if (!Array.isArray(parsed.orders)) return emptyStore;
-    // Older checkout versions incorrectly marked orders as under review before a receipt existed.
-    return {
-      orders: parsed.orders.map((order) =>
-        order.status === "payment_under_review" && !order.receipts?.length
-          ? { ...order, status: "awaiting_receipt", paymentStatus: "awaiting_receipt" }
-          : order,
-      ),
-    };
-  } catch {
-    return emptyStore;
+  const parsed: unknown = JSON.parse(readFileSync(storePath, "utf8"));
+  if (!parsed || typeof parsed !== "object" || !Array.isArray((parsed as OrderStoreFile).orders)) {
+    throw new Error("فایل سفارش‌های فروشگاه معتبر نیست.");
   }
+  // Older checkout versions incorrectly marked orders as under review before a receipt existed.
+  return {
+    orders: (parsed as OrderStoreFile).orders.map((order) =>
+      order.status === "payment_under_review" && !order.receipts?.length
+        ? { ...order, status: "awaiting_receipt", paymentStatus: "awaiting_receipt" }
+        : order,
+    ),
+  };
 }
 
 function writeStore(store: OrderStoreFile): void {
   const storePath = getOrderStorePath();
+  requireMountedProductionData(storePath);
   mkdirSync(dirname(storePath), { recursive: true });
-  const tempPath = `${storePath}.${Date.now()}.tmp`;
-  writeFileSync(tempPath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
-  if (existsSync(storePath)) rmSync(storePath, { force: true });
-  renameSync(tempPath, storePath);
+  const tempPath = `${storePath}.${process.pid}.${crypto.randomUUID()}.tmp`;
+  try {
+    writeFileSync(tempPath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
+    renameSync(tempPath, storePath);
+  } finally {
+    if (existsSync(tempPath)) rmSync(tempPath, { force: true });
+  }
 }
 
 function readCustomerStore(): CustomerStoreFile {
   const storePath = getCustomerStorePath();
+  requireMountedProductionData(storePath);
   if (!existsSync(storePath)) return emptyCustomerStore;
-  try {
-    const parsed = JSON.parse(readFileSync(storePath, "utf8")) as CustomerStoreFile;
-    return {
-      customers: Array.isArray(parsed.customers) ? parsed.customers : [],
-      carts: Array.isArray(parsed.carts) ? parsed.carts : [],
-      addresses: Array.isArray(parsed.addresses) ? parsed.addresses : [],
-    };
-  } catch {
-    return emptyCustomerStore;
+  const parsed: unknown = JSON.parse(readFileSync(storePath, "utf8"));
+  if (!parsed || typeof parsed !== "object" || !Array.isArray((parsed as CustomerStoreFile).customers)) {
+    throw new Error("فایل حساب‌های مشتریان معتبر نیست.");
   }
+  const store = parsed as CustomerStoreFile;
+  if (
+    ("carts" in store && !Array.isArray(store.carts)) ||
+    ("addresses" in store && !Array.isArray(store.addresses))
+  ) throw new Error("فایل حساب‌های مشتریان معتبر نیست.");
+  return {
+    customers: store.customers,
+    carts: Array.isArray(store.carts) ? store.carts : [],
+    addresses: Array.isArray(store.addresses) ? store.addresses : [],
+  };
 }
 
 function writeCustomerStore(store: CustomerStoreFile): void {
   const storePath = getCustomerStorePath();
+  requireMountedProductionData(storePath);
   mkdirSync(dirname(storePath), { recursive: true });
-  const tempPath = `${storePath}.${Date.now()}.tmp`;
-  writeFileSync(tempPath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
-  if (existsSync(storePath)) rmSync(storePath, { force: true });
-  renameSync(tempPath, storePath);
+  const tempPath = `${storePath}.${process.pid}.${crypto.randomUUID()}.tmp`;
+  try {
+    writeFileSync(tempPath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
+    renameSync(tempPath, storePath);
+  } finally {
+    if (existsSync(tempPath)) rmSync(tempPath, { force: true });
+  }
 }
 
 function trimOptional(value: unknown): string | undefined {

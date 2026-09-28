@@ -63,6 +63,37 @@ test("cart: skeleton waits for data and failed loading can be retried", async ({
   ).toBeVisible();
 });
 
+test("checkout does not mistake a failed address request for an empty address book", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("ufo-age-verified", "true");
+    localStorage.setItem("ufo-retail-session", JSON.stringify({
+      channel: "retail",
+      token: "ui-test-only",
+      customer: { id: "test-customer", firstName: "کاربر", lastName: "آزمایشی", mobileNumber: "09123456789" },
+    }));
+  });
+  let failAddresses = true;
+  await page.route("**/api/**", async (route) => {
+    const path = new URL(route.request().url()).pathname;
+    if (path === "/api/cart") return route.fulfill({ json: {
+      items: [{ id: "line-1", productName: "محصول آزمایشی", quantity: 1, totalPrice: 10000000 }],
+      summary: { subtotalRial: 10000000, discountRial: 0 },
+    } });
+    if (path === "/api/customer/addresses") return route.fulfill(failAddresses
+      ? { status: 401, json: { error: "نشست منقضی شده است." } }
+      : { json: { addresses: [{ id: "home-1", label: "خانه", province: "تهران", city: "تهران", line1: "خیابان نمونه، پلاک ۱", receiverName: "کاربر آزمایشی", receiverPhone: "09123456789", isDefault: true }] } });
+    if (path === "/api/shipping/methods") return route.fulfill({ json: { methods: [{ code: "tipax", scope: "nationwide", titleFa: "تیپاکس", descriptionFa: "ارسال", etaFa: "۲ روز", costRial: 0, available: true }] } });
+    return route.fulfill({ json: {} });
+  });
+  await page.goto("/checkout");
+  await expect(page.getByText("نشست منقضی شده است.")).toBeVisible();
+  await expect(page.getByText("اولین آدرس شما")).toHaveCount(0);
+  failAddresses = false;
+  await page.getByRole("button", { name: "تلاش دوباره" }).click();
+  await expect(page.getByText("خیابان نمونه، پلاک ۱")).toBeVisible();
+  await expect(page.getByText("اولین آدرس شما")).toHaveCount(0);
+});
+
 for (const channel of ["retail", "wholesale"] as const) {
   test(`${channel}: shipping selection, coordinates and manual payment`, async ({
     page,

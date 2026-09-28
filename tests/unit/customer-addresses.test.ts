@@ -1,10 +1,11 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createCustomerAddress,
   deleteCustomerAddress,
+  getCustomerStorePath,
   listCustomerAddresses,
   updateCustomerAddress,
   upsertCustomerAccount,
@@ -78,5 +79,27 @@ describe("customer address book", () => {
     );
     deleteCustomerAddress(customer.id, address.id);
     expect(listCustomerAddresses(customer.id)).toEqual([]);
+  });
+
+  it("does not replace an unreadable customer file with an empty account", () => {
+    const customer = upsertCustomerAccount({
+      mobileNumber: "09120000000",
+      customerType: "retail",
+      profile: { firstName: "کاربر", lastName: "تست" },
+    });
+    const storePath = getCustomerStorePath();
+    const saved = readFileSync(storePath, "utf8");
+    writeFileSync(storePath, "{invalid-json", "utf8");
+
+    expect(() => upsertCustomerAccount({ mobileNumber: customer.mobileNumber, customerType: "retail" })).toThrow();
+    expect(readFileSync(storePath, "utf8")).toBe("{invalid-json");
+
+    writeFileSync(storePath, saved, "utf8");
+    expect(upsertCustomerAccount({ mobileNumber: customer.mobileNumber, customerType: "retail" }).id).toBe(customer.id);
+
+    const invalidAddresses = JSON.stringify({ ...JSON.parse(saved), addresses: "invalid" });
+    writeFileSync(storePath, invalidAddresses, "utf8");
+    expect(() => listCustomerAddresses(customer.id)).toThrow("فایل حساب‌های مشتریان معتبر نیست");
+    expect(readFileSync(storePath, "utf8")).toBe(invalidAddresses);
   });
 });

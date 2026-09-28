@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createOtpChallenge } from "@ufo/auth";
-import { getCustomerAccount, upsertCustomerAccount } from "@ufo/orders";
+import { createCustomerAddress, getCustomerAccount, listCustomerAddresses, upsertCustomerAccount } from "@ufo/orders";
 import { POST } from "@/app/api/auth/verify-otp/route";
 import { PATCH } from "@/app/api/customer/profile/route";
 import { saveOtpChallenge } from "@/lib/otp-store";
@@ -61,12 +61,23 @@ describe.each(["retail", "wholesale"] as const)("%s OTP onboarding", (type) => {
       customerType: type,
       profile: { firstName: "Existing", lastName: "Customer", companyName: "Existing Store" },
     });
+    const home = createCustomerAddress(customer.id, {
+      label: "خانه",
+      province: "تهران",
+      city: "تهران",
+      line1: "خیابان نمونه، پلاک ۱",
+      receiverName: "Existing Customer",
+      receiverPhone: "09123456789",
+    });
     const request = await loginRequest(type, { fullName: "Changed Name", firstName: "Changed" });
     const payload = await (await POST(request())).json();
     expect(payload.needsProfileCompletion).toBe(false);
     expect(payload.customer.id).toBe(customer.id);
     expect(payload.customer.firstName).toBe("Existing");
     expect(payload.customer.lastName).toBe("Customer");
+    expect(listCustomerAddresses(payload.customer.id)).toEqual([
+      expect.objectContaining({ id: home.id, line1: "خیابان نمونه، پلاک ۱" }),
+    ]);
   });
 
   it("allows only one concurrent verification and rejects later replay", async () => {

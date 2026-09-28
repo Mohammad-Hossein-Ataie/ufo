@@ -138,6 +138,9 @@ for (const channel of ["retail", "wholesale"] as const) {
       expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(card);
       await page.getByRole("button", { name: "کپی شبا", exact: true }).click();
       expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(iban);
+      await expect(banks.locator('[data-bank-artwork] [data-bank-iban]')).toContainText(
+        iban!.replace(/(.{4})/g, "$1 ").trim(),
+      );
       await banks.screenshot({ path: `temp/receiving-${channel}-${card!.slice(-4)}.png` });
     }
     await page.getByLabel("تصویر یا فایل PDF رسید", { exact: true }).setInputFiles({

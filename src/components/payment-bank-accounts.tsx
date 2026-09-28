@@ -61,7 +61,7 @@ function CardArtwork({ account }: { account: BankAccount }) {
                 </text>
               ))}
             </g>
-            <text data-bank-iban x="20" y="252" fill="white" fontFamily="monospace" fontSize="8.5" direction="ltr" textAnchor="start">{iban}</text>
+            <text data-bank-iban x="20" y="252" fill="white" fontFamily="monospace" fontSize="9.5" direction="ltr" textAnchor="start">{iban}</text>
             <text x="25" y="271" fill="white" fontFamily="sans-serif" fontSize="11" direction="ltr">
               bank. but lovely
             </text>

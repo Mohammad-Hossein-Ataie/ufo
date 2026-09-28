@@ -57,12 +57,10 @@ async function mockCheckout(page: Page) {
                 ],
               }
             : path === "/api/orders"
-              ? { order: { id: "zibal-order-mobile" } }
-              : path === "/api/payments/zibal/zibal-order-mobile"
-                ? { error: "شناسه پذیرنده درگاه زیبال معتبر نیست." }
+              ? { order: { id: "manual-order-mobile" } }
                 : {};
     await route.fulfill({
-      status: path === "/api/payments/zibal/zibal-order-mobile" ? 502 : 200,
+      status: 200,
       json,
     });
   });
@@ -171,7 +169,7 @@ for (const width of [440, 360, 1440]) {
   });
 }
 
-test("portaled mobile checkout button submits its form and preserves a rejected order", async ({
+test("portaled mobile checkout button submits its form with card-to-card selected", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 440, height: 956 });
@@ -179,14 +177,8 @@ test("portaled mobile checkout button submits its form and preserves a rejected 
   await page.goto("/checkout");
   const submit = page
     .getByTestId("checkout-mobile-cta")
-    .getByRole("button", { name: "ثبت و پرداخت", exact: true });
+    .getByRole("button", { name: "تأیید سفارش", exact: true });
   await expect(submit).toBeEnabled();
   await submit.click();
-  await expect(
-    page.getByText("سفارش ثبت شد؛ اتصال به درگاه انجام نشد", { exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: "مشاهده سفارش و تلاش دوباره", exact: true }),
-  ).toHaveAttribute("href", "/orders/zibal-order-mobile");
-  await expect(submit).toBeDisabled();
+  await expect(page).toHaveURL(/\/orders\/manual-order-mobile$/);
 });

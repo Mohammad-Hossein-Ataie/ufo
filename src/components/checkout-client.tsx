@@ -48,9 +48,6 @@ const fieldClass =
 const textareaClass =
   "rounded-xl !border-white/10 !bg-[#090d13] px-4 py-3 !text-white caret-retail-accent !shadow-none placeholder:!text-retail-muted focus:!border-retail-accent focus:!ring-retail-accent/20";
 
-// Temporarily pause new gateway selections; the gateway integration stays available.
-const zibalComingSoon = true;
-
 function Step({ number, label, active }: { number: string; label: string; active: boolean }) {
   return (
     <div className={`flex items-center gap-2 ${active ? "text-white" : "text-retail-muted"}`}>
@@ -76,7 +73,7 @@ export function CheckoutClient({
   gatewayEnabled?: boolean;
 }) {
   const base = channel === "wholesale" ? "/b2b" : "";
-  const canSelectGateway = gatewayEnabled && !zibalComingSoon;
+  const canSelectGateway = gatewayEnabled;
   const [location, setLocation] = useState<ShippingAddress["location"]>();
   const [cartView, setCartView] = useState<CustomerCartView | null>(null);
   const [addresses, setAddresses] = useState<CustomerAddress[]>([]);
@@ -104,6 +101,7 @@ export function CheckoutClient({
   const [error, setError] = useState("");
   const [paymentOrderId, setPaymentOrderId] = useState("");
   const [addressError, setAddressError] = useState("");
+  const [addressLoadError, setAddressLoadError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isStartingPayment, setIsStartingPayment] = useState(false);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
@@ -136,22 +134,40 @@ export function CheckoutClient({
       `${session.customer.firstName} ${session.customer.lastName}`.trim() || session.fullName || "";
     setCustomerName(fullName);
     setPhone(session.customer.mobileNumber);
-    void Promise.all([
+    void Promise.allSettled([
       fetchCustomerCart(channel),
       fetch("/api/customer/addresses", {
         headers: authHeaders(channel),
         cache: "no-store",
-      }).then((response) => response.json() as Promise<{ addresses?: CustomerAddress[] }>),
+      }).then(async (response) => {
+        const payload = (await response.json().catch(() => ({}))) as {
+          addresses?: CustomerAddress[];
+          error?: string;
+        };
+        if (!response.ok || !Array.isArray(payload.addresses)) {
+          throw new Error(payload.error ?? "دریافت آدرس‌های ذخیره‌شده انجام نشد.");
+        }
+        return payload;
+      }),
     ])
-      .then(([cart, payload]) => {
-        setCartView(cart);
-        const saved = payload.addresses ?? [];
-        setAddresses(saved);
-        const preferred = saved.find((item) => item.isDefault) ?? saved[0];
-        if (preferred) applyAddress(preferred);
-        else setShowAddressForm(true);
+      .then(([cartResult, addressResult]) => {
+        if (cartResult.status === "fulfilled") setCartView(cartResult.value);
+        else setError("دریافت سبد خرید انجام نشد. دوباره تلاش کنید.");
+        if (addressResult.status === "fulfilled") {
+          const saved = addressResult.value.addresses ?? [];
+          setAddresses(saved);
+          const preferred = saved.find((item) => item.isDefault) ?? saved[0];
+          if (preferred) applyAddress(preferred);
+          else setShowAddressForm(true);
+        } else {
+          setAddressLoadError(true);
+          setError(
+            addressResult.reason instanceof Error
+              ? addressResult.reason.message
+              : "دریافت آدرس‌های ذخیره‌شده انجام نشد. دوباره تلاش کنید.",
+          );
+        }
       })
-      .catch(() => setError("دریافت اطلاعات تسویه حساب انجام نشد. دوباره تلاش کنید."))
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -381,7 +397,7 @@ export function CheckoutClient({
       {error ? (
         <div className="mb-5">
           <Alert
-            title={paymentOrderId ? "سفارش ثبت شد؛ اتصال به درگاه انجام نشد" : "خطا در ثبت سفارش"}
+            title={paymentOrderId ? "سفارش ثبت شد؛ اتصال به درگاه انجام نشد" : addressLoadError ? "دریافت آدرس‌ها انجام نشد" : "خطا در ثبت سفارش"}
             tone="danger"
           >
             <p>{error}</p>
@@ -392,6 +408,10 @@ export function CheckoutClient({
               >
                 مشاهده سفارش و تلاش دوباره
               </Link>
+            ) : addressLoadError ? (
+              <button type="button" onClick={() => window.location.reload()} className="mt-3 inline-flex rounded-xl border border-current/30 px-3 py-2 text-sm font-bold">
+                تلاش دوباره
+              </button>
             ) : null}
           </Alert>
         </div>
@@ -725,7 +745,7 @@ export function CheckoutClient({
               </div>
             </div>
             <div className="mt-4 grid gap-3">
-              {gatewayEnabled || zibalComingSoon ? (
+              {gatewayEnabled ? (
                 <label
                   className={`flex items-center gap-3 rounded-2xl border p-4 ${canSelectGateway ? "cursor-pointer" : "cursor-not-allowed opacity-60"} ${paymentMethod === "zibal" ? "border-retail-accent/60 bg-retail-accent/[0.08]" : "border-retail-border bg-black/15"}`}
                 >
@@ -739,11 +759,9 @@ export function CheckoutClient({
                     className="h-5 w-5 accent-cyan-300"
                   />
                   <div>
-                    <p className="flex flex-wrap items-center gap-2 font-black text-white">پرداخت آنلاین با زیبال
-                      {zibalComingSoon && <span className="rounded-full border border-current/20 px-2 py-1 text-xs font-bold text-retail-secondary">به‌زودی</span>}
-                    </p>
+                    <p className="font-black text-white">پرداخت آنلاین با زیبال</p>
                     <p className="mt-1 text-xs text-retail-secondary">
-                      انتقال امن به درگاه و تأیید خودکار پرداخت
+                      پس از ثبت سفارش به درگاه امن زیبال منتقل می‌شوید.
                     </p>
                   </div>
                   <ShieldCheck className="mr-auto shrink-0 text-retail-accent-2" size={21} />

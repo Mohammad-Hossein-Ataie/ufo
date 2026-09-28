@@ -1,6 +1,10 @@
 # Project Conventions
 
 - One Next.js app in `src`; shared TypeScript packages in `packages/*`.
+- Liara production data under `UFO_MOCK_DATA_DIR=./mock-data` must live on the
+  `ufopuff-data` disk mounted at `/app/mock-data`. Before the first disk-backed
+  deployment, back up the current container's `mock-data` privately and restore
+  it to the new mount; mounting an empty disk does not migrate existing files.
 - Zibal IPG uses server-only `ZIBAL_MERCHANT` at runtime and the callback origin from
   `APP_BASE_URL`; never derive payment callbacks from proxy/request hosts. Follow
   `https://help.zibal.ir/ipg/` (its linked OpenAPI schema includes result codes and badges).
