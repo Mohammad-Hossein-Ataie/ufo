@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import {
+  Calculator,
   Clock3,
   Mail,
   MapPin,
@@ -23,6 +24,7 @@ import { storeSettings } from "@ufo/domain";
 
 const retailFooterLinks = [
   { href: "/products", label: "محصولات", icon: ShoppingBag },
+  { href: "/nicotine-guide", label: "راهنمای نیکوتین", icon: Calculator },
   { href: "/cart", label: "سبد خرید", icon: Clock3 },
   { href: "/login", label: "حساب مشتری", icon: ShieldCheck },
   { href: "/store/tehran-molavi", label: "درباره یوفوپاف", icon: MessageCircle },

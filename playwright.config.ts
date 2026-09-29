@@ -6,6 +6,20 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
+    storageState: {
+      cookies: [],
+      origins: [
+        {
+          origin: "http://localhost:3000",
+          localStorage: [
+            {
+              name: "ufo:nicotine-guide-promo:v1",
+              value: JSON.stringify({ choice: "never", savedAt: 0 }),
+            },
+          ],
+        },
+      ],
+    },
   },
   projects: [
     {

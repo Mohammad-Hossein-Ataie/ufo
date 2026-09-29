@@ -52,6 +52,7 @@ describe("public sitemap", () => {
     vi.mocked(listCatalogRows).mockRejectedValue(new Error("catalog unavailable"));
     const entries = await sitemap();
     expect(entries.some((entry) => entry.url === "https://ufopuff.com/")).toBe(true);
+    expect(entries.some((entry) => entry.url === "https://ufopuff.com/nicotine-guide")).toBe(true);
     expect(entries.some((entry) => entry.url.includes("/products/"))).toBe(true);
   });
 });

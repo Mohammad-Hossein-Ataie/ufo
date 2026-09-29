@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import {
   BookOpenText,
+  Calculator,
   Home,
   Info,
   Menu,
@@ -30,6 +31,7 @@ interface CartLine {
 const navItems = [
   { href: "/", label: "خانه", icon: Home },
   { href: "/products", label: "محصولات", icon: PackageSearch },
+  { href: "/nicotine-guide", label: "راهنمای نیکوتین", icon: Calculator },
   { href: "/store/tehran-molavi", label: "درباره ما", icon: Info },
   { href: "/blog", label: "اخبار و مقالات", icon: BookOpenText },
 ];
@@ -257,7 +259,11 @@ export function SiteHeader() {
         >
           <div className="mb-5 flex items-center justify-between gap-3">
             <h2 className="text-lg font-black text-white">جستجوی محصولات</h2>
-            <IconButton label="بستن جستجو" onClick={() => setSearchOpen(false)} className="header-icon">
+            <IconButton
+              label="بستن جستجو"
+              onClick={() => setSearchOpen(false)}
+              className="header-icon"
+            >
               <X size={21} aria-hidden="true" />
             </IconButton>
           </div>

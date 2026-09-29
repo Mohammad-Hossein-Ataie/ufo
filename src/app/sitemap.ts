@@ -45,6 +45,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: canonical("/nicotine-guide"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: canonical("/store/tehran-molavi"),
       changeFrequency: "monthly",
       priority: 0.7,

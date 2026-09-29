@@ -15,6 +15,7 @@ import { Button } from "@ufo/ui";
 import { categories } from "@ufo/domain";
 import { HomepageProducts } from "@/components/homepage-products";
 import { ContentPostCard } from "@/components/content-post-card";
+import { NicotineGuidePromoModal } from "@/components/nicotine-guide-promo-modal";
 import { getLatestHomepageProducts } from "@/lib/homepage-products";
 import { listCatalogRowsForDiscovery } from "@/lib/catalog-data";
 import { categoryImageBySlug } from "@/lib/product-images";
@@ -97,6 +98,7 @@ export default async function HomePage() {
       <script {...jsonLdScriptProps(organizationJsonLd())} />
       <script {...jsonLdScriptProps(websiteJsonLd())} />
       <script {...jsonLdScriptProps(faqPageJsonLd(homeFaq))} />
+      <NicotineGuidePromoModal />
 
       <section
         className="home-hero relative isolate overflow-hidden"

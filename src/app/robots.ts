@@ -18,6 +18,7 @@ export default function robots(): MetadataRoute.Robots {
           "/",
           "/products",
           "/products/category",
+          "/nicotine-guide",
           "/store",
           "/blog",
           "/b2b",
