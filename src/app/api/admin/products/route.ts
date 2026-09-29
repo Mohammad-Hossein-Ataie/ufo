@@ -3,7 +3,7 @@ import { categories } from "@ufo/domain";
 import { listAdminBrands } from "@/lib/admin-brands";
 import { saveAdminProduct, type AdminProductInput } from "@/lib/admin-products";
 import { productQuerySchema, queryAdminProducts } from "@/lib/admin-product-query";
-import type { ProductVariantType } from "@ufo/types";
+import type { ProductVariantType, ProductVariantValueState } from "@ufo/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,6 +25,31 @@ function parseVariantType(value: unknown): ProductVariantType | undefined {
     value === "none"
     ? value
     : undefined;
+}
+
+function parseVariantValueStates(value: unknown): Record<string, ProductVariantValueState> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value).flatMap(([valueId, rawState]) => {
+      if (!rawState || typeof rawState !== "object" || Array.isArray(rawState)) return [];
+      const state = rawState as Record<string, unknown>;
+      const stockQuantity =
+        state.stockQuantity === undefined || state.stockQuantity === ""
+          ? undefined
+          : Number(state.stockQuantity);
+      return [[
+        valueId.trim(),
+        {
+          isActive: state.isActive === undefined ? true : Boolean(state.isActive),
+          isAvailable: state.isAvailable === undefined ? true : Boolean(state.isAvailable),
+          ...(stockQuantity !== undefined ? { stockQuantity } : {}),
+          ...(typeof state.sku === "string" && state.sku.trim()
+            ? { sku: state.sku.trim() }
+            : {}),
+        },
+      ]];
+    }),
+  );
 }
 
 function parseInput(body: unknown): AdminProductInput {
@@ -51,6 +76,14 @@ function parseInput(body: unknown): AdminProductInput {
     variantValueIds: Array.isArray(value.variantValueIds)
       ? value.variantValueIds.map(String)
       : undefined,
+    variantValueStates:
+      value.variantValueStates === undefined
+        ? undefined
+        : parseVariantValueStates(value.variantValueStates),
+    defaultVariantValueId:
+      value.defaultVariantValueId === undefined
+        ? undefined
+        : String(value.defaultVariantValueId),
     variantImages:
       value.variantImages === undefined ? undefined : parseImageMap(value.variantImages),
     colorImages: value.colorImages === undefined ? undefined : parseImageMap(value.colorImages),

@@ -3,7 +3,11 @@ import sharp from "sharp";
 import { createAdminSessionToken } from "@/lib/admin-session";
 import { findPublishedPostBySlug, listPublishedPosts } from "@/lib/content-posts";
 import { GET as listPosts, POST as createPost } from "@/app/api/admin/content/route";
-import { DELETE as deletePost, PATCH as updatePost } from "@/app/api/admin/content/[postId]/route";
+import {
+  DELETE as deletePost,
+  GET as readPost,
+  PATCH as updatePost,
+} from "@/app/api/admin/content/[postId]/route";
 import { POST as uploadCover } from "@/app/api/admin/content/upload/route";
 import { GET as readCover } from "@/app/api/content-images/[assetId]/route";
 
@@ -42,11 +46,80 @@ function input(status: "draft" | "published" = "draft") {
     author: "تحریریه تست",
     sources: ["https://example.com/source"],
     seoTitle: "راهنمای آزمایشی انتخاب محصول مناسب | یوفوپاف",
-    seoDescription: "این توضیحات آزمایشی برای بررسی متادیتای سئو، نمایش نتیجه جست‌وجو و اعتبارسنجی کامل مطلب در پنل مدیریت یوفوپاف نوشته شده است.",
+    seoDescription:
+      "این توضیحات آزمایشی برای بررسی متادیتای سئو، نمایش نتیجه جست‌وجو و اعتبارسنجی کامل مطلب در پنل مدیریت یوفوپاف نوشته شده است.",
   };
 }
 
 describe("content management", () => {
+  it("returns a lightweight library and retains table content in the detail endpoint", async () => {
+    const draft = {
+      ...input(),
+      body: JSON.stringify({
+        version: 1,
+        blocks: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "متن آموزشی برای بررسی ذخیره مقاله و بازیابی دقیق جدول. ".repeat(80),
+              },
+            ],
+          },
+          {
+            type: "table",
+            headerRow: true,
+            caption: "برنامه مطالعه",
+            rows: [
+              [[{ type: "text", text: "روز" }], [{ type: "text", text: "موضوع" }]],
+              [[{ type: "text", text: "شنبه" }], [{ type: "text", text: "یادداشت" }]],
+            ],
+          },
+        ],
+      }),
+    };
+    const created = await createPost(
+      new Request("http://localhost:3000/api/admin/content", {
+        method: "POST",
+        headers: await adminHeaders(true),
+        body: JSON.stringify(draft),
+      }),
+    );
+    expect(created.status).toBe(201);
+    const { post } = (await created.json()) as { post: { id: string; body: string } };
+    try {
+      const listed = await listPosts(
+        new Request("http://localhost:3000/api/admin/content", { headers: await adminHeaders() }),
+      );
+      const summaries = ((await listed.json()) as { posts: Array<Record<string, unknown>> }).posts;
+      expect(summaries.every((item) => !("body" in item))).toBe(true);
+      const summary = summaries.find((item) => item.id === post.id)!;
+      expect(JSON.stringify(summary).length).toBeLessThan(post.body.length / 10);
+      const detail = await readPost(
+        new Request(`http://localhost:3000/api/admin/content/${post.id}`, {
+          headers: await adminHeaders(),
+        }),
+        { params: Promise.resolve({ postId: post.id }) },
+      );
+      expect(detail.status).toBe(200);
+      expect(JSON.parse((await detail.json()).post.body)).toEqual(JSON.parse(draft.body));
+      const unauthorized = await readPost(
+        new Request(`http://localhost:3000/api/admin/content/${post.id}`),
+        { params: Promise.resolve({ postId: post.id }) },
+      );
+      expect(unauthorized.status).toBe(401);
+    } finally {
+      await deletePost(
+        new Request(`http://localhost:3000/api/admin/content/${post.id}`, {
+          method: "DELETE",
+          headers: await adminHeaders(true),
+        }),
+        { params: Promise.resolve({ postId: post.id }) },
+      );
+    }
+  });
+
   it("keeps drafts private, publishes them and supports authenticated deletion", async () => {
     const draft = input();
     const created = await createPost(
@@ -92,7 +165,11 @@ describe("content management", () => {
   });
 
   it("keeps retail and wholesale publications in their own storefronts", async () => {
-    const wholesalePost = { ...input("published"), audience: "wholesale", slug: `wholesale-${Date.now()}` };
+    const wholesalePost = {
+      ...input("published"),
+      audience: "wholesale",
+      slug: `wholesale-${Date.now()}`,
+    };
     const created = await createPost(
       new Request("http://localhost:3000/api/admin/content", {
         method: "POST",
@@ -101,12 +178,24 @@ describe("content management", () => {
       }),
     );
     expect(created.status).toBe(201);
-    const payload = (await created.json()) as { post: { id: string; slug: string; audience: string } };
+    const payload = (await created.json()) as {
+      post: { id: string; slug: string; audience: string };
+    };
     expect(payload.post.audience).toBe("wholesale");
-    expect((await listPublishedPosts({ audience: "wholesale" })).some((post) => post.id === payload.post.id)).toBe(true);
-    expect((await listPublishedPosts({ audience: "retail" })).some((post) => post.id === payload.post.id)).toBe(false);
+    expect(
+      (await listPublishedPosts({ audience: "wholesale" })).some(
+        (post) => post.id === payload.post.id,
+      ),
+    ).toBe(true);
+    expect(
+      (await listPublishedPosts({ audience: "retail" })).some(
+        (post) => post.id === payload.post.id,
+      ),
+    ).toBe(false);
     expect(await findPublishedPostBySlug(payload.post.slug, "retail")).toBeUndefined();
-    expect((await findPublishedPostBySlug(payload.post.slug, "wholesale"))?.id).toBe(payload.post.id);
+    expect((await findPublishedPostBySlug(payload.post.slug, "wholesale"))?.id).toBe(
+      payload.post.id,
+    );
 
     await deletePost(
       new Request(`http://localhost:3000/api/admin/content/${payload.post.id}`, {

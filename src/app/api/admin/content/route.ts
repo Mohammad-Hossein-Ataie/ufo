@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireAdminMutation, requireAdminRead, adminRequestErrorStatus } from "@/lib/admin-request";
-import { listAdminPosts, saveContentPost } from "@/lib/content-posts";
+import {
+  requireAdminMutation,
+  requireAdminRead,
+  adminRequestErrorStatus,
+} from "@/lib/admin-request";
+import { listAdminPostSummaries, saveContentPost } from "@/lib/content-posts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -8,7 +12,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   try {
     await requireAdminRead(request);
-    return NextResponse.json({ posts: await listAdminPosts() });
+    return NextResponse.json({ posts: await listAdminPostSummaries() });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "دریافت مطالب ناموفق بود." },

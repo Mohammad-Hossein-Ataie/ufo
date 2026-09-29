@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowDownUp,
   ArrowLeft,
@@ -18,8 +18,12 @@ import {
   Warehouse,
 } from "lucide-react";
 import { Badge, Button, EmptyState, Input, Price, StatusPill } from "@ufo/ui";
-import type { PaymentReviewStatus, SubmittedOrder } from "@ufo/orders";
+import type { PaymentReviewStatus } from "@ufo/orders";
 import type { OrderStatus, SalesChannel } from "@ufo/types";
+import type {
+  AdminOrderDashboardSummary,
+  AdminOrderSummary,
+} from "@/lib/admin-order-query";
 
 type PaymentFilter = "all" | "pending_review" | "approved" | "rejected";
 type SortKey = "createdAt" | "totalRial" | "status" | "customer";
@@ -46,16 +50,6 @@ const paymentStatusLabelsFa: Record<PaymentReviewStatus, string> = {
   approved: "پرداخت تایید شد",
   rejected: "پرداخت رد شد",
 };
-
-const activeStatuses: OrderStatus[] = [
-  "awaiting_payment",
-  "awaiting_receipt",
-  "payment_under_review",
-  "confirmed",
-  "processing",
-  "ready_for_pickup",
-  "shipped",
-];
 
 const terminalStatuses: OrderStatus[] = ["delivered", "cancelled", "returned"];
 
@@ -87,7 +81,7 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-function customerName(order: SubmittedOrder) {
+function customerName(order: AdminOrderSummary) {
   return order.customer.businessName ?? order.customer.fullName;
 }
 
@@ -95,16 +89,8 @@ function channelLabel(channel: SalesChannel) {
   return channel === "wholesale" ? "عمده" : "تکی";
 }
 
-function itemCount(order: SubmittedOrder) {
-  return order.items.reduce((sum, item) => sum + item.quantity, 0);
-}
-
-function cartonCount(order: SubmittedOrder) {
-  return order.items.reduce((sum, item) => sum + (item.cartonCount ?? 0), 0);
-}
-
 function nextActions(
-  order: SubmittedOrder,
+  order: AdminOrderSummary,
 ): Array<{ status: OrderStatus; label: string; tone?: "danger" }> {
   if (order.status === "payment_under_review") {
     return [{ status: "cancelled", label: "رد و لغو", tone: "danger" }];
@@ -123,13 +109,6 @@ function nextActions(
   if (!terminalStatuses.includes(order.status))
     return [{ status: "cancelled", label: "لغو", tone: "danger" }];
   return [];
-}
-
-function compareOrders(left: SubmittedOrder, right: SubmittedOrder, sortKey: SortKey) {
-  if (sortKey === "createdAt") return left.createdAt.localeCompare(right.createdAt);
-  if (sortKey === "totalRial") return left.totalRial - right.totalRial;
-  if (sortKey === "status") return left.status.localeCompare(right.status);
-  return customerName(left).localeCompare(customerName(right), "fa");
 }
 
 function SortButton({
@@ -163,7 +142,17 @@ function SortButton({
 }
 
 export function AdminOrdersClient() {
-  const [orders, setOrders] = useState<SubmittedOrder[]>([]);
+  const [orders, setOrders] = useState<AdminOrderSummary[]>([]);
+  const [priorityOrders, setPriorityOrders] = useState<AdminOrderSummary[]>([]);
+  const [summary, setSummary] = useState<AdminOrderDashboardSummary>({
+    openOrders: 0,
+    paymentReview: 0,
+    processing: 0,
+    readyToShip: 0,
+    totalRevenue: 0,
+    wholesaleOrders: 0,
+  });
+  const [shippingMethods, setShippingMethods] = useState<string[]>([]);
   const [channel, setChannel] = useState<SalesChannel | "all">("all");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all" | "active">("active");
   const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all");
@@ -171,78 +160,82 @@ export function AdminOrdersClient() {
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [channelTotal, setChannelTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [reload, setReload] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState("در حال خواندن سفارش‌ها...");
 
-  async function loadOrders(selectedChannel = channel) {
-    setIsLoading(true);
-    const suffix = selectedChannel === "all" ? "" : `?channel=${selectedChannel}`;
-    const response = await fetch(`/api/admin/orders${suffix}`, { cache: "no-store" });
-    const payload = (await response.json().catch(() => ({}))) as {
-      orders?: SubmittedOrder[];
-      error?: string;
-    };
-    setOrders(payload.orders ?? []);
-    setStatusMessage(payload.error ?? "سفارش‌ها به‌روز شد.");
-    setIsLoading(false);
-  }
-
   useEffect(() => {
-    void loadOrders();
-  }, []);
-
-  const shippingMethods = useMemo(
-    () => Array.from(new Set(orders.map((order) => order.shippingMethod))),
-    [orders],
-  );
-
-  const summary = useMemo(() => {
-    const openOrders = orders.filter((order) => activeStatuses.includes(order.status));
-    const paymentReview = orders.filter((order) => order.paymentStatus === "pending_review");
-    const processing = orders.filter((order) => order.status === "processing").length;
-    const readyToShip = orders.filter((order) => order.status === "ready_for_pickup").length;
-    const totalRevenue = orders.reduce((sum, order) => sum + order.totalRial, 0);
-    const wholesaleOrders = orders.filter((order) => order.channel === "wholesale").length;
-    return { openOrders, paymentReview, processing, readyToShip, totalRevenue, wholesaleOrders };
-  }, [orders]);
-
-  const filteredOrders = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return orders
-      .filter((order) => {
-        const haystack = [
-          order.orderNumber,
-          customerName(order),
-          order.customer.fullName,
-          order.customer.businessName,
-          order.customer.phone,
-          order.shippingAddress.city,
-          order.shippingAddress.province,
-          order.items.map((item) => item.productName).join(" "),
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
-        const matchesQuery = !normalized || haystack.includes(normalized);
-        const matchesStatus =
-          statusFilter === "all" ||
-          (statusFilter === "active" && activeStatuses.includes(order.status)) ||
-          order.status === statusFilter;
-        const matchesPayment = paymentFilter === "all" || order.paymentStatus === paymentFilter;
-        const matchesShipping = shippingFilter === "all" || order.shippingMethod === shippingFilter;
-        return matchesQuery && matchesStatus && matchesPayment && matchesShipping;
-      })
-      .sort((left, right) => {
-        const result = compareOrders(left, right, sortKey);
-        return sortDirection === "asc" ? result : -result;
-      });
-  }, [orders, paymentFilter, query, shippingFilter, sortDirection, sortKey, statusFilter]);
-
-  const priorityOrders = filteredOrders
-    .filter(
-      (order) => order.paymentStatus === "pending_review" || order.status === "ready_for_pickup",
-    )
-    .slice(0, 3);
+    const controller = new AbortController();
+    const timer = window.setTimeout(
+      async () => {
+        setIsLoading(true);
+        const params = new URLSearchParams({
+          channel,
+          status: statusFilter,
+          payment: paymentFilter,
+          shipping: shippingFilter,
+          q: query,
+          sort: sortKey,
+          direction: sortDirection,
+          page: String(page),
+        });
+        try {
+          const response = await fetch(`/api/admin/orders?${params}`, {
+            cache: "no-store",
+            signal: controller.signal,
+          });
+          const payload = (await response.json().catch(() => ({}))) as {
+            orders?: AdminOrderSummary[];
+            priorityOrders?: AdminOrderSummary[];
+            summary?: AdminOrderDashboardSummary;
+            shippingMethods?: string[];
+            total?: number;
+            channelTotal?: number;
+            page?: number;
+            totalPages?: number;
+            error?: string;
+          };
+          if (!response.ok) throw new Error(payload.error ?? "دریافت سفارش‌ها انجام نشد.");
+          setOrders(payload.orders ?? []);
+          setPriorityOrders(payload.priorityOrders ?? []);
+          if (payload.summary) setSummary(payload.summary);
+          setShippingMethods(payload.shippingMethods ?? []);
+          setTotal(payload.total ?? 0);
+          setChannelTotal(payload.channelTotal ?? 0);
+          setTotalPages(payload.totalPages ?? 1);
+          if (payload.page && payload.page !== page) setPage(payload.page);
+          setStatusMessage("سفارش‌ها به‌روز شد.");
+        } catch (error) {
+          if (!controller.signal.aborted) {
+            setStatusMessage(
+              error instanceof Error ? error.message : "دریافت سفارش‌ها انجام نشد.",
+            );
+          }
+        } finally {
+          if (!controller.signal.aborted) setIsLoading(false);
+        }
+      },
+      query.trim() ? 280 : 0,
+    );
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [
+    channel,
+    statusFilter,
+    paymentFilter,
+    shippingFilter,
+    query,
+    sortKey,
+    sortDirection,
+    page,
+    reload,
+  ]);
 
   async function changeStatus(orderId: string, status: OrderStatus) {
     setIsLoading(true);
@@ -253,12 +246,12 @@ export function AdminOrdersClient() {
     });
     const payload = (await response.json().catch(() => ({}))) as { error?: string };
     setStatusMessage(payload.error ?? `وضعیت سفارش به «${orderStatusLabelsFa[status]}» تغییر کرد.`);
-    await loadOrders();
+    setReload((value) => value + 1);
   }
 
   function selectChannel(nextChannel: SalesChannel | "all") {
     setChannel(nextChannel);
-    void loadOrders(nextChannel);
+    setPage(1);
   }
 
   function toggleSort(nextKey: SortKey) {
@@ -268,6 +261,7 @@ export function AdminOrdersClient() {
       setSortKey(nextKey);
       setSortDirection(nextKey === "createdAt" || nextKey === "totalRial" ? "desc" : "asc");
     }
+    setPage(1);
   }
 
   return (
@@ -276,13 +270,13 @@ export function AdminOrdersClient() {
         {[
           {
             label: "سفارش باز",
-            value: formatNumber(summary.openOrders.length),
+            value: formatNumber(summary.openOrders),
             meta: "نیازمند اقدام عملیاتی",
             icon: FileText,
           },
           {
             label: "تایید پرداخت",
-            value: formatNumber(summary.paymentReview.length),
+            value: formatNumber(summary.paymentReview),
             meta: "رسیدهای در انتظار بررسی",
             icon: Clock3,
           },
@@ -378,16 +372,20 @@ export function AdminOrdersClient() {
             <Input
               className="pr-10"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setPage(1);
+              }}
               placeholder="جستجو در شماره، مشتری، موبایل، شهر یا کالا"
             />
           </label>
           <select
             className="min-h-11 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-200"
             value={statusFilter}
-            onChange={(event) =>
-              setStatusFilter(event.target.value as OrderStatus | "all" | "active")
-            }
+            onChange={(event) => {
+              setStatusFilter(event.target.value as OrderStatus | "all" | "active");
+              setPage(1);
+            }}
             aria-label="فیلتر وضعیت سفارش"
           >
             <option value="active">سفارش‌های باز</option>
@@ -401,7 +399,10 @@ export function AdminOrdersClient() {
           <select
             className="min-h-11 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-200"
             value={paymentFilter}
-            onChange={(event) => setPaymentFilter(event.target.value as PaymentFilter)}
+            onChange={(event) => {
+              setPaymentFilter(event.target.value as PaymentFilter);
+              setPage(1);
+            }}
             aria-label="فیلتر پرداخت"
           >
             <option value="all">همه پرداخت‌ها</option>
@@ -412,7 +413,10 @@ export function AdminOrdersClient() {
           <select
             className="min-h-11 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-200"
             value={shippingFilter}
-            onChange={(event) => setShippingFilter(event.target.value)}
+            onChange={(event) => {
+              setShippingFilter(event.target.value);
+              setPage(1);
+            }}
             aria-label="فیلتر ارسال"
           >
             <option value="all">همه روش‌های ارسال</option>
@@ -429,6 +433,7 @@ export function AdminOrdersClient() {
               const [key, direction] = event.target.value.split(":") as [SortKey, SortDirection];
               setSortKey(key);
               setSortDirection(direction);
+              setPage(1);
             }}
             aria-label="مرتب‌سازی سفارش‌ها"
           >
@@ -442,7 +447,7 @@ export function AdminOrdersClient() {
             type="button"
             size="sm"
             variant="secondary"
-            onClick={() => loadOrders()}
+            onClick={() => setReload((value) => value + 1)}
             disabled={isLoading}
           >
             <RefreshCcw size={16} aria-hidden="true" />
@@ -470,14 +475,23 @@ export function AdminOrdersClient() {
           </div>
           <div className="flex items-center gap-2 text-sm text-[#5F6C79]" role="status">
             <Filter size={16} aria-hidden="true" />
-            {formatNumber(filteredOrders.length)} سفارش از {formatNumber(orders.length)}
+            {formatNumber(total)} سفارش از {formatNumber(channelTotal)}
           </div>
         </div>
       </section>
 
       {orders.length === 0 ? (
-        <EmptyState title={isLoading ? "در حال خواندن سفارش‌ها" : "سفارشی ثبت نشده است"}>
-          سفارش‌های ثبت‌شده از مسیر فروش تکی و مسیر عمده اینجا نمایش داده می‌شود.
+        <EmptyState
+          title={
+            isLoading
+              ? "در حال خواندن سفارش‌ها"
+              : channelTotal === 0
+                ? "سفارشی ثبت نشده است"
+                : "سفارشی با این فیلتر پیدا نشد"
+          }
+        >
+          فیلترها یا عبارت جست‌وجو را تغییر دهید؛ سفارش‌های ثبت‌شده تکی و عمده اینجا نمایش داده
+          می‌شوند.
         </EmptyState>
       ) : (
         <section className="overflow-hidden rounded-md border border-[#D7DDE4] bg-white shadow-sm">
@@ -528,7 +542,7 @@ export function AdminOrdersClient() {
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.map((order) => (
+                {orders.map((order) => (
                   <tr key={order.id} className="border-t border-[#D7DDE4] align-top">
                     <td className="px-4 py-4">
                       <Link
@@ -570,24 +584,24 @@ export function AdminOrdersClient() {
                         >
                           {paymentStatusLabelsFa[order.paymentStatus]}
                         </Badge>
-                        {order.chat.length > 0 ? (
+                        {order.chatCount > 0 ? (
                           <span className="inline-flex items-center gap-1 text-xs text-[#5F6C79]">
                             <MessageSquare size={14} aria-hidden="true" />
-                            {formatNumber(order.chat.length)} پیام
+                            {formatNumber(order.chatCount)} پیام
                           </span>
                         ) : null}
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      <p className="font-bold">{formatNumber(order.items.length)} قلم</p>
+                      <p className="font-bold">{formatNumber(order.itemCount)} قلم</p>
                       <p className="mt-1 text-xs text-[#5F6C79]">
-                        {formatNumber(itemCount(order))} عدد
+                        {formatNumber(order.unitCount)} عدد
                         {order.channel === "wholesale"
-                          ? ` · ${formatNumber(cartonCount(order))} کارتن`
+                          ? ` · ${formatNumber(order.cartonCount)} کارتن`
                           : ""}
                       </p>
                       <p className="mt-2 max-w-44 truncate text-xs text-[#5F6C79]">
-                        {order.items[0]?.productName}
+                        {order.firstProductName}
                       </p>
                     </td>
                     <td className="px-4 py-4">
@@ -629,13 +643,42 @@ export function AdminOrdersClient() {
               </tbody>
             </table>
           </div>
-          {filteredOrders.length === 0 ? (
+          {orders.length === 0 ? (
             <div className="p-8 text-center text-sm text-[#5F6C79]">
               سفارشی با این فیلتر پیدا نشد.
             </div>
           ) : null}
         </section>
       )}
+
+      {totalPages > 1 ? (
+        <nav
+          className="flex flex-wrap items-center justify-center gap-3 rounded-md border border-[#D7DDE4] bg-white p-3"
+          aria-label="صفحه‌بندی سفارش‌ها"
+        >
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            disabled={isLoading || page <= 1}
+            onClick={() => setPage((current) => Math.max(1, current - 1))}
+          >
+            صفحه قبل
+          </Button>
+          <span className="text-sm font-bold tabular-nums text-[#4C5A67]">
+            صفحه {formatNumber(page)} از {formatNumber(totalPages)}
+          </span>
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            disabled={isLoading || page >= totalPages}
+            onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+          >
+            صفحه بعد
+          </Button>
+        </nav>
+      ) : null}
 
       <p className="text-sm text-[#5F6C79]" role="status">
         {statusMessage}

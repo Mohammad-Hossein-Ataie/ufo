@@ -14,6 +14,7 @@ import {
 import { Button } from "@ufo/ui";
 import { categories } from "@ufo/domain";
 import { HomepageProducts } from "@/components/homepage-products";
+import { HomepageCategoryCarousel } from "@/components/homepage-category-carousel";
 import { ContentPostCard } from "@/components/content-post-card";
 import { NicotineGuidePromoModal } from "@/components/nicotine-guide-promo-modal";
 import { getLatestHomepageProducts } from "@/lib/homepage-products";
@@ -66,24 +67,6 @@ const trustStrip = [
   },
 ];
 
-const stats = [
-  { value: "+۵٬۰۰۰", label: "مشتری فعال" },
-  { value: "+۱۲٬۰۰۰", label: "سفارش پردازش‌شده" },
-  { value: "۴٫۸ / ۵", label: "رضایت خرید" },
-  { value: categories.length.toLocaleString("fa-IR"), label: "دسته‌بندی کالا" },
-];
-
-const categoryAccent: Record<string, string> = {
-  pod: "from-cyan-300/35",
-  vape: "from-yellow-300/35",
-  disposable: "from-yellow-300/30",
-  "e-liquid": "from-cyan-300/30",
-  "salt-nicotine": "from-purple-400/25",
-  coil: "from-cyan-300/25",
-  cartridge: "from-sky-300/25",
-  lighter: "from-yellow-300/30",
-};
-
 export default async function HomePage() {
   const [catalogRows, latestPosts, savedBrands] = await Promise.all([
     listCatalogRowsForDiscovery(),
@@ -116,27 +99,27 @@ export default async function HomePage() {
         />
         <div className="hero-overlay absolute inset-0 -z-10" aria-hidden="true" />
         <div className="home-hero-light absolute inset-0 -z-10" aria-hidden="true" />
-        <div className="mx-auto flex min-h-[80svh] max-w-7xl flex-col justify-center px-4 pb-8 pt-6 sm:pb-14 sm:pt-12 lg:pb-16">
-          <div className="home-hero-copy max-w-3xl">
+        <div className="mx-auto flex min-h-[88svh] max-w-7xl flex-col justify-center px-4 pb-8 pt-6 sm:pb-12 sm:pt-10 lg:pb-14">
+          <div className="home-hero-copy mx-auto max-w-4xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-retail-border bg-white/5 px-3 py-1 text-xs font-medium text-retail-secondary backdrop-blur">
               <Sparkles size={14} className="text-retail-accent-2" aria-hidden="true" />
-              یوفوپاف؛ فروش تکی و عمده پاد و ویپ
+              انتخاب روشن برای خرید تکی و همکاری
             </span>
             <h1
               id="home-hero-title"
               className="mt-4 text-3xl font-black leading-[1.3] tracking-tight text-white sm:mt-5 sm:text-5xl md:text-6xl"
             >
-              کاتالوگ شفاف یوفوپاف برای پاد و ویپ،
+              پاد، ویپ و جویس را
               <span className="bg-gradient-to-l from-retail-accent to-retail-accent-2 bg-clip-text text-transparent">
                 {" "}
-                از انتخاب تا تحویل
+                ساده‌تر و دقیق‌تر انتخاب کنید
               </span>
             </h1>
-            <p className="mt-3 max-w-xl text-base leading-7 text-[#D9E2EC] sm:mt-5 sm:text-lg sm:leading-8">
-              پاد، ویپ، جویس و لوازم جانبی با موجودی لحظه‌ای، قیمت شفاف و کنترل سازگاری؛ برای خرید
-              تکی مطمئن و سفارش عمده سریع.
+            <p className="mx-auto mt-3 max-w-2xl text-base leading-7 text-[#D9E2EC] sm:mt-5 sm:text-lg sm:leading-8">
+              دسته‌بندی‌ها، قیمت و مشخصات فنی را یک‌جا مقایسه کنید و با مسیر جداگانه برای خرید تکی یا
+              سفارش همکاری ادامه دهید.
             </p>
-            <div className="mt-5 flex flex-wrap gap-3 sm:mt-9 sm:gap-4">
+            <div className="mt-5 flex flex-wrap justify-center gap-3 sm:mt-7 sm:gap-4">
               <Link href="/products">
                 <Button
                   size="lg"
@@ -158,73 +141,26 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
-          <div
-            className="home-hero-categories mt-7 sm:mt-14"
-            aria-labelledby="home-categories-title"
-          >
-            <div className="mb-3 flex flex-wrap items-end justify-between gap-2 sm:mb-5">
-              <div>
-                <span className="text-xs font-bold text-retail-accent">مسیر سریع خرید</span>
-                <h2
-                  id="home-categories-title"
-                  className="mt-1 text-xl font-black text-white sm:text-2xl"
-                >
-                  خرید بر اساس دسته‌بندی
-                </h2>
-              </div>
+          <div className="home-hero-categories mt-6 sm:mt-8">
+            <HomepageCategoryCarousel
+              items={categories.map((category) => ({
+                id: category.id,
+                nameFa: category.nameFa,
+                slug: category.slug,
+                descriptionFa: category.descriptionFa,
+                image:
+                  categoryImageBySlug[category.slug] ?? "/images/categories/lighter.webp",
+              }))}
+            />
+            <div className="mt-1 text-center">
               <Link
                 href="/products"
-                className="inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-sm font-bold text-retail-accent transition hover:text-retail-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
+                className="inline-flex min-h-11 items-center gap-1 rounded-md px-3 text-sm font-bold text-retail-accent transition hover:text-retail-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent"
               >
-                کاتالوگ کامل
+                مشاهده کاتالوگ کامل
                 <ArrowLeft size={16} aria-hidden="true" />
               </Link>
             </div>
-            <ul className="home-category-rail" aria-label="دسته‌بندی‌های محصولات">
-              {categories.map((category) => {
-                const imageSrc =
-                  categoryImageBySlug[category.slug] ?? "/images/categories/default.png";
-                const accent = categoryAccent[category.slug] ?? "from-cyan-300/25";
-
-                return (
-                  <li key={category.id} className="min-w-0 snap-start">
-                    <Link
-                      href={`/products/category/${category.slug}`}
-                      className="home-category-card group relative isolate flex h-36 overflow-hidden rounded-2xl border border-white/20 bg-retail-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail-accent min-[400px]:h-44 sm:h-48 lg:h-44"
-                      aria-label={`مشاهده محصولات ${category.nameFa}`}
-                    >
-                      <Image
-                        src={imageSrc}
-                        alt=""
-                        fill
-                        loading="lazy"
-                        className="-z-20 object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
-                        sizes="(min-width: 1024px) 160px, (min-width: 640px) 190px, 44vw"
-                      />
-                      <span
-                        className={`absolute inset-0 -z-10 bg-gradient-to-t ${accent} via-black/15 to-black/5`}
-                        aria-hidden="true"
-                      />
-                      <span
-                        className="absolute inset-0 -z-10 bg-gradient-to-t from-black/90 via-black/15 to-transparent"
-                        aria-hidden="true"
-                      />
-                      <div className="mt-auto flex w-full items-end justify-between gap-1 p-3 text-sm font-black leading-5 text-white drop-shadow-md sm:text-base">
-                        <h3>{category.nameFa}</h3>
-                        <ArrowLeft
-                          className="shrink-0 text-retail-accent"
-                          size={16}
-                          aria-hidden="true"
-                        />
-                      </div>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-            <p className="mt-3 text-xs text-retail-secondary lg:hidden">
-              برای دیدن همه دسته‌ها، کارت‌ها را به چپ و راست بکشید.
-            </p>
           </div>
         </div>
       </section>
@@ -298,19 +234,7 @@ export default async function HomePage() {
 
       <section className="section-surface-alt border-y border-retail-border">
         <div className="mx-auto max-w-7xl px-4 py-16">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((item) => (
-              <div
-                key={item.label}
-                className="rounded-retail border border-retail-border bg-retail-surface p-6 text-center"
-              >
-                <div className="text-3xl font-black tabular-nums text-white">{item.value}</div>
-                <div className="mt-2 text-sm text-retail-secondary">{item.label}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="relative mt-12 overflow-hidden rounded-[2rem] border border-white/10 bg-[#080E15] px-4 py-8 shadow-2xl shadow-black/25 sm:px-8 sm:py-10">
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#080E15] px-4 py-8 shadow-2xl shadow-black/25 sm:px-8 sm:py-10">
             <div
               className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-retail-accent/10 blur-3xl"
               aria-hidden="true"

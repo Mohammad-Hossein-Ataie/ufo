@@ -67,6 +67,7 @@ export function B2BHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const headerDocked = useHeaderDocked();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const previousPathname = useRef(pathname);
   const formattedCount = useMemo(
     () => new Intl.NumberFormat("fa-IR").format(cartCount),
     [cartCount],
@@ -87,6 +88,8 @@ export function B2BHeader() {
   }, []);
 
   useEffect(() => {
+    if (previousPathname.current === pathname) return;
+    previousPathname.current = pathname;
     setMenuOpen(false);
   }, [pathname]);
 

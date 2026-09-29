@@ -3,10 +3,12 @@ import { brands, categories } from "@ufo/domain";
 import type { SalesChannel } from "@ufo/types";
 import type { AdminProductRecord } from "@/lib/admin-products";
 import {
+  getCatalogRowAvailability,
   getCatalogRowStock,
   listCatalogRowsForDiscovery,
   searchCatalogRows,
 } from "@/lib/catalog-data";
+import { publicAvailabilityLabelFa } from "@/lib/public-availability";
 import { expandCatalogSearchTokens, normalizeCatalogSearchText } from "@/lib/catalog-search-text";
 import { getCategoryImage, getProductSearchImage } from "@/lib/product-images";
 
@@ -50,12 +52,6 @@ function scoreRow(row: AdminProductRecord, tokens: string[]) {
     Math.min(stock, 25) +
     (hasRetailDiscount ? 8 : 0)
   );
-}
-
-function formatStockLabel(available: number, channel: SearchChannel) {
-  if (available <= 0) return channel === "wholesale" ? "نیازمند هماهنگی" : "پیش سفارش";
-  if (available < 10) return "موجودی محدود";
-  return "موجود";
 }
 
 export async function GET(request: Request) {
@@ -106,7 +102,7 @@ export async function GET(request: Request) {
     query: rawQuery,
     channel,
     products: rankedRows.map(({ row }) => {
-      const available = getCatalogRowStock(row);
+      const availabilityState = getCatalogRowAvailability(row);
       const priceRial =
         channel === "wholesale" ? row.variant.wholesalePriceRial : row.variant.retailPriceRial;
       const fallbackImage =
@@ -129,8 +125,11 @@ export async function GET(request: Request) {
           channel === "retail" && (row.variant.compareAtPriceRial ?? 0) > priceRial
             ? row.variant.compareAtPriceRial
             : null,
-        stockCount: available,
-        stockLabel: formatStockLabel(available, channel),
+        availabilityState,
+        stockLabel: publicAvailabilityLabelFa(
+          availabilityState,
+          channel === "wholesale" ? "نیازمند هماهنگی" : "پیش‌سفارش",
+        ),
         cartonSize: channel === "wholesale" ? row.variant.cartonSize : null,
         moq: channel === "wholesale" ? row.variant.minWholesaleCartonCount : null,
       };

@@ -25,14 +25,29 @@ export type RichTextImageBlock = {
   height: number;
 };
 
-export type RichTextBlock = RichTextTextBlock | RichTextListBlock | RichTextImageBlock;
+export const MAX_TABLE_ROWS = 30;
+export const MAX_TABLE_COLUMNS = 8;
+
+export type RichTextTableBlock = {
+  type: "table";
+  caption?: string;
+  headerRow: boolean;
+  rows: RichTextInline[][][];
+};
+
+export type RichTextBlock =
+  | RichTextTextBlock
+  | RichTextListBlock
+  | RichTextImageBlock
+  | RichTextTableBlock;
 
 export type RichTextDocument = {
   version: 1;
   blocks: RichTextBlock[];
 };
 
-const contentImagePattern = /^\/api\/content-images\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const contentImagePattern =
+  /^\/api\/content-images\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const textBlockTypes = new Set(["paragraph", "heading2", "heading3", "quote"]);
 const listBlockTypes = new Set(["bulletList", "orderedList"]);
 
@@ -43,7 +58,11 @@ function boundedText(value: unknown, max: number): string {
 export function safeContentHref(value: unknown): string | undefined {
   const href = boundedText(value, 1_000).trim();
   if (!href) return undefined;
-  if (/^\/(?!\/)/.test(href) || /^https:\/\//i.test(href) || /^mailto:[^\s@]+@[^\s@]+$/i.test(href)) {
+  if (
+    /^\/(?!\/)/.test(href) ||
+    /^https:\/\//i.test(href) ||
+    /^mailto:[^\s@]+@[^\s@]+$/i.test(href)
+  ) {
     return href;
   }
   return undefined;
@@ -67,7 +86,10 @@ function normalizeInline(value: unknown): RichTextInline | undefined {
 
 function normalizeInlines(value: unknown): RichTextInline[] {
   if (!Array.isArray(value)) return [];
-  return value.slice(0, 1_000).map(normalizeInline).filter((item): item is RichTextInline => Boolean(item));
+  return value
+    .slice(0, 1_000)
+    .map(normalizeInline)
+    .filter((item): item is RichTextInline => Boolean(item));
 }
 
 function normalizeBlock(value: unknown): RichTextBlock | undefined {
@@ -92,6 +114,23 @@ function normalizeBlock(value: unknown): RichTextBlock | undefined {
     return { type: type as RichTextListBlock["type"], items };
   }
 
+  if (type === "table") {
+    if (!Array.isArray(candidate.rows)) return undefined;
+    const rows = candidate.rows
+      .slice(0, MAX_TABLE_ROWS)
+      .filter((row): row is unknown[] => Array.isArray(row))
+      .map((row) => row.slice(0, MAX_TABLE_COLUMNS).map(normalizeInlines));
+    const columns = Math.max(0, ...rows.map((row) => row.length));
+    if (!rows.length || !columns) return undefined;
+    const caption = boundedText(candidate.caption, 240).trim();
+    return {
+      type: "table",
+      headerRow: candidate.headerRow === true,
+      rows: rows.map((row) => Array.from({ length: columns }, (_, index) => row[index] ?? [])),
+      ...(caption ? { caption } : {}),
+    };
+  }
+
   if (type === "image") {
     const src = boundedText(candidate.src, 1_000).trim();
     const alt = boundedText(candidate.alt, 180).trim();
@@ -99,7 +138,14 @@ function normalizeBlock(value: unknown): RichTextBlock | undefined {
     const width = Math.round(Number(candidate.width));
     const height = Math.round(Number(candidate.height));
     if (!contentImagePattern.test(src) || alt.length < 3) return undefined;
-    if (!Number.isFinite(width) || !Number.isFinite(height) || width < 1 || height < 1 || width > 4_000 || height > 4_000) {
+    if (
+      !Number.isFinite(width) ||
+      !Number.isFinite(height) ||
+      width < 1 ||
+      height < 1 ||
+      width > 4_000 ||
+      height > 4_000
+    ) {
       return undefined;
     }
     return { type: "image", src, alt, width, height, ...(caption ? { caption } : {}) };
@@ -128,6 +174,14 @@ export function richTextPlainText(document: RichTextDocument): string {
   return document.blocks
     .flatMap((block) => {
       if (block.type === "image") return [block.alt, block.caption ?? ""];
+      if (block.type === "table") {
+        return [
+          block.caption ?? "",
+          ...block.rows.map((row) =>
+            row.map((cell) => cell.map((inline) => inline.text).join("")).join("\t"),
+          ),
+        ];
+      }
       if ("items" in block) {
         return block.items.map((item) => item.map((inline) => inline.text).join(""));
       }
@@ -161,7 +215,8 @@ export function contentBodyImageCount(body: string): number {
 export function normalizeContentBody(value: unknown): { body: string; plainText: string } {
   const source = typeof value === "string" ? value.trim() : "";
   if (source.length > 120_000) throw new Error("حجم متن محتوا بیش از حد مجاز است.");
-  if (!source.startsWith("{")) return { body: source.slice(0, 50_000), plainText: contentBodyPlainText(source) };
+  if (!source.startsWith("{"))
+    return { body: source.slice(0, 50_000), plainText: contentBodyPlainText(source) };
 
   const document = parseRichTextDocument(source);
   if (!document) throw new Error("ساختار متن غنی معتبر نیست.");

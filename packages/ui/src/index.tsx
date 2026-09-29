@@ -266,9 +266,16 @@ export function ProductCard({
   );
 }
 
-export function StockStatus({ available }: { available: number }) {
-  if (available <= 0) return <Badge tone="warning">پیش‌سفارش</Badge>;
-  if (available < 10) return <Badge tone="warning">موجودی محدود</Badge>;
+export function StockStatus({
+  state,
+  unavailableLabel = "ناموجود",
+}: {
+  state: "available" | "low_stock" | "almost_unavailable" | "unavailable";
+  unavailableLabel?: string;
+}) {
+  if (state === "unavailable") return <Badge tone="warning">{unavailableLabel}</Badge>;
+  if (state === "almost_unavailable") return <Badge tone="danger">رو به اتمام</Badge>;
+  if (state === "low_stock") return <Badge tone="warning">موجودی محدود</Badge>;
   return <Badge tone="success">موجود</Badge>;
 }
 

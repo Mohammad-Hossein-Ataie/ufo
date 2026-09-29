@@ -1,17 +1,27 @@
 import { NextResponse } from "next/server";
 import { listSubmittedOrders } from "@ufo/orders";
-import type { SalesChannel } from "@ufo/types";
+import { adminRequestErrorStatus, requireAdminRead } from "@/lib/admin-request";
+import { parseAdminOrderQuery, queryAdminOrders } from "@/lib/admin-order-query";
 
 export const runtime = "nodejs";
 
-function channel(value: string | null): SalesChannel | undefined {
-  if (value === "retail" || value === "wholesale") return value;
-  return undefined;
-}
-
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const selectedChannel = channel(url.searchParams.get("channel"));
-  const orders = listSubmittedOrders(selectedChannel ? { channel: selectedChannel } : {});
-  return NextResponse.json({ orders });
+  const startedAt = performance.now();
+  try {
+    await requireAdminRead(request);
+    const allOrders = listSubmittedOrders();
+    const result = queryAdminOrders(allOrders, parseAdminOrderQuery(new URL(request.url)));
+    return NextResponse.json(result, {
+      headers: {
+        "Server-Timing": `admin-orders;dur=${(performance.now() - startedAt).toFixed(1)}`,
+        "X-Admin-Orders-Source-Count": String(allOrders.length),
+        "X-Admin-Orders-Page-Count": String(result.orders.length),
+      },
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "دریافت سفارش‌ها انجام نشد." },
+      { status: adminRequestErrorStatus(error) },
+    );
+  }
 }

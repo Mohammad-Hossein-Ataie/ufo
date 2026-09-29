@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AppShell } from "@/components/app-shell";
 import { canonical, siteOrigin } from "@ufo/seo";
+import { listActiveSiteAnnouncements } from "@/lib/site-announcements";
+
+// Re-evaluate scheduled announcements even when a storefront route is otherwise static.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin()),
@@ -52,10 +56,11 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const announcements = listActiveSiteAnnouncements();
   return (
     <html lang="fa-IR" dir="rtl" data-scroll-behavior="smooth">
       <body suppressHydrationWarning>
-        <AppShell>{children}</AppShell>
+        <AppShell announcements={announcements}>{children}</AppShell>
       </body>
     </html>
   );

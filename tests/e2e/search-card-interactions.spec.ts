@@ -25,7 +25,7 @@ test.beforeEach(async ({ page }) => {
             fallbackImage: "/images/categories/lighter.webp",
             priceRial: 12000000,
             compareAtPriceRial: 13000000,
-            stockCount: 12,
+            availabilityState: "available",
             stockLabel: "موجود",
             cartonSize: 10,
             moq: 1,

@@ -18,7 +18,13 @@ import { CatalogPagination } from "@/components/catalog-pagination";
 import { CatalogPriceRangeFilter } from "@/components/catalog-price-range-filter";
 import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
-import { getCatalogRowStock, listCatalogRows, searchCatalogRows } from "@/lib/catalog-data";
+import {
+  getCatalogRowAvailability,
+  getCatalogRowStock,
+  listCatalogRows,
+  searchCatalogRows,
+} from "@/lib/catalog-data";
+import { publicAvailabilityLabelFa } from "@/lib/public-availability";
 import { listAdminColors } from "@/lib/admin-colors";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import {
@@ -504,37 +510,45 @@ export default async function B2BCatalogPage({
                 const product = row.product;
                 const variant = getWholesaleVariant(row);
                 if (!variant) return null;
-                const available = getWholesaleStock(row);
+                const availability = getCatalogRowAvailability(row);
                 const unitToman = Math.round(variant.wholesalePriceRial / variant.cartonSize / 10);
                 const variantOptions = getStorefrontVariantOptions(product, flavors, colors);
                 return (
-                  <div
-                    key={product.id}
-                    className="h-full rounded-md transition hover:-translate-y-1 hover:shadow-lg"
-                  >
+                  <div key={product.id} className="h-full rounded-md">
                     <ProductCard
+                      className="catalog-linked-card"
                       title={product.nameFa}
                       subtitle={product.nameEn}
                       description={`حداقل ${new Intl.NumberFormat("fa-IR").format(variant.minWholesaleCartonCount)} کارتن، هر کارتن ${new Intl.NumberFormat("fa-IR").format(variant.cartonSize)} عدد؛ هر عدد حدود ${new Intl.NumberFormat("fa-IR").format(unitToman)} تومان`}
                       mediaClassName="bg-[#EEF0E5]"
                       media={
-                        <StorefrontProductImage
-                          zoomable
-                          viewerTone="light"
-                          key={`media-${product.id}`}
-                          src={getProductImage(product)}
-                          fallbackSrc={
-                            getCategoryImage(product.categoryId) ??
-                            "/images/categories/lighter.webp"
-                          }
-                          alt={product.nameFa}
-                          sizes="(min-width: 1280px) 22vw, (min-width: 768px) 42vw, 92vw"
-                          className="h-full w-full object-contain"
-                        />
+                        <div className="catalog-card-secondary-action h-full">
+                          <StorefrontProductImage
+                            zoomable
+                            viewerTone="light"
+                            key={`media-${product.id}`}
+                            src={getProductImage(product)}
+                            fallbackSrc={
+                              getCategoryImage(product.categoryId) ??
+                              "/images/categories/lighter.webp"
+                            }
+                            alt={product.nameFa}
+                            sizes="(min-width: 1280px) 22vw, (min-width: 768px) 42vw, 92vw"
+                            className="h-full w-full object-contain"
+                          />
+                        </div>
                       }
                       badge={
-                        <span className="inline-flex min-h-7 shrink-0 items-center rounded-md border border-[#A8E6C0] bg-[#E9FBF1] px-2 text-xs font-bold text-[#176D48]">
-                          {available > 0 ? "موجود" : "نیازمند هماهنگی"}
+                        <span
+                          className={`inline-flex min-h-7 shrink-0 items-center rounded-md border px-2 text-xs font-bold ${
+                            availability === "available"
+                              ? "border-[#A8E6C0] bg-[#E9FBF1] text-[#176D48]"
+                              : availability === "unavailable"
+                                ? "border-[#CBD5E1] bg-[#F1F5F9] text-[#475569]"
+                                : "border-[#F5D18A] bg-[#FFF7E5] text-[#925E00]"
+                          }`}
+                        >
+                          {publicAvailabilityLabelFa(availability, "نیازمند هماهنگی")}
                         </span>
                       }
                       price={
@@ -547,14 +561,13 @@ export default async function B2BCatalogPage({
                             <BadgeCheck size={15} className="text-[#1F8A5B]" aria-hidden="true" />
                             SKU: <span dir="ltr">{variant.sku}</span>
                           </div>
-                          <Link href="/b2b/quick-order">
-                            <Button
-                              size="sm"
-                              className="w-full border-[#1F8A5B] bg-[#1F8A5B] text-white hover:bg-[#176D48]"
-                            >
-                              افزودن کارتن به سفارش
-                              <ArrowLeft size={16} aria-hidden="true" />
-                            </Button>
+                          <Link
+                            href="/b2b/quick-order"
+                            data-product-navigation="select"
+                            className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-md border border-[#1F8A5B] bg-[#1F8A5B] px-3 text-sm font-bold text-white transition hover:bg-[#176D48] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1F8A5B]"
+                          >
+                            افزودن کارتن به سفارش
+                            <ArrowLeft size={16} aria-hidden="true" />
                           </Link>
                         </div>
                       }

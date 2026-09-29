@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { getDb, hasUsableMongoUri } from "@ufo/database";
-import type { Db } from "mongodb";
+import { getDb, getMongoClient, hasUsableMongoUri } from "@ufo/database";
+import type { Db, MongoClient } from "mongodb";
 import { normalizeContentBody } from "@/lib/content-rich-text";
 
 export type ContentPostType = "article" | "news";
@@ -50,8 +50,41 @@ export interface ContentPostInput {
   scheduledAt?: unknown;
 }
 
+export type ContentPostSummary = Pick<
+  ContentPost,
+  | "id"
+  | "type"
+  | "audience"
+  | "status"
+  | "title"
+  | "slug"
+  | "category"
+  | "tags"
+  | "author"
+  | "updatedAt"
+>;
+
+const summaryProjection = {
+  _id: 0,
+  id: 1,
+  type: 1,
+  audience: 1,
+  status: 1,
+  title: 1,
+  slug: 1,
+  category: 1,
+  tags: 1,
+  author: 1,
+  updatedAt: 1,
+} as const;
+
+function postSummary(post: ContentPost): ContentPostSummary {
+  const { id, type, audience, status, title, slug, category, tags, author, updatedAt } = post;
+  return { id, type, audience, status, title, slug, category, tags, author, updatedAt };
+}
+
 const seededAt = "2026-08-05T08:00:00.000Z";
-const memoryPosts: ContentPost[] = [
+const seedPosts: ContentPost[] = [
   {
     id: "guide-compatible-cartridge",
     type: "article",
@@ -59,8 +92,7 @@ const memoryPosts: ContentPost[] = [
     status: "published",
     title: "چطور کارتریج سازگار با دستگاه خود را پیدا کنیم؟",
     slug: "compatible-cartridge-guide",
-    excerpt:
-      "راهنمای بررسی نام دستگاه، سری کارتریج، مقاومت کویل و مشخصات فنی برای انتخاب دقیق‌تر.",
+    excerpt: "راهنمای بررسی نام دستگاه، سری کارتریج، مقاومت کویل و مشخصات فنی برای انتخاب دقیق‌تر.",
     body: `انتخاب کارتریج سازگار از مقایسه دقیق مدل دستگاه و مشخصات محصول شروع می‌شود.
 
 ## مدل و سری دستگاه را بررسی کنید
@@ -91,8 +123,7 @@ const memoryPosts: ContentPost[] = [
     status: "published",
     title: "در خرید پاد یک‌بارمصرف به چه نکاتی توجه کنیم؟",
     slug: "disposable-pod-buying-guide",
-    excerpt:
-      "مقایسه تعداد پاف، ظرفیت باتری، نوع شارژ، برند و موجودی برای یک انتخاب آگاهانه‌تر.",
+    excerpt: "مقایسه تعداد پاف، ظرفیت باتری، نوع شارژ، برند و موجودی برای یک انتخاب آگاهانه‌تر.",
     body: `پیش از انتخاب پاد یک‌بارمصرف، مشخصات درج‌شده برای هر مدل را کنار هم قرار دهید.
 
 ## مشخصات قابل مقایسه
@@ -120,8 +151,7 @@ const memoryPosts: ContentPost[] = [
     status: "published",
     title: "مسیر خرید تکی و همکاری یوفوپاف چگونه کار می‌کند؟",
     slug: "retail-and-wholesale-shopping",
-    excerpt:
-      "تفکیک شفاف قیمت واحد، حداقل سفارش همکاری و کالاهای فعال در کاتالوگ عمده یوفوپاف.",
+    excerpt: "تفکیک شفاف قیمت واحد، حداقل سفارش همکاری و کالاهای فعال در کاتالوگ عمده یوفوپاف.",
     body: `فروشگاه یوفوپاف دو مسیر مجزا برای خرید تکی و همکاری دارد.
 
 در خرید تکی، قیمت واحد و موجودی همان لحظه نمایش داده می‌شود. در مسیر همکاری، قیمت عمده و حداقل تعداد کارتن فقط برای کالاهایی نمایش داده می‌شود که فروش همکاری آن‌ها فعال است.`,
@@ -141,16 +171,41 @@ const memoryPosts: ContentPost[] = [
   },
 ];
 
+// Share the development fallback between route and server-component bundles.
+const globalContent = globalThis as typeof globalThis & { __ufoContentPosts?: ContentPost[] };
+const memoryPosts = globalContent.__ufoContentPosts ??= structuredClone(seedPosts);
+
+const initializedContent = new WeakMap<MongoClient, Map<string, Promise<void>>>();
+
 async function ensureSeededContent(db: Db): Promise<void> {
-  const marker = await db.collection("settings").updateOne(
-    { id: "content-seed-v1" },
-    { $setOnInsert: { id: "content-seed-v1", createdAt: new Date().toISOString() } },
-    { upsert: true },
-  );
+  const client = await getMongoClient();
+  let databases = initializedContent.get(client);
+  if (!databases) {
+    databases = new Map();
+    initializedContent.set(client, databases);
+  }
+  const existing = databases.get(db.databaseName);
+  if (existing) return existing;
+  const pending = initializeContent(db).catch((error: unknown) => {
+    databases.delete(db.databaseName);
+    throw error;
+  });
+  databases.set(db.databaseName, pending);
+  return pending;
+}
+
+async function initializeContent(db: Db): Promise<void> {
+  const marker = await db
+    .collection("settings")
+    .updateOne(
+      { id: "content-seed-v1" },
+      { $setOnInsert: { id: "content-seed-v1", createdAt: new Date().toISOString() } },
+      { upsert: true },
+    );
   if (marker.upsertedCount === 1) {
     try {
       await db.collection<ContentPost>("blogPosts").bulkWrite(
-        memoryPosts.map((post) => ({
+        seedPosts.map((post) => ({
           updateOne: { filter: { slug: post.slug }, update: { $setOnInsert: post }, upsert: true },
         })),
       );
@@ -160,21 +215,24 @@ async function ensureSeededContent(db: Db): Promise<void> {
     }
   }
 
-  const audienceMarker = await db.collection("settings").updateOne(
-    { id: "content-audience-v1" },
-    { $setOnInsert: { id: "content-audience-v1", createdAt: new Date().toISOString() } },
-    { upsert: true },
-  );
+  const audienceMarker = await db
+    .collection("settings")
+    .updateOne(
+      { id: "content-audience-v1" },
+      { $setOnInsert: { id: "content-audience-v1", createdAt: new Date().toISOString() } },
+      { upsert: true },
+    );
   if (audienceMarker.upsertedCount === 1) {
     try {
-      await db.collection("blogPosts").updateMany(
-        { audience: { $nin: ["retail", "wholesale"] } },
-        { $set: { audience: "retail" } },
-      );
-      await db.collection("blogPosts").updateOne(
-        { slug: "retail-and-wholesale-shopping" },
-        { $set: { audience: "wholesale" } },
-      );
+      await db
+        .collection("blogPosts")
+        .updateMany(
+          { audience: { $nin: ["retail", "wholesale"] } },
+          { $set: { audience: "retail" } },
+        );
+      await db
+        .collection("blogPosts")
+        .updateOne({ slug: "retail-and-wholesale-shopping" }, { $set: { audience: "wholesale" } });
     } catch (error) {
       await db.collection("settings").deleteOne({ id: "content-audience-v1" });
       throw error;
@@ -187,8 +245,15 @@ function text(value: unknown, maxLength: number): string {
 }
 
 function stringList(value: unknown, maxItems: number, maxLength: number): string[] {
-  const values = Array.isArray(value) ? value : typeof value === "string" ? value.split(/[,\n]/) : [];
-  return [...new Set(values.map((item) => text(item, maxLength)).filter(Boolean))].slice(0, maxItems);
+  const values = Array.isArray(value)
+    ? value
+    : typeof value === "string"
+      ? value.split(/[,\n]/)
+      : [];
+  return [...new Set(values.map((item) => text(item, maxLength)).filter(Boolean))].slice(
+    0,
+    maxItems,
+  );
 }
 
 export function contentSlug(value: string): string {
@@ -205,7 +270,10 @@ function readingMinutes(plainText: string): number {
   return Math.max(1, Math.ceil(words / 200));
 }
 
-function parseInput(input: ContentPostInput, current?: ContentPost): Omit<ContentPost, "id" | "createdAt" | "updatedAt" | "publishedAt"> {
+function parseInput(
+  input: ContentPostInput,
+  current?: ContentPost,
+): Omit<ContentPost, "id" | "createdAt" | "updatedAt" | "publishedAt"> {
   const title = text(input.title, 140);
   const slug = contentSlug(text(input.slug, 120) || title);
   const excerpt = text(input.excerpt, 320);
@@ -229,8 +297,7 @@ function parseInput(input: ContentPostInput, current?: ContentPost): Omit<Conten
   const seoTitle = text(input.seoTitle, 70) || title;
   const seoDescription = text(input.seoDescription, 180) || excerpt;
   if (seoTitle.length < 20) throw new Error("عنوان SEO باید حداقل ۲۰ کاراکتر باشد.");
-  if (seoDescription.length < 70)
-    throw new Error("توضیحات SEO باید حداقل ۷۰ کاراکتر باشد.");
+  if (seoDescription.length < 70) throw new Error("توضیحات SEO باید حداقل ۷۰ کاراکتر باشد.");
 
   return {
     type,
@@ -267,7 +334,9 @@ function withoutMongoId(post: ContentPost & { _id?: unknown }): ContentPost {
 function isPublic(post: ContentPost, now = Date.now()): boolean {
   return (
     post.status === "published" ||
-    (post.status === "scheduled" && Boolean(post.scheduledAt) && new Date(post.scheduledAt!).getTime() <= now)
+    (post.status === "scheduled" &&
+      Boolean(post.scheduledAt) &&
+      new Date(post.scheduledAt!).getTime() <= now)
   );
 }
 
@@ -283,7 +352,11 @@ export async function listPublishedPosts(
           (!options.type || post.type === options.type) &&
           (!options.audience || post.audience === options.audience),
       )
-      .sort((a, b) => String(b.publishedAt ?? b.scheduledAt).localeCompare(String(a.publishedAt ?? a.scheduledAt)))
+      .sort((a, b) =>
+        String(b.publishedAt ?? b.scheduledAt).localeCompare(
+          String(a.publishedAt ?? a.scheduledAt),
+        ),
+      )
       .slice(0, limit);
   }
   const now = new Date().toISOString();
@@ -310,7 +383,8 @@ export async function findPublishedPostBySlug(
   if (!normalized) return undefined;
   if (!hasUsableMongoUri())
     return memoryPosts.find(
-      (post) => post.slug === normalized && isPublic(post) && (!audience || post.audience === audience),
+      (post) =>
+        post.slug === normalized && isPublic(post) && (!audience || post.audience === audience),
     );
   const now = new Date().toISOString();
   const db = await getDb();
@@ -323,11 +397,16 @@ export async function findPublishedPostBySlug(
   return post ? withoutMongoId(post) : undefined;
 }
 
-export async function listAdminPosts(): Promise<ContentPost[]> {
-  if (!hasUsableMongoUri()) return [...memoryPosts].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+export async function listAdminPostSummaries(): Promise<ContentPostSummary[]> {
+  if (!hasUsableMongoUri())
+    return [...memoryPosts].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).map(postSummary);
   const db = await getDb();
   await ensureSeededContent(db);
-  return (await db.collection<ContentPost>("blogPosts").find({}).sort({ updatedAt: -1 }).toArray()).map(withoutMongoId);
+  return db
+    .collection<ContentPost>("blogPosts")
+    .find<ContentPostSummary>({}, { projection: summaryProjection })
+    .sort({ updatedAt: -1 })
+    .toArray();
 }
 
 export async function getAdminPost(id: string): Promise<ContentPost | undefined> {
@@ -342,7 +421,19 @@ export async function saveContentPost(input: ContentPostInput, id?: string): Pro
   const current = id ? await getAdminPost(id) : undefined;
   if (id && !current) throw new Error("مطلب پیدا نشد.");
   const parsed = parseInput(input, current);
-  const duplicate = (await listAdminPosts()).find((post) => post.slug === parsed.slug && post.id !== id);
+  let duplicate: unknown;
+  if (!hasUsableMongoUri()) {
+    duplicate = memoryPosts.find((post) => post.slug === parsed.slug && post.id !== id);
+  } else {
+    const db = await getDb();
+    await ensureSeededContent(db);
+    duplicate = await db
+      .collection<ContentPost>("blogPosts")
+      .findOne(
+        { slug: parsed.slug, ...(id ? { id: { $ne: id } } : {}) },
+        { projection: { _id: 1 } },
+      );
+  }
   if (duplicate) throw new Error("این اسلاگ قبلاً استفاده شده است.");
   const now = new Date().toISOString();
   const post: ContentPost = {
@@ -363,7 +454,9 @@ export async function saveContentPost(input: ContentPostInput, id?: string): Pro
     return post;
   }
   const db = await getDb();
-  await db.collection<ContentPost>("blogPosts").updateOne({ id: post.id }, { $set: post }, { upsert: true });
+  await db
+    .collection<ContentPost>("blogPosts")
+    .updateOne({ id: post.id }, { $set: post }, { upsert: true });
   return post;
 }
 

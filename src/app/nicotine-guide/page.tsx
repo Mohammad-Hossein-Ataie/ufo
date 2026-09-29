@@ -14,7 +14,7 @@ import {
   NicotineGuideCalculator,
   type NicotineRecommendationSets,
 } from "@/components/nicotine-guide-calculator";
-import { getCatalogRowStock, listCatalogRowsForDiscovery } from "@/lib/catalog-data";
+import { getCatalogRowAvailability, listCatalogRowsForDiscovery } from "@/lib/catalog-data";
 import { getCategoryImage, getProductImage } from "@/lib/product-images";
 import {
   buildNicotineRecommendationSets,
@@ -142,7 +142,7 @@ async function getRecommendationData() {
           fallbackImage:
             getCategoryImage(row.product.categoryId) ?? "/images/categories/e-liquid.webp",
           priceRial: row.variant.retailPriceRial,
-          available: getCatalogRowStock(row),
+          availability: getCatalogRowAvailability(row),
           strengthsMg,
           matchQuality,
         })),

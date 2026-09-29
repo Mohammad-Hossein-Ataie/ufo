@@ -29,7 +29,7 @@ interface SearchProduct {
   fallbackImage: string;
   priceRial: number;
   compareAtPriceRial: number | null;
-  stockCount: number;
+  availabilityState: "available" | "low_stock" | "almost_unavailable" | "unavailable";
   stockLabel: string;
   cartonSize: number | null;
   moq: number | null;

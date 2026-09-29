@@ -47,6 +47,7 @@ describe("admin proxy CSRF boundary", () => {
   it.each([
     "/api/admin/storage/upload",
     "/api/admin/products",
+    "/api/admin/announcements",
     "/api/admin/shipping-methods",
     "/api/admin/logout",
   ])("protects mutations at %s behind an internal origin", async (path) => {

@@ -23,16 +23,18 @@ import {
 import type { StorefrontVariantOption } from "@/lib/storefront-variants";
 import type { Product, ProductVariant, ProductVariantType } from "@ufo/types";
 import { Alert, Badge, Button, Price, StockStatus } from "@ufo/ui";
+import type { PublicAvailabilityState } from "@/lib/public-availability";
 
 interface ProductDetailClientProps {
   product: Pick<Product, "id" | "nameFa" | "nameEn" | "shortDescriptionFa">;
   variant: ProductVariant;
-  available: number;
+  availability: PublicAvailabilityState;
   brandName?: string | undefined;
   galleryImages: string[];
   variantType: ProductVariantType;
   variantImages: Record<string, string>;
   variantOptions: StorefrontVariantOption[];
+  initialVariantValueId: string | null;
 }
 
 function buildVariantImageMap(
@@ -57,12 +59,13 @@ function getVariantTypeLabel(variantType: ProductVariantType) {
 export function ProductDetailClient({
   product,
   variant,
-  available,
+  availability,
   brandName,
   galleryImages,
   variantType,
   variantImages,
   variantOptions,
+  initialVariantValueId,
 }: ProductDetailClientProps) {
   const firstImage = galleryImages[0] ?? "/images/categories/lighter.webp";
   const variantImageMap = useMemo(
@@ -93,14 +96,24 @@ export function ProductDetailClient({
       }),
     [imagePreloadSources, imageVariantValueMap, product.nameFa, variantOptions],
   );
-  const [selectedImage, setSelectedImage] = useState(firstImage);
+  const initialImage = initialVariantValueId
+    ? variantImageMap.get(initialVariantValueId) ?? firstImage
+    : firstImage;
+  const [selectedImage, setSelectedImage] = useState(initialImage);
   const [imageOpen, setImageOpen] = useState(false);
-  const [selectedVariantValueId, setSelectedVariantValueId] = useState<string | null>(null);
+  const [selectedVariantValueId, setSelectedVariantValueId] = useState<string | null>(
+    initialVariantValueId,
+  );
   const selectedVariantOption = variantOptions.find(
     (option) => option.id === selectedVariantValueId,
   );
-  const hasVariantOptions = variantType !== "none" && variantOptions.length > 0;
-  const needsVariantSelection = hasVariantOptions && !selectedVariantValueId;
+  const requiresVariantSelection = variantType !== "none";
+  const needsVariantSelection = requiresVariantSelection && !selectedVariantOption;
+  const hasAvailableVariant = variantOptions.some((option) => !option.disabled);
+  const effectiveAvailability = selectedVariantOption?.availability ?? availability;
+  const displayedAvailability = needsVariantSelection
+    ? "unavailable"
+    : effectiveAvailability;
   const variantTypeLabel = getVariantTypeLabel(variantType);
   const selectorTitle = `${variantTypeLabel} را انتخاب کنید`;
   const compareAt = variant.compareAtPriceRial;
@@ -110,23 +123,26 @@ export function ProductDetailClient({
       : 0;
 
   function selectVariantValue(valueId: string) {
+    if (variantOptions.find((option) => option.id === valueId)?.disabled) return;
     setSelectedVariantValueId(valueId);
     setSelectedImage(variantImageMap.get(valueId) ?? firstImage);
   }
 
   function selectImage(image: string) {
     setSelectedImage(image);
-    setSelectedVariantValueId(imageVariantValueMap.get(image) ?? null);
+    const optionId = imageVariantValueMap.get(image);
+    const option = variantOptions.find((item) => item.id === optionId);
+    setSelectedVariantValueId(option && !option.disabled ? option.id : null);
   }
 
-  const variantSelector = hasVariantOptions ? (
+  const variantSelector = requiresVariantSelection ? (
     <section aria-label={`انتخاب ${variantTypeLabel} محصول`}>
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="inline-flex items-center gap-2 text-base font-black text-white">
           {variantType === "flavor" ? <Sparkles size={18} className="text-cyan-300" aria-hidden="true" />
             : variantType === "color" ? <Palette size={18} className="text-cyan-300" aria-hidden="true" />
             : <Gauge size={18} className="text-cyan-300" aria-hidden="true" />}
-          {selectorTitle}
+          {hasAvailableVariant ? selectorTitle : `${variantTypeLabel} موجود نیست`}
         </h2>
         {selectedVariantOption ? <span className="text-xs font-bold text-retail-accent">{selectedVariantOption.labelFa}</span> : null}
       </div>
@@ -136,19 +152,26 @@ export function ProductDetailClient({
           const optionImage = variantImageMap.get(option.id);
           return option.type === "flavor" ? (
             <button key={option.id} type="button" onClick={() => selectVariantValue(option.id)}
-              className={`flex min-h-12 select-none items-center justify-between gap-3 rounded-md border px-3 text-sm font-black transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 motion-reduce:transition-none ${active ? "border-cyan-300 bg-cyan-300 text-slate-950 shadow-[0_10px_24px_rgba(0,217,255,0.20)]" : "border-white/10 bg-white/[0.04] text-white hover:border-cyan-300/60 hover:bg-white/[0.07]"}`}
-              role="radio" aria-checked={active}>
+              disabled={option.disabled}
+              className={`flex min-h-12 select-none items-center justify-between gap-3 rounded-md border px-3 text-sm font-black transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 motion-reduce:transition-none ${active ? "border-cyan-300 bg-cyan-300 text-slate-950 shadow-[0_10px_24px_rgba(0,217,255,0.20)]" : option.disabled ? "cursor-not-allowed border-white/10 bg-white/[0.02] text-white/40 line-through" : "border-white/10 bg-white/[0.04] text-white hover:border-cyan-300/60 hover:bg-white/[0.07]"}`}
+              role="radio" aria-checked={active} aria-disabled={option.disabled}>
               <span className="inline-flex min-w-0 items-center gap-2"><FlavorVisual option={option} /><span className="truncate">{option.labelFa}</span></span>
-              <span className="inline-flex shrink-0 items-center gap-1">{optionImage ? <PackageCheck size={14} aria-hidden="true" /> : null}{active ? <SelectedCheck /> : null}</span>
+              <span className="inline-flex shrink-0 items-center gap-1">{option.disabled ? <span className="no-underline text-[10px]">ناموجود</span> : null}{optionImage ? <PackageCheck size={14} aria-hidden="true" /> : null}{active ? <SelectedCheck /> : null}</span>
             </button>
           ) : (
             <button key={option.id} type="button" onClick={() => selectVariantValue(option.id)}
-              className={`inline-flex min-h-11 shrink-0 select-none items-center gap-2 rounded-md border px-3 text-sm font-bold transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 motion-reduce:transition-none ${active ? "border-cyan-300 bg-white text-slate-950" : "border-white/10 bg-white/[0.04] text-white hover:border-cyan-300/60"}`}
-              role="radio" aria-checked={active}>
-              <VariantOptionVisual option={option} /><span>{option.labelFa}</span>{active ? <Check size={15} aria-hidden="true" /> : null}
+              disabled={option.disabled}
+              className={`inline-flex min-h-11 shrink-0 select-none items-center gap-2 rounded-md border px-3 text-sm font-bold transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 motion-reduce:transition-none ${active ? "border-cyan-300 bg-white text-slate-950" : option.disabled ? "cursor-not-allowed border-white/10 bg-white/[0.02] text-white/40 line-through" : "border-white/10 bg-white/[0.04] text-white hover:border-cyan-300/60"}`}
+              role="radio" aria-checked={active} aria-disabled={option.disabled}>
+              <VariantOptionVisual option={option} /><span>{option.labelFa}</span>{option.disabled ? <span className="no-underline text-[10px]">ناموجود</span> : null}{active ? <Check size={15} aria-hidden="true" /> : null}
             </button>
           );
         })}
+        {variantOptions.length === 0 ? (
+          <p className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-3 text-sm text-retail-secondary">
+            در حال حاضر گزینه فعالی برای این محصول وجود ندارد.
+          </p>
+        ) : null}
       </div>
     </section>
   ) : null;
@@ -245,7 +268,10 @@ export function ProductDetailClient({
 
       <div className="flex min-w-0 flex-col py-1 lg:order-1">
         <div className="flex flex-wrap items-center gap-2">
-          <StockStatus available={available} />
+          <StockStatus
+            state={displayedAvailability}
+            unavailableLabel={requiresVariantSelection ? "ناموجود" : "پیش‌سفارش"}
+          />
           <Badge tone="warning">۱۸+</Badge>
           {brandName ? <Badge tone="info">{brandName}</Badge> : null}
         </div>
@@ -284,21 +310,32 @@ export function ProductDetailClient({
           </div>
           <div className="grid gap-1 text-left text-xs text-retail-secondary">
             <span dir="ltr">SKU: {variant.sku}</span>
-            <span>{new Intl.NumberFormat("fa-IR").format(available)} عدد قابل سفارش</span>
+            <span>
+              {displayedAvailability === "available"
+                ? "آماده سفارش"
+                : displayedAvailability === "low_stock"
+                  ? "موجودی محدود"
+                  : displayedAvailability === "almost_unavailable"
+                    ? "رو به اتمام"
+                    : requiresVariantSelection
+                      ? "ناموجود"
+                      : "قابل پیش‌سفارش"}
+            </span>
           </div>
         </div>
 
         <div className="product-purchase-zone mt-6 grid gap-4">
           {needsVariantSelection ? (
             <Button type="button" disabled className="w-full min-h-12 text-base">
-              ابتدا {variantTypeLabel} را انتخاب کنید
+              {hasAvailableVariant
+                ? `ابتدا ${variantTypeLabel} را انتخاب کنید`
+                : "همه گزینه‌ها ناموجود هستند"}
             </Button>
           ) : (
             <AddToCartButton
               key={`${variant.id}-${selectedVariantValueId ?? "default"}`}
               variantId={variant.id}
-              maxQuantity={available > 0 ? available : undefined}
-              label={available > 0 ? "افزودن به سبد خرید" : "ثبت پیش‌سفارش"}
+              label={effectiveAvailability !== "unavailable" ? "افزودن به سبد خرید" : "ثبت پیش‌سفارش"}
               enableQuantity
               selectedVariant={
                 selectedVariantValueId && variantType !== "none"

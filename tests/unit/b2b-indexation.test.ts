@@ -44,8 +44,8 @@ describe("B2B indexation safety", () => {
     expect(robots().rules).toEqual([{ userAgent: "*", disallow: "/" }]);
   });
 
-  it("keeps utility and account URLs out of the sitemap", () => {
-    const paths = sitemap().map((entry) => new URL(entry.url).pathname);
+  it("keeps utility and account URLs out of the sitemap", async () => {
+    const paths = (await sitemap()).map((entry) => new URL(entry.url).pathname);
     for (const path of utilityPaths) {
       expect(paths.some((entry) => entry === path || entry.startsWith(`${path}/`))).toBe(false);
     }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   BookOpenText,
   Calculator,
@@ -114,6 +114,7 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [emptyCartOpen, setEmptyCartOpen] = useState(false);
+  const previousPathname = useRef(pathname);
   const headerDocked = useHeaderDocked();
 
   useEffect(() => {
@@ -139,6 +140,8 @@ export function SiteHeader() {
   }, []);
 
   useEffect(() => {
+    if (previousPathname.current === pathname) return;
+    previousPathname.current = pathname;
     setMenuOpen(false);
     setSearchOpen(false);
     setEmptyCartOpen(false);

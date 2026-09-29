@@ -22,6 +22,7 @@ import type {
   ProductKind,
   ProductSpec,
   ProductVariant,
+  ProductVariantValueState,
   ProductVariantType,
   SalesChannel,
 } from "@ufo/types";
@@ -54,6 +55,8 @@ export interface AdminProductInput {
   images?: string[] | undefined;
   variantType?: ProductVariantType | undefined;
   variantValueIds?: string[] | undefined;
+  variantValueStates?: Record<string, ProductVariantValueState> | undefined;
+  defaultVariantValueId?: string | undefined;
   variantImages?: Record<string, string> | undefined;
   colorImages?: Record<string, string> | undefined;
   tags?: string[] | undefined;
@@ -137,6 +140,18 @@ function assertInput(input: AdminProductInput) {
     (!Number.isInteger(input.wholesalePriceRial) || input.wholesalePriceRial < 0)
   ) {
     throw new Error("قیمت همکاری معتبر نیست.");
+  }
+  for (const [valueId, state] of Object.entries(input.variantValueStates ?? {})) {
+    if (
+      !valueId.trim() ||
+      typeof state.isActive !== "boolean" ||
+      typeof state.isAvailable !== "boolean" ||
+      (state.stockQuantity !== undefined &&
+        (!Number.isSafeInteger(state.stockQuantity) || state.stockQuantity < 0)) ||
+      (state.sku !== undefined && (typeof state.sku !== "string" || state.sku.length > 100))
+    ) {
+      throw new Error("وضعیت تنوع محصول معتبر نیست.");
+    }
   }
   if (!input.salesChannels.every((channel) => channel === "retail" || channel === "wholesale")) {
     throw new Error("کانال فروش معتبر نیست.");
@@ -274,6 +289,31 @@ function buildDocuments(
           (images.includes(imageValue) || /^https?:\/\//i.test(imageValue)),
       ),
   );
+  const rawVariantValueStates =
+    input.variantValueStates ?? current?.product.variantValueStates ?? {};
+  const variantValueStates = Object.fromEntries(
+    variantValueIds.map((valueId) => {
+      const state = rawVariantValueStates[valueId];
+      return [
+        valueId,
+        {
+          isActive: state?.isActive ?? true,
+          isAvailable: state?.isAvailable ?? true,
+          ...(state?.stockQuantity !== undefined
+            ? { stockQuantity: state.stockQuantity }
+            : {}),
+          ...(state?.sku?.trim() ? { sku: state.sku.trim() } : {}),
+        },
+      ] as const;
+    }),
+  );
+  const requestedDefaultVariantValueId =
+    input.defaultVariantValueId === undefined
+      ? current?.product.defaultVariantValueId
+      : input.defaultVariantValueId.trim();
+  const defaultVariantValueId = variantValueIds.includes(requestedDefaultVariantValueId ?? "")
+    ? requestedDefaultVariantValueId
+    : undefined;
   const optionAttribute = variantAttribute(variantType, variantValueIds);
 
   const product: Product = {
@@ -295,6 +335,8 @@ function buildDocuments(
     images,
     variantType,
     ...(variantValueIds.length > 0 ? { variantValueIds } : {}),
+    ...(Object.keys(variantValueStates).length > 0 ? { variantValueStates } : {}),
+    ...(defaultVariantValueId ? { defaultVariantValueId } : {}),
     ...(Object.keys(variantImages).length > 0 ? { variantImages } : {}),
     tags,
     attributes: [
@@ -504,10 +546,29 @@ export async function saveAdminProduct(input: AdminProductInput): Promise<AdminP
 
   const db = await getDb();
   await ensureIndexes(db);
+  const optionalProductFields = [
+    "variantValueIds",
+    "variantValueStates",
+    "defaultVariantValueId",
+    "variantImages",
+    "colorImages",
+  ] as const;
+  const productUnset: Record<string, ""> = Object.fromEntries(
+    optionalProductFields
+      .filter((field) => !(field in row.product))
+      .map((field) => [field, ""]),
+  );
   await Promise.all([
     db
       .collection<Product>("products")
-      .updateOne({ id: row.product.id }, { $set: row.product }, { upsert: true }),
+      .updateOne(
+        { id: row.product.id },
+        {
+          $set: row.product,
+          ...(Object.keys(productUnset).length > 0 ? { $unset: productUnset } : {}),
+        },
+        { upsert: true },
+      ),
     db
       .collection<ProductVariant>("productVariants")
       .updateOne({ id: row.variant.id }, { $set: row.variant }, { upsert: true }),

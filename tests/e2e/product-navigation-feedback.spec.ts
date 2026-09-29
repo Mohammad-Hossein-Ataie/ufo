@@ -15,19 +15,38 @@ for (const viewport of [
 
     const slot = page.locator(".homepage-product-slot").first();
     await slot.scrollIntoViewIfNeeded();
-    const details = slot.locator('[data-product-navigation="details"]');
-    await expect(details).toBeVisible();
-    await details.focus();
-    const href = await details.getAttribute("href");
+    const navigation = slot.locator("[data-product-navigation]");
+    await expect(navigation).toHaveCount(1);
+    await expect(navigation).toBeVisible();
+    await expect(slot.locator("a a, a button, a input")).toHaveCount(0);
+    const href = await navigation.getAttribute("href");
     expect(href).toMatch(/^\/products\//);
+    for (const part of [slot.locator(".media-frame"), slot.locator("h3")]) {
+      expect(
+        await part.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          return document
+            .elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)
+            ?.closest("a")
+            ?.getAttribute("href");
+        }),
+      ).toBe(href);
+    }
+    await navigation.focus();
+    await expect(navigation).toBeFocused();
+    const action = await navigation.getAttribute("data-product-navigation");
 
-    await page.route(`**${href}?*`, async (route) => {
+    await page.route(`**${href}*`, async (route) => {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       await route.continue();
     });
 
-    await details.click({ noWaitAfter: true });
-    await expect(page.getByText("در حال باز کردن…", { exact: true })).toBeVisible({ timeout: 500 });
+    await navigation.click({ noWaitAfter: true });
+    await expect(
+      page.getByText(action === "select" ? "در حال آماده‌سازی…" : "در حال باز کردن…", {
+        exact: true,
+      }),
+    ).toBeVisible({ timeout: 500 });
     await slot.screenshot({ path: `temp/navigation-feedback-${viewport.name}.png` });
     await expect(page).toHaveURL(new RegExp(`${href!.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`));
     const loading = page.getByTestId("loading-product");

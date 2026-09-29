@@ -21,6 +21,8 @@ import { MotionReveal } from "@/components/motion-reveal";
 import { FooterCopyContact } from "@/components/footer-copy-contact";
 import { SiteHeader } from "@/components/site-header";
 import { storeSettings } from "@ufo/domain";
+import { SiteAnnouncementBar } from "@/components/site-announcement-bar";
+import type { SiteAnnouncement } from "@/lib/site-announcements";
 
 const retailFooterLinks = [
   { href: "/products", label: "محصولات", icon: ShoppingBag },
@@ -40,7 +42,13 @@ const SiteAnalytics = dynamic(
   { ssr: false },
 );
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  announcements,
+}: {
+  children: React.ReactNode;
+  announcements: SiteAnnouncement[];
+}) {
   const pathname = usePathname();
 
   if (pathname === "/admin/login") {
@@ -58,6 +66,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <a href="#main-content" className="skip-link">
           پرش به محتوای اصلی
         </a>
+        <SiteAnnouncementBar announcements={announcements} />
         <B2BHeader />
         {children}
       </div>
@@ -70,6 +79,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <a href="#main-content" className="skip-link">
         پرش به محتوای اصلی
       </a>
+      <SiteAnnouncementBar announcements={announcements} />
       <SiteHeader />
       {children}
       <footer className="border-t border-[#22303D] bg-[#0D1117] pb-[calc(5rem+env(safe-area-inset-bottom)+var(--checkout-cta-height,0px))] text-[#D9E2EC] lg:pb-0">

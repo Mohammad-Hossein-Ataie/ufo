@@ -36,6 +36,7 @@ import type {
   ProductKind,
   ProductSpec,
   ProductVariant,
+  ProductVariantValueState,
   ProductVariantType,
   SalesChannel,
 } from "@ufo/types";
@@ -87,6 +88,8 @@ interface FormState {
   images: string[];
   variantType: ProductVariantType;
   variantValueIds: string[];
+  variantValueStates: Record<string, ProductVariantValueState>;
+  defaultVariantValueId: string;
   variantImages: Record<string, string>;
   tagsText: string;
   specsText: string;
@@ -135,6 +138,8 @@ const emptyForm: FormState = {
   images: ["/images/ufo-hero.webp"],
   variantType: "flavor",
   variantValueIds: [],
+  variantValueStates: {},
+  defaultVariantValueId: "",
   variantImages: {},
   tagsText: "",
   specsText: "",
@@ -309,6 +314,25 @@ function getInitialVariantImages(
   );
 }
 
+function getInitialVariantValueStates(
+  valueIds: string[],
+  existing: Record<string, ProductVariantValueState> | undefined,
+) {
+  return Object.fromEntries(
+    valueIds.map((valueId) => [
+      valueId,
+      {
+        isActive: existing?.[valueId]?.isActive ?? true,
+        isAvailable: existing?.[valueId]?.isAvailable ?? true,
+        ...(existing?.[valueId]?.stockQuantity !== undefined
+          ? { stockQuantity: existing[valueId].stockQuantity }
+          : {}),
+        ...(existing?.[valueId]?.sku ? { sku: existing[valueId].sku } : {}),
+      },
+    ]),
+  );
+}
+
 function getLockedVariantType(categoryId: string, productKind: ProductKind) {
   return getDefaultProductVariantType({ categoryId, productKind });
 }
@@ -368,6 +392,11 @@ function rowToForm(row: AdminProductRecord): FormState {
     images,
     variantType,
     variantValueIds,
+    variantValueStates: getInitialVariantValueStates(
+      variantValueIds,
+      row.product.variantValueStates,
+    ),
+    defaultVariantValueId: row.product.defaultVariantValueId ?? "",
     variantImages: getInitialVariantImages(
       variantValueIds,
       images,
@@ -431,6 +460,7 @@ export function ProductManager() {
   const [bulkFailures, setBulkFailures] = useState<Array<{ id: string; error: string }>>([]);
   const [editorFetching, setEditorFetching] = useState(false);
   const fetchSequence = useRef(0);
+  const variantListsLoaded = useRef(false);
   const dirty = isEditorOpen && JSON.stringify(form) !== baseline;
 
   function changeFilters(next: FilterState) {
@@ -485,7 +515,7 @@ export function ProductManager() {
     };
   }, [filters, page, pageSize, sort, direction, reload]);
   useEffect(() => {
-    if (!isEditorOpen) return;
+    if (!isEditorOpen || variantListsLoaded.current) return;
     const controller = new AbortController();
     Promise.all([
       fetch("/api/admin/flavors", { signal: controller.signal }),
@@ -497,6 +527,7 @@ export function ProductManager() {
         if (!controller.signal.aborted) {
           setFlavors(fa.flavors);
           setColors(co.colors);
+          variantListsLoaded.current = true;
         }
       })
       .catch(() => {
@@ -562,6 +593,9 @@ export function ProductManager() {
         productKind,
         variantType,
         variantValueIds: current.variantType === variantType ? current.variantValueIds : [],
+        variantValueStates: current.variantType === variantType ? current.variantValueStates : {},
+        defaultVariantValueId:
+          current.variantType === variantType ? current.defaultVariantValueId : "",
         variantImages: current.variantType === variantType ? current.variantImages : {},
       };
     });
@@ -576,6 +610,9 @@ export function ProductManager() {
         categoryId,
         variantType,
         variantValueIds: current.variantType === variantType ? current.variantValueIds : [],
+        variantValueStates: current.variantType === variantType ? current.variantValueStates : {},
+        defaultVariantValueId:
+          current.variantType === variantType ? current.defaultVariantValueId : "",
         variantImages: current.variantType === variantType ? current.variantImages : {},
       };
     });
@@ -599,6 +636,8 @@ export function ProductManager() {
         ...current,
         variantType,
         variantValueIds: [],
+        variantValueStates: {},
+        defaultVariantValueId: "",
         variantImages: {},
       };
     });
@@ -608,19 +647,57 @@ export function ProductManager() {
     setForm((current) => {
       const exists = current.variantValueIds.includes(valueId);
       const variantImages = { ...current.variantImages };
+      const variantValueStates = { ...current.variantValueStates };
       if (exists) delete variantImages[valueId];
+      if (exists) delete variantValueStates[valueId];
       if (!exists && current.images.length > 0) {
         const assignedImages = new Set(Object.values(variantImages));
         const fallbackImage =
           current.images.find((image) => !assignedImages.has(image)) ?? current.images[0];
         if (fallbackImage) variantImages[valueId] = fallbackImage;
       }
+      if (!exists) {
+        variantValueStates[valueId] = { isActive: true, isAvailable: true };
+      }
       return {
         ...current,
         variantValueIds: exists
           ? current.variantValueIds.filter((item) => item !== valueId)
           : [...current.variantValueIds, valueId],
+        variantValueStates,
+        defaultVariantValueId:
+          exists && current.defaultVariantValueId === valueId
+            ? ""
+            : current.defaultVariantValueId,
         variantImages,
+      };
+    });
+  }
+
+  function updateVariantValueState(
+    valueId: string,
+    patch: Omit<Partial<ProductVariantValueState>, "stockQuantity" | "sku"> & {
+      stockQuantity?: number | undefined;
+      sku?: string | undefined;
+    },
+  ) {
+    setForm((current) => {
+      const existing = current.variantValueStates[valueId] ?? {
+        isActive: true,
+        isAvailable: true,
+      };
+      const stockQuantity =
+        "stockQuantity" in patch ? patch.stockQuantity : existing.stockQuantity;
+      const sku = "sku" in patch ? patch.sku : existing.sku;
+      const next: ProductVariantValueState = {
+        isActive: patch.isActive ?? existing.isActive,
+        isAvailable: patch.isAvailable ?? existing.isAvailable,
+        ...(stockQuantity !== undefined ? { stockQuantity } : {}),
+        ...(sku !== undefined ? { sku } : {}),
+      };
+      return {
+        ...current,
+        variantValueStates: { ...current.variantValueStates, [valueId]: next },
       };
     });
   }
@@ -635,6 +712,13 @@ export function ProductManager() {
         variantValueIds: current.variantValueIds.includes(valueId)
           ? current.variantValueIds
           : [...current.variantValueIds, valueId],
+        variantValueStates: {
+          ...current.variantValueStates,
+          [valueId]: current.variantValueStates[valueId] ?? {
+            isActive: true,
+            isAvailable: true,
+          },
+        },
         variantImages: {
           ...current.variantImages,
           ...(current.variantImages[valueId] || !fallbackImage ? {} : { [valueId]: fallbackImage }),
@@ -671,6 +755,13 @@ export function ProductManager() {
     setForm((current) => ({
       ...current,
       variantValueIds,
+      variantValueStates: getInitialVariantValueStates(
+        variantValueIds,
+        current.variantValueStates,
+      ),
+      defaultVariantValueId: variantValueIds.includes(current.defaultVariantValueId)
+        ? current.defaultVariantValueId
+        : "",
       variantImages: getInitialVariantImages(
         variantValueIds,
         current.images,
@@ -828,6 +919,12 @@ export function ProductManager() {
       images,
       variantType: form.variantType,
       variantValueIds: form.variantType === "none" ? [] : form.variantValueIds,
+      variantValueStates: Object.fromEntries(
+        Object.entries(form.variantValueStates).filter(([valueId]) =>
+          form.variantValueIds.includes(valueId),
+        ),
+      ),
+      defaultVariantValueId: form.defaultVariantValueId,
       variantImages,
       tags: form.tagsText
         .split(/[،,]/)
@@ -977,6 +1074,13 @@ export function ProductManager() {
         variantValueIds: current.variantValueIds.includes(data.flavor!.id)
           ? current.variantValueIds
           : [...current.variantValueIds, data.flavor!.id],
+        variantValueStates: {
+          ...current.variantValueStates,
+          [data.flavor!.id]: current.variantValueStates[data.flavor!.id] ?? {
+            isActive: true,
+            isAvailable: true,
+          },
+        },
       }));
       setNewFlavor({ nameFa: "", nameEn: "", slug: "", iconKey: "" });
       setIsFlavorDialogOpen(false);
@@ -1014,6 +1118,13 @@ export function ProductManager() {
         variantValueIds: current.variantValueIds.includes(data.color!.id)
           ? current.variantValueIds
           : [...current.variantValueIds, data.color!.id],
+        variantValueStates: {
+          ...current.variantValueStates,
+          [data.color!.id]: current.variantValueStates[data.color!.id] ?? {
+            isActive: true,
+            isAvailable: true,
+          },
+        },
       }));
       setNewColor({ labelFa: "", id: "", hex: "#168BFF" });
       setIsColorDialogOpen(false);
@@ -1541,6 +1652,8 @@ export function ProductManager() {
                             setForm((current) => ({
                               ...current,
                               variantValueIds: [],
+                              variantValueStates: {},
+                              defaultVariantValueId: "",
                               variantImages: {},
                             }))
                           }
@@ -1664,6 +1777,131 @@ export function ProductManager() {
                         );
                       })}
                     </div>
+
+                    {activeVariantOptions.length > 0 ? (
+                      <div className="mt-5 overflow-x-auto rounded-md border border-[#D7DDE4]">
+                        <table className="min-w-[780px] w-full border-collapse text-sm">
+                          <caption className="border-b bg-[#F7F9FB] px-3 py-3 text-right font-black text-[#17202A]">
+                            مدیریت مستقیم تنوع‌ها
+                          </caption>
+                          <thead className="bg-[#F7F9FB] text-xs text-[#5F6C79]">
+                            <tr>
+                              <th className="px-3 py-2 text-right">تنوع</th>
+                              <th className="px-3 py-2 text-right">SKU</th>
+                              <th className="px-3 py-2 text-right">موجودی دقیق</th>
+                              <th className="px-3 py-2 text-center">فعال</th>
+                              <th className="px-3 py-2 text-center">قابل سفارش</th>
+                              <th className="px-3 py-2 text-center">پیش‌فرض</th>
+                              <th className="px-3 py-2 text-center">وضعیت</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {activeVariantOptions.map((option) => {
+                              const state = form.variantValueStates[option.id] ?? {
+                                isActive: true,
+                                isAvailable: true,
+                              };
+                              const unavailable =
+                                !state.isAvailable || state.stockQuantity === 0;
+                              return (
+                                <tr key={option.id} className="border-t border-[#E5EAF0]">
+                                  <th className="px-3 py-3 text-right font-bold">
+                                    {option.labelFa}
+                                  </th>
+                                  <td className="px-3 py-2">
+                                    <Input
+                                      dir="ltr"
+                                      value={state.sku ?? ""}
+                                      onChange={(event) =>
+                                        updateVariantValueState(option.id, {
+                                          sku: event.target.value || undefined,
+                                        })
+                                      }
+                                      aria-label={`SKU ${option.labelFa}`}
+                                      placeholder="اختیاری"
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2">
+                                    <Input
+                                      type="number"
+                                      min={0}
+                                      value={state.stockQuantity ?? ""}
+                                      onChange={(event) =>
+                                        updateVariantValueState(option.id, {
+                                          stockQuantity:
+                                            event.target.value === ""
+                                              ? undefined
+                                              : Number(event.target.value),
+                                        })
+                                      }
+                                      aria-label={`موجودی ${option.labelFa}`}
+                                      placeholder="موجودی اصلی"
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2 text-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={state.isActive}
+                                      onChange={(event) =>
+                                        updateVariantValueState(option.id, {
+                                          isActive: event.target.checked,
+                                        })
+                                      }
+                                      aria-label={`فعال بودن ${option.labelFa}`}
+                                      className="h-5 w-5 accent-[#168BFF]"
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2 text-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={state.isAvailable}
+                                      onChange={(event) =>
+                                        updateVariantValueState(option.id, {
+                                          isAvailable: event.target.checked,
+                                        })
+                                      }
+                                      aria-label={`قابل سفارش بودن ${option.labelFa}`}
+                                      className="h-5 w-5 accent-[#168BFF]"
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2 text-center">
+                                    <input
+                                      type="radio"
+                                      name="default-variant-value"
+                                      checked={form.defaultVariantValueId === option.id}
+                                      disabled={!state.isActive || unavailable}
+                                      onChange={() => update("defaultVariantValueId", option.id)}
+                                      aria-label={`انتخاب ${option.labelFa} به عنوان پیش‌فرض`}
+                                      className="h-5 w-5 accent-[#168BFF]"
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2 text-center">
+                                    <span
+                                      className={`inline-flex rounded-full px-2 py-1 text-xs font-bold ${
+                                        !state.isActive
+                                          ? "bg-slate-100 text-slate-600"
+                                          : unavailable
+                                            ? "bg-rose-50 text-rose-700"
+                                            : "bg-emerald-50 text-emerald-700"
+                                      }`}
+                                    >
+                                      {!state.isActive
+                                        ? "غیرفعال"
+                                        : unavailable
+                                          ? "ناموجود"
+                                          : "موجود"}
+                                    </span>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                        <p className="border-t bg-[#F7F9FB] px-3 py-2 text-xs leading-6 text-[#5F6C79]">
+                          موجودی خالی از موجودی مدل اصلی استفاده می‌کند. غیرفعال‌کردن یک تنوع، عکس و داده‌های آن را حفظ می‌کند.
+                        </p>
+                      </div>
+                    ) : null}
                   </section>
                 </div>
               )}

@@ -4,10 +4,15 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { ArrowLeft, BadgeCheck, Box, Film, ListChecks, ShieldCheck } from "lucide-react";
 import { ProductDetailClient } from "@/components/product-detail-client";
+import { ProductNavigationLink } from "@/components/product-navigation-link";
 import { ProtectedProductImage } from "@/components/protected-product-image";
 import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
-import { getCatalogRowStock, listCatalogRowsForDiscovery } from "@/lib/catalog-data";
+import {
+  getCatalogRowAvailability,
+  getCatalogRowStock,
+  listCatalogRowsForDiscovery,
+} from "@/lib/catalog-data";
 import { listAdminColors } from "@/lib/admin-colors";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import {
@@ -16,7 +21,10 @@ import {
   getProductImages,
   getProductVariantImages,
 } from "@/lib/product-images";
-import { getStorefrontVariantOptions } from "@/lib/storefront-variants";
+import {
+  getStorefrontVariantOptions,
+  resolveStorefrontVariantValueId,
+} from "@/lib/storefront-variants";
 import { productCatalogImageUrl, productDetailImageVersion } from "@/lib/product-image-protection";
 import {
   categories,
@@ -27,7 +35,7 @@ import {
   productCapacityAttributeTechnicalValue,
 } from "@ufo/domain";
 import { breadcrumbJsonLd, jsonLdScriptProps, productJsonLd } from "@ufo/seo";
-import { Button, Price, ProductCard, StockStatus } from "@ufo/ui";
+import { Price, ProductCard, StockStatus } from "@ufo/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -141,8 +149,15 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProductPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ variant?: string | string[] }>;
+}) {
   const { slug } = await params;
+  const requestedVariant = (await searchParams).variant;
   const [catalogRows, flavors, colors] = await Promise.all([
     getProductCatalog(),
     listAdminFlavors(),
@@ -158,7 +173,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const galleryImages = getProductImages(product);
   const variantImages = getProductVariantImages(product);
   const variantType = getProductVariantType(product);
-  const variantOptions = getStorefrontVariantOptions(product, flavors, colors);
+  const availability = getCatalogRowAvailability(row);
+  const variantOptions = getStorefrontVariantOptions(product, flavors, colors, availability);
+  const initialVariantValueId = resolveStorefrontVariantValueId(
+    variantOptions,
+    Array.isArray(requestedVariant) ? requestedVariant[0] : requestedVariant,
+    product.defaultVariantValueId,
+  );
   const relatedRows = catalogRows
     .filter(
       (item) =>
@@ -207,12 +228,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             shortDescriptionFa: product.shortDescriptionFa,
           }}
           variant={variant}
-          available={available}
+          availability={availability}
           brandName={brandName}
           galleryImages={galleryImages}
           variantType={variantType}
           variantImages={variantImages}
           variantOptions={variantOptions}
+          initialVariantValueId={initialVariantValueId}
         />
 
         <section className="mt-10 grid gap-5 lg:grid-cols-[minmax(0,1fr)_24rem]">
@@ -337,11 +359,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               {relatedRows.map((relatedRow) => {
                 const related = relatedRow.product;
                 const relatedVariant = relatedRow.variant;
-                const relatedAvailable = getCatalogRowStock(relatedRow);
                 const relatedVariantOptions = getStorefrontVariantOptions(related, flavors, colors);
                 return (
                   <ProductCard
                     key={related.id}
+                    className="catalog-linked-card"
                     title={related.nameFa}
                     subtitle={related.nameEn}
                     description={related.shortDescriptionFa}
@@ -355,7 +377,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                         alt={related.nameFa}
                       />
                     }
-                    badge={<StockStatus available={relatedAvailable} />}
+                    badge={
+                      <StockStatus
+                        state={getCatalogRowAvailability(relatedRow)}
+                        unavailableLabel="پیش‌سفارش"
+                      />
+                    }
                     price={<Price valueRial={relatedVariant.retailPriceRial} />}
                     variantSummary={
                       <div key={`variants-${related.id}`} className="hidden sm:block">
@@ -364,11 +391,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     }
                     actions={
                       <div className="grid gap-2 sm:gap-3">
-                        <Link href={`/products/${related.slug}`}>
-                          <Button size="sm" className="w-full px-2">
-                            مشاهده محصول
-                          </Button>
-                        </Link>
+                        <ProductNavigationLink
+                          href={`/products/${related.slug}`}
+                          action="details"
+                          className="w-full bg-retail-accent px-2 text-retail-bg hover:bg-retail-accent-hover"
+                        >
+                          مشاهده محصول
+                        </ProductNavigationLink>
                       </div>
                     }
                   />

@@ -10,6 +10,7 @@ export function BrandLogo({ compact = true }: { compact?: boolean }) {
         width={2172}
         height={724}
         fetchPriority="high"
+        loading="eager"
         decoding="async"
         unoptimized
         className={`h-auto max-w-full object-contain ${compact ? "w-[120px] lg:w-36" : "w-36"}`}

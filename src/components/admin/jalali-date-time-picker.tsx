@@ -88,7 +88,14 @@ export function JalaliDateTimePicker({
       Math.max(viewportPadding, preferredLeft),
       Math.max(viewportPadding, window.innerWidth - width - viewportPadding),
     );
-    setCalendarPosition({ top, left, width, maxHeight });
+    setCalendarPosition((current) =>
+      current?.top === top &&
+      current.left === left &&
+      current.width === width &&
+      current.maxHeight === maxHeight
+        ? current
+        : { top, left, width, maxHeight },
+    );
   }, []);
 
   useEffect(() => {
@@ -111,11 +118,16 @@ export function JalaliDateTimePicker({
       }
     };
     const reposition = () => positionCalendar();
+    // Applying the popover width or loading fonts can change its height after
+    // the initial measurement, even without a window resize or scroll.
+    const observer = new ResizeObserver(reposition);
+    if (panelRef.current) observer.observe(panelRef.current);
     document.addEventListener("pointerdown", close);
     document.addEventListener("keydown", closeWithEscape);
     window.addEventListener("resize", reposition);
     window.addEventListener("scroll", reposition, true);
     return () => {
+      observer.disconnect();
       document.removeEventListener("pointerdown", close);
       document.removeEventListener("keydown", closeWithEscape);
       window.removeEventListener("resize", reposition);

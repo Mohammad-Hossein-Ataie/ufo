@@ -5,6 +5,7 @@ import {
   getProductFlavorOptions,
   getProductColorOptions,
   getProductVariantOptions,
+  getProductVariantType,
   getUnitPriceRial,
   products,
   validateWholesaleCartonCount,
@@ -140,6 +141,62 @@ function getSelectedVariantLabel(type: Exclude<ProductVariantType, "none">) {
   if (type === "color") return "رنگ";
   if (type === "resistance") return "اهم";
   return "ظرفیت";
+}
+
+function assertSelectedVariantAvailable(
+  product: Product,
+  line: Pick<CartLineInput, "selectedVariant" | "colorId" | "quantity">,
+  allowMissingSelection = false,
+) {
+  const variantType = getProductVariantType(product);
+  const option =
+    line.selectedVariant ??
+    (line.colorId ? ({ type: "color", valueId: line.colorId } as const) : undefined);
+  if (variantType === "none") {
+    if (option) throw new Error("این محصول تنوع انتخابی ندارد.");
+    return;
+  }
+  // Legacy records without option-state metadata keep their former cart behavior.
+  if (!option && (allowMissingSelection || !product.variantValueStates)) return;
+  if (!option || option.type !== variantType) {
+    throw new Error("یک تنوع معتبر برای محصول انتخاب کنید.");
+  }
+  const validOption = getProductVariantOptions(product).some(
+    (candidate) => candidate.id === option.valueId && candidate.type === option.type,
+  );
+  const state = product.variantValueStates?.[option.valueId];
+  if (
+    !validOption ||
+    state?.isActive === false ||
+    state?.isAvailable === false ||
+    (state?.stockQuantity !== undefined && state.stockQuantity < line.quantity)
+  ) {
+    throw new Error("تنوع انتخاب‌شده در حال حاضر قابل سفارش نیست.");
+  }
+}
+
+function resolveReorderSelectedVariant(product: Product, item: OrderItemSnapshot) {
+  const variantType = getProductVariantType(product);
+  if (variantType === "none") return undefined;
+  const options = getProductVariantOptions(product);
+  const requestedValueId = item.selectedAttributes.find((attribute) =>
+    options.some((option) => option.id === attribute.technicalValue),
+  )?.technicalValue;
+  const available = (valueId: string | undefined) => {
+    if (!valueId || !options.some((option) => option.id === valueId)) return false;
+    const state = product.variantValueStates?.[valueId];
+    return (
+      state?.isActive !== false &&
+      state?.isAvailable !== false &&
+      (state?.stockQuantity === undefined || state.stockQuantity > 0)
+    );
+  };
+  const valueId = available(requestedValueId)
+    ? requestedValueId
+    : available(product.defaultVariantValueId)
+      ? product.defaultVariantValueId
+      : options.find((option) => available(option.id))?.id;
+  return valueId ? { type: variantType, valueId } : undefined;
 }
 
 export interface SubmittedOrder extends Order {
@@ -392,6 +449,8 @@ function priceCartLine(line: CartLineInput, channel: SalesChannel): CartItem {
   } else if (!Number.isInteger(quantity) || quantity <= 0) {
     throw new Error("تعداد محصول باید عدد صحیح و مثبت باشد.");
   }
+
+  assertSelectedVariantAvailable(product, { ...line, quantity }, channel === "wholesale");
 
   return {
     id: `ci_${crypto.randomUUID()}`,
@@ -723,6 +782,15 @@ export function addCartItem(
   const cart = getOrCreateActiveCart(customerId, platformType);
   const priced = { ...priceCartLine(line, platformType), cartId: cart.id };
   const existing = cart.items.find((item) => getLineKey(item) === getLineKey(priced));
+  if (existing) {
+    const product = priced.productId ? findProduct(priced.productId) : undefined;
+    if (product) {
+      assertSelectedVariantAvailable(product, {
+        quantity: existing.quantity + priced.quantity,
+        ...(priced.selectedVariant ? { selectedVariant: priced.selectedVariant } : {}),
+      }, platformType === "wholesale");
+    }
+  }
   const nextItems = existing
     ? cart.items.map((item) =>
         item.id === existing.id
@@ -826,6 +894,8 @@ function createItemSnapshots(
     if (!variant) throw new Error("واریانت محصول پیدا نشد.");
     const product = findProduct(variant.productId);
     if (!product) throw new Error("محصول پیدا نشد.");
+
+    assertSelectedVariantAvailable(product, line, channel === "wholesale");
 
     const option =
       line.selectedVariant ??
@@ -1041,10 +1111,16 @@ export function reorderSubmittedOrder(args: {
       (entry) => entry.sku === item.sku && entry.isActive,
     );
     if (!variant) continue;
+    const product = findProduct(variant.productId);
+    const selectedVariant = product
+      ? resolveReorderSelectedVariant(product, item)
+      : undefined;
+    if (product && getProductVariantType(product) !== "none" && !selectedVariant) continue;
     view = addCartItem(args.customerId, args.channel, {
       variantId: variant.id,
       quantity: item.quantity,
       ...(item.cartonCount ? { cartonCount: item.cartonCount } : {}),
+      ...(selectedVariant ? { selectedVariant } : {}),
     });
   }
   return view;

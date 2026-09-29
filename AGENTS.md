@@ -76,6 +76,14 @@
 - Shared product cards show `subtitle` (English name, LTR) below the Persian title and above
   status. Read-only variant summaries must label resistance with Ω, capacity with its actual
   value, and reserve color swatches for color data.
+- Selectable product values remain in the existing `variantValueIds` / `variantImages` model.
+  Store per-value admin state in optional `variantValueStates` and the preferred value in
+  `defaultVariantValueId`; missing state is legacy-compatible active/available data. Public
+  option helpers must omit inactive values, expose unavailable values as disabled, map exact
+  quantities to semantic availability only, and resolve selection in this order: valid requested
+  value, available configured default, first available value, then none. Disabling a value must
+  preserve its image and metadata so it can be re-enabled. Cart/order validation must reject
+  configured inactive, unavailable, invalid, or insufficient-stock selections.
 - Products-list cards extend the existing CTA link across the card with a CSS pseudo-element;
   keep one navigation link and place independent cart controls above its click area. Never
   wrap cards containing buttons in an anchor. Search matches use text color only.
@@ -87,3 +95,12 @@
   URLs, never put tokens in URLs or expose storage keys through an unauthenticated downloader.
   JPG/PNG/WebP images are decoded/re-encoded; PDFs are served as downloads. Persistent storage
   for the order data directory must include `private-receipts` and `private-chat`.
+- Site announcements are stored as `site-announcements.json` beside the order store on the
+  persistent `mock-data` disk. Render active schedules server-side above storefront headers,
+  preserve priority ordering, authenticate admin writes, and revalidate the root layout.
+- Public storefronts and search APIs expose only `PublicAvailabilityState` via
+  `getCatalogRowAvailability`; exact sellable quantities stay server/admin-only.
+- The homepage category carousel uses CSS 3D transforms with RTL keyboard, pointer/swipe and
+  reduced-motion support. Keep it dependency-free and avoid persistent `will-change` layers.
+- Admin order lists use `admin-order-query` summaries with server-side filtering, sorting and
+  pagination. Do not return full chat, receipt, timeline or item snapshots to list views.

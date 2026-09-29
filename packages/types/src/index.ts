@@ -108,6 +108,13 @@ export type ProductKind =
 
 export type ProductVariantType = "flavor" | "color" | "resistance" | "capacity" | "none";
 
+export interface ProductVariantValueState {
+  isActive: boolean;
+  isAvailable: boolean;
+  stockQuantity?: number;
+  sku?: string;
+}
+
 export interface ProductSpec {
   labelFa: string;
   valueFa: string;
@@ -140,6 +147,8 @@ export interface Product {
   images: string[];
   variantType?: ProductVariantType;
   variantValueIds?: string[];
+  variantValueStates?: Record<string, ProductVariantValueState>;
+  defaultVariantValueId?: string;
   variantImages?: Record<string, string>;
   colorImages?: Record<string, string>;
   tags: string[];

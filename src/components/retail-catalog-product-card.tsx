@@ -2,7 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import { Price, ProductCard, StockStatus } from "@ufo/ui";
 import type { AdminProductRecord } from "@/lib/admin-products";
 import type { StorefrontVariantOption } from "@/lib/storefront-variants";
-import { getCatalogRowStock } from "@/lib/catalog-data";
+import { getCatalogRowAvailability } from "@/lib/catalog-data";
 import { getCategoryImage, getProductImage } from "@/lib/product-images";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { ProductVariantDots, ProductVariantSummary } from "@/components/product-variant-visuals";
@@ -19,7 +19,7 @@ export function RetailCatalogProductCard({
   eagerImage?: boolean;
 }) {
   const { product, variant } = row;
-  const available = getCatalogRowStock(row);
+  const availability = getCatalogRowAvailability(row);
   const compareAt = variant.compareAtPriceRial;
   const discountPercent =
     compareAt && compareAt > variant.retailPriceRial
@@ -52,7 +52,7 @@ export function RetailCatalogProductCard({
               ٪{new Intl.NumberFormat("fa-IR").format(discountPercent)}
             </span>
           ) : null}
-          <StockStatus available={available} />
+          <StockStatus state={availability} unavailableLabel="پیش‌سفارش" />
         </div>
       }
       price={
@@ -95,7 +95,6 @@ export function RetailCatalogProductCard({
                 variantId={variant.id}
                 label="افزودن به سبد خرید"
                 enableQuantity
-                maxQuantity={available > 0 ? available : undefined}
               />
             </div>
           ) : null}

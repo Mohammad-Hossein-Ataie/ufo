@@ -1,14 +1,21 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type APIRequestContext } from "@playwright/test";
 import sharp from "sharp";
 import { getProductColorOptions, getProductVariantType, products } from "@ufo/domain";
-test.beforeEach(async ({ page }, testInfo) => {
-  if (testInfo.title === "color product can be added on mobile and desktop" ||
-      testInfo.title === "catalog starts without a hidden price ceiling and keeps its blurred hero backdrop") return;
-  const response = await page.request.post("/api/admin/login", {
+let adminCookies: Awaited<ReturnType<APIRequestContext["storageState"]>>["cookies"] = [];
+
+test.beforeAll(async ({ request }) => {
+  const response = await request.post("/api/admin/login", {
     headers: { origin: "http://127.0.0.1:3106" },
     data: { username: "local-catalog-test", password: "local-only-catalog-test-password" },
   });
   expect(response.ok()).toBeTruthy();
+  adminCookies = (await request.storageState()).cookies;
+});
+
+test.beforeEach(async ({ page }, testInfo) => {
+  if (testInfo.title === "color product can be added on mobile and desktop" ||
+      testInfo.title === "catalog starts without a hidden price ceiling and keeps its blurred hero backdrop") return;
+  await page.context().addCookies(adminCookies);
   await page.goto("/admin/products");
   await expect(page.getByRole("button", { name: "افزودن محصول", exact: true })).toBeVisible();
 });
@@ -104,7 +111,9 @@ test("color product can be added on mobile and desktop", async ({ page }) => {
     const selector = page.getByRole("radiogroup", { name: "انتخاب رنگ محصول" });
     await expect(selector).toBeVisible();
     if (width === 390) {
-      expect((await image.boundingBox())!.width).toBeLessThanOrEqual(240);
+      const imageBounds = (await image.boundingBox())!;
+      expect(imageBounds.width).toBeLessThanOrEqual(width - 32);
+      expect(imageBounds.width / imageBounds.height).toBeCloseTo(3 / 4, 2);
       const selectorBounds = (await selector.boundingBox())!;
       expect(selectorBounds.y).toBeLessThan((await page.getByText("قیمت فروش").boundingBox())!.y);
       expect(selectorBounds.y + selectorBounds.height).toBeLessThanOrEqual(844);
@@ -160,6 +169,113 @@ test("server pagination, filtering, selection and sorting", async ({ page }) => 
     sortedData.rows[1].variant.retailPriceRial,
   );
   await page.screenshot({ path: "test-results/admin-products-desktop.png", fullPage: true });
+});
+
+test("variant reference lists are fetched once across repeated editor opens", async ({ page }) => {
+  const requests = { flavors: 0, colors: 0 };
+  page.on("request", (request) => {
+    const path = new URL(request.url()).pathname;
+    if (path === "/api/admin/flavors") requests.flavors += 1;
+    if (path === "/api/admin/colors") requests.colors += 1;
+  });
+
+  await page.getByRole("button", { name: "افزودن محصول", exact: true }).click();
+  await expect.poll(() => requests).toEqual({ flavors: 1, colors: 1 });
+  await page.getByRole("dialog", { name: "ایجاد محصول" }).getByRole("button", { name: "بستن" }).click();
+  await page.getByRole("button", { name: "افزودن محصول", exact: true }).click();
+  await page.waitForTimeout(300);
+  expect(requests).toEqual({ flavors: 1, colors: 1 });
+});
+
+test("dashboard, content, and settings avoid duplicate client data requests", async ({ page }) => {
+  const requests: string[] = [];
+  await page.waitForLoadState("networkidle");
+  page.on("request", (request) => {
+    const url = new URL(request.url());
+    if (url.pathname.startsWith("/api/admin/")) requests.push(url.pathname);
+  });
+
+  await page.goto("/admin");
+  await page.waitForLoadState("networkidle");
+  expect(requests.filter((path) => path === "/api/admin/products").length).toBeLessThanOrEqual(1);
+  expect(requests.filter((path) => path !== "/api/admin/products")).toEqual([]);
+
+  requests.length = 0;
+  await page.goto("/admin/content");
+  await page.waitForLoadState("networkidle");
+  expect(requests.filter((path) => path === "/api/admin/content")).toHaveLength(1);
+
+  requests.length = 0;
+  await page.goto("/admin/settings");
+  await page.waitForLoadState("networkidle");
+  const expectedSettingsRequests = [
+    "/api/admin/announcements",
+    "/api/admin/payment-accounts",
+    "/api/admin/shipping-methods",
+  ];
+  for (const path of expectedSettingsRequests) {
+    expect(requests.filter((candidate) => candidate === path)).toHaveLength(1);
+  }
+  expect(
+    [...new Set(requests)].filter(
+      (path) => requests.filter((candidate) => candidate === path).length > 1,
+    ),
+  ).toEqual([]);
+});
+
+test("per-option availability persists across admin save and reopen", async ({ page }) => {
+  const slug = `variant-state-browser-${Date.now()}`;
+  const created = await page.request.post("/api/admin/products", {
+    headers: { origin: "http://127.0.0.1:3106" },
+    data: {
+      nameFa: "محصول وضعیت تنوع مرورگر",
+      nameEn: "Browser variant state product",
+      slug,
+      brandId: "brand-ufo",
+      categoryId: "cat-vape",
+      productKind: "vape-device",
+      salesChannels: ["retail"],
+      image: "/images/ufo-hero.webp",
+      images: ["/images/ufo-hero.webp", "/images/categories/vape.webp"],
+      variantType: "color",
+      variantValueIds: ["black", "silver"],
+      variantImages: {
+        black: "/images/ufo-hero.webp",
+        silver: "/images/categories/vape.webp",
+      },
+      retailPriceRial: 1_250_000,
+      onHand: 20,
+      restockThreshold: 3,
+      isActive: true,
+    },
+  });
+  expect(created.status()).toBe(201);
+
+  await page.getByLabel("جست‌وجوی محصولات").fill(slug);
+  await expect(page.getByRole("button", { name: "ویرایش", exact: true })).toHaveCount(1);
+  await page.getByRole("button", { name: "ویرایش", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "ویرایش محصول" });
+  await editor.getByRole("tab", { name: "تنوع‌ها" }).click();
+  const variantTable = editor.getByRole("table", { name: "مدیریت مستقیم تنوع‌ها" });
+  await variantTable.getByLabel("SKU مشکی").fill("BLACK-BROWSER-01");
+  await variantTable.getByLabel("موجودی مشکی").fill("0");
+  await variantTable.getByLabel("قابل سفارش بودن مشکی").uncheck();
+  await variantTable.getByLabel("SKU نقره‌ای").fill("SILVER-BROWSER-07");
+  await variantTable.getByLabel("موجودی نقره‌ای").fill("7");
+  await variantTable.getByLabel("انتخاب نقره‌ای به عنوان پیش‌فرض").check();
+  await editor.getByRole("button", { name: "ذخیره محصول", exact: true }).click();
+  await expect(editor).toHaveCount(0);
+
+  await page.getByLabel("جست‌وجوی محصولات").fill(slug);
+  await page.getByRole("button", { name: "ویرایش", exact: true }).click();
+  const reopened = page.getByRole("dialog", { name: "ویرایش محصول" });
+  await reopened.getByRole("tab", { name: "تنوع‌ها" }).click();
+  const reopenedTable = reopened.getByRole("table", { name: "مدیریت مستقیم تنوع‌ها" });
+  await expect(reopenedTable.getByLabel("SKU مشکی")).toHaveValue("BLACK-BROWSER-01");
+  await expect(reopenedTable.getByLabel("موجودی مشکی")).toHaveValue("0");
+  await expect(reopenedTable.getByLabel("قابل سفارش بودن مشکی")).not.toBeChecked();
+  await expect(reopenedTable.getByLabel("انتخاب نقره‌ای به عنوان پیش‌فرض")).toBeChecked();
+  await reopened.getByRole("button", { name: "بستن" }).click();
 });
 
 test("tabbed editing, image order, unsaved warning, SEO and bulk actions", async ({ page }) => {

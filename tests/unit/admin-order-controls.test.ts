@@ -5,7 +5,6 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { JalaliDateTimePicker } from "@/components/admin/jalali-date-time-picker";
 import { AdminOrderFulfillment } from "@/components/admin/admin-order-fulfillment";
-import { shiftDay, tehranDayKey } from "@/lib/jalali-calendar";
 import type { SubmittedOrder } from "@ufo/orders";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
@@ -28,21 +27,67 @@ const click = async (element: HTMLElement) => {
   await act(async () => element.click());
 };
 
-it("selects a Persian calendar day, emits the Tehran wall time and closes on Escape", async () => {
+it("keeps the calendar in view after resizing, emits UTC from Tehran time and restores focus", async () => {
   const change = vi.fn();
-  await act(async () =>
-    root.render(createElement(JalaliDateTimePicker, { value: "", onChange: change })),
+  let resize: () => void = () => {};
+  const disconnect = vi.fn();
+  vi.stubGlobal(
+    "ResizeObserver",
+    class {
+      constructor(callback: () => void) {
+        resize = callback;
+      }
+      observe = vi.fn();
+      disconnect = disconnect;
+    },
   );
-  await click(button("انتخاب تاریخ شمسی"));
-  expect(host.querySelector('[aria-label="تقویم شمسی"]')).not.toBeNull();
+  await act(async () =>
+    root.render(
+      createElement(JalaliDateTimePicker, {
+        value: "2026-09-29T08:30:00.000Z",
+        onChange: change,
+      }),
+    ),
+  );
+  const trigger = host.querySelector<HTMLButtonElement>('[aria-label="زمان انتشار"]')!;
+  vi.spyOn(trigger, "getBoundingClientRect").mockReturnValue({
+    top: 650,
+    bottom: 698,
+    left: 300,
+    right: 550,
+    width: 250,
+    height: 48,
+    x: 300,
+    y: 650,
+    toJSON: () => ({}),
+  });
+  await click(trigger);
+  const calendar = document.querySelector<HTMLElement>(
+    '[role="dialog"][aria-label="انتخاب تاریخ جلالی انتشار"]',
+  )!;
+  expect(calendar).not.toBeNull();
   expect(host.querySelector('input[type="datetime-local"]')).toBeNull();
-  await click(button("فردا"));
-  expect(change).toHaveBeenCalledWith(`${shiftDay(tehranDayKey(), 1)}T12:00`);
-  expect(host.querySelector('[aria-label="تقویم شمسی"]')).toBeNull();
-  await click(button("انتخاب تاریخ شمسی"));
+  const initialTop = Number.parseFloat(calendar.style.top);
+  vi.spyOn(calendar, "getBoundingClientRect").mockReturnValue({
+    top: initialTop,
+    bottom: initialTop + 650,
+    left: 198,
+    right: 550,
+    width: 352,
+    height: 650,
+    x: 198,
+    y: initialTop,
+    toJSON: () => ({}),
+  });
+  await act(async () => resize());
+  expect(Number.parseFloat(calendar.style.top)).toBeLessThan(initialTop);
+  expect(Number.parseFloat(calendar.style.top) + 650).toBeLessThanOrEqual(window.innerHeight);
+  await click(calendar.querySelector<HTMLButtonElement>('[aria-label="۱ مهر ۱۴۰۵"]')!);
+  expect(change).toHaveBeenCalledWith("2026-09-23T08:30:00.000Z");
   await act(async () => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })));
-  expect(host.querySelector('[aria-label="تقویم شمسی"]')).toBeNull();
-  expect(document.activeElement).toBe(button("انتخاب تاریخ شمسی"));
+  expect(document.querySelector('[aria-label="انتخاب تاریخ جلالی انتشار"]')).toBeNull();
+  expect(disconnect).toHaveBeenCalledOnce();
+  expect(document.activeElement).toBe(trigger);
 });
 
 it.each(["pickup", "tipax"])(

@@ -25,6 +25,7 @@ import {
   type VapingDevice,
 } from "@/lib/nicotine-guide";
 import type { NicotineMatchQuality } from "@/lib/nicotine-product-recommendations";
+import type { PublicAvailabilityState } from "@/lib/public-availability";
 
 export interface NicotineRecommendationProduct {
   id: string;
@@ -36,7 +37,7 @@ export interface NicotineRecommendationProduct {
   image: string;
   fallbackImage: string;
   priceRial: number;
-  available: number;
+  availability: PublicAvailabilityState;
   strengthsMg: number[];
   matchQuality: NicotineMatchQuality;
 }
@@ -153,7 +154,7 @@ function RecommendationCard({ product }: { product: NicotineRecommendationProduc
             {exactStrength ? <BadgeCheck size={13} aria-hidden="true" /> : null}
             {exactStrength ?? "تطابق نوع محصول"}
           </span>
-          <StockStatus available={product.available} />
+          <StockStatus state={product.availability} />
         </div>
       }
       price={<Price valueRial={product.priceRial} />}

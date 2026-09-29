@@ -3,19 +3,19 @@
 import { useState } from "react";
 import { Check, Gauge, Palette, Sparkles } from "lucide-react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
-import type { ProductVariantOption } from "@ufo/domain";
+import type { StorefrontVariantOption } from "@/lib/storefront-variants";
 import type { ProductVariantType } from "@ufo/types";
 import { Button } from "@ufo/ui";
 
 interface ProductPurchasePanelProps {
   variantId: string;
   variantType: ProductVariantType;
-  variantOptions: ProductVariantOption[];
-  maxQuantity?: number | undefined;
+  variantOptions: StorefrontVariantOption[];
+  initialVariantValueId?: string | null;
   label: string;
 }
 
-function swatchStyle(option: ProductVariantOption) {
+function swatchStyle(option: StorefrontVariantOption) {
   if (!option.swatch) return undefined;
   return option.swatch.startsWith("linear-gradient")
     ? { backgroundImage: option.swatch }
@@ -34,13 +34,16 @@ export function ProductPurchasePanel({
   variantId,
   variantType,
   variantOptions,
-  maxQuantity,
+  initialVariantValueId = null,
   label,
 }: ProductPurchasePanelProps) {
-  const [selectedValueId, setSelectedValueId] = useState<string | null>(null);
-  const hasOptions = variantType !== "none" && variantOptions.length > 0;
+  const [selectedValueId, setSelectedValueId] = useState<string | null>(
+    initialVariantValueId,
+  );
+  const hasOptions = variantType !== "none";
   const selectedOption = variantOptions.find((option) => option.id === selectedValueId);
-  const needsSelection = hasOptions && !selectedValueId;
+  const needsSelection = hasOptions && !selectedOption;
+  const hasAvailableOption = variantOptions.some((option) => !option.disabled);
   const labelFa = getVariantTypeLabel(variantType);
 
   return (
@@ -69,14 +72,20 @@ export function ProductPurchasePanel({
                 <button
                   key={option.id}
                   type="button"
-                  onClick={() => setSelectedValueId(option.id)}
+                  disabled={option.disabled}
+                  onClick={() => {
+                    if (!option.disabled) setSelectedValueId(option.id);
+                  }}
                   className={`inline-flex min-h-10 items-center gap-2 rounded-md border px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 ${
                     active
                       ? "border-cyan-300 bg-cyan-300 text-slate-950"
+                      : option.disabled
+                        ? "cursor-not-allowed border-[#22303D] bg-[#141A22] text-white/40 line-through"
                       : "border-[#22303D] bg-[#141A22] text-white hover:border-cyan-300/70"
                   }`}
                   role="radio"
                   aria-checked={active}
+                  aria-disabled={option.disabled}
                 >
                   {option.swatch ? (
                     <span
@@ -86,6 +95,7 @@ export function ProductPurchasePanel({
                     />
                   ) : null}
                   {option.labelFa}
+                  {option.disabled ? <span className="text-[10px] no-underline">ناموجود</span> : null}
                   {active ? <Check size={15} aria-hidden="true" /> : null}
                 </button>
               );
@@ -96,13 +106,12 @@ export function ProductPurchasePanel({
 
       {needsSelection ? (
         <Button type="button" disabled className="w-full">
-          ابتدا {labelFa} را انتخاب کنید
+          {hasAvailableOption ? `ابتدا ${labelFa} را انتخاب کنید` : "همه گزینه‌ها ناموجود هستند"}
         </Button>
       ) : (
         <AddToCartButton
           key={`${variantId}-${selectedValueId ?? "default"}`}
           variantId={variantId}
-          maxQuantity={maxQuantity}
           label={label}
           enableQuantity
           selectedVariant={
