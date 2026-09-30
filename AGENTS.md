@@ -100,6 +100,21 @@
   preserve priority ordering, authenticate admin writes, and revalidate the root layout.
 - Public storefronts and search APIs expose only `PublicAvailabilityState` via
   `getCatalogRowAvailability`; exact sellable quantities stay server/admin-only.
+- Product `isActive` controls public visibility; optional `isAvailable` defaults to available for
+  legacy records and independently controls parent-level purchasing. Use the shared domain
+  purchasability helpers: a false parent availability overrides every option, while an available
+  parent remains purchasable only when at least one configured variant value is available.
+- Nicotine calculator business logic lives only in `src/lib/nicotine-guide.ts`. It uses daily
+  cigarette count (1–100) and cigarette type coefficients (unknown/medium 0.7, light 0.4,
+  heavy 1.0) and may return only the client-defined 20/25/35/50 mg strengths. UI and product
+  recommendations must consume that pure calculation rather than reimplementing thresholds.
+- Keep nicotine calculation and catalog selection separate. Device choice never changes the
+  numeric result: Pod candidates are `salt-nicotine`, Vape candidates are `e-liquid`, and no
+  Salt-to-Juice strength conversion may be inferred without an explicit business rule.
+- Optional product-level `nicotineStrengthsMg` is the sole source for exact nicotine matching and
+  is independent of flavor variants. Missing/empty metadata means unknown, never zero or a title-
+  derived guess. Recommendations must first enforce public retail purchasability and exact family/
+  strength eligibility, then deduplicate products and apply deterministic brand/flavor diversity.
 - The homepage category carousel uses CSS 3D transforms with RTL keyboard, pointer/swipe and
   reduced-motion support. Keep it dependency-free and avoid persistent `will-change` layers.
 - Admin order lists use `admin-order-query` summaries with server-side filtering, sorting and

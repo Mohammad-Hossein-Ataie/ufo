@@ -39,7 +39,11 @@ const options: StorefrontVariantOption[] = [
   },
 ];
 
-function render(variantOptions: StorefrontVariantOption[], initialVariantValueId: string | null) {
+function render(
+  variantOptions: StorefrontVariantOption[],
+  initialVariantValueId: string | null,
+  purchasable = true,
+) {
   return renderToStaticMarkup(
     React.createElement(ProductDetailClient, {
       product: {
@@ -49,6 +53,7 @@ function render(variantOptions: StorefrontVariantOption[], initialVariantValueId
       },
       variant,
       availability: "available",
+      purchasable,
       galleryImages: ["/images/ufo-hero.webp"],
       variantType: "color",
       variantImages: {},
@@ -78,6 +83,23 @@ describe("product detail variant controls", () => {
       null,
     );
     expect(markup).toContain("همه گزینه‌ها ناموجود هستند");
+    expect(markup).not.toContain("افزودن به سبد خرید");
+  });
+
+  it("keeps unavailable product information visible while disabling the parent purchase", () => {
+    const markup = render(
+      options.map((option) => ({
+        ...option,
+        availability: "unavailable" as const,
+        disabled: true,
+      })),
+      null,
+      false,
+    );
+
+    expect(markup).toContain("product-detail-unavailable-media");
+    expect(markup).toContain("محصول ناموجود است");
+    expect(markup).toContain("line-through");
     expect(markup).not.toContain("افزودن به سبد خرید");
   });
 });

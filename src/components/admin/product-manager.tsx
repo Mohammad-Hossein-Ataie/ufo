@@ -76,6 +76,7 @@ interface FormState {
   brandId: string;
   categoryId: string;
   productKind: ProductKind;
+  nicotineStrengthsText: string;
   retailPriceToman: number;
   wholesalePriceToman: number;
   retailEnabled: boolean;
@@ -96,6 +97,7 @@ interface FormState {
   shortDescriptionFa: string;
   descriptionFa: string;
   isActive: boolean;
+  isAvailable: boolean;
 }
 
 interface PendingImageUpload {
@@ -126,6 +128,7 @@ const emptyForm: FormState = {
   brandId: "brand-ufo",
   categoryId: "cat-disposable",
   productKind: "disposable",
+  nicotineStrengthsText: "",
   retailPriceToman: 0,
   wholesalePriceToman: 0,
   retailEnabled: true,
@@ -146,6 +149,7 @@ const emptyForm: FormState = {
   shortDescriptionFa: "",
   descriptionFa: "",
   isActive: true,
+  isAvailable: true,
 };
 
 function rialToToman(value: number) {
@@ -169,6 +173,21 @@ function textToSpecs(text: string): ProductSpec[] {
       const [labelFa, ...rest] = line.split(":");
       return { labelFa: (labelFa ?? "مشخصه").trim(), valueFa: rest.join(":").trim() || "-" };
     });
+}
+
+function parseNicotineStrengthsText(text: string) {
+  const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
+  const arabicDigits = "٠١٢٣٤٥٦٧٨٩";
+  const normalized = text
+    .replace(/[۰-۹]/g, (digit) => String(persianDigits.indexOf(digit)))
+    .replace(/[٠-٩]/g, (digit) => String(arabicDigits.indexOf(digit)));
+  const tokens = normalized.split(/[،,\s]+/).filter(Boolean);
+  if (tokens.some((token) => !/^\d+(?:\.\d+)?$/.test(token))) return undefined;
+  const values = tokens.map(Number);
+  if (values.some((value) => !Number.isFinite(value) || value < 0 || value > 100)) {
+    return undefined;
+  }
+  return [...new Set(values)].sort((left, right) => left - right);
 }
 
 function summarizeFileLike(value: unknown) {
@@ -379,6 +398,7 @@ function rowToForm(row: AdminProductRecord): FormState {
     brandId: row.product.brandId,
     categoryId: row.product.categoryId,
     productKind: row.product.productKind ?? "disposable",
+    nicotineStrengthsText: (row.product.nicotineStrengthsMg ?? []).join("، "),
     retailPriceToman: rialToToman(row.variant.retailPriceRial),
     wholesalePriceToman: rialToToman(row.variant.wholesalePriceRial),
     retailEnabled: row.product.salesChannels?.includes("retail") ?? true,
@@ -407,6 +427,7 @@ function rowToForm(row: AdminProductRecord): FormState {
     shortDescriptionFa: row.product.shortDescriptionFa,
     descriptionFa: row.product.descriptionFa,
     isActive: row.product.isActive,
+    isAvailable: row.product.isAvailable ?? true,
   };
 }
 
@@ -666,9 +687,7 @@ export function ProductManager() {
           : [...current.variantValueIds, valueId],
         variantValueStates,
         defaultVariantValueId:
-          exists && current.defaultVariantValueId === valueId
-            ? ""
-            : current.defaultVariantValueId,
+          exists && current.defaultVariantValueId === valueId ? "" : current.defaultVariantValueId,
         variantImages,
       };
     });
@@ -686,8 +705,7 @@ export function ProductManager() {
         isActive: true,
         isAvailable: true,
       };
-      const stockQuantity =
-        "stockQuantity" in patch ? patch.stockQuantity : existing.stockQuantity;
+      const stockQuantity = "stockQuantity" in patch ? patch.stockQuantity : existing.stockQuantity;
       const sku = "sku" in patch ? patch.sku : existing.sku;
       const next: ProductVariantValueState = {
         isActive: patch.isActive ?? existing.isActive,
@@ -755,10 +773,7 @@ export function ProductManager() {
     setForm((current) => ({
       ...current,
       variantValueIds,
-      variantValueStates: getInitialVariantValueStates(
-        variantValueIds,
-        current.variantValueStates,
-      ),
+      variantValueStates: getInitialVariantValueStates(variantValueIds, current.variantValueStates),
       defaultVariantValueId: variantValueIds.includes(current.defaultVariantValueId)
         ? current.defaultVariantValueId
         : "",
@@ -884,6 +899,12 @@ export function ProductManager() {
       setActiveTab("variants");
       return;
     }
+    const nicotineStrengthsMg = parseNicotineStrengthsText(form.nicotineStrengthsText);
+    if (nicotineStrengthsMg === undefined) {
+      setStatus("غلظت نیکوتین را با عددهای ۰ تا ۱۰۰ و جداشده با ویرگول وارد کنید.");
+      setActiveTab("pricing");
+      return;
+    }
     setLoading(true);
     const salesChannels: SalesChannel[] = [
       ...(form.retailEnabled ? ["retail" as const] : []),
@@ -912,6 +933,10 @@ export function ProductManager() {
       brandId: form.brandId,
       categoryId: form.categoryId,
       productKind: form.productKind,
+      nicotineStrengthsMg:
+        form.productKind === "salt-nicotine" || form.productKind === "e-liquid"
+          ? nicotineStrengthsMg
+          : [],
       salesChannels,
       shortDescriptionFa: form.shortDescriptionFa,
       descriptionFa: form.descriptionFa,
@@ -939,6 +964,7 @@ export function ProductManager() {
       onHand: form.onHand,
       restockThreshold: form.restockThreshold,
       isActive: form.isActive,
+      isAvailable: form.isAvailable,
     };
     try {
       const response = await fetch(
@@ -1432,7 +1458,14 @@ export function ProductManager() {
                       <div className="grid gap-1 text-sm">
                         <div className="flex items-center justify-between gap-2">
                           <span>برند</span>
-                          <button type="button" onClick={() => { setBrandError(""); setIsBrandDialogOpen(true); }} className="inline-flex items-center gap-1 text-xs font-bold text-blue-700 hover:underline">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setBrandError("");
+                              setIsBrandDialogOpen(true);
+                            }}
+                            className="inline-flex items-center gap-1 text-xs font-bold text-blue-700 hover:underline"
+                          >
                             <Plus size={14} aria-hidden="true" /> افزودن برند
                           </button>
                         </div>
@@ -1801,8 +1834,7 @@ export function ProductManager() {
                                 isActive: true,
                                 isAvailable: true,
                               };
-                              const unavailable =
-                                !state.isAvailable || state.stockQuantity === 0;
+                              const unavailable = !state.isAvailable || state.stockQuantity === 0;
                               return (
                                 <tr key={option.id} className="border-t border-[#E5EAF0]">
                                   <th className="px-3 py-3 text-right font-bold">
@@ -1898,7 +1930,8 @@ export function ProductManager() {
                           </tbody>
                         </table>
                         <p className="border-t bg-[#F7F9FB] px-3 py-2 text-xs leading-6 text-[#5F6C79]">
-                          موجودی خالی از موجودی مدل اصلی استفاده می‌کند. غیرفعال‌کردن یک تنوع، عکس و داده‌های آن را حفظ می‌کند.
+                          موجودی خالی از موجودی مدل اصلی استفاده می‌کند. غیرفعال‌کردن یک تنوع، عکس و
+                          داده‌های آن را حفظ می‌کند.
                         </p>
                       </div>
                     ) : null}
@@ -1959,6 +1992,47 @@ export function ProductManager() {
                   <section className="rounded-md border p-4">
                     <h3 className="font-black">موجودی انبار</h3>
                     <div className="mt-4 grid gap-4">
+                      <label className="flex min-h-20 items-center justify-between gap-4 rounded-md border border-[#D7DDE4] bg-[#F8FAFC] px-4 py-3">
+                        <span className="grid gap-1">
+                          <span className="text-sm font-black">موجودی کالا</span>
+                          <span className="text-xs leading-6 text-slate-500">
+                            در صورت ناموجود کردن، محصول همچنان در سایت نمایش داده می‌شود اما امکان
+                            سفارش آن وجود نخواهد داشت.
+                          </span>
+                        </span>
+                        <span className="grid shrink-0 justify-items-center gap-1 text-xs font-bold">
+                          <input
+                            type="checkbox"
+                            checked={form.isAvailable}
+                            onChange={(event) => update("isAvailable", event.target.checked)}
+                            aria-label="محصول موجود است"
+                            className="h-5 w-5 accent-[#168BFF]"
+                          />
+                          {form.isAvailable ? "موجود" : "ناموجود"}
+                        </span>
+                      </label>
+                      {form.productKind === "salt-nicotine" || form.productKind === "e-liquid" ? (
+                        <label className="grid gap-2 text-sm">
+                          غلظت‌های نیکوتین (mg/ml)
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            value={form.nicotineStrengthsText}
+                            onChange={(event) =>
+                              update("nicotineStrengthsText", event.target.value)
+                            }
+                            placeholder="مثلاً ۲۰، ۲۵، ۳۵، ۵۰"
+                            aria-describedby="nicotine-strengths-help"
+                          />
+                          <span
+                            id="nicotine-strengths-help"
+                            className="text-xs leading-6 text-slate-500"
+                          >
+                            چند مقدار را با ویرگول جدا کنید. این داده مستقل از طعم‌های محصول است؛
+                            خالی‌گذاشتن یعنی غلظت نامشخص، نه صفر میلی‌گرم.
+                          </span>
+                        </label>
+                      ) : null}
                       <label className="grid gap-2 text-sm">
                         موجودی کل
                         <Input
@@ -2106,27 +2180,59 @@ export function ProductManager() {
           <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-[100] grid w-[min(92vw,30rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-md border border-[#D7DDE4] bg-white p-5 text-[#17202A] shadow-2xl">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <DialogPrimitive.Title className="text-lg font-black">افزودن برند</DialogPrimitive.Title>
+                <DialogPrimitive.Title className="text-lg font-black">
+                  افزودن برند
+                </DialogPrimitive.Title>
                 <DialogPrimitive.Description className="mt-1 text-sm leading-6 text-[#5F6C79]">
                   برند پس از ذخیره به فهرست اضافه و برای همین محصول انتخاب می‌شود.
                 </DialogPrimitive.Description>
               </div>
               <DialogPrimitive.Close asChild>
-                <IconButton label="بستن" className="h-9 w-9 border-[#D7DDE4] bg-white text-[#17202A]"><X size={16} aria-hidden="true" /></IconButton>
+                <IconButton
+                  label="بستن"
+                  className="h-9 w-9 border-[#D7DDE4] bg-white text-[#17202A]"
+                >
+                  <X size={16} aria-hidden="true" />
+                </IconButton>
               </DialogPrimitive.Close>
             </div>
             <label className="grid gap-1 text-sm font-bold">
               نام برند
-              <Input autoFocus value={newBrand.nameFa} onChange={(event) => setNewBrand((current) => ({ ...current, nameFa: event.target.value }))} placeholder="نام برند" />
+              <Input
+                autoFocus
+                value={newBrand.nameFa}
+                onChange={(event) =>
+                  setNewBrand((current) => ({ ...current, nameFa: event.target.value }))
+                }
+                placeholder="نام برند"
+              />
             </label>
             <label className="grid gap-1 text-sm font-bold">
               شناسه انگلیسی (اختیاری)
-              <Input dir="ltr" value={newBrand.slug} onChange={(event) => setNewBrand((current) => ({ ...current, slug: event.target.value }))} placeholder="brand-name" />
+              <Input
+                dir="ltr"
+                value={newBrand.slug}
+                onChange={(event) =>
+                  setNewBrand((current) => ({ ...current, slug: event.target.value }))
+                }
+                placeholder="brand-name"
+              />
             </label>
-            {brandError ? <p role="alert" className="text-sm text-red-700">{brandError}</p> : null}
+            {brandError ? (
+              <p role="alert" className="text-sm text-red-700">
+                {brandError}
+              </p>
+            ) : null}
             <div className="flex justify-end gap-2 border-t border-[#D7DDE4] pt-4">
-              <DialogPrimitive.Close asChild><Button type="button" variant="secondary">انصراف</Button></DialogPrimitive.Close>
-              <Button type="button" onClick={createBrand} disabled={loading}><Plus size={17} aria-hidden="true" />ذخیره برند</Button>
+              <DialogPrimitive.Close asChild>
+                <Button type="button" variant="secondary">
+                  انصراف
+                </Button>
+              </DialogPrimitive.Close>
+              <Button type="button" onClick={createBrand} disabled={loading}>
+                <Plus size={17} aria-hidden="true" />
+                ذخیره برند
+              </Button>
             </div>
           </DialogPrimitive.Content>
         </DialogPrimitive.Portal>

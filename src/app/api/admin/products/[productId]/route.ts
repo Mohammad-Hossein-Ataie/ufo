@@ -34,19 +34,25 @@ function parseVariantValueStates(value: unknown): Record<string, ProductVariantV
         state.stockQuantity === undefined || state.stockQuantity === ""
           ? undefined
           : Number(state.stockQuantity);
-      return [[
-        valueId.trim(),
-        {
-          isActive: state.isActive === undefined ? true : Boolean(state.isActive),
-          isAvailable: state.isAvailable === undefined ? true : Boolean(state.isAvailable),
-          ...(stockQuantity !== undefined ? { stockQuantity } : {}),
-          ...(typeof state.sku === "string" && state.sku.trim()
-            ? { sku: state.sku.trim() }
-            : {}),
-        },
-      ]];
+      return [
+        [
+          valueId.trim(),
+          {
+            isActive: state.isActive === undefined ? true : Boolean(state.isActive),
+            isAvailable: state.isAvailable === undefined ? true : Boolean(state.isAvailable),
+            ...(stockQuantity !== undefined ? { stockQuantity } : {}),
+            ...(typeof state.sku === "string" && state.sku.trim() ? { sku: state.sku.trim() } : {}),
+          },
+        ],
+      ];
     }),
   );
+}
+
+function parseNicotineStrengths(value: unknown): number[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) return [Number.NaN];
+  return value.map(Number);
 }
 
 function parseInput(productId: string, body: unknown): AdminProductInput {
@@ -64,6 +70,7 @@ function parseInput(productId: string, body: unknown): AdminProductInput {
     brandId: value.brandId,
     categoryId: String(value.categoryId ?? "cat-disposable"),
     productKind: value.productKind ?? "disposable",
+    nicotineStrengthsMg: parseNicotineStrengths(value.nicotineStrengthsMg),
     salesChannels: Array.isArray(value.salesChannels) ? value.salesChannels : ["retail"],
     shortDescriptionFa: value.shortDescriptionFa,
     descriptionFa: value.descriptionFa,
@@ -78,9 +85,7 @@ function parseInput(productId: string, body: unknown): AdminProductInput {
         ? undefined
         : parseVariantValueStates(value.variantValueStates),
     defaultVariantValueId:
-      value.defaultVariantValueId === undefined
-        ? undefined
-        : String(value.defaultVariantValueId),
+      value.defaultVariantValueId === undefined ? undefined : String(value.defaultVariantValueId),
     variantImages:
       value.variantImages === undefined ? undefined : parseImageMap(value.variantImages),
     colorImages: value.colorImages === undefined ? undefined : parseImageMap(value.colorImages),
@@ -101,6 +106,7 @@ function parseInput(productId: string, body: unknown): AdminProductInput {
     restockThreshold:
       value.restockThreshold === undefined ? undefined : Number(value.restockThreshold),
     isActive: value.isActive === undefined ? true : Boolean(value.isActive),
+    isAvailable: value.isAvailable === undefined ? undefined : Boolean(value.isAvailable),
   };
 }
 

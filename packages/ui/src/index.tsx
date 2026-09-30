@@ -179,6 +179,7 @@ export function ProductCard({
   actions,
   mediaClassName,
   compactOnMobile = false,
+  unavailable = false,
 }: {
   className?: string;
   title: string;
@@ -192,11 +193,14 @@ export function ProductCard({
   actions?: ReactNode;
   mediaClassName?: string;
   compactOnMobile?: boolean;
+  unavailable?: boolean;
 }) {
   return (
     <article
+      data-availability={unavailable ? "unavailable" : "available"}
       className={cn(
         "storefront-product-card group grid min-w-0 h-full overflow-hidden rounded-lg border border-current/10 bg-current/[0.028] shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-current/20 hover:bg-current/[0.045] hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+        unavailable && "storefront-product-unavailable",
         mediaFooter != null ? "grid-rows-[auto_auto_1fr]" : "grid-rows-[auto_1fr]",
         compactOnMobile && "mobile-product-card",
         className,
@@ -204,7 +208,11 @@ export function ProductCard({
     >
       <MediaFrame
         ratio="3 / 4"
-        className={cn("bg-black/10", compactOnMobile && "mobile-product-media", mediaClassName)}
+        className={cn(
+          "storefront-product-media bg-black/10",
+          compactOnMobile && "mobile-product-media",
+          mediaClassName,
+        )}
       >
         {media}
       </MediaFrame>

@@ -26,6 +26,7 @@ test.beforeEach(async ({ page }) => {
             priceRial: 12000000,
             compareAtPriceRial: 13000000,
             availabilityState: "available",
+            purchasable: true,
             stockLabel: "موجود",
             cartonSize: 10,
             moq: 1,

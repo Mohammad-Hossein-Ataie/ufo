@@ -958,6 +958,28 @@ body {
   position: relative;
 }
 
+.storefront-product-unavailable {
+  border-color: rgb(148 163 184 / 0.28);
+  background-color: rgb(148 163 184 / 0.055);
+}
+
+.storefront-product-unavailable .storefront-product-media img {
+  filter: grayscale(1) saturate(0.15);
+  opacity: 0.68;
+  transition: filter 200ms ease, opacity 200ms ease;
+}
+
+.product-detail-unavailable-media img {
+  filter: grayscale(1) saturate(0.15);
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storefront-product-unavailable .storefront-product-media img {
+    transition: none;
+  }
+}
+
 /* Listing cards size to their content; homepage carousel geometry stays separate. */
 .catalog-linked-card .mobile-product-body {
   display: flex;

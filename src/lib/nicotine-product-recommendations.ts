@@ -1,17 +1,19 @@
+import type { Product } from "@ufo/types";
+import { isProductAvailableForPurchase } from "@ufo/domain";
 import type { AdminProductRecord } from "@/lib/admin-products";
 import { getCatalogRowStock } from "@/lib/catalog-data";
 import {
-  getNicotineRecommendationTargets,
-  nicotineDependenceBands,
-  nicotineGuideDevices,
-  type DependenceBand,
-  type NicotineLiquidKind,
-  type NicotineRecommendationTarget,
-  type VapingDevice,
+  nicotineRecommendationStrengths,
+  type NicotineRecommendationStrength,
 } from "@/lib/nicotine-guide";
 
-export type NicotineMatchQuality = "strength" | "type-only";
-export type NicotineRecommendationSetKey = `${VapingDevice}:${DependenceBand}`;
+export const nicotineDeviceTypes = ["pod", "vape"] as const;
+
+export type NicotineDeviceType = (typeof nicotineDeviceTypes)[number];
+export type NicotineLiquidKind = "salt" | "freebase";
+export type NicotineMatchQuality = "strength";
+export type NicotineRecommendationSetKey =
+  `${NicotineDeviceType}:${NicotineRecommendationStrength}`;
 
 export interface RankedNicotineProduct {
   row: AdminProductRecord;
@@ -20,125 +22,130 @@ export interface RankedNicotineProduct {
   matchQuality: NicotineMatchQuality;
 }
 
-const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
-const arabicDigits = "٠١٢٣٤٥٦٧٨٩";
-
-function normalizeDigits(value: string) {
-  return value
-    .replace(/[۰-۹]/g, (digit) => String(persianDigits.indexOf(digit)))
-    .replace(/[٠-٩]/g, (digit) => String(arabicDigits.indexOf(digit)));
-}
-
-function uniqueSorted(values: number[]) {
+function uniqueSortedStrengths(values: number[] | undefined) {
   return [
-    ...new Set(values.filter((value) => Number.isFinite(value) && value >= 0 && value <= 100)),
+    ...new Set(
+      (values ?? []).filter((value) => Number.isFinite(value) && value >= 0 && value <= 100),
+    ),
   ].sort((left, right) => left - right);
 }
 
-export function extractNicotineStrengthsMg(row: AdminProductRecord): number[] {
-  const attributes = [
-    ...row.product.attributes,
-    ...(row.product.specs ?? []).map((spec) => ({
-      nameFa: spec.labelFa,
-      valueFa: spec.valueFa,
-      technicalValue: spec.technicalValue,
-    })),
-    ...row.variant.attributes,
-  ];
-  const strengths: number[] = [];
-
-  for (const attribute of attributes) {
-    const text = normalizeDigits(
-      `${attribute.nameFa} ${attribute.valueFa} ${attribute.technicalValue ?? ""}`,
-    );
-    const isNicotineField = /نیکوتین|nicotine|nic\b/i.test(attribute.nameFa);
-    for (const match of text.matchAll(
-      /(\d{1,3}(?:\.\d+)?)\s*(?:mg(?:\s*\/\s*ml)?|میلی[\s‌-]*گرم)/gi,
-    )) {
-      strengths.push(Number(match[1]));
-    }
-    if (isNicotineField) {
-      for (const match of text.matchAll(/(\d{1,2}(?:\.\d+)?)\s*[%٪]/g)) {
-        strengths.push(Number(match[1]) * 10);
-      }
-    }
-  }
-
-  return uniqueSorted(strengths);
+/**
+ * The only source of truth for nicotine strength matching. Product titles,
+ * descriptions, tags, specs and flavor variants are intentionally ignored.
+ */
+export function getProductNicotineStrengths(product: Product): number[] {
+  return uniqueSortedStrengths(product.nicotineStrengthsMg);
 }
 
 export function getNicotineLiquidKind(row: AdminProductRecord): NicotineLiquidKind | undefined {
   if (row.product.productKind === "salt-nicotine") return "salt";
   if (row.product.productKind === "e-liquid") return "freebase";
+  if (row.product.productKind) return undefined;
   if (row.product.categoryId === "cat-salt-nicotine") return "salt";
-  if (row.product.categoryId !== "cat-eliquid") return undefined;
-
-  const searchable = normalizeDigits(
-    [
-      row.product.nameFa,
-      row.product.nameEn,
-      ...row.product.tags,
-      ...row.product.attributes.flatMap((attribute) => [attribute.nameFa, attribute.valueFa]),
-    ]
-      .filter(Boolean)
-      .join(" "),
-  );
-  return /سالت|salt(?:\s+nic(?:otine)?)?/i.test(searchable) ? "salt" : "freebase";
+  if (row.product.categoryId === "cat-eliquid") return "freebase";
+  return undefined;
 }
 
-function isPublicInStock(row: AdminProductRecord) {
+function requiredKind(deviceType: NicotineDeviceType): NicotineLiquidKind {
+  return deviceType === "pod" ? "salt" : "freebase";
+}
+
+function isEligible(row: AdminProductRecord) {
   return (
+    !row.product.deletedAt &&
     row.product.isActive &&
     row.variant.isActive &&
     (row.product.salesChannels?.includes("retail") ?? true) &&
+    isProductAvailableForPurchase(row.product) &&
     getCatalogRowStock(row) > 0
   );
 }
 
-function rankForTarget(
-  rows: AdminProductRecord[],
-  target: NicotineRecommendationTarget,
+function flavorSignature(row: AdminProductRecord) {
+  if (row.product.variantType !== "flavor") return row.product.id;
+  const values = [...new Set(row.product.variantValueIds ?? [])].sort();
+  return values.length > 0 ? values.join("|") : row.product.id;
+}
+
+function selectDiverseProducts(
+  candidates: Array<RankedNicotineProduct & { stock: number }>,
   limit: number,
-): RankedNicotineProduct[] {
-  const midpoint = (target.minMg + target.maxMg) / 2;
-  return rows
-    .map((row, index) => {
-      const kind = getNicotineLiquidKind(row);
-      const strengthsMg = extractNicotineStrengthsMg(row);
-      const matchingStrengths = strengthsMg.filter(
-        (strength) => strength >= target.minMg && strength <= target.maxMg,
+) {
+  const bestByProduct = new Map<string, (typeof candidates)[number]>();
+  for (const candidate of candidates) {
+    const current = bestByProduct.get(candidate.row.product.id);
+    if (
+      !current ||
+      candidate.stock > current.stock ||
+      (candidate.stock === current.stock &&
+        candidate.row.variant.id.localeCompare(current.row.variant.id) < 0)
+    ) {
+      bestByProduct.set(candidate.row.product.id, candidate);
+    }
+  }
+
+  const remaining = [...bestByProduct.values()].sort(
+    (left, right) =>
+      right.stock - left.stock || left.row.product.id.localeCompare(right.row.product.id),
+  );
+  const selected: typeof remaining = [];
+  const brandUse = new Map<string, number>();
+  const flavorUse = new Map<string, number>();
+
+  while (remaining.length > 0 && selected.length < limit) {
+    remaining.sort((left, right) => {
+      const brandDifference =
+        (brandUse.get(left.row.product.brandId) ?? 0) -
+        (brandUse.get(right.row.product.brandId) ?? 0);
+      if (brandDifference !== 0) return brandDifference;
+      const flavorDifference =
+        (flavorUse.get(flavorSignature(left.row)) ?? 0) -
+        (flavorUse.get(flavorSignature(right.row)) ?? 0);
+      return (
+        flavorDifference ||
+        right.stock - left.stock ||
+        left.row.product.id.localeCompare(right.row.product.id)
       );
-      if (!isPublicInStock(row) || kind !== target.kind) return undefined;
-      if (strengthsMg.length > 0 && matchingStrengths.length === 0) return undefined;
-      return {
+    });
+    const next = remaining.shift();
+    if (!next) break;
+    selected.push(next);
+    brandUse.set(next.row.product.brandId, (brandUse.get(next.row.product.brandId) ?? 0) + 1);
+    const flavor = flavorSignature(next.row);
+    flavorUse.set(flavor, (flavorUse.get(flavor) ?? 0) + 1);
+  }
+
+  return selected.map(({ stock: _stock, ...candidate }) => candidate);
+}
+
+export function selectRecommendedProducts({
+  rows,
+  nicotineResult,
+  deviceType,
+  limit = 4,
+}: {
+  rows: AdminProductRecord[];
+  nicotineResult: NicotineRecommendationStrength;
+  deviceType: NicotineDeviceType;
+  limit?: number;
+}): RankedNicotineProduct[] {
+  const kind = requiredKind(deviceType);
+  const candidates = rows.flatMap((row) => {
+    if (!isEligible(row) || getNicotineLiquidKind(row) !== kind) return [];
+    const strengthsMg = getProductNicotineStrengths(row.product);
+    if (!strengthsMg.includes(nicotineResult)) return [];
+    return [
+      {
         row,
         kind,
         strengthsMg,
-        matchingStrengths,
-        matchQuality: matchingStrengths.length > 0 ? ("strength" as const) : ("type-only" as const),
-        distance:
-          matchingStrengths.length > 0
-            ? Math.min(...matchingStrengths.map((strength) => Math.abs(strength - midpoint)))
-            : Number.POSITIVE_INFINITY,
+        matchQuality: "strength" as const,
         stock: getCatalogRowStock(row),
-        index,
-      };
-    })
-    .filter((item): item is NonNullable<typeof item> => Boolean(item))
-    .sort(
-      (left, right) =>
-        Number(right.matchQuality === "strength") - Number(left.matchQuality === "strength") ||
-        left.distance - right.distance ||
-        right.stock - left.stock ||
-        left.index - right.index,
-    )
-    .slice(0, limit)
-    .map(({ row, kind, strengthsMg, matchQuality }) => ({
-      row,
-      kind,
-      strengthsMg,
-      matchQuality,
-    }));
+      },
+    ];
+  });
+  return selectDiverseProducts(candidates, limit);
 }
 
 export function buildNicotineRecommendationSets(
@@ -146,34 +153,35 @@ export function buildNicotineRecommendationSets(
   limit = 4,
 ): Record<NicotineRecommendationSetKey, RankedNicotineProduct[]> {
   const sets = {} as Record<NicotineRecommendationSetKey, RankedNicotineProduct[]>;
-  for (const device of nicotineGuideDevices) {
-    for (const band of nicotineDependenceBands) {
-      const targets = getNicotineRecommendationTargets(device, band);
-      const perTargetLimit =
-        targets.length > 1 ? Math.max(1, Math.floor(limit / targets.length)) : limit;
-      const seen = new Set<string>();
-      const recommendations: RankedNicotineProduct[] = [];
-      for (const target of targets) {
-        for (const item of rankForTarget(rows, target, perTargetLimit)) {
-          const key = `${item.row.product.id}:${item.row.variant.id}`;
-          if (seen.has(key)) continue;
-          seen.add(key);
-          recommendations.push(item);
-        }
-      }
-      sets[`${device}:${band}`] = recommendations.slice(0, limit);
+  for (const deviceType of nicotineDeviceTypes) {
+    for (const strength of nicotineRecommendationStrengths) {
+      sets[`${deviceType}:${strength}`] = selectRecommendedProducts({
+        rows,
+        nicotineResult: strength,
+        deviceType,
+        limit,
+      });
     }
   }
   return sets;
 }
 
 export function summarizeNicotineCatalog(rows: AdminProductRecord[]) {
-  const publicRows = rows.filter(isPublicInStock);
   const summaryFor = (kind: NicotineLiquidKind) => {
-    const matching = publicRows.filter((row) => getNicotineLiquidKind(row) === kind);
+    const uniqueProducts = new Map<string, AdminProductRecord>();
+    for (const row of rows) {
+      if (isEligible(row) && getNicotineLiquidKind(row) === kind) {
+        uniqueProducts.set(row.product.id, row);
+      }
+    }
+    const products = [...uniqueProducts.values()];
+    const withStrength = products.filter(
+      (row) => getProductNicotineStrengths(row.product).length > 0,
+    ).length;
     return {
-      available: matching.length,
-      withStrength: matching.filter((row) => extractNicotineStrengthsMg(row).length > 0).length,
+      available: products.length,
+      withStrength,
+      unknownStrength: products.length - withStrength,
     };
   };
   return { salt: summaryFor("salt"), freebase: summaryFor("freebase") };

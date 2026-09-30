@@ -1,50 +1,103 @@
 import { expect, test } from "@playwright/test";
 
-test("retail nicotine guide calculates a device-aware starting range", async ({ page }) => {
+test.describe.configure({ timeout: 120_000 });
+
+test("nicotine calculator keeps the four client values separate from device recommendations", async ({
+  page,
+}) => {
   await page.goto("/nicotine-guide");
 
   await expect(
-    page.getByRole("heading", { name: "محاسبه‌گر نیکوتین سالت و جویس بر اساس مصرف سیگار" }),
+    page.getByRole("heading", {
+      name: "محاسبه‌گر نیکوتین بر اساس تعداد و نوع سیگار",
+    }),
   ).toBeVisible();
-  await expect(page).toHaveTitle(/محاسبه‌گر نیکوتین سالت و جویس/);
+  await expect(page).toHaveTitle(/محاسبه‌گر نیکوتین بر اساس تعداد و نوع سیگار/);
 
-  await page.getByLabel("تعداد نخ سیگار در روز").fill("10");
-  await page.getByText("تا ۳۰ دقیقه", { exact: true }).click();
-  await expect(page.getByLabel("تا ۳۰ دقیقه")).toBeChecked();
-  await page.getByText("پاد کم‌وات (MTL)", { exact: true }).click();
-  await expect(page.getByLabel("پاد کم‌وات (MTL)")).toBeChecked();
-  await page.getByRole("button", { name: "نمایش پیشنهاد شروع" }).click();
+  const count = page.getByLabel("تعداد نخ سیگار در روز");
+  const submit = page.getByRole("button", { name: "نمایش پیشنهاد شروع" });
+  const recommendation = page.getByTestId("nicotine-recommendation-value");
+  const pod = page.getByRole("radio", { name: /^پاد/ });
+  const vape = page.getByRole("radio", { name: /^ویپ/ });
 
-  const result = page.getByRole("complementary", { name: "نتیجه راهنمای نیکوتین" });
-  await expect(result.getByText("سالت نیکوتین برای پاد کم‌وات")).toBeVisible();
-  await expect(result.getByText("12–18 mg/ml")).toBeVisible();
-  await expect(result.getByRole("link", { name: "مشاهده محصولات پیشنهادی" })).toHaveAttribute(
+  await expect(count).toHaveAttribute("min", "1");
+  await expect(count).toHaveAttribute("max", "100");
+  await expect(pod).toBeVisible();
+  await expect(vape).toBeVisible();
+  await expect(pod).toBeChecked();
+
+  await count.fill("10");
+  await page.getByText("سبک / اولترا لایت", { exact: true }).click();
+  await submit.click();
+  await expect(recommendation).toHaveText("20mg");
+
+  await page.getByText("معمولی / لایت", { exact: true }).click();
+  await submit.click();
+  await expect(recommendation).toHaveText("25mg");
+
+  await count.fill("20");
+  await submit.click();
+  await expect(recommendation).toHaveText("35mg");
+
+  await page.getByText("سنگین / پرکشش", { exact: true }).click();
+  await submit.click();
+  await expect(recommendation).toHaveText("50mg");
+  await expect(page.getByTestId("nicotine-device-value")).toHaveText("پاد");
+  await expect(page.getByTestId("nicotine-family-value")).toHaveText("سالت نیکوتین");
+  await expect(page.getByRole("link", { name: "مشاهده همه دسته" })).toHaveAttribute(
     "href",
-    "#recommended-products",
+    "/products/category/salt-nicotine",
   );
 
-  const recommendations = page.locator("#recommended-products");
-  await expect(
-    recommendations.getByRole("heading", { name: "محصولات متناسب با نتیجه شما" }),
-  ).toBeVisible();
-  await expect(recommendations.getByRole("article")).toHaveCount(4);
-  await expect(recommendations.getByText("تطابق نوع محصول", { exact: true })).toHaveCount(4);
-  await page.screenshot({ path: "temp/nicotine-guide-desktop-result.png", fullPage: true });
+  await page.getByText("ویپ", { exact: true }).click();
+  await expect(recommendation).toHaveText("50mg");
+  await expect(page.getByTestId("nicotine-device-value")).toHaveText("ویپ");
+  await expect(page.getByTestId("nicotine-family-value")).toHaveText("جویس / ای‌لیکوئید");
+  await expect(page.getByRole("link", { name: "مشاهده همه دسته" })).toHaveAttribute(
+    "href",
+    "/products/category/e-liquid",
+  );
+  await expect(page.getByText(/هیچ تبدیل حدسی از سالت به جویس/)).toBeVisible();
+
+  await count.fill("100");
+  await submit.click();
+  await expect(recommendation).toHaveText("50mg");
 });
 
-test("nicotine guide remains readable without horizontal overflow on mobile", async ({ page }) => {
-  await page.setViewportSize({ width: 360, height: 800 });
+test("nicotine calculator validates empty and out-of-range inputs", async ({ page }) => {
   await page.goto("/nicotine-guide");
 
-  await expect(page.getByLabel("تعداد نخ سیگار در روز")).toBeVisible();
-  await page.getByLabel("تعداد نخ سیگار در روز").fill("15");
-  await page.getByText("تا ۳۰ دقیقه", { exact: true }).click();
-  await page.getByText("پاد کم‌وات (MTL)", { exact: true }).click();
-  await page.getByRole("button", { name: "نمایش پیشنهاد شروع" }).click();
-  await expect(page.locator("#recommended-products").getByRole("article")).toHaveCount(4);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
-    true,
-  );
+  const count = page.getByLabel("تعداد نخ سیگار در روز");
+  const submit = page.getByRole("button", { name: "نمایش پیشنهاد شروع" });
+  const error = page.locator("#cigarette-count-error");
 
-  await page.screenshot({ path: "temp/nicotine-guide-mobile.png", fullPage: true });
+  await submit.click();
+  await expect(error).toHaveText("تعداد نخ سیگار در روز را وارد کنید.");
+
+  await count.fill("0");
+  await submit.click();
+  await expect(error).toContainText("بین ۱ تا ۱۰۰");
+
+  await count.fill("101");
+  await submit.click();
+  await expect(error).toContainText("بین ۱ تا ۱۰۰");
+  await expect(page.getByTestId("nicotine-recommendation-value")).toHaveCount(0);
+});
+
+test("nicotine calculator stays readable at every requested responsive width", async ({ page }) => {
+  for (const width of [375, 390, 430, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: width < 768 ? 844 : 900 });
+    await page.goto("/nicotine-guide");
+    await page.getByLabel("تعداد نخ سیگار در روز").fill("20");
+    await page.getByText("سنگین / پرکشش", { exact: true }).click();
+    await page.getByText("ویپ", { exact: true }).click();
+    await page.getByRole("button", { name: "نمایش پیشنهاد شروع" }).click();
+
+    await expect(page.getByTestId("nicotine-recommendation-value")).toHaveText("50mg");
+    await expect(page.getByTestId("nicotine-family-value")).toHaveText("جویس / ای‌لیکوئید");
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+    await page.screenshot({ path: `temp/nicotine-guide-${width}.png`, fullPage: true });
+  }
 });

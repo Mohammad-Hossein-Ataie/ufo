@@ -7,6 +7,7 @@ import {
   getProductVariantOptions,
   getProductVariantType,
   getUnitPriceRial,
+  isProductAvailableForPurchase,
   products,
   validateWholesaleCartonCount,
   variants,
@@ -148,6 +149,10 @@ function assertSelectedVariantAvailable(
   line: Pick<CartLineInput, "selectedVariant" | "colorId" | "quantity">,
   allowMissingSelection = false,
 ) {
+  if (!product.isActive) throw new Error("محصول پیدا نشد.");
+  if (!isProductAvailableForPurchase(product)) {
+    throw new Error("این محصول در حال حاضر قابل سفارش نیست.");
+  }
   const variantType = getProductVariantType(product);
   const option =
     line.selectedVariant ??
@@ -336,14 +341,19 @@ function readCustomerStore(): CustomerStoreFile {
   requireMountedProductionData(storePath);
   if (!existsSync(storePath)) return emptyCustomerStore;
   const parsed: unknown = JSON.parse(readFileSync(storePath, "utf8"));
-  if (!parsed || typeof parsed !== "object" || !Array.isArray((parsed as CustomerStoreFile).customers)) {
+  if (
+    !parsed ||
+    typeof parsed !== "object" ||
+    !Array.isArray((parsed as CustomerStoreFile).customers)
+  ) {
     throw new Error("فایل حساب‌های مشتریان معتبر نیست.");
   }
   const store = parsed as CustomerStoreFile;
   if (
     ("carts" in store && !Array.isArray(store.carts)) ||
     ("addresses" in store && !Array.isArray(store.addresses))
-  ) throw new Error("فایل حساب‌های مشتریان معتبر نیست.");
+  )
+    throw new Error("فایل حساب‌های مشتریان معتبر نیست.");
   return {
     customers: store.customers,
     carts: Array.isArray(store.carts) ? store.carts : [],
@@ -785,10 +795,14 @@ export function addCartItem(
   if (existing) {
     const product = priced.productId ? findProduct(priced.productId) : undefined;
     if (product) {
-      assertSelectedVariantAvailable(product, {
-        quantity: existing.quantity + priced.quantity,
-        ...(priced.selectedVariant ? { selectedVariant: priced.selectedVariant } : {}),
-      }, platformType === "wholesale");
+      assertSelectedVariantAvailable(
+        product,
+        {
+          quantity: existing.quantity + priced.quantity,
+          ...(priced.selectedVariant ? { selectedVariant: priced.selectedVariant } : {}),
+        },
+        platformType === "wholesale",
+      );
     }
   }
   const nextItems = existing
@@ -1112,9 +1126,7 @@ export function reorderSubmittedOrder(args: {
     );
     if (!variant) continue;
     const product = findProduct(variant.productId);
-    const selectedVariant = product
-      ? resolveReorderSelectedVariant(product, item)
-      : undefined;
+    const selectedVariant = product ? resolveReorderSelectedVariant(product, item) : undefined;
     if (product && getProductVariantType(product) !== "none" && !selectedVariant) continue;
     view = addCartItem(args.customerId, args.channel, {
       variantId: variant.id,

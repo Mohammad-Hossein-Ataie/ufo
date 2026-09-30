@@ -30,7 +30,7 @@ import {
 import type { AdminProductRecord } from "@/lib/admin-products";
 import { canonical, itemListJsonLd, jsonLdScriptProps } from "@ufo/seo";
 import { Badge, EmptyState } from "@ufo/ui";
-import { categories } from "@ufo/domain";
+import { categories, isProductAvailableForPurchase } from "@ufo/domain";
 import type { ProductFlavor, ProductKind } from "@ufo/types";
 
 export const dynamic = "force-dynamic";
@@ -163,9 +163,10 @@ function filterProducts(
     })
     .filter((row) => {
       const stock = getCatalogRowStock(row);
-      if (params.stock === "available") return stock > 0;
-      if (params.stock === "low") return stock > 0 && stock < 10;
-      if (params.stock === "preorder") return stock <= 0;
+      const purchasable = isProductAvailableForPurchase(row.product);
+      if (params.stock === "available") return purchasable && stock > 0;
+      if (params.stock === "low") return purchasable && stock > 0 && stock < 10;
+      if (params.stock === "preorder") return purchasable && stock <= 0;
       return true;
     })
     .sort((left, right) => {

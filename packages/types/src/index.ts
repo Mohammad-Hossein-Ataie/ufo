@@ -140,6 +140,7 @@ export interface Product {
   brandId: string;
   categoryId: string;
   productKind?: ProductKind;
+  nicotineStrengthsMg?: number[];
   salesChannels?: SalesChannel[];
   shortDescriptionFa: string;
   descriptionFa: string;
@@ -159,6 +160,7 @@ export interface Product {
   sourceNoteFa?: string;
   adminNotesFa?: string;
   isActive: boolean;
+  isAvailable?: boolean;
   isAgeRestricted: boolean;
   seoTitle: string;
   seoDescription: string;

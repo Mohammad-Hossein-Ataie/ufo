@@ -84,18 +84,18 @@ export function NicotineGuidePromoModal() {
             id="nicotine-promo-description"
             className="mt-4 max-w-xl text-sm leading-7 text-retail-secondary sm:text-base sm:leading-8"
           >
-            با ۳ پاسخ کوتاه درباره مصرف روزانه و دستگاه‌تان، بازه شروع سالت یا جویس را ببینید و از
-            میان محصولات موجود فروشگاه انتخاب دقیق‌تری داشته باشید.
+            با پاسخ درباره تعداد و نوع سیگار، عدد پیشنهادی ۲۰، ۲۵، ۳۵ یا ۵۰ میلی‌گرم را ببینید؛ سپس
+            با انتخاب پاد یا ویپ، محصولات همان خانواده را جداگانه بررسی کنید.
           </p>
 
           <ul className="mt-5 grid gap-2.5 text-sm text-white/85 sm:grid-cols-2">
             <li className="flex items-center gap-2">
               <Check size={17} className="shrink-0 text-emerald-300" aria-hidden="true" />
-              تطبیق با نوع دستگاه شما
+              محاسبه بر اساس نوع سیگار شما
             </li>
             <li className="flex items-center gap-2">
               <Check size={17} className="shrink-0 text-emerald-300" aria-hidden="true" />
-              پیشنهاد از موجودی روز فروشگاه
+              چهار خروجی دقیق ۲۰، ۲۵، ۳۵ و ۵۰
             </li>
             <li className="flex items-center gap-2 sm:col-span-2">
               <ShieldCheck size={17} className="shrink-0 text-retail-accent" aria-hidden="true" />

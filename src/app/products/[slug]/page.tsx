@@ -8,11 +8,7 @@ import { ProductNavigationLink } from "@/components/product-navigation-link";
 import { ProtectedProductImage } from "@/components/protected-product-image";
 import { ProductVariantSummary } from "@/components/product-variant-visuals";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
-import {
-  getCatalogRowAvailability,
-  getCatalogRowStock,
-  listCatalogRowsForDiscovery,
-} from "@/lib/catalog-data";
+import { getCatalogRowAvailability, listCatalogRowsForDiscovery } from "@/lib/catalog-data";
 import { listAdminColors } from "@/lib/admin-colors";
 import { listAdminFlavors } from "@/lib/admin-flavors";
 import {
@@ -29,6 +25,7 @@ import { productCatalogImageUrl, productDetailImageVersion } from "@/lib/product
 import {
   categories,
   getProductVariantType,
+  isProductAvailableForPurchase,
   productColorAttributeTechnicalValue,
   productFlavorAttributeTechnicalValue,
   productResistanceAttributeTechnicalValue,
@@ -168,12 +165,12 @@ export default async function ProductPage({
 
   const product = row.product;
   const variant = row.variant;
-  const available = getCatalogRowStock(row);
   const category = categories.find((item) => item.id === product.categoryId);
   const galleryImages = getProductImages(product);
   const variantImages = getProductVariantImages(product);
   const variantType = getProductVariantType(product);
   const availability = getCatalogRowAvailability(row);
+  const purchasable = isProductAvailableForPurchase(product);
   const variantOptions = getStorefrontVariantOptions(product, flavors, colors, availability);
   const initialVariantValueId = resolveStorefrontVariantValueId(
     variantOptions,
@@ -189,7 +186,13 @@ export default async function ProductPage({
     )
     .slice(0, 4);
   const brandName = row.brandNameFa || undefined;
-  const jsonLd = productJsonLd(product, variant, available > 0, brandName, galleryImages);
+  const jsonLd = productJsonLd(
+    product,
+    variant,
+    availability !== "unavailable",
+    brandName,
+    galleryImages,
+  );
   const breadcrumb = breadcrumbJsonLd([
     { name: "خانه", path: "/" },
     { name: "محصولات", path: "/products" },
@@ -229,6 +232,7 @@ export default async function ProductPage({
           }}
           variant={variant}
           availability={availability}
+          purchasable={purchasable}
           brandName={brandName}
           galleryImages={galleryImages}
           variantType={variantType}
@@ -359,11 +363,13 @@ export default async function ProductPage({
               {relatedRows.map((relatedRow) => {
                 const related = relatedRow.product;
                 const relatedVariant = relatedRow.variant;
+                const relatedPurchasable = isProductAvailableForPurchase(related);
                 const relatedVariantOptions = getStorefrontVariantOptions(related, flavors, colors);
                 return (
                   <ProductCard
                     key={related.id}
                     className="catalog-linked-card"
+                    unavailable={!relatedPurchasable}
                     title={related.nameFa}
                     subtitle={related.nameEn}
                     description={related.shortDescriptionFa}
@@ -380,10 +386,15 @@ export default async function ProductPage({
                     badge={
                       <StockStatus
                         state={getCatalogRowAvailability(relatedRow)}
-                        unavailableLabel="پیش‌سفارش"
+                        unavailableLabel={relatedPurchasable ? "پیش‌سفارش" : "ناموجود"}
                       />
                     }
-                    price={<Price valueRial={relatedVariant.retailPriceRial} />}
+                    price={
+                      <Price
+                        valueRial={relatedVariant.retailPriceRial}
+                        className={!relatedPurchasable ? "text-retail-muted line-through" : ""}
+                      />
+                    }
                     variantSummary={
                       <div key={`variants-${related.id}`} className="hidden sm:block">
                         <ProductVariantSummary options={relatedVariantOptions} />

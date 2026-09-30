@@ -30,6 +30,7 @@ interface SearchProduct {
   priceRial: number;
   compareAtPriceRial: number | null;
   availabilityState: "available" | "low_stock" | "almost_unavailable" | "unavailable";
+  purchasable: boolean;
   stockLabel: string;
   cartonSize: number | null;
   moq: number | null;
@@ -351,6 +352,7 @@ export function SmartSearch({
                       href={product.href}
                       data-search-product="true"
                       data-search-channel={channel}
+                      data-availability={product.purchasable ? "available" : "unavailable"}
                       data-has-price={product.priceRial > 0 ? "true" : "false"}
                       data-has-wholesale-meta={
                         channel === "wholesale" && product.moq && product.cartonSize
@@ -385,7 +387,10 @@ export function SmartSearch({
                           alt={product.title}
                           sizes="72px"
                           loading="eager"
-                          className="h-full w-full object-contain"
+                          className={cn(
+                            "h-full w-full object-contain",
+                            !product.purchasable && "grayscale opacity-65",
+                          )}
                         />
                       </span>
                       <span className="grid min-w-0 flex-1 gap-1">
@@ -412,7 +417,12 @@ export function SmartSearch({
                           {highlightText(product.subtitle, query)}
                         </span>
                         <span className="flex flex-wrap items-baseline gap-2">
-                          <span className="text-sm font-black tabular-nums">
+                          <span
+                            className={cn(
+                              "text-sm font-black tabular-nums",
+                              !product.purchasable && "text-current/55 line-through",
+                            )}
+                          >
                             {formatToman(product.priceRial)}
                           </span>
                           {product.compareAtPriceRial ? (

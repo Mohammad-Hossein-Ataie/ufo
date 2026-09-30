@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { brands, categories } from "@ufo/domain";
+import { brands, categories, isProductAvailableForPurchase } from "@ufo/domain";
 import type { SalesChannel } from "@ufo/types";
 import type { AdminProductRecord } from "@/lib/admin-products";
 import {
@@ -103,6 +103,7 @@ export async function GET(request: Request) {
     channel,
     products: rankedRows.map(({ row }) => {
       const availabilityState = getCatalogRowAvailability(row);
+      const purchasable = isProductAvailableForPurchase(row.product);
       const priceRial =
         channel === "wholesale" ? row.variant.wholesalePriceRial : row.variant.retailPriceRial;
       const fallbackImage =
@@ -126,9 +127,10 @@ export async function GET(request: Request) {
             ? row.variant.compareAtPriceRial
             : null,
         availabilityState,
+        purchasable,
         stockLabel: publicAvailabilityLabelFa(
           availabilityState,
-          channel === "wholesale" ? "نیازمند هماهنگی" : "پیش‌سفارش",
+          purchasable ? (channel === "wholesale" ? "نیازمند هماهنگی" : "پیش‌سفارش") : "ناموجود",
         ),
         cartonSize: channel === "wholesale" ? row.variant.cartonSize : null,
         moq: channel === "wholesale" ? row.variant.minWholesaleCartonCount : null,

@@ -1,6 +1,7 @@
 import { listAdminProducts, type AdminProductRecord } from "@/lib/admin-products";
 import { catalogSearchTokenGroups, normalizeCatalogSearchText } from "@/lib/catalog-search-text";
 import { getPublicAvailabilityState } from "@/lib/public-availability";
+import { isProductAvailableForPurchase } from "@ufo/domain";
 
 function matchesQuery(row: AdminProductRecord, query: string): boolean {
   const tokenGroups = catalogSearchTokenGroups(query);
@@ -75,6 +76,7 @@ export function getCatalogRowStock(row: AdminProductRecord): number {
 }
 
 export function getCatalogRowAvailability(row: AdminProductRecord) {
+  if (!isProductAvailableForPurchase(row.product)) return "unavailable" as const;
   return getPublicAvailabilityState(getCatalogRowStock(row), {
     lowStockAt: row.inventory.restockThreshold,
   });

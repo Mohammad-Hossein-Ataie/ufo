@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { breadcrumbJsonLd, canonical, faqPageJsonLd, jsonLdScriptProps } from "@ufo/seo";
+import { isProductAvailableForPurchase } from "@ufo/domain";
 import {
   NicotineGuideCalculator,
   type NicotineRecommendationSets,
@@ -25,24 +26,24 @@ export const dynamic = "force-dynamic";
 
 const faqItems = [
   {
-    question: "برای کسی که روزانه ۱۰ نخ سیگار می‌کشد چه نیکوتینی مناسب است؟",
+    question: "برای ۱۰ نخ سیگار معمولی در روز چه عددی نمایش داده می‌شود؟",
     answer:
-      "به‌عنوان نقطه شروع، برای پاد کم‌وات معمولاً سالت ۱۰ تا ۱۲ میلی‌گرم در میلی‌لیتر و برای ویپ پرقدرت جویس فری‌بیس ۳ تا ۶ میلی‌گرم در میلی‌لیتر بررسی می‌شود. زمان اولین سیگار و مشخصات دستگاه می‌تواند این بازه را تغییر دهد.",
+      "ضریب سیگار معمولی ۰٫۷ میلی‌گرم است؛ ۱۰ × ۰٫۷ برابر با ۷ می‌شود و طبق منطق اصلی مشتری، خروجی دقیق این حالت ۲۵mg است.",
   },
   {
-    question: "سالت نیکوتین بهتر است یا جویس معمولی؟",
+    question: "نوع سیگار چه اثری در محاسبه دارد؟",
     answer:
-      "سالت بیشتر برای پادهای کم‌وات و کام‌دهی دهان‌به‌ریه مناسب است. جویس فری‌بیس با غلظت پایین‌تر معمولاً برای ویپ یا مود پرقدرت و بخار بیشتر انتخاب می‌شود. نوع دستگاه از تعداد نخ مهم‌تر است.",
+      "ضریب سیگار سبک ۰٫۴، معمولی ۰٫۷، سنگین ۱ و گزینه «نمی‌دانم» ۰٫۷ میلی‌گرم برای هر نخ است. سؤال دیگری مقدار خروجی را تغییر نمی‌دهد.",
   },
   {
-    question: "آیا سیگار لایت به نیکوتین کمتری نیاز دارد؟",
+    question: "فرمول محاسبه چیست؟",
     answer:
-      "نه لزوماً. برچسب لایت یا رنگ پاکت مقدار واقعی دریافت نیکوتین را دقیق نشان نمی‌دهد، چون شیوه پک‌زدن و دفعات مصرف متفاوت است. این راهنما از تعداد نخ و زمان اولین سیگار استفاده می‌کند.",
+      "تعداد نخ روزانه در ضریب نوع سیگار ضرب می‌شود. اگر حاصل کمتر از ۷ باشد خروجی ۲۰mg، از ۷ تا کمتر از ۱۲ برابر ۲۵mg، از ۱۲ تا کمتر از ۱۸ برابر ۳۵mg و از ۱۸ به بالا برابر ۵۰mg است.",
   },
   {
-    question: "آیا سالت ۳۵ یا ۵۰ میلی‌گرم پیشنهاد می‌شود؟",
+    question: "چه زمانی خروجی ۳۵ یا ۵۰ میلی‌گرم می‌شود؟",
     answer:
-      "این راهنما غلظت بالاتر از ۲۰ میلی‌گرم در میلی‌لیتر را پیشنهاد نمی‌کند. دریافت نیکوتین به دستگاه و شیوه مصرف وابسته است و غلظت بالا می‌تواند احتمال دریافت بیش‌ازحد را افزایش دهد.",
+      "اگر حاصل تعداد نخ × ضریب نوع سیگار از ۱۲ تا کمتر از ۱۸ باشد، خروجی ۳۵mg است. حاصل ۱۸ یا بیشتر همیشه ۵۰mg برمی‌گرداند و به خروجی پایین‌تر محدود نمی‌شود.",
   },
   {
     question: "از کجا بفهمم نیکوتین زیاد یا کم است؟",
@@ -52,9 +53,9 @@ const faqItems = [
 ];
 
 export const metadata: Metadata = {
-  title: "محاسبه‌گر نیکوتین سالت و جویس بر اساس مصرف سیگار",
+  title: "محاسبه‌گر نیکوتین بر اساس تعداد و نوع سیگار",
   description:
-    "با تعداد نخ سیگار، زمان اولین سیگار و نوع دستگاه، بازه شروع نیکوتین سالت یا جویس فری‌بیس را پیدا کنید؛ راهنمای رایگان ویژه بزرگسالان سیگاری.",
+    "با تعداد نخ روزانه و نوع سیگار، یکی از چهار عدد دقیق ۲۰، ۲۵، ۳۵ یا ۵۰ میلی‌گرم را بر اساس فرمول اصلی محاسبه کنید.",
   keywords: [
     "محاسبه نیکوتین سالت",
     "نیکوتین مناسب بر اساس تعداد سیگار",
@@ -64,9 +65,8 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: canonical("/nicotine-guide") },
   openGraph: {
-    title: "محاسبه‌گر نیکوتین سالت و جویس | یوفوپاف",
-    description:
-      "یک بازه شروع محافظه‌کارانه برای نیکوتین، متناسب با مصرف سیگار و نوع دستگاه پیدا کنید.",
+    title: "محاسبه‌گر نیکوتین بر اساس نوع سیگار | یوفوپاف",
+    description: "پیشنهاد عددی ۲۰، ۲۵، ۳۵ یا ۵۰ میلی‌گرم را با تعداد و نوع سیگار محاسبه کنید.",
     url: canonical("/nicotine-guide"),
     type: "website",
     locale: "fa_IR",
@@ -86,7 +86,7 @@ const applicationJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "@id": canonical("/nicotine-guide#calculator"),
-  name: "محاسبه‌گر نیکوتین سالت و جویس یوفوپاف",
+  name: "محاسبه‌گر نیکوتین بر اساس تعداد و نوع سیگار یوفوپاف",
   url: canonical("/nicotine-guide"),
   applicationCategory: "LifestyleApplication",
   operatingSystem: "Any",
@@ -98,7 +98,7 @@ const applicationJsonLd = {
     audienceType: "بزرگسالانی که در حال حاضر سیگار مصرف می‌کنند",
   },
   description:
-    "راهنمای آموزشی انتخاب بازه شروع نیکوتین سالت یا جویس بر اساس تعداد سیگار، زمان اولین سیگار و نوع دستگاه؛ این ابزار تشخیص یا نسخه پزشکی نیست.",
+    "محاسبه‌گر آموزشی نیکوتین بر اساس تعداد نخ روزانه و نوع سیگار با چهار خروجی ثابت ۲۰، ۲۵، ۳۵ و ۵۰ میلی‌گرم؛ این ابزار تشخیص یا نسخه پزشکی نیست.",
   offers: {
     "@type": "Offer",
     price: 0,
@@ -143,6 +143,7 @@ async function getRecommendationData() {
             getCategoryImage(row.product.categoryId) ?? "/images/categories/e-liquid.webp",
           priceRial: row.variant.retailPriceRial,
           availability: getCatalogRowAvailability(row),
+          purchasable: isProductAvailableForPurchase(row.product),
           strengthsMg,
           matchQuality,
         })),
@@ -153,8 +154,8 @@ async function getRecommendationData() {
     return {
       recommendationSets: {} as NicotineRecommendationSets,
       catalogSummary: {
-        salt: { available: 0, withStrength: 0 },
-        freebase: { available: 0, withStrength: 0 },
+        salt: { available: 0, withStrength: 0, unknownStrength: 0 },
+        freebase: { available: 0, withStrength: 0, unknownStrength: 0 },
       },
     };
   }
@@ -202,14 +203,14 @@ export default async function NicotineGuidePage() {
                 ابزار رایگان خرده‌فروشی
               </span>
               <h1 className="mt-5 max-w-4xl text-3xl font-black leading-[1.4] text-white sm:text-5xl sm:leading-[1.3] lg:text-6xl">
-                محاسبه‌گر نیکوتین سالت و جویس
+                محاسبه‌گر نیکوتین
                 <span className="mt-1 block bg-gradient-to-l from-retail-accent to-retail-accent-2 bg-clip-text text-transparent">
-                  بر اساس مصرف سیگار
+                  بر اساس تعداد و نوع سیگار
                 </span>
               </h1>
               <p className="mt-5 max-w-3xl text-base leading-8 text-[#d6e1ea] sm:text-lg sm:leading-9">
-                تعداد نخ روزانه، زمان اولین سیگار و نوع دستگاه را وارد کنید تا یک بازه شروع
-                محافظه‌کارانه برای سالت یا جویس فری‌بیس ببینید؛ بدون ادعای محاسبه دقیق جذب نیکوتین.
+                تعداد نخ روزانه و نوع سیگار را وارد کنید تا فرمول اصلی مشتری یکی از چهار عدد دقیق
+                ۲۰، ۲۵، ۳۵ یا ۵۰ میلی‌گرم را نمایش دهد؛ بدون ادعای محاسبه دقیق جذب نیکوتین.
               </p>
             </div>
 
@@ -219,9 +220,9 @@ export default async function NicotineGuidePage() {
                 <p className="mt-1 text-sm font-black text-white">بزرگسالان سیگاری ۱۸+</p>
               </div>
               <div className="rounded-xl border border-white/10 bg-black/20 p-4 backdrop-blur">
-                <p className="text-xs text-retail-muted">حد پیشنهادی ابزار</p>
+                <p className="text-xs text-retail-muted">چهار خروجی ثابت</p>
                 <p dir="ltr" className="mt-1 text-left text-sm font-black text-retail-accent">
-                  حداکثر 20 mg/ml
+                  20 / 25 / 35 / 50 mg
                 </p>
               </div>
             </div>
@@ -249,12 +250,12 @@ export default async function NicotineGuidePage() {
         <div className="lg:sticky lg:top-[calc(var(--retail-header-height)+1.5rem)]">
           <span className="text-sm font-black text-retail-accent">جواب کوتاه</span>
           <h2 className="mt-2 text-2xl font-black leading-10 text-white sm:text-3xl">
-            سالت یا جویس را اول با دستگاه تطبیق دهید
+            نتیجه دقیق است، اما نسخه پزشکی نیست
           </h2>
           <p className="mt-4 text-sm leading-8 text-retail-secondary">
-            برای پاد کم‌وات و کام MTL معمولاً سالت با غلظت بالاتر کاربرد دارد؛ برای دستگاه پرقدرت
-            DTL، جویس فری‌بیس با غلظت پایین‌تر. تعداد سیگار فقط نقطه شروع است و توان دستگاه، مقاومت
-            کویل و الگوی کام‌گرفتن روی دریافت واقعی نیکوتین اثر می‌گذارند.
+            خروجی محاسبه فقط از تعداد نخ روزانه و ضریب نوع سیگار ساخته می‌شود. مشخصات دستگاه، مقاومت
+            کویل و شیوه مصرف همچنان برای انتخاب محصول و استفاده ایمن مهم‌اند، اما مقدار محاسبه‌شده
+            را تغییر نمی‌دهند.
           </p>
           <Link
             href="/products"
@@ -329,9 +330,9 @@ export default async function NicotineGuidePage() {
                 روش محاسبه و منابع
               </h2>
               <p className="mt-2 max-w-4xl text-sm leading-8 text-retail-secondary">
-                این ابزار جذب خونی نیکوتین را محاسبه نمی‌کند. تعداد نخ، زمان اولین سیگار به‌عنوان
-                نشانه ساده وابستگی، و نوع دستگاه را به یک بازه شروع تبدیل می‌کند. نتیجه باید با
-                کنترل میل به سیگار و نشانه‌های دریافت زیاد تنظیم شود.
+                فرمول ابزار برابر است با تعداد نخ روزانه × ضریب نوع سیگار. حاصل کمتر از ۷ به ۲۰mg،
+                از ۷ تا کمتر از ۱۲ به ۲۵mg، از ۱۲ تا کمتر از ۱۸ به ۳۵mg و حاصل ۱۸ یا بیشتر به ۵۰mg
+                نگاشت می‌شود. این ابزار جذب خونی نیکوتین را محاسبه نمی‌کند.
               </p>
             </div>
           </div>

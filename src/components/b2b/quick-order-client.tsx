@@ -5,6 +5,7 @@ import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { Button, Price } from "@ufo/ui";
 import {
   calculateCartonQuantity,
+  isProductAvailableForPurchase,
   products,
   validateWholesaleCartonCount,
   variants,
@@ -29,6 +30,7 @@ export function QuickOrderClient() {
           const cartonCount = cartons[variant.id] ?? 0;
           const quantity = cartonCount > 0 ? calculateCartonQuantity(variant, cartonCount) : 0;
           const isSelected = cartonCount > 0;
+          const purchasable = product ? isProductAvailableForPurchase(product) : false;
           const isBelowMinimum = isSelected && cartonCount < variant.minWholesaleCartonCount;
           return {
             variant,
@@ -36,6 +38,7 @@ export function QuickOrderClient() {
             cartonCount,
             quantity,
             isSelected,
+            purchasable,
             isBelowMinimum,
             totalRial: quantity * variant.wholesalePriceRial,
           };
@@ -45,7 +48,9 @@ export function QuickOrderClient() {
   );
 
   const selectedLines = lines.filter((line) => line.isSelected);
-  const hasInvalidSelection = selectedLines.some((line) => line.isBelowMinimum);
+  const hasInvalidSelection = selectedLines.some(
+    (line) => line.isBelowMinimum || !line.purchasable,
+  );
   const totalRial = selectedLines.reduce((sum, line) => sum + line.totalRial, 0);
 
   function updateCarton(variantId: string, value: number) {
@@ -137,7 +142,16 @@ export function QuickOrderClient() {
                   {formatter.format(line.variant.cartonSize)}
                 </td>
                 <td className="px-4 py-3">
-                  {line.isSelected ? (
+                  {!line.purchasable ? (
+                    <Button
+                      type="button"
+                      disabled
+                      aria-describedby={`quick-order-item-${line.variant.id}`}
+                      size="sm"
+                    >
+                      ناموجود
+                    </Button>
+                  ) : line.isSelected ? (
                     <div className="grid gap-2">
                       <div className="inline-flex h-11 w-fit items-center overflow-hidden rounded-md border border-[#8FA08F] bg-white text-[#12201A] shadow-sm">
                         <button
@@ -187,7 +201,10 @@ export function QuickOrderClient() {
                   )}
                 </td>
                 <td className="px-4 py-3 text-[#12201A]">
-                  <Price valueRial={line.variant.wholesalePriceRial} />
+                  <Price
+                    valueRial={line.variant.wholesalePriceRial}
+                    className={!line.purchasable ? "text-[#718078] line-through" : ""}
+                  />
                 </td>
                 <td className="px-4 py-3 font-bold text-[#12201A]">
                   {line.isSelected ? <Price valueRial={line.totalRial} /> : "انتخاب نشده"}

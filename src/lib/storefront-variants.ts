@@ -47,7 +47,7 @@ export function getStorefrontVariantOptions(
     const state = product.variantValueStates?.[valueId];
     if (state?.isActive === false) return undefined;
     const availability =
-      state?.isAvailable === false
+      product.isAvailable === false || state?.isAvailable === false
         ? "unavailable"
         : state?.stockQuantity !== undefined
           ? getPublicAvailabilityState(state.stockQuantity)
@@ -104,9 +104,7 @@ export function getStorefrontVariantOptions(
         : attributeIds(product, technicalValue);
     return valueIds.flatMap((valueId) => {
       const state = publicState(valueId);
-      return state
-        ? [{ id: valueId, labelFa: valueId, type: variantType, ...state }]
-        : [];
+      return state ? [{ id: valueId, labelFa: valueId, type: variantType, ...state }] : [];
     });
   }
 

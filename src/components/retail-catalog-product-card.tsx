@@ -8,6 +8,7 @@ import { StorefrontProductImage } from "@/components/storefront-product-image";
 import { ProductVariantDots, ProductVariantSummary } from "@/components/product-variant-visuals";
 import { ProductNavigationLink } from "@/components/product-navigation-link";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { isProductAvailableForPurchase } from "@ufo/domain";
 
 export function RetailCatalogProductCard({
   row,
@@ -20,6 +21,7 @@ export function RetailCatalogProductCard({
 }) {
   const { product, variant } = row;
   const availability = getCatalogRowAvailability(row);
+  const purchasable = isProductAvailableForPurchase(product);
   const compareAt = variant.compareAtPriceRial;
   const discountPercent =
     compareAt && compareAt > variant.retailPriceRial
@@ -32,6 +34,7 @@ export function RetailCatalogProductCard({
   return (
     <ProductCard
       className="catalog-linked-card"
+      unavailable={!purchasable}
       title={product.nameFa}
       subtitle={product.nameEn}
       description={product.shortDescriptionFa}
@@ -52,7 +55,10 @@ export function RetailCatalogProductCard({
               ٪{new Intl.NumberFormat("fa-IR").format(discountPercent)}
             </span>
           ) : null}
-          <StockStatus state={availability} unavailableLabel="پیش‌سفارش" />
+          <StockStatus
+            state={availability}
+            unavailableLabel={purchasable ? "پیش‌سفارش" : "ناموجود"}
+          />
         </div>
       }
       price={
@@ -63,7 +69,10 @@ export function RetailCatalogProductCard({
               className="text-xs font-medium text-retail-muted line-through"
             />
           ) : null}
-          <Price valueRial={variant.retailPriceRial} />
+          <Price
+            valueRial={variant.retailPriceRial}
+            className={!purchasable ? "text-retail-muted line-through" : ""}
+          />
         </div>
       }
       variantSummary={
@@ -78,24 +87,26 @@ export function RetailCatalogProductCard({
           <ProductNavigationLink
             href={`/products/${product.slug}`}
             documentNavigation
-            action={variantOptions.length > 0 ? "select" : "details"}
-            pendingLabel={variantOptions.length > 0 ? "در حال آماده‌سازی…" : "در حال باز کردن…"}
+            action={purchasable && variantOptions.length > 0 ? "select" : "details"}
+            pendingLabel={
+              purchasable && variantOptions.length > 0 ? "در حال آماده‌سازی…" : "در حال باز کردن…"
+            }
             className={`w-full px-2 ${
-              variantOptions.length > 0
+              purchasable && variantOptions.length > 0
                 ? "border border-cyan-300 bg-cyan-300 text-slate-950 hover:bg-cyan-200"
                 : "border border-transparent text-current hover:bg-white/10"
             }`}
           >
-            {variantOptions.length > 0 ? "انتخاب و خرید" : "جزئیات"}
+            {purchasable
+              ? variantOptions.length > 0
+                ? "انتخاب و خرید"
+                : "جزئیات"
+              : "مشاهده محصول"}
             <ArrowLeft size={16} aria-hidden="true" />
           </ProductNavigationLink>
-          {variantOptions.length === 0 ? (
+          {purchasable && variantOptions.length === 0 ? (
             <div className="catalog-card-secondary-action">
-              <AddToCartButton
-                variantId={variant.id}
-                label="افزودن به سبد خرید"
-                enableQuantity
-              />
+              <AddToCartButton variantId={variant.id} label="افزودن به سبد خرید" enableQuantity />
             </div>
           ) : null}
         </div>

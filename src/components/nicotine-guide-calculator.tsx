@@ -19,12 +19,19 @@ import { Price, ProductCard, StockStatus } from "@ufo/ui";
 import { ProductNavigationLink } from "@/components/product-navigation-link";
 import { StorefrontProductImage } from "@/components/storefront-product-image";
 import {
-  getNicotineGuide,
-  type FirstCigaretteTiming,
-  type NicotineGuideResult,
-  type VapingDevice,
+  calculateNicotineRecommendation,
+  NICOTINE_CIGARETTE_COUNT_MAX,
+  NICOTINE_CIGARETTE_COUNT_MIN,
+  nicotinePerCigaretteMg,
+  type CigaretteType,
+  type NicotineCalculationError,
+  type NicotineRecommendationResult,
 } from "@/lib/nicotine-guide";
-import type { NicotineMatchQuality } from "@/lib/nicotine-product-recommendations";
+import type {
+  NicotineDeviceType,
+  NicotineMatchQuality,
+  NicotineRecommendationSetKey,
+} from "@/lib/nicotine-product-recommendations";
 import type { PublicAvailabilityState } from "@/lib/public-availability";
 
 export interface NicotineRecommendationProduct {
@@ -38,43 +45,73 @@ export interface NicotineRecommendationProduct {
   fallbackImage: string;
   priceRial: number;
   availability: PublicAvailabilityState;
+  purchasable: boolean;
   strengthsMg: number[];
   matchQuality: NicotineMatchQuality;
 }
 
-export type NicotineRecommendationSets = Record<string, NicotineRecommendationProduct[]>;
+export type NicotineRecommendationSets = Record<
+  NicotineRecommendationSetKey,
+  NicotineRecommendationProduct[]
+>;
 
 export interface NicotineCatalogSummary {
-  salt: { available: number; withStrength: number };
-  freebase: { available: number; withStrength: number };
+  salt: { available: number; withStrength: number; unknownStrength: number };
+  freebase: { available: number; withStrength: number; unknownStrength: number };
 }
 
-const firstCigaretteOptions: Array<{
-  value: FirstCigaretteTiming;
+const cigaretteTypeOptions: Array<{
+  value: CigaretteType;
   label: string;
   hint: string;
 }> = [
-  { value: "within-30", label: "تا ۳۰ دقیقه", hint: "وابستگی احتمالاً بیشتر" },
-  { value: "within-60", label: "۳۰ تا ۶۰ دقیقه", hint: "الگوی میانی" },
-  { value: "after-60", label: "بیشتر از یک ساعت", hint: "وابستگی احتمالاً کمتر" },
-  { value: "unknown", label: "مطمئن نیستم", hint: "فقط تعداد نخ محاسبه شود" },
-];
-
-const deviceOptions: Array<{ value: VapingDevice; label: string; hint: string }> = [
   {
-    value: "pod-mtl",
-    label: "پاد کم‌وات (MTL)",
-    hint: "کام دهان‌به‌ریه؛ شبیه‌تر به سیگار",
+    value: "unknown",
+    label: "نمی‌دانم / میانگین بازار",
+    hint: `${nicotinePerCigaretteMg.unknown} میلی‌گرم نیکوتین برای هر نخ`,
   },
   {
-    value: "mod-dtl",
-    label: "ویپ یا مود پرقدرت (DTL)",
-    hint: "بخار زیاد و کام مستقیم به ریه",
+    value: "light",
+    label: "سبک / اولترا لایت",
+    hint: `${nicotinePerCigaretteMg.light} میلی‌گرم نیکوتین برای هر نخ`,
   },
-  { value: "unknown", label: "هنوز دستگاه ندارم / نمی‌دانم", hint: "هر دو مسیر نمایش داده شود" },
+  {
+    value: "medium",
+    label: "معمولی / لایت",
+    hint: `${nicotinePerCigaretteMg.medium} میلی‌گرم نیکوتین برای هر نخ`,
+  },
+  {
+    value: "heavy",
+    label: "سنگین / پرکشش",
+    hint: `${nicotinePerCigaretteMg.heavy} میلی‌گرم نیکوتین برای هر نخ`,
+  },
 ];
 
-const quickCounts = [5, 10, 15, 20];
+const quickCounts = [5, 10, 20, 40, 60, 100];
+
+const deviceOptions: Array<{
+  value: NicotineDeviceType;
+  label: string;
+  hint: string;
+}> = [
+  {
+    value: "pod",
+    label: "پاد",
+    hint: "پیشنهاد محصول فقط از خانواده سالت نیکوتین",
+  },
+  {
+    value: "vape",
+    label: "ویپ",
+    hint: "پیشنهاد محصول فقط از خانواده جویس / ای‌لیکوئید",
+  },
+];
+
+const calculationErrorMessages: Record<NicotineCalculationError, string> = {
+  required: "تعداد نخ سیگار در روز را وارد کنید.",
+  "invalid-count": "تعداد نخ باید یک عدد صحیح باشد.",
+  "out-of-range": `تعداد نخ را به‌صورت یک عدد بین ${NICOTINE_CIGARETTE_COUNT_MIN.toLocaleString("fa-IR")} تا ${NICOTINE_CIGARETTE_COUNT_MAX.toLocaleString("fa-IR")} وارد کنید.`,
+  "invalid-cigarette-type": "نوع سیگار انتخاب‌شده معتبر نیست.",
+};
 
 function RadioCard({
   checked,
@@ -130,13 +167,14 @@ function RecommendationCard({ product }: { product: NicotineRecommendationProduc
   return (
     <ProductCard
       className="catalog-linked-card"
+      unavailable={!product.purchasable}
       compactOnMobile
       title={product.nameFa}
       subtitle={product.nameEn}
       description={
         exactStrength
-          ? `غلظت ${exactStrength} در مشخصات محصول ثبت شده و با بازه پیشنهادی شما هم‌خوان است.`
-          : "نوع محصول با دستگاه شما هم‌خوان است؛ غلظت نیکوتین در اطلاعات فعلی محصول ثبت نشده است."
+          ? `غلظت ${exactStrength} در مشخصات محصول ثبت شده و با عدد پیشنهادی شما هم‌خوان است.`
+          : "محصول از نوع سالت است؛ غلظت نیکوتین در اطلاعات فعلی آن ثبت نشده است."
       }
       media={
         <StorefrontProductImage
@@ -154,10 +192,15 @@ function RecommendationCard({ product }: { product: NicotineRecommendationProduc
             {exactStrength ? <BadgeCheck size={13} aria-hidden="true" /> : null}
             {exactStrength ?? "تطابق نوع محصول"}
           </span>
-          <StockStatus state={product.availability} />
+          <StockStatus state={product.availability} unavailableLabel="ناموجود" />
         </div>
       }
-      price={<Price valueRial={product.priceRial} />}
+      price={
+        <Price
+          valueRial={product.priceRial}
+          className={!product.purchasable ? "text-retail-muted line-through" : ""}
+        />
+      }
       actions={
         <ProductNavigationLink
           href={`/products/${product.slug}`}
@@ -182,28 +225,40 @@ export function NicotineGuideCalculator({
   catalogSummary: NicotineCatalogSummary;
 }) {
   const [cigaretteCount, setCigaretteCount] = useState("");
-  const [firstCigarette, setFirstCigarette] = useState<FirstCigaretteTiming>("unknown");
-  const [device, setDevice] = useState<VapingDevice>("unknown");
-  const [result, setResult] = useState<NicotineGuideResult | null>(null);
+  const [cigaretteType, setCigaretteType] = useState<CigaretteType>("unknown");
+  const [deviceType, setDeviceType] = useState<NicotineDeviceType>("pod");
+  const [result, setResult] = useState<NicotineRecommendationResult | null>(null);
   const [error, setError] = useState("");
-  const recommendations = result ? (recommendationSets[result.recommendationKey] ?? []) : [];
+  const recommendationKey = result
+    ? (`${deviceType}:${result.recommendedStrength}` as NicotineRecommendationSetKey)
+    : undefined;
+  const recommendations = recommendationKey ? (recommendationSets[recommendationKey] ?? []) : [];
+  const selectedFamilyLabel = deviceType === "pod" ? "سالت نیکوتین" : "جویس / ای‌لیکوئید";
+  const selectedDeviceLabel = deviceType === "pod" ? "پاد" : "ویپ";
+  const selectedCatalogSummary =
+    deviceType === "pod" ? catalogSummary.salt : catalogSummary.freebase;
+  const selectedCategoryHref =
+    deviceType === "pod" ? "/products/category/salt-nicotine" : "/products/category/e-liquid";
 
   const calculate = () => {
-    const count = Number(cigaretteCount);
-    if (!Number.isInteger(count) || count < 1 || count > 60) {
-      setError("تعداد نخ را به‌صورت یک عدد بین ۱ تا ۶۰ وارد کنید.");
+    const outcome = calculateNicotineRecommendation({
+      cigCount: cigaretteCount,
+      cigType: cigaretteType,
+    });
+    if (!outcome.ok) {
+      setError(calculationErrorMessages[outcome.error]);
       setResult(null);
       return;
     }
 
     setError("");
-    setResult(getNicotineGuide(count, firstCigarette, device));
+    setResult(outcome.result);
   };
 
   const reset = () => {
     setCigaretteCount("");
-    setFirstCigarette("unknown");
-    setDevice("unknown");
+    setCigaretteType("unknown");
+    setDeviceType("pod");
     setResult(null);
     setError("");
   };
@@ -217,9 +272,11 @@ export function NicotineGuideCalculator({
               <Gauge size={22} aria-hidden="true" />
             </span>
             <div>
-              <p className="text-xs font-bold text-retail-accent">سه ورودی، کمتر از یک دقیقه</p>
+              <p className="text-xs font-bold text-retail-accent">
+                دو ورودی محاسبه، یک انتخاب برای پیشنهاد محصول
+              </p>
               <h2 id="calculator-title" className="mt-1 text-xl font-black text-white sm:text-2xl">
-                بازه شروع مناسب را پیدا کنید
+                عدد پیشنهادی نیکوتین را محاسبه کنید
               </h2>
             </div>
           </div>
@@ -246,8 +303,8 @@ export function NicotineGuideCalculator({
                     id="cigarette-count"
                     type="number"
                     inputMode="numeric"
-                    min={1}
-                    max={60}
+                    min={NICOTINE_CIGARETTE_COUNT_MIN}
+                    max={NICOTINE_CIGARETTE_COUNT_MAX}
                     step={1}
                     value={cigaretteCount}
                     onChange={(event) => {
@@ -298,18 +355,18 @@ export function NicotineGuideCalculator({
             <fieldset>
               <legend className="text-sm font-black text-white">
                 <span className="ml-2 text-retail-accent">۲.</span>
-                اولین سیگار را معمولاً چه زمانی بعد از بیدارشدن می‌کشید؟
+                معمولاً چه نوع سیگاری مصرف می‌کنید؟
               </legend>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                {firstCigaretteOptions.map((option) => (
+                {cigaretteTypeOptions.map((option) => (
                   <RadioCard
                     key={option.value}
-                    name="first-cigarette"
+                    name="cigarette-type"
                     value={option.value}
                     label={option.label}
                     hint={option.hint}
-                    checked={firstCigarette === option.value}
-                    onChange={() => setFirstCigarette(option.value)}
+                    checked={cigaretteType === option.value}
+                    onChange={() => setCigaretteType(option.value)}
                   />
                 ))}
               </div>
@@ -318,21 +375,25 @@ export function NicotineGuideCalculator({
             <fieldset>
               <legend className="text-sm font-black text-white">
                 <span className="ml-2 text-retail-accent">۳.</span>
-                چه دستگاهی استفاده می‌کنید؟
+                از چه دستگاهی استفاده می‌کنید؟
               </legend>
-              <div className="mt-3 grid gap-2">
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {deviceOptions.map((option) => (
                   <RadioCard
                     key={option.value}
-                    name="device"
+                    name="device-type"
                     value={option.value}
                     label={option.label}
                     hint={option.hint}
-                    checked={device === option.value}
-                    onChange={() => setDevice(option.value)}
+                    checked={deviceType === option.value}
+                    onChange={() => setDeviceType(option.value)}
                   />
                 ))}
               </div>
+              <p className="mt-2 text-xs leading-5 text-retail-muted">
+                انتخاب دستگاه فقط خانواده محصولات پیشنهادی را عوض می‌کند و روی عدد محاسبه‌شده اثر
+                ندارد.
+              </p>
             </fieldset>
 
             <div className="flex flex-col gap-2 sm:flex-row">
@@ -373,30 +434,55 @@ export function NicotineGuideCalculator({
             <div className="flex h-full flex-col">
               <div className="flex items-center justify-between gap-3">
                 <span className="rounded-full border border-retail-accent-2/25 bg-retail-accent-2/10 px-3 py-1 text-xs font-black text-retail-accent-2">
-                  {result.bandLabel}
+                  محاسبه بر اساس کد اصلی مشتری
                 </span>
-                <span className="text-xs text-retail-muted">بازه شروع، نه نسخه پزشکی</span>
+                <span className="text-xs text-retail-muted">راهنمای عددی، نه نسخه پزشکی</span>
               </div>
 
               <div className="mt-7 border-b border-white/10 pb-7">
-                <p className="text-sm text-retail-secondary">نوع پیشنهادی</p>
-                <h3 className="mt-2 text-2xl font-black leading-10 text-white">
-                  {result.productType}
-                </h3>
-                <p className="mt-5 text-sm text-retail-secondary">غلظت پیشنهادی برای شروع</p>
+                <h3 className="text-lg font-black leading-8 text-white">نتیجه محاسبه نیکوتین</h3>
+                <p className="mt-4 text-sm text-retail-secondary">عدد پیشنهادی</p>
                 <p
                   dir="ltr"
-                  className="mt-1 text-left text-4xl font-black tracking-tight text-retail-accent sm:text-5xl"
+                  data-testid="nicotine-recommendation-value"
+                  className="mt-1 text-left text-5xl font-black tracking-tight text-retail-accent sm:text-6xl"
                 >
-                  {result.nicotineStrength}
+                  {result.recommendedStrength}mg
                 </p>
+                <dl className="mt-6 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.035] p-3">
+                    <dt className="text-xs text-retail-muted">دستگاه انتخابی</dt>
+                    <dd data-testid="nicotine-device-value" className="mt-1 font-black text-white">
+                      {selectedDeviceLabel}
+                    </dd>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/[0.035] p-3">
+                    <dt className="text-xs text-retail-muted">نوع محصول پیشنهادی</dt>
+                    <dd data-testid="nicotine-family-value" className="mt-1 font-black text-white">
+                      {selectedFamilyLabel}
+                    </dd>
+                  </div>
+                </dl>
               </div>
 
               <div className="mt-6 grid gap-4 text-sm leading-7">
-                <p className="text-[#d6e1ea]">{result.explanation}</p>
+                <p className="text-[#d6e1ea]">
+                  با مصرف روزانه {result.cigCount.toLocaleString("fa-IR")} نخ و ضریب{" "}
+                  <span dir="ltr" className="inline-block font-bold text-white">
+                    {result.nicPerCig}mg
+                  </span>{" "}
+                  برای هر نخ، مجموع برآوردی روزانه شما{" "}
+                  <span dir="ltr" className="inline-block font-bold text-white">
+                    {result.totalDailyNicotine}mg
+                  </span>{" "}
+                  است.
+                </p>
                 <div className="rounded-xl border border-white/10 bg-white/[0.035] p-4">
-                  <p className="text-xs font-black text-retail-accent-2">مسیر جایگزین</p>
-                  <p className="mt-1 text-retail-secondary">{result.alternative}</p>
+                  <p className="text-xs font-black text-retail-accent-2">معادل پاکت ۲۰‌تایی</p>
+                  <p className="mt-1 text-retail-secondary">
+                    حدود {result.packs.toLocaleString("fa-IR", { maximumFractionDigits: 2 })} پاکت
+                    در روز
+                  </p>
                 </div>
               </div>
 
@@ -417,17 +503,17 @@ export function NicotineGuideCalculator({
               </span>
               <p className="mt-7 text-xs font-black text-retail-accent">نتیجه شخصی‌سازی‌شده</p>
               <h3 className="mt-2 text-2xl font-black leading-10 text-white sm:text-3xl">
-                اول الگوی مصرف و دستگاه را مشخص کنید
+                تعداد و نوع سیگار و دستگاه را مشخص کنید
               </h3>
               <p className="mt-4 max-w-md text-sm leading-8 text-retail-secondary">
-                نتیجه، نوع مایع مناسب دستگاه، بازه نیکوتین و یک مسیر جایگزین را کنار هم نشان می‌دهد
-                تا سالت و جویس فری‌بیس با هم اشتباه نشوند.
+                محاسبه فقط با تعداد نخ روزانه و ضریب نوع سیگار انجام می‌شود؛ دستگاه فقط محصولات
+                پیشنهادی را بین سالت و جویس فیلتر می‌کند.
               </p>
               <ul className="mt-7 grid gap-3 text-sm text-[#d6e1ea]">
                 {[
-                  "حد بالای راهنما ۲۰ mg/ml است.",
-                  "سیگار «لایت» جداگانه امتیاز نمی‌گیرد.",
-                  "غلظت با توان و مقاومت کویل تطبیق داده می‌شود.",
+                  "خروجی‌های دقیق: ۲۰، ۲۵، ۳۵ یا ۵۰ میلی‌گرم.",
+                  "زمان اولین سیگار و نوع دستگاه نتیجه را تغییر نمی‌دهند.",
+                  "بازه معتبر تعداد سیگار از ۱ تا ۱۰۰ نخ در روز است.",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2">
                     <Check
@@ -460,18 +546,18 @@ export function NicotineGuideCalculator({
                 id="recommended-products-title"
                 className="mt-2 text-2xl font-black text-white sm:text-3xl"
               >
-                محصولات متناسب با نتیجه شما
+                محصولات پیشنهادی برای دستگاه شما
               </h2>
               <p className="mt-2 max-w-3xl text-sm leading-7 text-retail-secondary">
-                {result.recommendationKey.startsWith("pod-mtl")
-                  ? `از ${catalogSummary.salt.available.toLocaleString("fa-IR")} سالت موجود، ${catalogSummary.salt.withStrength.toLocaleString("fa-IR")} محصول غلظت ثبت‌شده دارد.`
-                  : result.recommendationKey.startsWith("mod-dtl")
-                    ? `در حال حاضر ${catalogSummary.freebase.available.toLocaleString("fa-IR")} جویس فری‌بیس موجود با نوع محصول قابل تشخیص است.`
-                    : "تا وقتی نوع دستگاه مشخص نباشد، هر دو مسیر سالت و جویس بررسی می‌شوند."}
+                دستگاه {selectedDeviceLabel}، خانواده {selectedFamilyLabel} را انتخاب کرده است. از{" "}
+                {selectedCatalogSummary.available.toLocaleString("fa-IR")} محصول قابل خرید این
+                خانواده، {selectedCatalogSummary.withStrength.toLocaleString("fa-IR")} محصول غلظت
+                ساخت‌یافته دارد و فقط تطابق دقیق{" "}
+                {result.recommendedStrength.toLocaleString("fa-IR")}mg نمایش داده می‌شود.
               </p>
             </div>
             <Link
-              href={result.catalogHref}
+              href={selectedCategoryHref}
               className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-retail-border px-4 text-sm font-bold text-white transition hover:border-retail-accent/50 hover:text-retail-accent"
             >
               مشاهده همه دسته
@@ -481,20 +567,6 @@ export function NicotineGuideCalculator({
 
           {recommendations.length > 0 ? (
             <>
-              {recommendations.some((product) => product.matchQuality === "type-only") ? (
-                <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber-300/25 bg-amber-300/[0.06] p-4 text-xs leading-6 text-amber-50">
-                  <CircleAlert
-                    size={17}
-                    className="mt-0.5 shrink-0 text-amber-300"
-                    aria-hidden="true"
-                  />
-                  <p>
-                    محصول دارای برچسب «تطابق نوع محصول» فقط از نظر سالت یا جویس‌بودن و موجودی تأیید
-                    شده است. چون غلظت در دیتابیس آن ثبت نشده، پیش از خرید مقدار روی بسته یا صفحه
-                    محصول را با بازه پیشنهادی تطبیق دهید.
-                  </p>
-                </div>
-              ) : null}
               <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
                 {recommendations.map((product) => (
                   <RecommendationCard key={product.id} product={product} />
@@ -508,11 +580,13 @@ export function NicotineGuideCalculator({
               </span>
               <h3 className="mt-4 text-lg font-black text-white">محصول منطبقِ موجود پیدا نشد</h3>
               <p className="mt-2 max-w-xl text-sm leading-7 text-retail-secondary">
-                برای این نوع دستگاه و بازه نیکوتین، محصولی با اطلاعات کافی در کاتالوگ فعلی نداریم.
-                نتیجه را با محصول سالت یا غلظت نامشخص جایگزین نکردیم.
+                در حال حاضر محصول قابل خرید از خانواده {selectedFamilyLabel} با غلظت ساخت‌یافته و
+                دقیق {result.recommendedStrength.toLocaleString("fa-IR")}mg در کاتالوگ ثبت نشده است.
+                محصولات با غلظت نامشخص یا عدد متفاوت جایگزین نشده‌اند.
+                {deviceType === "vape" ? " هیچ تبدیل حدسی از سالت به جویس نیز اعمال نشده است." : ""}
               </p>
               <Link
-                href={result.catalogHref}
+                href={selectedCategoryHref}
                 className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-retail-border px-4 text-sm font-bold text-white transition hover:border-retail-accent/50 hover:text-retail-accent"
               >
                 بررسی دستی کاتالوگ

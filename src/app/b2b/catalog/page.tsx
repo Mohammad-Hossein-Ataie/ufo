@@ -39,7 +39,7 @@ import {
 import type { AdminProductRecord } from "@/lib/admin-products";
 import { canonical } from "@ufo/seo";
 import { Button, EmptyState, Price, ProductCard } from "@ufo/ui";
-import { categories } from "@ufo/domain";
+import { categories, isProductAvailableForPurchase } from "@ufo/domain";
 import { listAdminBrands } from "@/lib/admin-brands";
 import type { ProductKind, ProductVariant } from "@ufo/types";
 
@@ -172,9 +172,10 @@ function filterWholesaleProducts(
     })
     .filter((row) => {
       const stock = getWholesaleStock(row);
-      if (params.stock === "available") return stock > 0;
-      if (params.stock === "low") return stock > 0 && stock < 10;
-      if (params.stock === "preorder") return stock <= 0;
+      const purchasable = isProductAvailableForPurchase(row.product);
+      if (params.stock === "available") return purchasable && stock > 0;
+      if (params.stock === "low") return purchasable && stock > 0 && stock < 10;
+      if (params.stock === "preorder") return purchasable && stock <= 0;
       return true;
     })
     .sort((left, right) => {
@@ -347,7 +348,10 @@ export default async function B2BCatalogPage({
                     placeholder="نام محصول، برند یا SKU"
                   />
                 </span>
-                <button type="submit" className="min-h-11 rounded-md bg-[#176d48] px-3 text-sm font-bold text-white hover:bg-[#12583a]">
+                <button
+                  type="submit"
+                  className="min-h-11 rounded-md bg-[#176d48] px-3 text-sm font-bold text-white hover:bg-[#12583a]"
+                >
                   جستجو
                 </button>
               </div>
@@ -511,12 +515,14 @@ export default async function B2BCatalogPage({
                 const variant = getWholesaleVariant(row);
                 if (!variant) return null;
                 const availability = getCatalogRowAvailability(row);
+                const purchasable = isProductAvailableForPurchase(product);
                 const unitToman = Math.round(variant.wholesalePriceRial / variant.cartonSize / 10);
                 const variantOptions = getStorefrontVariantOptions(product, flavors, colors);
                 return (
                   <div key={product.id} className="h-full rounded-md">
                     <ProductCard
                       className="catalog-linked-card"
+                      unavailable={!purchasable}
                       title={product.nameFa}
                       subtitle={product.nameEn}
                       description={`حداقل ${new Intl.NumberFormat("fa-IR").format(variant.minWholesaleCartonCount)} کارتن، هر کارتن ${new Intl.NumberFormat("fa-IR").format(variant.cartonSize)} عدد؛ هر عدد حدود ${new Intl.NumberFormat("fa-IR").format(unitToman)} تومان`}
@@ -548,13 +554,26 @@ export default async function B2BCatalogPage({
                                 : "border-[#F5D18A] bg-[#FFF7E5] text-[#925E00]"
                           }`}
                         >
-                          {publicAvailabilityLabelFa(availability, "نیازمند هماهنگی")}
+                          {publicAvailabilityLabelFa(
+                            availability,
+                            purchasable ? "نیازمند هماهنگی" : "ناموجود",
+                          )}
                         </span>
                       }
                       price={
-                        <Price key={`price-${product.id}`} valueRial={variant.wholesalePriceRial} />
+                        <Price
+                          key={`price-${product.id}`}
+                          valueRial={variant.wholesalePriceRial}
+                          className={!purchasable ? "text-[#718078] line-through" : ""}
+                        />
                       }
-                      variantSummary={<ProductVariantSummary key={`variants-${product.id}`} options={variantOptions} tone="light" />}
+                      variantSummary={
+                        <ProductVariantSummary
+                          key={`variants-${product.id}`}
+                          options={variantOptions}
+                          tone="light"
+                        />
+                      }
                       actions={
                         <div key={`quick-${product.id}`} className="grid w-full gap-2">
                           <div className="flex min-h-6 items-center gap-2 text-xs text-[#596B61]">
@@ -562,11 +581,15 @@ export default async function B2BCatalogPage({
                             SKU: <span dir="ltr">{variant.sku}</span>
                           </div>
                           <Link
-                            href="/b2b/quick-order"
-                            data-product-navigation="select"
-                            className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-md border border-[#1F8A5B] bg-[#1F8A5B] px-3 text-sm font-bold text-white transition hover:bg-[#176D48] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1F8A5B]"
+                            href={purchasable ? "/b2b/quick-order" : `/products/${product.slug}`}
+                            data-product-navigation={purchasable ? "select" : "details"}
+                            className={`inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-md border px-3 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1F8A5B] ${
+                              purchasable
+                                ? "border-[#1F8A5B] bg-[#1F8A5B] text-white hover:bg-[#176D48]"
+                                : "border-[#8FA08F] bg-white text-[#405148] hover:bg-[#EEF0E5]"
+                            }`}
                           >
-                            افزودن کارتن به سفارش
+                            {purchasable ? "افزودن کارتن به سفارش" : "ناموجود — مشاهده محصول"}
                             <ArrowLeft size={16} aria-hidden="true" />
                           </Link>
                         </div>

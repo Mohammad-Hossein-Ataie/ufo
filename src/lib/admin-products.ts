@@ -48,6 +48,7 @@ export interface AdminProductInput {
   brandId?: string | undefined;
   categoryId: string;
   productKind: ProductKind;
+  nicotineStrengthsMg?: number[] | undefined;
   salesChannels: SalesChannel[];
   shortDescriptionFa?: string | undefined;
   descriptionFa?: string | undefined;
@@ -71,13 +72,25 @@ export interface AdminProductInput {
   reserved?: number | undefined;
   restockThreshold?: number | undefined;
   isActive?: boolean | undefined;
+  isAvailable?: boolean | undefined;
 }
 
-const memoryState = {
-  products: [...products],
-  variants: [...variants],
-  inventoryItems: [...inventoryItems],
+interface AdminProductMemoryState {
+  products: Product[];
+  variants: ProductVariant[];
+  inventoryItems: InventoryItem[];
+}
+
+const adminProductsGlobal = globalThis as typeof globalThis & {
+  __ufoAdminProductMemoryState?: AdminProductMemoryState;
 };
+const memoryState =
+  adminProductsGlobal.__ufoAdminProductMemoryState ??
+  (adminProductsGlobal.__ufoAdminProductMemoryState = {
+    products: [...products],
+    variants: [...variants],
+    inventoryItems: [...inventoryItems],
+  });
 
 function normalizeSlug(value: string): string {
   const normalized = value
@@ -105,6 +118,11 @@ function getCategoryName(categoryId: string): string {
 }
 
 function assertInput(input: AdminProductInput) {
+  for (const field of [input.isActive, input.isAvailable]) {
+    if (field !== undefined && typeof field !== "boolean") {
+      throw new Error("وضعیت محصول معتبر نیست.");
+    }
+  }
   for (const field of [input.onHand, input.reserved, input.restockThreshold]) {
     if (field !== undefined && (!Number.isSafeInteger(field) || field < 0))
       throw new Error("موجودی معتبر نیست.");
@@ -112,6 +130,15 @@ function assertInput(input: AdminProductInput) {
   for (const field of [input.cartonSize, input.minWholesaleCartonCount]) {
     if (field !== undefined && (!Number.isSafeInteger(field) || field < 1))
       throw new Error("تعداد بسته‌بندی معتبر نیست.");
+  }
+  if (
+    input.nicotineStrengthsMg !== undefined &&
+    (!Array.isArray(input.nicotineStrengthsMg) ||
+      input.nicotineStrengthsMg.some(
+        (strength) => !Number.isFinite(strength) || strength < 0 || strength > 100,
+      ))
+  ) {
+    throw new Error("غلظت نیکوتین باید عددی بین ۰ تا ۱۰۰ میلی‌گرم باشد.");
   }
   if (
     input.seoTitle !== undefined &&
@@ -237,6 +264,10 @@ function buildDocuments(
     ...(input.images ?? current?.product.images ?? []).map((item) => item.trim()).filter(Boolean),
   ].filter((item, index, list) => list.indexOf(item) === index);
   const tags = input.tags?.filter(Boolean) ?? current?.product.tags ?? [];
+  const nicotineStrengthsMg =
+    input.nicotineStrengthsMg === undefined
+      ? current?.product.nicotineStrengthsMg
+      : [...new Set(input.nicotineStrengthsMg)].sort((left, right) => left - right);
   const variantType =
     input.variantType ??
     current?.product.variantType ??
@@ -299,9 +330,7 @@ function buildDocuments(
         {
           isActive: state?.isActive ?? true,
           isAvailable: state?.isAvailable ?? true,
-          ...(state?.stockQuantity !== undefined
-            ? { stockQuantity: state.stockQuantity }
-            : {}),
+          ...(state?.stockQuantity !== undefined ? { stockQuantity: state.stockQuantity } : {}),
           ...(state?.sku?.trim() ? { sku: state.sku.trim() } : {}),
         },
       ] as const;
@@ -324,6 +353,7 @@ function buildDocuments(
     brandId,
     categoryId: input.categoryId,
     productKind: input.productKind,
+    ...(nicotineStrengthsMg && nicotineStrengthsMg.length > 0 ? { nicotineStrengthsMg } : {}),
     salesChannels,
     shortDescriptionFa:
       input.shortDescriptionFa?.trim() || `${input.nameFa.trim()} در کاتالوگ UFO Puff.`,
@@ -355,6 +385,7 @@ function buildDocuments(
     specs: input.specs ?? current?.product.specs ?? [],
     sourceNoteFa: current?.product.sourceNoteFa ?? "ثبت‌شده از پنل ادمین",
     isActive: input.isActive ?? true,
+    isAvailable: input.isAvailable ?? current?.product.isAvailable ?? true,
     isAgeRestricted: true,
     seoTitle:
       (input.seoTitle === undefined ? current?.product.seoTitle : input.seoTitle.trim()) ||
@@ -552,23 +583,20 @@ export async function saveAdminProduct(input: AdminProductInput): Promise<AdminP
     "defaultVariantValueId",
     "variantImages",
     "colorImages",
+    "nicotineStrengthsMg",
   ] as const;
   const productUnset: Record<string, ""> = Object.fromEntries(
-    optionalProductFields
-      .filter((field) => !(field in row.product))
-      .map((field) => [field, ""]),
+    optionalProductFields.filter((field) => !(field in row.product)).map((field) => [field, ""]),
   );
   await Promise.all([
-    db
-      .collection<Product>("products")
-      .updateOne(
-        { id: row.product.id },
-        {
-          $set: row.product,
-          ...(Object.keys(productUnset).length > 0 ? { $unset: productUnset } : {}),
-        },
-        { upsert: true },
-      ),
+    db.collection<Product>("products").updateOne(
+      { id: row.product.id },
+      {
+        $set: row.product,
+        ...(Object.keys(productUnset).length > 0 ? { $unset: productUnset } : {}),
+      },
+      { upsert: true },
+    ),
     db
       .collection<ProductVariant>("productVariants")
       .updateOne({ id: row.variant.id }, { $set: row.variant }, { upsert: true }),

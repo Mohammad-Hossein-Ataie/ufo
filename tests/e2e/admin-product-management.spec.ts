@@ -13,8 +13,12 @@ test.beforeAll(async ({ request }) => {
 });
 
 test.beforeEach(async ({ page }, testInfo) => {
-  if (testInfo.title === "color product can be added on mobile and desktop" ||
-      testInfo.title === "catalog starts without a hidden price ceiling and keeps its blurred hero backdrop") return;
+  if (
+    testInfo.title === "color product can be added on mobile and desktop" ||
+    testInfo.title ===
+      "catalog starts without a hidden price ceiling and keeps its blurred hero backdrop"
+  )
+    return;
   await page.context().addCookies(adminCookies);
   await page.goto("/admin/products");
   await expect(page.getByRole("button", { name: "افزودن محصول", exact: true })).toBeVisible();
@@ -87,12 +91,18 @@ test("admin can replace a brand logo in the brand manager", async ({ page }) => 
   await expect(page.getByRole("heading", { name: "تصاویر برندها" })).toBeVisible();
   await expect(page.getByText(/لوگوی بدون پس‌زمینه/)).toBeVisible();
 
-  const brand = page.getByRole("listitem").filter({ has: page.getByRole("heading", { name: "Uwell", exact: true }) });
+  const brand = page
+    .getByRole("listitem")
+    .filter({ has: page.getByRole("heading", { name: "Uwell", exact: true }) });
   await expect(brand.getByText("تصویر پیش‌فرض")).toBeVisible();
-  const logo = await sharp({ create: { width: 800, height: 300, channels: 4, background: "#00000000" } })
+  const logo = await sharp({
+    create: { width: 800, height: 300, channels: 4, background: "#00000000" },
+  })
     .png()
     .toBuffer();
-  await brand.getByLabel("آپلود تصویر برند Uwell").setInputFiles({ name: "uwell.png", mimeType: "image/png", buffer: logo });
+  await brand
+    .getByLabel("آپلود تصویر برند Uwell")
+    .setInputFiles({ name: "uwell.png", mimeType: "image/png", buffer: logo });
   await expect(brand.getByText("آپلود شده")).toBeVisible();
   const preview = brand.getByRole("img", { name: "پیش‌نمایش لوگوی Uwell" });
   const uploadedUrl = await preview.getAttribute("src");
@@ -101,7 +111,12 @@ test("admin can replace a brand logo in the brand manager", async ({ page }) => 
 });
 
 test("color product can be added on mobile and desktop", async ({ page }) => {
-  const product = products.find((item) => item.isActive && getProductVariantType(item) === "color" && getProductColorOptions(item).length > 0);
+  const product = products.find(
+    (item) =>
+      item.isActive &&
+      getProductVariantType(item) === "color" &&
+      getProductColorOptions(item).length > 0,
+  );
   expect(product).toBeDefined();
   const firstColor = getProductColorOptions(product!)[0]!;
   for (const width of [390, 1280]) {
@@ -125,11 +140,17 @@ test("color product can be added on mobile and desktop", async ({ page }) => {
   await expect(page.getByText(product!.nameFa)).toBeVisible();
 });
 
-test("catalog starts without a hidden price ceiling and keeps its blurred hero backdrop", async ({ page }) => {
+test("catalog starts without a hidden price ceiling and keeps its blurred hero backdrop", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1280, height: 844 });
   await page.goto("/products");
   const maxPrice = await page.locator('input[name="maxPrice"]').inputValue();
-  const maxToman = Number(maxPrice.replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit))).replace(/[^\d]/g, ""));
+  const maxToman = Number(
+    maxPrice
+      .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+      .replace(/[^\d]/g, ""),
+  );
   expect(maxToman).toBeGreaterThan(3_000_000);
   const backdrop = await page.locator(".catalog-showcase").evaluate((element) => {
     const style = window.getComputedStyle(element, "::before");
@@ -181,7 +202,10 @@ test("variant reference lists are fetched once across repeated editor opens", as
 
   await page.getByRole("button", { name: "افزودن محصول", exact: true }).click();
   await expect.poll(() => requests).toEqual({ flavors: 1, colors: 1 });
-  await page.getByRole("dialog", { name: "ایجاد محصول" }).getByRole("button", { name: "بستن" }).click();
+  await page
+    .getByRole("dialog", { name: "ایجاد محصول" })
+    .getByRole("button", { name: "بستن" })
+    .click();
   await page.getByRole("button", { name: "افزودن محصول", exact: true }).click();
   await page.waitForTimeout(300);
   expect(requests).toEqual({ flavors: 1, colors: 1 });
@@ -278,6 +302,102 @@ test("per-option availability persists across admin save and reopen", async ({ p
   await reopened.getByRole("button", { name: "بستن" }).click();
 });
 
+test("product availability persists and remains visible but unpurchasable responsively", async ({
+  page,
+}) => {
+  const suffix = Date.now();
+  const slug = `parent-unavailable-browser-${suffix}`;
+  const name = `محصول ناموجود مرورگر ${suffix}`;
+  const created = await page.request.post("/api/admin/products", {
+    headers: { origin: "http://127.0.0.1:3106" },
+    data: {
+      nameFa: name,
+      nameEn: "Unavailable browser product",
+      slug,
+      brandId: "brand-ufo",
+      categoryId: "cat-lighter",
+      productKind: "accessory",
+      salesChannels: ["retail", "wholesale"],
+      image: "/images/categories/lighter.webp",
+      images: ["/images/categories/lighter.webp"],
+      variantType: "none",
+      variantValueIds: [],
+      retailPriceRial: 1_250_000,
+      wholesalePriceRial: 1_000_000,
+      wholesaleEnabled: true,
+      cartonSize: 10,
+      minWholesaleCartonCount: 1,
+      onHand: 20,
+      restockThreshold: 3,
+      isActive: true,
+      isAvailable: true,
+    },
+  });
+  expect(created.status()).toBe(201);
+
+  await page.getByLabel("جست‌وجوی محصولات").fill(slug);
+  await page.getByRole("button", { name: "ویرایش", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "ویرایش محصول" });
+  await editor.getByRole("tab", { name: "قیمت و موجودی" }).click();
+  const productAvailability = editor.getByLabel("محصول موجود است");
+  await expect(productAvailability).toBeChecked();
+  await productAvailability.uncheck();
+  await expect(editor.getByText("ناموجود", { exact: true })).toBeVisible();
+  await editor.getByRole("button", { name: "ذخیره محصول", exact: true }).click();
+  await expect(editor).toHaveCount(0);
+
+  await page.getByLabel("جست‌وجوی محصولات").fill(slug);
+  await page.getByRole("button", { name: "ویرایش", exact: true }).click();
+  const reopened = page.getByRole("dialog", { name: "ویرایش محصول" });
+  await reopened.getByRole("tab", { name: "قیمت و موجودی" }).click();
+  await expect(reopened.getByLabel("محصول موجود است")).not.toBeChecked();
+  await reopened.getByRole("button", { name: "بستن" }).click();
+
+  for (const width of [375, 390, 430, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: width < 768 ? 844 : 900 });
+    await page.goto(`/products?q=${encodeURIComponent(slug)}`);
+    const card = page.getByRole("article").filter({ hasText: name });
+    if ((await card.count()) === 0) {
+      // A previous catalog test may have populated the short-lived discovery snapshot.
+      // The first read starts its background refresh; reload once after that refresh settles.
+      await page.waitForTimeout(500);
+      await page.reload();
+    }
+    await expect(card).toBeVisible();
+    await expect(card).toHaveAttribute("data-availability", "unavailable");
+    await expect(card.getByText("ناموجود", { exact: true })).toBeVisible();
+    await expect(card.locator(".line-through")).toContainText("تومان");
+    await expect(card.getByRole("button", { name: /افزودن به سبد خرید/ })).toHaveCount(0);
+    await expect(card.getByRole("link", { name: /مشاهده محصول/ })).toBeVisible();
+    expect(
+      await card
+        .locator("img")
+        .first()
+        .evaluate((image) => getComputedStyle(image).filter),
+    ).not.toBe("none");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+    if (width === 390 || width === 1440) {
+      await page.screenshot({
+        path: `test-results/product-unavailable-${width}.png`,
+        fullPage: true,
+      });
+    }
+  }
+
+  await page.goto(`/products/${slug}`);
+  await expect(page.getByRole("heading", { name })).toBeVisible();
+  await expect(page.getByRole("button", { name: "محصول ناموجود است" })).toBeDisabled();
+  await expect(page.getByTestId("product-gallery-surface")).toHaveClass(
+    /product-detail-unavailable-media/,
+  );
+  await expect(
+    page.getByText("قیمت فروش", { exact: true }).locator("..").locator(".line-through"),
+  ).toContainText("تومان");
+  await expect(page.getByText("ناموجود", { exact: true }).first()).toBeVisible();
+});
+
 test("tabbed editing, image order, unsaved warning, SEO and bulk actions", async ({ page }) => {
   const slug = `catalog-browser-${Date.now()}`;
   await page.getByRole("button", { name: "افزودن محصول", exact: true }).click();
@@ -364,6 +484,58 @@ test("tabbed editing, image order, unsaved warning, SEO and bulk actions", async
   await page.getByRole("button", { name: "اعمال تغییرات" }).click();
   await page.getByRole("dialog").getByRole("button", { name: "تأیید", exact: true }).click();
   await expect(page.getByText("محصولی با این مشخصات پیدا نشد")).toBeVisible();
+});
+
+test("admin edits nicotine strengths independently from flavor variants and persists them", async ({
+  page,
+}) => {
+  const suffix = Date.now();
+  const slug = `nicotine-strength-admin-${suffix}`;
+  const created = await page.request.post("/api/admin/products", {
+    headers: { origin: "http://127.0.0.1:3106" },
+    data: {
+      nameFa: `سالت تست غلظت ${suffix}`,
+      nameEn: "Admin nicotine strength test",
+      slug,
+      brandId: "brand-ufo",
+      categoryId: "cat-salt-nicotine",
+      productKind: "salt-nicotine",
+      nicotineStrengthsMg: [20],
+      salesChannels: ["retail"],
+      image: "/images/categories/e-liquid.webp",
+      images: ["/images/categories/e-liquid.webp"],
+      variantType: "flavor",
+      variantValueIds: ["mint"],
+      retailPriceRial: 1_250_000,
+      onHand: 12,
+      restockThreshold: 2,
+      isActive: true,
+      isAvailable: true,
+    },
+  });
+  expect(created.status()).toBe(201);
+
+  await page.getByLabel("جست‌وجوی محصولات").fill(slug);
+  await page.getByRole("button", { name: "ویرایش", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "ویرایش محصول" });
+  await editor.getByRole("tab", { name: "قیمت و موجودی" }).click();
+  const strengths = editor.getByLabel("غلظت‌های نیکوتین (mg/ml)");
+  await expect(strengths).toHaveValue("20");
+  await strengths.fill("۵۰، ۲۰، ۲۵، ۵۰");
+
+  const patched = page.waitForResponse(
+    (response) =>
+      response.request().method() === "PATCH" && response.url().includes("/api/admin/products/"),
+  );
+  await editor.getByRole("button", { name: "ذخیره محصول", exact: true }).click();
+  const patchBody = await (await patched).json();
+  expect(patchBody.row.product.nicotineStrengthsMg).toEqual([20, 25, 50]);
+
+  await page.getByLabel("جست‌وجوی محصولات").fill(slug);
+  await page.getByRole("button", { name: "ویرایش", exact: true }).click();
+  const reopened = page.getByRole("dialog", { name: "ویرایش محصول" });
+  await reopened.getByRole("tab", { name: "قیمت و موجودی" }).click();
+  await expect(reopened.getByLabel("غلظت‌های نیکوتین (mg/ml)")).toHaveValue("20، 25، 50");
 });
 
 test("responsive editor keeps save reachable and keyboard tabs work", async ({ page }) => {

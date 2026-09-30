@@ -4,6 +4,11 @@ import {
   getStorefrontVariantOptions,
   resolveStorefrontVariantValueId,
 } from "@/lib/storefront-variants";
+import {
+  hasPurchasableProductVariant,
+  isProductAvailableForPurchase,
+  isProductLevelAvailable,
+} from "@ufo/domain";
 
 const baseProduct: Product = {
   id: "variant-state-product",
@@ -105,5 +110,49 @@ describe("storefront variant availability", () => {
       id: "black",
       disabled: false,
     });
+  });
+
+  it("gives parent availability precedence without changing legacy defaults", () => {
+    expect(isProductLevelAvailable(baseProduct)).toBe(true);
+    expect(isProductAvailableForPurchase(baseProduct)).toBe(true);
+
+    const unavailableParent: Product = {
+      ...baseProduct,
+      isAvailable: false,
+      variantValueStates: {
+        black: { isActive: true, isAvailable: true, stockQuantity: 10 },
+        silver: { isActive: true, isAvailable: true, stockQuantity: 10 },
+        green: { isActive: true, isAvailable: true, stockQuantity: 10 },
+      },
+    };
+    expect(isProductAvailableForPurchase(unavailableParent)).toBe(false);
+    expect(getStorefrontVariantOptions(unavailableParent).every((option) => option.disabled)).toBe(
+      true,
+    );
+  });
+
+  it("keeps a product purchasable through one valid option and rejects all-unavailable options", () => {
+    const oneAvailable: Product = {
+      ...baseProduct,
+      isAvailable: true,
+      variantValueStates: {
+        black: { isActive: true, isAvailable: false },
+        silver: { isActive: true, isAvailable: true, stockQuantity: 2 },
+        green: { isActive: false, isAvailable: true },
+      },
+    };
+    expect(hasPurchasableProductVariant(oneAvailable)).toBe(true);
+    expect(isProductAvailableForPurchase(oneAvailable)).toBe(true);
+
+    const noneAvailable: Product = {
+      ...oneAvailable,
+      variantValueStates: {
+        black: { isActive: true, isAvailable: false },
+        silver: { isActive: true, isAvailable: true, stockQuantity: 0 },
+        green: { isActive: false, isAvailable: true },
+      },
+    };
+    expect(hasPurchasableProductVariant(noneAvailable)).toBe(false);
+    expect(isProductAvailableForPurchase(noneAvailable)).toBe(false);
   });
 });

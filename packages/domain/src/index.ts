@@ -838,6 +838,44 @@ export function getProductVariantOptions(product: Product): ProductVariantOption
   return [];
 }
 
+export function isProductLevelAvailable(product: Product): boolean {
+  // Missing values belong to legacy records and keep their previous, available behavior.
+  return product.isAvailable !== false;
+}
+
+export function hasPurchasableProductVariant(product: Product): boolean {
+  const variantType = getProductVariantType(product);
+  if (variantType === "none") return true;
+
+  const technicalValue =
+    variantType === "color"
+      ? productColorAttributeTechnicalValue
+      : variantType === "flavor"
+        ? productFlavorAttributeTechnicalValue
+        : variantType === "resistance"
+          ? productResistanceAttributeTechnicalValue
+          : productCapacityAttributeTechnicalValue;
+  const valueIds =
+    uniqueIds(product.variantValueIds).length > 0
+      ? uniqueIds(product.variantValueIds)
+      : getAttributeIds(product, technicalValue);
+
+  // Records created before per-option state existed remain orderable.
+  if (!product.variantValueStates) return true;
+  return valueIds.some((valueId) => {
+    const state = product.variantValueStates?.[valueId];
+    return (
+      state?.isActive !== false &&
+      state?.isAvailable !== false &&
+      (state?.stockQuantity === undefined || state.stockQuantity > 0)
+    );
+  });
+}
+
+export function isProductAvailableForPurchase(product: Product): boolean {
+  return isProductLevelAvailable(product) && hasPurchasableProductVariant(product);
+}
+
 export function getGenericProductVariantValueIds(
   product: Product,
   variantType: ProductVariantType,
