@@ -43,6 +43,8 @@ function render(
   variantOptions: StorefrontVariantOption[],
   initialVariantValueId: string | null,
   purchasable = true,
+  variantImages: Record<string, string> = {},
+  galleryImages = ["/images/ufo-hero.webp"],
 ) {
   return renderToStaticMarkup(
     React.createElement(ProductDetailClient, {
@@ -54,9 +56,9 @@ function render(
       variant,
       availability: "available",
       purchasable,
-      galleryImages: ["/images/ufo-hero.webp"],
+      galleryImages,
       variantType: "color",
-      variantImages: {},
+      variantImages,
       variantOptions,
       initialVariantValueId,
     }),
@@ -71,6 +73,26 @@ describe("product detail variant controls", () => {
     expect(markup).toContain('aria-checked="true"');
     expect(markup).toContain("افزودن به سبد خرید");
     expect(markup).not.toContain("stockQuantity");
+  });
+
+  it("marks the gallery thumbnail matched to an unavailable option as grayscale", () => {
+    const markup = render(
+      options,
+      "silver",
+      true,
+      {
+        black: "/images/black.webp",
+        silver: "/images/silver.webp",
+      },
+      ["/images/black.webp", "/images/silver.webp"],
+    );
+
+    expect(markup).toMatch(
+      /data-availability="unavailable" class="[^"]*product-detail-unavailable-thumbnail/,
+    );
+    expect(markup).toContain('aria-label="محصول تست مشکی - ناموجود"');
+    expect(markup).toContain('data-availability="available"');
+    expect(markup).toContain('aria-label="محصول تست نقره‌ای"');
   });
 
   it("does not fabricate a selection or purchase action when every option is unavailable", () => {

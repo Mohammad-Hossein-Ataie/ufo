@@ -259,12 +259,12 @@ test("per-option availability persists across admin save and reopen", async ({ p
       categoryId: "cat-vape",
       productKind: "vape-device",
       salesChannels: ["retail"],
-      image: "/images/ufo-hero.webp",
-      images: ["/images/ufo-hero.webp", "/images/categories/vape.webp"],
+      image: "/images/categories/pod.webp",
+      images: ["/images/categories/pod.webp", "/images/categories/vape.webp"],
       variantType: "color",
       variantValueIds: ["black", "silver"],
       variantImages: {
-        black: "/images/ufo-hero.webp",
+        black: "/images/categories/pod.webp",
         silver: "/images/categories/vape.webp",
       },
       retailPriceRial: 1_250_000,
@@ -300,6 +300,27 @@ test("per-option availability persists across admin save and reopen", async ({ p
   await expect(reopenedTable.getByLabel("قابل سفارش بودن مشکی")).not.toBeChecked();
   await expect(reopenedTable.getByLabel("انتخاب نقره‌ای به عنوان پیش‌فرض")).toBeChecked();
   await reopened.getByRole("button", { name: "بستن" }).click();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`/products/${slug}`);
+  const unavailableThumbnail = page.getByRole("button", {
+    name: "محصول وضعیت تنوع مرورگر مشکی - ناموجود",
+    exact: true,
+  });
+  const availableThumbnail = page.getByRole("button", {
+    name: "محصول وضعیت تنوع مرورگر نقره‌ای",
+    exact: true,
+  });
+  await expect(unavailableThumbnail).toHaveAttribute("data-availability", "unavailable");
+  await expect(unavailableThumbnail).toHaveClass(/product-detail-unavailable-thumbnail/);
+  await expect(availableThumbnail).toHaveAttribute("data-availability", "available");
+  expect(
+    await unavailableThumbnail.locator("img").evaluate((image) => getComputedStyle(image).filter),
+  ).toContain("grayscale(1)");
+  expect(
+    await availableThumbnail.locator("img").evaluate((image) => getComputedStyle(image).filter),
+  ).toBe("none");
+  await page.screenshot({ path: "test-results/unavailable-variant-thumbnail-390.png" });
 });
 
 test("product availability persists and remains visible but unpurchasable responsively", async ({

@@ -262,19 +262,23 @@ export function ProductDetailClient({
             const thumbnailOption = variantOptions.find(
               (option) => option.id === imageVariantValueMap.get(image),
             );
+            const thumbnailUnavailable = thumbnailOption?.disabled === true;
             return (
               <button
                 key={`${image}-${index}`}
                 type="button"
                 onClick={() => selectImage(image)}
+                data-availability={thumbnailUnavailable ? "unavailable" : "available"}
                 className={`group relative aspect-[3/4] w-[4.25rem] shrink-0 snap-start select-none overflow-hidden rounded-xl border bg-[#091019] transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 sm:w-auto motion-reduce:transition-none ${
                   !purchasable ? "product-detail-unavailable-media opacity-75" : ""
-                } ${
+                } ${thumbnailUnavailable ? "product-detail-unavailable-thumbnail" : ""} ${
                   active
                     ? "border-cyan-300 ring-2 ring-cyan-300/30"
                     : "border-white/10 hover:border-cyan-300/70"
                 }`}
-                aria-label={`${product.nameFa} ${thumbnailOption?.labelFa ?? index + 1}`}
+                aria-label={`${product.nameFa} ${thumbnailOption?.labelFa ?? index + 1}${
+                  thumbnailUnavailable ? " - ناموجود" : ""
+                }`}
                 aria-pressed={active}
               >
                 <ProtectedProductImage
